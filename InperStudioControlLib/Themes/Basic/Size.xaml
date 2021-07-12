@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <sys:Double x:Key="InperNormalFontSize">12</sys:Double>
+    <sys:Double x:Key="InperSmallFontSize">10</sys:Double>
+    <sys:Double x:Key="InperLargeFontSize">14</sys:Double>
+
+    <CornerRadius x:Key="InperDialogWindowCornerRadius">10</CornerRadius>
+    <CornerRadius x:Key="InperDefaultCornerRadius">4</CornerRadius>
+    
+</ResourceDictionary>

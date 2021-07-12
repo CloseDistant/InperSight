@@ -1,0 +1,38 @@
+﻿<inper:InperDialogWindow x:Class="InperStudio.Views.DataPathConfigView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:local="clr-namespace:InperStudio.Views"
+        xmlns:global="clr-namespace:InperStudio.Lib.Bean"
+        IsShowTopAllButton="False" IsShowOtherButton="False" FontFamily="{DynamicResource InperFontFamily}"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataPathConfigViewModel}"
+        Width="600" Height="400" MinWidth="200" MinHeight="200" Title="Config" ConfirmClickEvent="{s:Action InperDialogWindow_ConfirmClickEvent}">
+    <inper:InperDialogWindow.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass"/>
+    </inper:InperDialogWindow.Resources>
+    <Grid Background="{DynamicResource InperDialogContentColor}">
+        <Grid x:Name="Path"  Visibility="Collapsed">
+            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Height="30">
+                <Button Style="{StaticResource ButtonPrimary}" FontFamily="{DynamicResource InperFontFamily}" Command="{s:Action ChoosePath}" CommandParameter="Path" Background="{DynamicResource InperTheme}" Content="Path"  hc:BorderElement.CornerRadius="4 0 0 4" />
+                <TextBox hc:InfoElement.Placeholder="Storage Path" Text="{Binding Source={StaticResource InperGlobalClass},Path=DataPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource TextBoxExtend}" MinWidth="100" IsEnabled="False" hc:BorderElement.CornerRadius="0" Padding="10 0" x:Name="pathText"  />
+                <TextBox Style="{DynamicResource TextBoxExtend}"  Text="{Binding Source={StaticResource InperGlobalClass},Path=DataFolderName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" hc:InfoElement.Placeholder="File name" MinWidth="100" x:Name="fileName" />
+            </WrapPanel>
+        </Grid>
+        <Grid x:Name="Load" Visibility="Collapsed">
+            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Height="30">
+                <Button Style="{StaticResource ButtonPrimary}" FontFamily="{DynamicResource InperFontFamily}" Command="{s:Action ChoosePath}" Background="{DynamicResource InperTheme}" Content="Path"  CommandParameter="Load"   hc:BorderElement.CornerRadius="4 0 0 4" />
+                <TextBox hc:InfoElement.Placeholder="Storage Path" Style="{DynamicResource TextBoxExtend}" MinWidth="100" IsEnabled="False" hc:BorderElement.CornerRadius="0" Padding="10 0" x:Name="loadPath"    />
+            </WrapPanel>
+        </Grid>
+        <Grid x:Name="Save" Visibility="Collapsed">
+            <WrapPanel>
+                <Button Style="{DynamicResource InperFreeButton}"></Button>
+            </WrapPanel>
+        </Grid>
+    </Grid>
+</inper:InperDialogWindow>

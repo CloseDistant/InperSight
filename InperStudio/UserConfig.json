@@ -1,0 +1,91 @@
+{
+  "start": {
+    "immediately": false,
+    "delay": {
+      "isActive": false,
+      "value": 0
+    },
+    "atTime": {
+      "isActive": false,
+      "hours": 0,
+      "minutes": 0,
+      "seconds": 0
+    },
+    "Trigger": {
+      "isActive": false,
+      "source": "trig2",
+      "priTrigger": 100,
+      "threshodMin": 3.99,
+      "threshodMax": 5.99
+    }
+  },
+  "stop": {
+    "immediately": false,
+    "delay": {
+      "isActive": false,
+      "value": 0
+    },
+    "atTime": {
+      "isActive": false,
+      "hours": 0,
+      "minutes": 0,
+      "seconds": 0
+    },
+    "Trigger": {
+      "isActive": false,
+      "source": "trig2",
+      "priTrigger": 100,
+      "threshodMin": 3.99,
+      "threshodMax": 5.99
+    }
+  },
+  "eventPanelProperties": {
+    "heightAuto": true,
+    "heightFixed": false,
+    "heightFixedValue": 100,
+    "displayLockedBottom": true,
+    "displayNameVisible": true
+  },
+  "cameraSignalSettings": {
+    "exposure": 30,
+    "sampling": 50,
+    "brightness": 40,
+    "recordMode": {
+      "isContinuous": true,
+      "isInterval": false,
+      "duration": 10,
+      "interval": 10,
+      "delay": 10
+    },
+    "lightMode": [
+      {
+        "isActive": false,
+        "groupId": 0,
+        "waveType": "410 nm",
+        "lightPower": 50
+      }
+    ],
+    "cameraChannels": [
+      {
+        "channelId": 0,
+        "name": "test",
+        "roi": 40
+      }
+    ]
+  },
+  "eventSettings": {
+    "channels": [
+      {
+        "channelId": 0,
+        "name": "test",
+        "type": "marker",
+        "isActive": false,
+        "hotkeys": "F1",
+        "deltaF": 1,
+        "bgColor": "#000000"
+      }
+    ],
+    "marker": null,
+    "output": null
+  }
+}

@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="InperTitlePageColor">#F8F2F4</SolidColorBrush>
+    <SolidColorBrush x:Key="InperMainPageColor">#F9F9F9</SolidColorBrush>
+    <SolidColorBrush x:Key="InperDialogContentColor">#F6F6F6</SolidColorBrush>
+    <SolidColorBrush x:Key="InperTitleTextColor" >#333333</SolidColorBrush>
+    <SolidColorBrush x:Key="InperDialogButtonColor">#D7D7D7</SolidColorBrush>
+    <SolidColorBrush x:Key="InperListboxEvenColor">#FDFAFF</SolidColorBrush>
+    <SolidColorBrush x:Key="InperListboxOddColor">#FDFDFD</SolidColorBrush>
+</ResourceDictionary>

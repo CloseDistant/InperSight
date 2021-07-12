@@ -1,0 +1,53 @@
+﻿<hc:BlurWindow x:Class="InperStudio.Views.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:local="clr-namespace:InperStudio.Views"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        mc:Ignorable="d"
+        BorderBrush="{DynamicResource InperTheme}"
+        CloseButtonHoverBackground="{DynamicResource DarkMaskBrush}"
+        CloseButtonHoverForeground="{StaticResource PrimaryTextBrush}"
+        NonClientAreaBackground="{DynamicResource InperTheme}"
+        NonClientAreaForeground="White"
+        Icon="../inper_studio_icon_96.ico"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
+        Title="inper" Height="800" Width="1282" MinWidth="1000" MinHeight="660">
+    <Grid Background="{StaticResource InperMainPageColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <hc:TransitioningContentControl Grid.Row="0" TransitionMode="Top2Bottom">
+            <Grid Margin="0 5 0 0" Background="{StaticResource InperTitlePageColor}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width=".15*"/>
+                </Grid.ColumnDefinitions>
+                <ContentControl Grid.Column="0" x:Name="manulControl" s:View.Model="{Binding ManulControlViewModel}"/>
+                <ToggleButton Grid.Column="1" Style="{StaticResource ToggleButtonSwitch}" Checked="{s:Action ButtonVisibilitySwitch_Checked}" Unchecked="{s:Action ButtonVisibilitySwitch_Unchecked}" Name="buttonVisibilitySwitch" IsChecked="True"/>
+            </Grid>
+        </hc:TransitioningContentControl>
+        <Border VerticalAlignment="Bottom" BorderBrush="#eee" BorderThickness="1"/>
+        <Grid Grid.Row="1" Name="main">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width=".2*" />
+            </Grid.ColumnDefinitions>
+            <hc:TransitioningContentControl TransitionMode="Left2Right">
+                <ContentControl s:View.Model="{Binding ActiveItem}"/>
+            </hc:TransitioningContentControl>
+            <hc:TransitioningContentControl Grid.Column="1" TransitionMode="Right2Left">
+                <local:LeftToolsControlView x:Name="RightToolsView" DataContext="{Binding LeftToolsControlViewModel}" />
+            </hc:TransitioningContentControl>
+            <GridSplitter Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="1" Opacity=".2"  />
+        </Grid>
+        <ResizeGrip Width="10" Height="10" x:Name="ResizeGrip" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="1" IsTabStop="False" Visibility="Visible" WindowChrome.ResizeGripDirection="BottomRight" />
+        <ScrollViewer Grid.RowSpan="2" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right" Panel.ZIndex="9999">
+            <StackPanel  hc:Growl.Token="SuccessMsg" VerticalAlignment="Top" Margin="0,10,10,10"/>
+        </ScrollViewer>
+    </Grid>
+</hc:BlurWindow>

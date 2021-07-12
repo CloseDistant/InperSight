@@ -1,0 +1,16 @@
+﻿<inp:InperDialogWindow x:Class="InperStudio.Views.VideoWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        xmlns:local="clr-namespace:InperStudio.Views"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:ctrl="clr-namespace:InperStudio.Views.Control"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
+        Title="Video Window" Height="450" Width="500" MinWidth="500" MinHeight="450" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}">
+    <Grid Background="{DynamicResource InperTitlePageColor}">
+        <Image Grid.Row="0" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap}"  />
+    </Grid>
+</inp:InperDialogWindow>

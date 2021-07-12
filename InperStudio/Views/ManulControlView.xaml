@@ -1,0 +1,171 @@
+﻿<UserControl x:Class="InperStudio.Views.ManulControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:vm="clr-namespace:InperStudio.ViewModels"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:global="clr-namespace:InperStudio.Lib.Bean"
+             xmlns:lib="clr-namespace:InperStudio.Lib.Enum"
+             xmlns:local="clr-namespace:InperStudio.Views"
+             d:DataContext="{d:DesignInstance vm:ManulControlViewModel}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#7D7D7D"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0 3"/>
+        </Style>
+        <Style TargetType="{x:Type Image}">
+            <Setter Property="Width" Value="25" />
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Margin" Value="0 2"/>
+        </Style>
+        <Style TargetType="{x:Type Path}">
+            <Setter Property="Width" Value="25" />
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Margin" Value="0 2"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid x:Name="Root_Gird">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition  Width="1*" />
+            <ColumnDefinition  Width="2*"  />
+            <ColumnDefinition  Width="2*"  />
+            <ColumnDefinition  Width="2*"  />
+            <ColumnDefinition  Width="2*"  />
+            <ColumnDefinition  Width="3*"  />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock>File</TextBlock>
+            <StackPanel HorizontalAlignment="Center">
+                <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DataPathShow}" CommandParameter="Path" >
+                    <StackPanel>
+                        <Image Source="/Lib/Images/InperFile.png"/>
+                        <TextBlock>Path</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock>Config</TextBlock>
+            <WrapPanel HorizontalAlignment="Center">
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DataPathShow}" CommandParameter="Load">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Config_Load.png"/>
+                            <TextBlock>Load</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DataPathShow}" CommandParameter="Save">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Config_Save.png"/>
+                            <TextBlock>Save</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="2"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock>Signal</TextBlock>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" >
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Camera">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Signal_Camera.png"/>
+                            <TextBlock>Camera</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Analog">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Signal_analogInput.png"/>
+                            <TextBlock>Analog</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="3"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock>Event</TextBlock>
+            <WrapPanel HorizontalAlignment="Center">
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Event_marker.png"/>
+                            <TextBlock>Marker</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Output">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Event_output.png"/>
+                            <TextBlock>Output</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="4"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock>Addition</TextBlock>
+            <WrapPanel HorizontalAlignment="Center">
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Addition_trigger.png"/>
+                            <TextBlock>Trigger</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Video">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Addition_Video.png"/>
+                            <TextBlock>Video</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="5">
+            <TextBlock>Record</TextBlock>
+            <WrapPanel HorizontalAlignment="Center">
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Preview"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Record_preview.png"/>
+                            <TextBlock>Preview</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Start"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Record_start.png"/>
+                            <TextBlock>Start</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" x:Name="stop"  Command="{s:Action RecordSettingsShow}" CommandParameter="Stop"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsStop,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Record_stop.png"/>
+                            <TextBlock>Stop</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

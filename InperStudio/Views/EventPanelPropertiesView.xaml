@@ -1,0 +1,56 @@
+﻿<inp:InperDialogWindow x:Class="InperStudio.Views.EventPanelPropertiesView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:global="clr-namespace:InperStudio.Lib.Bean"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:local="clr-namespace:InperStudio.Views" 
+        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False"
+        Title="Event Panel Properties" Height="300" Width="400" d:DataContext="{d:DesignInstance Type=vm:EventPanelPropertiesViewModel}">
+    <inp:InperDialogWindow.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass"/>
+    </inp:InperDialogWindow.Resources>
+    <Grid Background="{DynamicResource InperDialogContentColor}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Margin="20">
+            <Grid Margin="0 10" >
+                <TextBlock Text="Height (px)" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
+                <hc:Divider Width="50" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
+            </Grid>
+            <Grid Margin="0 10">
+                <RadioButton x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightAuto ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                    <TextBlock Text="Auto" Margin="5 0"/>
+                </RadioButton>
+            </Grid>
+            <Grid Margin="0 10">
+                <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixed ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                    <TextBlock Text="Fixed" Margin="5 0" />
+                </RadioButton>
+                <hc:TextBox Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />
+            </Grid>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Margin="20">
+            <Grid Margin="0 10" >
+                <TextBlock Text="Display" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
+                <hc:Divider Width="70" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
+            </Grid>
+            <Grid Margin="0 10">
+                <CheckBox  HorizontalAlignment="Left" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayLockedBottom ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                    <TextBlock Text="Locked to bottom" Margin="5 0"/>
+                </CheckBox>
+            </Grid>
+            <Grid Margin="0 10">
+                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayNameVisible ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                    <TextBlock Text="Name Visible" Margin="5 0"/>
+                </CheckBox>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</inp:InperDialogWindow>
