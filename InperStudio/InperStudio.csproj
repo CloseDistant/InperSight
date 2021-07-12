@@ -175,7 +175,6 @@
     <Compile Include="Lib\Bean\BehaviorRecorderKit.cs" />
     <Compile Include="Lib\Bean\BindableObject.cs" />
     <Compile Include="Lib\Bean\Channel\CameraChannel.cs" />
-    <Compile Include="Lib\Bean\Channel\Class1.cs" />
     <Compile Include="Lib\Bean\Channel\EventChannel.cs" />
     <Compile Include="Lib\Bean\HPTimer.cs" />
     <Compile Include="Lib\Bean\InperGlobalClass.cs" />
