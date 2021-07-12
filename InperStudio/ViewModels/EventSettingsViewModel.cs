@@ -47,7 +47,6 @@ namespace InperStudio.ViewModels
                 default:
                     break;
             }
-            //if (@enum == EventSettingsTypeEnum.Marker)
             {
                 for (int i = 0; i < 8; i++)
                 {
