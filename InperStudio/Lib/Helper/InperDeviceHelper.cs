@@ -1,5 +1,6 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Enum;
 using InperStudio.ViewModels;
 using InperStudioControlLib.Lib.DeviceAgency;
 using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
@@ -45,6 +46,7 @@ namespace InperStudio.Lib.Helper
         public readonly DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         private readonly AutoResetEvent _DataEvent = new AutoResetEvent(false);
         public readonly object _SignalQsLocker = new object();
+        private readonly object _EventQLock = new object();
 
         private Task updateTask;
         private Task frameProcTask;
@@ -53,7 +55,7 @@ namespace InperStudio.Lib.Helper
         private long _PlottingStartTime;
 
         private short[] _SwapBuffer;
-
+        private Queue<long> EventTimeSet = new Queue<long>();
         #region
         public int VisionWidth = 720;
         public int VisionHeight = 540;
@@ -66,9 +68,9 @@ namespace InperStudio.Lib.Helper
         /// 每个通道对应的数据
         /// </summary>
         public Dictionary<int, SignalData> _SignalQs = new Dictionary<int, SignalData>();
-
         public ConcurrentDictionary<int, Mat> ROIMasks { get; set; } = new ConcurrentDictionary<int, Mat>();
         public BindableCollection<CameraChannel> CameraChannels { get; set; } = new BindableCollection<CameraChannel>();
+        public EventChannelChart EventChannelChart { get; set; } = new EventChannelChart();
 
         private BindableCollection<WaveGroup> lightWaveLength = new BindableCollection<WaveGroup>();
         public BindableCollection<WaveGroup> LightWaveLength { get => lightWaveLength; set => SetAndNotify(ref lightWaveLength, value); }
@@ -95,11 +97,37 @@ namespace InperStudio.Lib.Helper
             {
                 _ = _DataEvent.Set();
             };
+            //这里用来初始化event chart
+            if (InperGlobalClass.EventSettings.Channels.Count > 0)
+            {
+                InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                {
+                    if (x.Type == EventSettingsTypeEnum.Marker.ToString())
+                    {
+                        EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = x.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(x.BgColor) });
+                        EventChannelChart.EventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                    }
+                });
+            }
         }
 
         private void Instance_OnPortStatusChanged(object sender, PortStatusChangedEventArgs e)
         {
-            Console.WriteLine(e.PortStatus);
+            if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
+            {
+                Monitor.Enter(_EventQLock);
+                if (EventTimeSet.Count > 0)
+                {
+                    foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in EventChannelChart.EventQs)
+                    {
+                        item.Value.Enqueue(new KeyValuePair<long, double>(EventTimeSet.Last(), e.PortStatus[item.Key]));
+                    }
+                    EventTimeSet.Clear();
+                }
+                //Console.WriteLine(" value0:" + e.PortStatus[0] + " value1:" + e.PortStatus[1] + " value2:" + e.PortStatus[2] + " value3:" + e.PortStatus[3] + " value4:" + e.PortStatus[4] + " value5:" + e.PortStatus[5] + " value6:" + e.PortStatus[6] + " value7:" + e.PortStatus[7]);
+                Monitor.Exit(_EventQLock);
+            }
+
         }
 
         private void Instance_OnImageGrabbed(object sender, MarkedMat e)
@@ -256,7 +284,8 @@ namespace InperStudio.Lib.Helper
                     foreach (MarkedMat m in mmats)
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
-                        long sig_time_base = _PlottingStartTime;
+
+                        EventTimeSet.Enqueue(ts);
 
                         ConcurrentDictionary<int, double> ploting_data = new ConcurrentDictionary<int, double>();
                         if (CameraChannels.Count > 0)
@@ -267,10 +296,7 @@ namespace InperStudio.Lib.Helper
 
                                   ploting_data[mask.ChannelId] = r;
                               });
-                            if (sig_time_base != _PlottingStartTime)
-                            {
-                                continue;
-                            }
+
                             this.AppendData(ploting_data, m.Group, ts);
                         }
                     }
@@ -308,36 +334,77 @@ namespace InperStudio.Lib.Helper
         }
         public void UpdateDataProc()
         {
-            var t = DateTime.Now.Ticks;
             while (isLoop)
             {
                 _ = _DataEvent.WaitOne();
                 Monitor.Enter(_SignalQsLocker);
                 try
                 {
+                    object synSpan = new object();
                     if (CameraChannels.Count > 0)
                     {
-                        foreach (KeyValuePair<int, SignalData> kv in _SignalQs)
+                        _ = Parallel.ForEach(_SignalQs, kv =>
                         {
                             CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
-                            if (channel.LightModes.Count >= 0)
+                            if (channel.LightModes.Count > 0)
                             {
-                                foreach (IRenderableSeriesViewModel item in channel.RenderableSeries)
-                                {
-                                    int id = int.Parse((item as LineRenderableSeriesViewModel).Tag.ToString());
+                                _ = Parallel.ForEach(channel.RenderableSeries, item =>
+                                 {
+                                     int id = int.Parse((item as LineRenderableSeriesViewModel).Tag.ToString());
 
-                                    using (item.DataSeries.SuspendUpdates())
-                                    {
-                                        Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(kv.Value.ValuePairs[id]);
-                                        if (s0_plot_data.Item1.Length > 0)
-                                        {
-                                            kv.Value.ValuePairs[id].Clear();
-                                            (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
-                                        }
-                                    }
-                                }
+                                     using (item.DataSeries.SuspendUpdates())
+                                     {
+                                         Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(kv.Value.ValuePairs[id]);
+                                         if (s0_plot_data.Item1.Length > 0)
+                                         {
+                                             synSpan = s0_plot_data.Item1;
+                                             kv.Value.ValuePairs[id].Clear();
+                                             (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                         }
+                                     }
+                                 });
                             }
+                        });
+                        if (Monitor.TryEnter(_EventQLock))
+                        {
+                            _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
+                            {
+                                if (EventChannelChart.RenderableSeries.Count > 0)
+                                {
+                                    _ = Parallel.ForEach(EventChannelChart.RenderableSeries, item =>
+                                    {
+                                        int id = int.Parse((item as LineRenderableSeriesViewModel).Tag.ToString());
+                                        if (q.Key == id)
+                                        {
+                                            using (item.DataSeries.SuspendUpdates())
+                                            {
+                                                Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(q.Value);
+                                                q.Value.Clear();
+
+                                                if (s0_plot_data.Item1.Count() == 0)
+                                                {
+                                                    if ((synSpan as TimeSpan[]) != null)
+                                                    {
+                                                        int length = (synSpan as TimeSpan[]).Length;
+                                                        s0_plot_data = new Tuple<TimeSpan[], double[]>(new TimeSpan[length], new double[length]);
+
+                                                        for (int i = 0; i < (synSpan as TimeSpan[]).Length; i++)
+                                                        {
+                                                            s0_plot_data.Item1[i] = (synSpan as TimeSpan[])[i];
+                                                            s0_plot_data.Item2[i] = item.DataSeries.YValues.Count > 0 ? (double)item.DataSeries.YValues[item.DataSeries.YValues.Count - 1] : 0;
+                                                        }
+                                                    }
+                                                }
+                                                (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            Monitor.Exit(_EventQLock);
                         }
+
                     }
                 }
                 catch (Exception ex)

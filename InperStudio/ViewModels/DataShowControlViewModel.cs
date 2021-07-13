@@ -24,11 +24,13 @@ namespace InperStudio.ViewModels
         private DataShowControlView view;
         private BindableCollection<CameraChannel> cameraChannels;
         public BindableCollection<CameraChannel> ChartDatas { get => cameraChannels; set => SetAndNotify(ref cameraChannels, value); }
+        public EventChannelChart EventChannelChart { get; set; }
         #endregion
         public DataShowControlViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
             ChartDatas = InperDeviceHelper.Instance.CameraChannels;
+            EventChannelChart = InperDeviceHelper.Instance.EventChannelChart;
         }
         protected override void OnViewLoaded()
         {

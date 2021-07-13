@@ -232,7 +232,7 @@ namespace InperStudio.ViewModels
                         };
                         item.LightModes.Add(mode);
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = wave.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
-                        //line.DataSeries.DataSeriesChanged += DataSeries_DataSeriesChanged;
+                     
                         item.RenderableSeries.Add(line);
                         InperDeviceHelper._SignalQs[index - 1].ValuePairs.Add(mode.LightType, new Queue<KeyValuePair<long, double>>());
                     }
@@ -261,45 +261,6 @@ namespace InperStudio.ViewModels
 
             return grid;
         }
-        private void DataSeries_DataSeriesChanged(object sender, DataSeriesChangedEventArgs e)
-        {
-            if (Monitor.TryEnter(_DataRangeLocker))
-            {
-                try
-                {
-                    var a = sender as LineRenderableSeriesViewModel;
-                    AdjustXVisibleRange(sender);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                }
-                finally
-                {
-                    Monitor.Exit(_DataRangeLocker);
-                }
-            }
-
-
-            return;
-        }
-        private void AdjustXVisibleRange(object sen)
-        {
-            IXyDataSeries<TimeSpan, double> enabled_ds = MainWindowViewModel.ChartDatas[0].S0DataSeries;
-            if (MainWindowViewModel.ChartDatas[0].S0DataSeries.Count > 1 && MainWindowViewModel.ChartDatas[0].S0DataSeries.Count > enabled_ds.Count)
-            {
-                enabled_ds = MainWindowViewModel.ChartDatas[0].S0DataSeries;
-            }
-
-
-            if (enabled_ds.Count > 1)
-            {
-                MainWindowViewModel.ChartDatas[0].XVisibleRange = new TimeSpanRange(enabled_ds.XValues.Last() - TimeSpan.FromSeconds(10), enabled_ds.XValues.Last());
-            }
-
-            return;
-        }
-
         public void Grid_MouseUp(object sender, MouseButtonEventArgs e)
         {
             isDown = false;

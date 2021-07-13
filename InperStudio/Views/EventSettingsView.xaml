@@ -66,7 +66,7 @@
                     </ComboBox>
                 </Grid>
                 <Grid Margin="0 20 0 0" >
-                    <hc:TextBox TextType="Double" Name="deltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0" hc:TitleElement.TitleWidth="65" hc:TitleElement.Background="Red" hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="δF/F (%)" />
+                    <hc:TextBox TextType="Double" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0" hc:TitleElement.TitleWidth="65" hc:TitleElement.Background="Red" hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="δF/F (%)" />
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>

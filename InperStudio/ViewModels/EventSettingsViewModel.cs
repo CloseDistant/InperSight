@@ -28,6 +28,7 @@ namespace InperStudio.ViewModels
 
         private BindableCollection<EventChannel> markerChannels = new BindableCollection<EventChannel>();
         public BindableCollection<EventChannel> MarkerChannels { get => markerChannels; set => SetAndNotify(ref markerChannels, value); }
+        public List<string> EventColorList { get; set; } = InperColorHelper.ColorPresetList;
         #endregion
         public EventSettingsViewModel(EventSettingsTypeEnum typeEnum)
         {
@@ -47,14 +48,29 @@ namespace InperStudio.ViewModels
                 default:
                     break;
             }
+            //读取所有通道
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    MarkerChannels.Add(new EventChannel() { IsActive = false, ChannelId = i + 1, Name = "DIO-" + (i + 1) + "-PFC", BgColor = InperColorHelper.ColorPresetList[i], Hotkeys = InperColorHelper.HotkeysList[i] });
+                    MarkerChannels.Add(new EventChannel() { IsActive = false, ChannelId = i, Name = "DIO-" + (i + 1) + "-PFC", BgColor = InperColorHelper.ColorPresetList[i], Hotkeys = InperColorHelper.HotkeysList[i] });
                 }
-                MarkerChannels[0].IsActive = true;
 
                 view.MarkerChannelCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
+            }
+            //配置文件匹配  并设置当前可用通道
+            foreach (EventChannelJson item in InperGlobalClass.EventSettings.Channels)
+            {
+                if (item.Type == @enum.ToString())
+                {
+                    MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).IsActive = item.IsActive;
+                }
+                else
+                {
+                    if (item.IsActive)
+                    {
+                        MarkerChannels.Remove(MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId));
+                    }
+                }
             }
         }
 
@@ -149,22 +165,9 @@ namespace InperStudio.ViewModels
                     {
                         markerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId).IsActive = false;
                         var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId);
-                        if (item == null)
+                        if (item != null)
                         {
-                            InperGlobalClass.EventSettings.Channels.Add(new EventChannelJson()
-                            {
-                                ChannelId = ch_active.ChannelId,
-                                IsActive = ch_active.IsActive,
-                                Name = ch_active.Name,
-                                BgColor = ch_active.BgColor,
-                                DeltaF = ch_active.DeltaF,
-                                Hotkeys = ch_active.Hotkeys,
-                                Type = @enum.ToString()
-                            });
-                        }
-                        else
-                        {
-                            item.IsActive = ch_active.IsActive;
+                            _ = InperGlobalClass.EventSettings.Channels.Remove(item);
                         }
                     }
                 }

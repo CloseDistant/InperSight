@@ -17,7 +17,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public bool IsActive { get; set; }
         public string BgColor { get; set; } = Brushes.Red.ToString();
         public string Hotkeys { get; set; }
-        public bool DeltaF { get; set; }
+        public double DeltaF { get; set; }
         /// <summary>
         /// 类型  区分是mark通道还是output通道
         /// </summary>

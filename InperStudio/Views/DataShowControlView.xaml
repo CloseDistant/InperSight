@@ -17,7 +17,7 @@
         <DataTemplate x:Key="ListDataTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
@@ -88,34 +88,58 @@
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>
-                    <Grid MouseDown="{s:Action Grid_MouseDown}"  VerticalAlignment="Bottom" x:Name="relativeBottom" Grid.Row="1" Background="Transparent" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayLockedBottom,Converter={StaticResource boolToVisibilityReverse},UpdateSourceTrigger=PropertyChanged}">
-                        <sc:SciChartSurface Background="Transparent"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
-                                
-                            <sc:SciChartSurface.XAxis>
-                                <sc:TimeSpanAxis DrawMajorBands="False"
+                    <Grid Margin="3 0 0 0" MouseDown="{s:Action Grid_MouseDown}"  VerticalAlignment="Bottom" x:Name="relativeBottom" Grid.Row="1" Background="Transparent" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayLockedBottom,Converter={StaticResource boolToVisibilityReverse},UpdateSourceTrigger=PropertyChanged}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
+                        <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+                            <TextBlock TextWrapping="Wrap" Text="Event" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center"/>
+                        </Border>
+                        <Grid Grid.Column="1">
+                            <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 20">
+                                <Button Margin="0 10 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                                    <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
+                                </Button>
+                                <Button Margin="0 10 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                                    <Path Fill="#1875F0" Stretch="Uniform" Data="M0,91.67h25v25h16.67V75H0V91.67z M25,25H0v16.67h41.67V0H25C25,0,25,25,25,25z M75,116.67h16.67v-25h25V75H75  V116.67z M91.67,25V0H75v41.67h41.67V25H91.67z"/>
+                                </Button>
+                                <Button Margin="0 10" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                                    <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Column="2">
+                            <sc:SciChartSurface Background="Transparent" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
+                                <sc:SciChartSurface.XAxis>
+                                    <sc:TimeSpanAxis DrawMajorBands="False"
                                            DrawMajorGridLines="False"
-                                           DrawMinorGridLines="False" Visibility="Visible" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/> 
-                            </sc:SciChartSurface.XAxis>
-                            <sc:SciChartSurface.YAxis>
-                                <sc:NumericAxis DrawMajorBands="False"
-                                DrawMajorGridLines="False"
-                                DrawMinorGridLines="False" AxisAlignment="Left" VisibleRange="-1,1"/>
-                                <!--VisibleRange="{Binding DoubleRange,Mode=TwoWay}"-->
-                            </sc:SciChartSurface.YAxis>
-                            <sc:SciChartSurface.ChartModifier>
-                                <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
-                                    <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
-                                    <!--<sc:MouseWheelZoomModifier  ReceiveHandledEvents="True"/>-->
-                                    <sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
-                                </sc:ModifierGroup>
-                            </sc:SciChartSurface.ChartModifier>
-                        </sc:SciChartSurface>
+                                           DrawMinorGridLines="False" Visibility="Visible" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </sc:SciChartSurface.XAxis>
+                                <sc:SciChartSurface.YAxis>
+                                    <sc:NumericAxis DrawMajorBands="False"
+                                    DrawMajorGridLines="False"
+                                    DrawMinorGridLines="False" AxisAlignment="Left" AutoRange="Never" VisibleRange="0,2"/>
+                                    <!--VisibleRange="{Binding DoubleRange,Mode=TwoWay}"-->
+                                </sc:SciChartSurface.YAxis>
+                                <sc:SciChartSurface.ChartModifier>
+                                    <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupI" >
+                                        <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
+                                        <!--<sc:MouseWheelZoomModifier  ReceiveHandledEvents="True"/>-->
+                                        <sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
+                                    </sc:ModifierGroup>
+                                </sc:SciChartSurface.ChartModifier>
+                            </sc:SciChartSurface>
+                        </Grid>
                     </Grid>
                 </Grid>
             </ScrollViewer>
         </Grid>
         <Grid Grid.Row="1" x:Name="fixedBottom" MouseDown="{s:Action Grid_MouseDown}"  Background="Transparent"  Visibility="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayLockedBottom,Converter={StaticResource boolToVisibilityPositive},UpdateSourceTrigger=PropertyChanged}">
-
+            
         </Grid>
         <Grid Grid.Row="2" Background="Gray">
             <sc:SciChartScrollbar Name="sciScroll" />
