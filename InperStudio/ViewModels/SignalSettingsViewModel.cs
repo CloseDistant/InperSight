@@ -39,7 +39,6 @@ namespace InperStudio.ViewModels
         private bool isDown = false;
         private int diameter = 40;
         private Grid moveGrid = null;
-        private readonly object _DataRangeLocker = new object();
         public Grid MoveGrid { get => moveGrid; set => SetAndNotify(ref moveGrid, value); }
         public int Diameter { get => diameter; set => SetAndNotify(ref diameter, value); }
         //
@@ -108,8 +107,8 @@ namespace InperStudio.ViewModels
 
                 InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
                 {
-                    Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.Left, x.Top);
-                
+                    Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x.Left, x.Top);
+
                     this.view.ellipseCanvas.Children.Add(grid);
                 });
 
@@ -126,7 +125,7 @@ namespace InperStudio.ViewModels
                 if (EllipseBorder.Count < 9)
                 {
                     int index = EllipseBorder.Count == 0 ? 1 : int.Parse((EllipseBorder.Last().Children[0] as TextBlock).Text) + 1;
-                    Grid grid = DrawCircle(index, Diameter);
+                    Grid grid = DrawCircle(index, Diameter, 10, 0);
                     if (EllipseBorder.Count > 4)
                     {
                         grid.SetValue(Canvas.LeftProperty, 55.0);
@@ -182,7 +181,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        private Grid DrawCircle(int index, double diameter, double left = 1, double top = 1)
+        private Grid DrawCircle(int index, double diameter, double ytop, double ybottom, double left = 1, double top = 1)
         {
             Grid grid = new Grid() { Cursor = Cursors.Hand, Background = Brushes.Transparent, Name = "ROI_" + index };
             grid.SetValue(Canvas.LeftProperty, left);
@@ -216,7 +215,8 @@ namespace InperStudio.ViewModels
                 CameraChannel item = new CameraChannel()
                 {
                     ChannelId = index - 1,
-                    Name = "ROI-" + index + "-PFC"
+                    Name = "ROI-" + index + "-PFC",
+                    YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop)
                 };
                 InperDeviceHelper._SignalQs.Add(index - 1, new SignalData());
 
@@ -232,7 +232,7 @@ namespace InperStudio.ViewModels
                         };
                         item.LightModes.Add(mode);
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = wave.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
-                     
+
                         item.RenderableSeries.Add(line);
                         InperDeviceHelper._SignalQs[index - 1].ValuePairs.Add(mode.LightType, new Queue<KeyValuePair<long, double>>());
                     }
@@ -250,7 +250,9 @@ namespace InperStudio.ViewModels
                         Name = "ROI-" + index + "-PFC",
                         Left = double.Parse(grid.GetValue(Canvas.LeftProperty).ToString()),
                         Top = double.Parse(grid.GetValue(Canvas.TopProperty).ToString()),
-                        ROI = ellipse.Width
+                        ROI = ellipse.Width,
+                        YTop = ytop,
+                        YBottom = ybottom
                     }); ;
                 }
 

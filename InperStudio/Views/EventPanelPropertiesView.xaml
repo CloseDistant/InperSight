@@ -25,12 +25,12 @@
                 <hc:Divider Width="50" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
             </Grid>
             <Grid Margin="0 10">
-                <RadioButton x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightAuto ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightAuto  ,UpdateSourceTrigger=PropertyChanged}">
                     <TextBlock Text="Auto" Margin="5 0"/>
                 </RadioButton>
             </Grid>
             <Grid Margin="0 10">
-                <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixed ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixed  ,UpdateSourceTrigger=PropertyChanged}">
                     <TextBlock Text="Fixed" Margin="5 0" />
                 </RadioButton>
                 <hc:TextBox Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />

@@ -25,8 +25,15 @@ namespace InperStudio.ViewModels
             try
             {
                 this.view = this.View as EventPanelPropertiesView;
-                this.view.heightAuto.Checked += (s, e) => this.dataShowControlView.relativeBottom.Height = this.dataShowControlView.fixedBottom.Height = this.dataShowControlView.dataList.ActualHeight / this.dataShowControlView.dataList.Items.Count;
-                this.view.heightFixed.Checked += (s, e) => this.dataShowControlView.relativeBottom.Height = this.dataShowControlView.fixedBottom.Height = InperGlobalClass.EventPanelProperties.HeightFixedValue;
+
+                this.view.heightAuto.Checked += (s, e) =>
+                {
+                    this.dataShowControlView.relativeBottom.Height = this.dataShowControlView.fixedBottom.Height = this.dataShowControlView.dataList.ActualHeight / this.dataShowControlView.dataList.Items.Count;
+                };
+                this.view.heightFixed.Checked += (s, e) =>
+                {
+                    this.dataShowControlView.relativeBottom.Height = this.dataShowControlView.fixedBottom.Height = InperGlobalClass.EventPanelProperties.HeightFixedValue;
+                };
                 this.view.fixedValue.TextChanged += (s, e) => this.dataShowControlView.relativeBottom.Height = this.dataShowControlView.fixedBottom.Height = double.Parse(this.view.fixedValue.Text);
             }
             catch (Exception ex)

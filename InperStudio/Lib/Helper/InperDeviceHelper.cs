@@ -7,6 +7,7 @@ using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Charting.Visuals.Annotations;
 using SciChart.Charting.Visuals.RenderableSeries;
 using Stylet;
 using System;
@@ -17,6 +18,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -46,7 +48,7 @@ namespace InperStudio.Lib.Helper
         public readonly DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         private readonly AutoResetEvent _DataEvent = new AutoResetEvent(false);
         public readonly object _SignalQsLocker = new object();
-        private readonly object _EventQLock = new object();
+        public readonly object _EventQLock = new object();
 
         private Task updateTask;
         private Task frameProcTask;
@@ -284,8 +286,11 @@ namespace InperStudio.Lib.Helper
                     foreach (MarkedMat m in mmats)
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
-
-                        EventTimeSet.Enqueue(ts);
+                        if (Monitor.TryEnter(_EventQLock))
+                        {
+                            EventTimeSet.Enqueue(ts);
+                            Monitor.Exit(_EventQLock);
+                        }
 
                         ConcurrentDictionary<int, double> ploting_data = new ConcurrentDictionary<int, double>();
                         if (CameraChannels.Count > 0)
@@ -379,7 +384,6 @@ namespace InperStudio.Lib.Helper
                                             using (item.DataSeries.SuspendUpdates())
                                             {
                                                 Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(q.Value);
-                                                q.Value.Clear();
 
                                                 if (s0_plot_data.Item1.Count() == 0)
                                                 {
@@ -395,6 +399,7 @@ namespace InperStudio.Lib.Helper
                                                         }
                                                     }
                                                 }
+                                                q.Value.Clear();
                                                 (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
 
                                             }
@@ -439,7 +444,24 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
+        public void AddMarkerByHotkeys(string text,Color color)
+        {
+            int count = EventChannelChart.RenderableSeries.First().DataSeries.XValues.Count;
 
+            EventChannelChart.Annotations.Add(new VerticalLineAnnotationViewModel()
+            {
+                VerticalAlignment = VerticalAlignment.Stretch,
+                FontSize = 12,
+                ShowLabel = true,
+                Stroke = color,
+                LabelValue = text,
+                LabelTextFormatting = "12",
+                LabelPlacement = LabelPlacement.Left,
+                LabelsOrientation = System.Windows.Controls.Orientation.Vertical,
+                StrokeThickness = 1,
+                X1 = (IComparable)EventChannelChart.RenderableSeries.First().DataSeries.XValues[count - 1]
+            });
+        }
         public void StopCollect()
         {
             try

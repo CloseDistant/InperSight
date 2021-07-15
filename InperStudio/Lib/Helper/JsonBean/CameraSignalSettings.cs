@@ -32,5 +32,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double ROI { get; set; }
         public double Left { get; set; }
         public double Top { get; set; }
+        public double YTop { get; set; }
+        public double YBottom { get; set; }
     }
 }

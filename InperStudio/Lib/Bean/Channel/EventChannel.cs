@@ -1,4 +1,5 @@
 ﻿using SciChart.Charting.Model.ChartSeries;
+using SciChart.Charting.Visuals.Annotations;
 using SciChart.Data.Model;
 using Stylet;
 using System;
@@ -21,6 +22,9 @@ namespace InperStudio.Lib.Bean.Channel
     public class EventChannelChart : PropertyChangedBase
     {
         public Dictionary<int, Queue<KeyValuePair<long, double>>> EventQs { get; set; } = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
+
+        private BindableCollection<IAnnotationViewModel> annotations = new BindableCollection<IAnnotationViewModel>();
+        public BindableCollection<IAnnotationViewModel> Annotations { get => annotations; set => SetAndNotify(ref annotations, value); }
         public ScrollingViewportManager ViewportManager { get; set; } = new ScrollingViewportManager(100000000);
         private IRange range = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
         public IRange XVisibleRange { get => range; set => SetAndNotify(ref range, value); }

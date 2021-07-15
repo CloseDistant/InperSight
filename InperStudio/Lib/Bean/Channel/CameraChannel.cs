@@ -23,12 +23,14 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public Mat Mask { get; set; }
         public double ROI { get; set; }
-        private BindableCollection<IRenderableSeriesViewModel> renderableSeriesViewModels= new BindableCollection<IRenderableSeriesViewModel>();
+        private BindableCollection<IRenderableSeriesViewModel> renderableSeriesViewModels = new BindableCollection<IRenderableSeriesViewModel>();
         public BindableCollection<IRenderableSeriesViewModel> RenderableSeries { get => renderableSeriesViewModels; set => SetAndNotify(ref renderableSeriesViewModels, value); }
         public List<LightMode<TimeSpan, double>> LightModes { get; set; } = new List<LightMode<TimeSpan, double>>();
         public ScrollingViewportManager ViewportManager { get; set; } = new ScrollingViewportManager(100000000);
-        private IRange range = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
-        public IRange XVisibleRange { get => range; set => SetAndNotify(ref range, value); }
+        private IRange xrange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
+        public IRange XVisibleRange { get => xrange; set => SetAndNotify(ref xrange, value); }
+        private IRange yrange = new DoubleRange(0, 10);
+        public IRange YVisibleRange { get => yrange; set => SetAndNotify(ref yrange, value); }
     }
     public class LightMode<TX, TY> : PropertyChangedBase
         where TX : IComparable

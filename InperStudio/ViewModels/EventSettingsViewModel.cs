@@ -6,11 +6,14 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
+using SciChart.Charting.Model.ChartSeries;
+using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,7 +58,6 @@ namespace InperStudio.ViewModels
                     MarkerChannels.Add(new EventChannel() { IsActive = false, ChannelId = i, Name = "DIO-" + (i + 1) + "-PFC", BgColor = InperColorHelper.ColorPresetList[i], Hotkeys = InperColorHelper.HotkeysList[i] });
                 }
 
-                view.MarkerChannelCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
             }
             //配置文件匹配  并设置当前可用通道
             foreach (EventChannelJson item in InperGlobalClass.EventSettings.Channels)
@@ -72,6 +74,7 @@ namespace InperStudio.ViewModels
                     }
                 }
             }
+            view.MarkerChannelCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
         }
 
         #region method Marker
@@ -111,7 +114,21 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    bt.Content = bt.Content == null ? e.Key.ToString() : bt.Content + "+" + e.Key.ToString();
+                    if (bt.Content != null)
+                    {
+                        if (bt.Content.ToString().Split('+').Length < 3)
+                        {
+                            bt.Content = bt.Content == null ? e.Key.ToString() : bt.Content + "+" + e.Key.ToString();
+                        }
+                        else
+                        {
+                            Growl.Info(new GrowlInfo() { Message = "快捷键数量超出限制", Token = "SuccessMsg", WaitTime = 1 });
+                        }
+                    }
+                    else
+                    {
+                        bt.Content = bt.Content == null ? e.Key.ToString() : bt.Content + "+" + e.Key.ToString();
+                    }
                 }
                 MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
             }
@@ -163,19 +180,27 @@ namespace InperStudio.ViewModels
                 {
                     if (ch_active != null)
                     {
-                        markerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId).IsActive = false;
+                        MarkerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId).IsActive = false;
                         var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId);
                         if (item != null)
                         {
                             _ = InperGlobalClass.EventSettings.Channels.Remove(item);
                         }
+                        Monitor.Enter(InperDeviceHelper.Instance._EventQLock);
+                        IRenderableSeriesViewModel render = InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.FirstOrDefault(x => ((LineRenderableSeriesViewModel)x).Tag.ToString() == ch_active.ChannelId.ToString());
+                        if (render != null)
+                        {
+                            _ = InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Remove(render);
+                            _ = InperDeviceHelper.Instance.EventChannelChart.EventQs.Remove(ch_active.ChannelId);
+                        }
+                        Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
                     }
                 }
                 else
                 {
                     if (ch != null)
                     {
-                        markerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId).IsActive = true;
+                        MarkerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId).IsActive = true;
 
                         var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId);
 
@@ -196,6 +221,11 @@ namespace InperStudio.ViewModels
                         {
                             item.IsActive = ch.IsActive;
                         }
+
+                        Monitor.Enter(InperDeviceHelper.Instance._EventQLock);
+                        InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = ch.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(ch.BgColor) });
+                        InperDeviceHelper.Instance.EventChannelChart.EventQs.Add(ch.ChannelId, new Queue<KeyValuePair<long, double>>());
+                        Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
 
                         view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(MarkerChannels.FirstOrDefault(x => x.IsActive == false).BgColor));
                         view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
