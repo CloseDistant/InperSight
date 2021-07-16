@@ -42,7 +42,9 @@ namespace InperStudio.ViewModels
                     Parallel.ForEach(ChartDatas, item =>
                     {
                         item.XVisibleRange = e.SelectedRange;
+                        EventChannelChart.XVisibleRange = e.SelectedRange;
                     });
+
                 };
 
                 this.view.dataList.PreviewMouseWheel += (s, e) =>
@@ -76,9 +78,17 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                var grid = sender as Grid;
                 if (e.ClickCount == 2)
                 {
-                    this.windowManager.ShowDialog(new EventPanelPropertiesViewModel(this.view));
+                    if (grid.Name.Equals("chartItem"))
+                    {
+                        this.windowManager.ShowDialog(new SignalPropertiesViewModel(SignalPropertiesTypeEnum.Camera));
+                    }
+                    else
+                    {
+                        this.windowManager.ShowDialog(new EventPanelPropertiesViewModel(this.view));
+                    }
                 }
             }
             catch (Exception ex)
@@ -160,21 +170,8 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
-        } 
-        public void EventYaxisAdd(object sender)
-        {
-            try
-            {
-                EventChannelChart channel = sender as EventChannelChart;
-                
-
-                
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
         }
+        
         public void YaxisReduce(object sender)
         {
             try
@@ -193,19 +190,7 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
-        }
-        public void EventYaxisReduce(object sender)
-        {
-            try
-            {
-                EventChannelChart channel = sender as EventChannelChart;
-                
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-        }
+        }      
         public void YaxisNormal(object sender)
         {
             try
@@ -221,19 +206,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        public void EventYaxisNormal(object sender)
-        {
-            try
-            {
-                EventChannelChart channel = sender as EventChannelChart;
-
-                
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-        }
+         
         #endregion
     }
 }

@@ -252,7 +252,7 @@ namespace InperStudio.ViewModels
                         Top = double.Parse(grid.GetValue(Canvas.TopProperty).ToString()),
                         ROI = ellipse.Width,
                         YTop = ytop,
-                        YBottom = ybottom
+                        YBottom = ybottom,
                     }); ;
                 }
 

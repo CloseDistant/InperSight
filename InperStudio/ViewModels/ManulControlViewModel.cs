@@ -35,13 +35,13 @@ namespace InperStudio.ViewModels
             {
                 if (e)
                 {
-                    View.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") == null)
-                        {
-                            windowManager.ShowWindow(new SignalSettingsViewModel(Lib.Enum.SignalSettingsTypeEnum.Camera));
-                        }
-                    }));
+                    _ = View.Dispatcher.BeginInvoke(new Action(() =>
+                      {
+                          if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") == null)
+                          {
+                              windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
+                          }
+                      }));
                 }
                 else
                 {

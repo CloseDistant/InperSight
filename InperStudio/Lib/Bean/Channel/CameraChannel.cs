@@ -23,6 +23,9 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public Mat Mask { get; set; }
         public double ROI { get; set; }
+        public bool Offset { get; set; }
+        public Filters Filters { get; set; } = new Filters();
+
         private BindableCollection<IRenderableSeriesViewModel> renderableSeriesViewModels = new BindableCollection<IRenderableSeriesViewModel>();
         public BindableCollection<IRenderableSeriesViewModel> RenderableSeries { get => renderableSeriesViewModels; set => SetAndNotify(ref renderableSeriesViewModels, value); }
         public List<LightMode<TimeSpan, double>> LightModes { get; set; } = new List<LightMode<TimeSpan, double>>();
@@ -43,5 +46,16 @@ namespace InperStudio.Lib.Bean.Channel
         private XyDataSeries<TX, TY> dataSeries = new XyDataSeries<TX, TY>();
         public XyDataSeries<TX, TY> XyDataSeries { get => dataSeries; set => SetAndNotify(ref dataSeries, value); }
         public SolidColorBrush WaveColor { get; set; }
+    }
+    public class Filters
+    {
+        public bool IsLowPass { get; set; }
+        public double LowPass { get; set; }
+        public bool IsHighPass { get; set; }
+        public double HighPass { get; set; }
+        public bool IsNotch { get; set; }
+        public double Notch { get; set; }
+        public bool IsSmooth { get; set; }
+        public double Smooth { get; set; }
     }
 }

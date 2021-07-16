@@ -34,5 +34,18 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double Top { get; set; }
         public double YTop { get; set; }
         public double YBottom { get; set; }
+        public bool Offset { get; set; }
+        public Filters Filters { get; set; } = new Filters();
+    }
+    public class Filters
+    {
+        public bool IsLowPass { get; set; }
+        public double LowPass { get; set; }
+        public bool IsHighPass { get; set; }
+        public double HighPass { get; set; }
+        public bool IsNotch { get; set; }
+        public double Notch { get; set; }
+        public bool IsSmooth { get; set; }
+        public double Smooth { get; set; }
     }
 }
