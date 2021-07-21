@@ -16,7 +16,6 @@ namespace InperStudio.ViewModels.Tests
         {
             PrivateObject po = new PrivateObject(new MainWindowViewModel(null));
             Assert.AreEqual(po.Invoke("Test", 1, 1),2);
-
         }
     }
 }

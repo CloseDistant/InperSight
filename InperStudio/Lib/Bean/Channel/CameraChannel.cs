@@ -17,6 +17,7 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public int ChannelId { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; }
     }
 
     public class CameraChannel : ChannelBase

@@ -107,6 +107,7 @@ namespace InperStudio.ViewModels
                 DataTemplate template = myContentPresenter.ContentTemplate;
 
                 SciChartSurface sciChart = (SciChartSurface)template.FindName("sciChartSurface", myContentPresenter);
+                sciChart.XAxis.VisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0),TimeSpan.FromSeconds(10));
                 view.sciScroll.Axis = sciChart.XAxis;
             }
             catch (Exception ex)
@@ -171,7 +172,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        
+
         public void YaxisReduce(object sender)
         {
             try
@@ -190,7 +191,7 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
-        }      
+        }
         public void YaxisNormal(object sender)
         {
             try
@@ -206,7 +207,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-         
+
         #endregion
     }
 }

@@ -162,6 +162,7 @@ namespace InperStudio.ViewModels
         }
         private void PreviewRecord()
         {
+            ChannelCountErrorDetection();
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsStop = false;
@@ -172,6 +173,10 @@ namespace InperStudio.ViewModels
         }
         private void StartRecord()
         {
+            ChannelCountErrorDetection();
+            //数据库优先初始化
+            App.SqlDataInit = new Lib.Data.SqlDataInit();
+
             if (!InperGlobalClass.IsPreview)
             {
                 InperDeviceHelper.Instance.StartCollect();
@@ -197,6 +202,14 @@ namespace InperStudio.ViewModels
             while (InperClassHelper.GetWindowByNameChar("Video Window") != null)
             {
                 InperClassHelper.GetWindowByNameChar("Video Window").Close();
+            }
+        }
+        private void ChannelCountErrorDetection()
+        {
+            if (((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).ChartDatas.Count < 1)
+            {
+                Growl.Error(new GrowlInfo() { Message = "未找到数据通道", Token = "SuccessMsg", WaitTime = 1 });
+                return;
             }
         }
         #endregion

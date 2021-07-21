@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Data;
 using InperStudio.Lib.Helper;
 using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.Helper;
@@ -22,6 +23,7 @@ namespace InperStudio
     public partial class App : Application
     {
         public static ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static SqlDataInit SqlDataInit;
         protected override void OnStartup(StartupEventArgs e)
         {
             // Set this code once in App.xaml.cs or application startup

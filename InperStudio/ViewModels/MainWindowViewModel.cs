@@ -67,7 +67,8 @@ namespace InperStudio.ViewModels
             }
             finally
             {
-                RequestClose();
+                //RequestClose();
+                Environment.Exit(0);
             }
         }
         #endregion

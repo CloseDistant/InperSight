@@ -1,5 +1,6 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.ViewModels;
 using InperStudioControlLib.Lib.DeviceAgency;
@@ -46,7 +47,9 @@ namespace InperStudio.Lib.Helper
         private readonly object _DisplayQLock = new object();
         private readonly AutoResetEvent _AREvent = new AutoResetEvent(false);
         public readonly DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
+        public readonly DispatcherTimer _DataSaveTimer = new DispatcherTimer(DispatcherPriority.Render);
         private readonly AutoResetEvent _DataEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent _DataSaveEvent = new AutoResetEvent(false);
         public readonly object _SignalQsLocker = new object();
         public readonly object _EventQLock = new object();
 
@@ -58,6 +61,7 @@ namespace InperStudio.Lib.Helper
 
         private short[] _SwapBuffer;
         private Queue<long> EventTimeSet = new Queue<long>();
+        private Dictionary<int, Queue<KeyValuePair<long, double>>> _SaveEventQs = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
         #region
         public int VisionWidth = 720;
         public int VisionHeight = 540;
@@ -99,6 +103,12 @@ namespace InperStudio.Lib.Helper
             {
                 _ = _DataEvent.Set();
             };
+
+            _DataSaveTimer.Interval = TimeSpan.FromSeconds(3);
+            _DataSaveTimer.Tick += (s, e) =>
+            {
+                _ = _DataSaveEvent.Set();
+            };
             //这里用来初始化event chart
             if (InperGlobalClass.EventSettings.Channels.Count > 0)
             {
@@ -124,9 +134,16 @@ namespace InperStudio.Lib.Helper
                     {
                         item.Value.Enqueue(new KeyValuePair<long, double>(EventTimeSet.Last(), e.PortStatus[item.Key]));
                     }
+                    if (InperGlobalClass.IsRecord)
+                    {
+                        foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in _SaveEventQs)
+                        {
+                            item.Value.Enqueue(new KeyValuePair<long, double>(EventTimeSet.Last(), e.PortStatus[item.Key]));
+                        }
+                    }
                     EventTimeSet.Clear();
                 }
-                //Console.WriteLine(" value0:" + e.PortStatus[0] + " value1:" + e.PortStatus[1] + " value2:" + e.PortStatus[2] + " value3:" + e.PortStatus[3] + " value4:" + e.PortStatus[4] + " value5:" + e.PortStatus[5] + " value6:" + e.PortStatus[6] + " value7:" + e.PortStatus[7]);
+
                 Monitor.Exit(_EventQLock);
             }
 
@@ -423,6 +440,41 @@ namespace InperStudio.Lib.Helper
 
             }
         }
+        public void SaveDateProc()
+        {
+            while (InperGlobalClass.IsRecord)
+            {
+                _ = _DataSaveEvent.WaitOne();
+                if (Monitor.TryEnter(_EventQLock))
+                {
+                    Tuple<TimeSpan[], double[]> s0_plot_data = new Tuple<TimeSpan[], double[]>(null, null);
+                    _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
+                    {
+                        s0_plot_data = TransposeDataAndRegisterTR(q.Value);
+                        _ = App.SqlDataInit.sqlSugar.UseTran(() =>
+                          {
+                              if (s0_plot_data.Item1.Count() > 0)
+                              {
+                                  for (int i = 0; i < s0_plot_data.Item1.Count(); i++)
+                                  {
+                                      Input input = new Input()
+                                      {
+                                          CameraTime = s0_plot_data.Item1[i].Ticks,
+                                          ChannelId = q.Key,
+                                          Value = s0_plot_data.Item2[i],
+                                          CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                      };
+                                      //App.SqlDataInit.sqlSugar.Insertable();
+                                  }
+                              }
+                          });
+                    });
+
+
+                    Monitor.Exit(_EventQLock);
+                }
+            }
+        }
         private Tuple<TimeSpan[], double[]> TransposeDataAndRegisterTR(Queue<KeyValuePair<long, double>> sigs)
         {
             KeyValuePair<long, double>[] sig_data = sigs.ToArray();
@@ -444,7 +496,7 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
-        public void AddMarkerByHotkeys(string text,Color color)
+        public void AddMarkerByHotkeys(string text, Color color)
         {
             int count = EventChannelChart.RenderableSeries.First().DataSeries.XValues.Count;
 
@@ -506,6 +558,14 @@ namespace InperStudio.Lib.Helper
                         data.Value.Clear();
                     }
                 }
+                EventChannelChart.RenderableSeries.ToList().ForEach(x =>
+                {
+                    x.DataSeries.Clear();
+                });
+                foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in EventChannelChart.EventQs)
+                {
+                    item.Value.Clear();
+                }
                 isFirstRecordTiem = true; isLoop = true;
                 timer.Start();
                 updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
@@ -516,5 +576,6 @@ namespace InperStudio.Lib.Helper
                 App.Log.Error(ex.ToString());
             }
         }
+
     }
 }
