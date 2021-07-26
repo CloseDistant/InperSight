@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
+using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
@@ -162,18 +163,48 @@ namespace InperStudio.ViewModels
         }
         private void PreviewRecord()
         {
-            ChannelCountErrorDetection();
+            InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
+            InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
+            InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
+
+            if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
+            {
+                InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                return;
+            }
+            if (!InperDeviceHelper.Instance.InitDataStruct())
+            {
+                InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                return;
+            }
+            InperDeviceHelper.Instance.StartCollect();
+
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsStop = false;
 
-            InperDeviceHelper.Instance.StartCollect();
 
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
         private void StartRecord()
         {
-            ChannelCountErrorDetection();
+
+            if (!InperGlobalClass.IsPreview)
+            {
+                InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
+                InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
+                InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
+                if (!InperDeviceHelper.Instance.InitDataStruct())
+                {
+                    InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                    return;
+                }
+            }
+
+            if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+            {
+                _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+            }
             //数据库优先初始化
             App.SqlDataInit = new Lib.Data.SqlDataInit();
 
@@ -181,14 +212,15 @@ namespace InperStudio.ViewModels
             {
                 InperDeviceHelper.Instance.StartCollect();
             }
+            else
+            {
+                InperDeviceHelper.Instance.saveDataTask= Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
+            }
             InperGlobalClass.IsRecord = true;
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsStop = false;
 
-            if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-            {
-                _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
-            }
+            ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
         private void StopRecord()
         {
@@ -202,14 +234,6 @@ namespace InperStudio.ViewModels
             while (InperClassHelper.GetWindowByNameChar("Video Window") != null)
             {
                 InperClassHelper.GetWindowByNameChar("Video Window").Close();
-            }
-        }
-        private void ChannelCountErrorDetection()
-        {
-            if (((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).ChartDatas.Count < 1)
-            {
-                Growl.Error(new GrowlInfo() { Message = "未找到数据通道", Token = "SuccessMsg", WaitTime = 1 });
-                return;
             }
         }
         #endregion

@@ -1,4 +1,6 @@
-﻿using InperStudio.Lib.Enum;
+﻿using HandyControl.Controls;
+using HandyControl.Data;
+using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using System;
@@ -121,5 +123,10 @@ namespace InperStudio.Lib.Bean
         #endregion
 
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+
+        public static void ShowReminderInfo(string message, int waitTime = 1)
+        {
+            Growl.Error(new GrowlInfo() { Message = message, Token = "SuccessMsg", WaitTime = waitTime });
+        }
     }
 }

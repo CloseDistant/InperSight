@@ -2,6 +2,7 @@
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data.Model;
+using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using SciChart.Charting.Model.ChartSeries;
 using SqlSugar;
@@ -18,13 +19,19 @@ namespace InperStudio.Lib.Data
     public class SqlDataInit
     {
         public readonly SqlSugarScope sqlSugar;
+        public Dictionary<string, string> RecordTablePairs = new Dictionary<string, string>();
         public SqlDataInit(string dataName = "data.db")
         {
-            string dataPath = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName);
-            if (!Directory.Exists(dataPath))
+            if (RecordTablePairs.Count > 0)
             {
-                _ = Directory.CreateDirectory(dataPath);
+                RecordTablePairs = new Dictionary<string, string>();
             }
+
+            string dataPath = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName);
+            //if (!Directory.Exists(dataPath))
+            //{
+            //    _ = Directory.CreateDirectory(dataPath);
+            //}
             string filePath = Path.Combine(dataPath, dataName);
 
             sqlSugar = new SqlSugarScope(new ConnectionConfig()
@@ -37,7 +44,11 @@ namespace InperStudio.Lib.Data
             {
                 sqlSugar.Aop.OnLogExecuting = (s, p) =>
                 {
-                    App.Log.Error(s);
+                    App.Log.Info(s);
+                };
+                sqlSugar.Aop.OnError = (exp) =>
+                {
+                    App.Log.Error(exp);
                 };
             });
 
@@ -57,16 +68,45 @@ namespace InperStudio.Lib.Data
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Config));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.AIROI));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Manual));
+
             foreach (var item in InperDeviceHelper.Instance.CameraChannels)
             {
-                sqlSugar.MappingTables.Add(nameof(ChannelRecord), nameof(ChannelRecord) + item.ChannelId);
+                sqlSugar.MappingTables.Add(nameof(ChannelRecord), nameof(ChannelRecord) + item.Type + item.ChannelId);
                 sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(ChannelRecord));
+                RecordTablePairs.Add(item.Type + item.ChannelId, nameof(ChannelRecord) + item.Type + item.ChannelId);
+
+                TablesDesc desc = new TablesDesc()
+                {
+                    TableName = nameof(ChannelRecord) + item.Type + item.ChannelId,
+                    TableType = item.Type == SignalSettingsTypeEnum.Camera.ToString() ? 0 : 1,
+                    Desc = "0:Camera 通道数据表,1:Analog 通道数据表",
+                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                };
+                _ = sqlSugar.Insertable(desc).ExecuteCommand();
             }
-            foreach(LineRenderableSeriesViewModel item in InperDeviceHelper.Instance.EventChannelChart.RenderableSeries)
+            foreach (LineRenderableSeriesViewModel item in InperDeviceHelper.Instance.EventChannelChart.RenderableSeries)
             {
                 sqlSugar.MappingTables.Add(nameof(Input), nameof(Input) + item.Tag);
                 sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Input));
+                TablesDesc desc = new TablesDesc()
+                {
+                    TableName = nameof(Input) + item.Tag,
+                    TableType = 0,
+                    Desc = "0:Input 输入电信号数据表",
+                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                };
+                _ = sqlSugar.Insertable(desc).ExecuteCommand();
             }
+
+            ColumnDesc desc1 = new ColumnDesc()
+            {
+                TableName = "ChannelRecord",
+                ColumnName = "Type",
+                ColumnType = 0,
+                Desc = "0 410激发光,1 470激发光,2 561激发光,-1 代表Input 电信号",
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            };
+            _ = sqlSugar.Insertable(desc1).ExecuteCommand();
         }
     }
 }

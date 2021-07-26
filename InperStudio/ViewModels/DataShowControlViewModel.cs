@@ -8,6 +8,7 @@ using SciChart.Charting.Visuals;
 using SciChart.Data.Model;
 using Stylet;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,13 +24,37 @@ namespace InperStudio.ViewModels
         private DataShowControlView view;
         private BindableCollection<CameraChannel> cameraChannels;
         public BindableCollection<CameraChannel> ChartDatas { get => cameraChannels; set => SetAndNotify(ref cameraChannels, value); }
-        public EventChannelChart EventChannelChart { get; set; }
+        private EventChannelChart eventChannel;
+        public EventChannelChart EventChannelChart { get => eventChannel; set => SetAndNotify(ref eventChannel, value); }
+        public List<string> TextLableFormatting { get; set; } = new List<string>();
+        public static string TextFormat = "hh:mm:ss";
+        private double visibleValue = 0;
+        public double VisibleValue
+        {
+            get => visibleValue;
+            set
+            {
+                SetAndNotify(ref visibleValue, value);
+                foreach (var channel in ChartDatas)
+                {
+                    channel.XVisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(value));
+
+                    channel.ViewportManager = new ScrollingViewportManager(value);
+                };
+                EventChannelChart.XVisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(value));
+                EventChannelChart.ViewportManager = new ScrollingViewportManager(value);
+            }
+        }
         #endregion
         public DataShowControlViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
             ChartDatas = InperDeviceHelper.Instance.CameraChannels;
             EventChannelChart = InperDeviceHelper.Instance.EventChannelChart;
+            TextLableFormatting.Add("hh:mm:ss");
+            TextLableFormatting.Add("Seconds");
+            TextLableFormatting.Add("ms");
+            TextLableFormatting.Add("Time of day");
         }
         protected override void OnViewLoaded()
         {
@@ -57,6 +82,7 @@ namespace InperStudio.ViewModels
                     this.view.dataList.RaiseEvent(eventArg);
                 };
 
+                VisibleValue = ((TimeSpan)this.view.tiemsAxis.VisibleRange.Diff).TotalSeconds;
 
                 if (InperGlobalClass.EventPanelProperties.HeightAuto)
                 {
@@ -107,7 +133,7 @@ namespace InperStudio.ViewModels
                 DataTemplate template = myContentPresenter.ContentTemplate;
 
                 SciChartSurface sciChart = (SciChartSurface)template.FindName("sciChartSurface", myContentPresenter);
-                sciChart.XAxis.VisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0),TimeSpan.FromSeconds(10));
+                sciChart.XAxis.VisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(VisibleValue));
                 view.sciScroll.Axis = sciChart.XAxis;
             }
             catch (Exception ex)
@@ -172,7 +198,6 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-
         public void YaxisReduce(object sender)
         {
             try
@@ -207,7 +232,40 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-
+        public void TextFormat_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                string item = (sender as System.Windows.Controls.ComboBox).SelectedValue.ToString();
+                if (!string.IsNullOrEmpty(item))
+                {
+                    TextFormat = item;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void TextFormatChanged(string type)
+        {
+            try
+            {
+                if (type.Equals("Add"))
+                {
+                    VisibleValue++;
+                }
+                if (type.Equals("Reduce"))
+                {
+                    VisibleValue--;
+                }
+                //this.Refresh();
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         #endregion
     }
 }

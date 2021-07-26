@@ -17,7 +17,7 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public int ChannelId { get; set; }
         public string Name { get; set; }
-        public string Type { get; set; }
+        public string Type { get; set; } = "Camera";
     }
 
     public class CameraChannel : ChannelBase
@@ -30,7 +30,8 @@ namespace InperStudio.Lib.Bean.Channel
         private BindableCollection<IRenderableSeriesViewModel> renderableSeriesViewModels = new BindableCollection<IRenderableSeriesViewModel>();
         public BindableCollection<IRenderableSeriesViewModel> RenderableSeries { get => renderableSeriesViewModels; set => SetAndNotify(ref renderableSeriesViewModels, value); }
         public List<LightMode<TimeSpan, double>> LightModes { get; set; } = new List<LightMode<TimeSpan, double>>();
-        public ScrollingViewportManager ViewportManager { get; set; } = new ScrollingViewportManager(100000000);
+        private ScrollingViewportManager viewportManager= new ScrollingViewportManager(10);
+        public ScrollingViewportManager ViewportManager { get => viewportManager; set => SetAndNotify(ref viewportManager, value); }
         private IRange xrange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
         public IRange XVisibleRange { get => xrange; set => SetAndNotify(ref xrange, value); }
         private IRange yrange = new DoubleRange(0, 10);

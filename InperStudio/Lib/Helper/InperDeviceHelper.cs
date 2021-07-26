@@ -45,6 +45,7 @@ namespace InperStudio.Lib.Helper
 
         private readonly object _QLock = new object();
         private readonly object _DisplayQLock = new object();
+        private readonly object _SaveDataLock = new object();
         private readonly AutoResetEvent _AREvent = new AutoResetEvent(false);
         public readonly DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         public readonly DispatcherTimer _DataSaveTimer = new DispatcherTimer(DispatcherPriority.Render);
@@ -55,6 +56,7 @@ namespace InperStudio.Lib.Helper
 
         private Task updateTask;
         private Task frameProcTask;
+        public Task saveDataTask;
         private bool isFirstRecordTiem = true;
         private bool isLoop = true;
         private long _PlottingStartTime;
@@ -62,6 +64,7 @@ namespace InperStudio.Lib.Helper
         private short[] _SwapBuffer;
         private Queue<long> EventTimeSet = new Queue<long>();
         private Dictionary<int, Queue<KeyValuePair<long, double>>> _SaveEventQs = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
+        private Dictionary<int, SignalData> _SaveSignalQs = new Dictionary<int, SignalData>();
         #region
         public int VisionWidth = 720;
         public int VisionHeight = 540;
@@ -109,18 +112,56 @@ namespace InperStudio.Lib.Helper
             {
                 _ = _DataSaveEvent.Set();
             };
-            //这里用来初始化event chart
-            if (InperGlobalClass.EventSettings.Channels.Count > 0)
+
+        }
+        public bool InitDataStruct()
+        {
+            try
             {
-                InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                if (_SignalQs.Count > 0)
                 {
-                    if (x.Type == EventSettingsTypeEnum.Marker.ToString())
+                    foreach (var item in CameraChannels)
                     {
-                        EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = x.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(x.BgColor) });
-                        EventChannelChart.EventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                        _SaveSignalQs.Add(item.ChannelId, new SignalData());
+                        if (item.LightModes.Count > 0)
+                        {
+                            item.LightModes.ForEach(x =>
+                            {
+                                _SaveSignalQs[item.ChannelId].ValuePairs.Add(x.LightType, new Queue<KeyValuePair<long, double>>());
+                            });
+                        }
+                        else
+                        {
+                            _SaveSignalQs[item.ChannelId].ValuePairs.Add(-1, new Queue<KeyValuePair<long, double>>());
+                        }
                     }
-                });
+                }
+                else
+                {
+                    return false;
+                }
+                if (InperGlobalClass.EventSettings.Channels.Count > 0)
+                {
+                    InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                    {
+                        if (x.Type == EventSettingsTypeEnum.Marker.ToString())
+                        {
+                            EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = x.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(x.BgColor) });
+                            if (!EventChannelChart.EventQs.ContainsKey(x.ChannelId))
+                            {
+                                EventChannelChart.EventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                            }
+                            _SaveEventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                        }
+                    });
+                }
             }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+                return false;
+            }
+            return true;
         }
 
         private void Instance_OnPortStatusChanged(object sender, PortStatusChangedEventArgs e)
@@ -148,7 +189,6 @@ namespace InperStudio.Lib.Helper
             }
 
         }
-
         private void Instance_OnImageGrabbed(object sender, MarkedMat e)
         {
             try
@@ -251,7 +291,6 @@ namespace InperStudio.Lib.Helper
                 App.Log.Error(ex.ToString());
             }
         }
-
         public void DisplayProc()
         {
             _SwapBuffer = new short[DevPhotometry.Instance.VisionWidth * DevPhotometry.Instance.VisionHeight];
@@ -286,7 +325,6 @@ namespace InperStudio.Lib.Helper
                 }
             }
         }
-
         public void FrameProc()
         {
             while (isLoop)
@@ -320,12 +358,24 @@ namespace InperStudio.Lib.Helper
                               });
 
                             this.AppendData(ploting_data, m.Group, ts);
+                            this.SaveData(ploting_data, ts, m.Group);
                         }
                     }
                 }
             }
         }
-
+        private void SaveData(ConcurrentDictionary<int, double> data, long timestamp, int s_group = -1)
+        {
+            Monitor.Enter(_SaveDataLock);
+            _ = Parallel.ForEach(data, kv =>
+            {
+                if (_SaveSignalQs.ContainsKey(kv.Key))
+                {
+                    _SaveSignalQs[kv.Key].ValuePairs[s_group].Enqueue(new KeyValuePair<long, double>(timestamp, kv.Value));
+                }
+            });
+            Monitor.Exit(_SaveDataLock);
+        }
         private void AppendData(ConcurrentDictionary<int, double> data, int s_group, long timestamp)
         {
 
@@ -342,7 +392,6 @@ namespace InperStudio.Lib.Helper
                                   _SignalQs[kv.Key].ValuePairs[s_group].Enqueue(new KeyValuePair<long, double>(timestamp, kv.Value));
                               }
                           }
-
                       });
                 }
                 finally
@@ -387,6 +436,8 @@ namespace InperStudio.Lib.Helper
                                  });
                             }
                         });
+                        Monitor.Exit(_SignalQsLocker);
+
                         if (Monitor.TryEnter(_EventQLock))
                         {
                             _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
@@ -416,9 +467,11 @@ namespace InperStudio.Lib.Helper
                                                         }
                                                     }
                                                 }
+                                                if (s0_plot_data.Item1.Count() != 0)
+                                                {
+                                                    (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                                }
                                                 q.Value.Clear();
-                                                (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
-
                                             }
                                         }
                                     });
@@ -433,11 +486,6 @@ namespace InperStudio.Lib.Helper
                 {
                     App.Log.Error(ex.ToString());
                 }
-                finally
-                {
-                    Monitor.Exit(_SignalQsLocker);
-                }
-
             }
         }
         public void SaveDateProc()
@@ -447,31 +495,80 @@ namespace InperStudio.Lib.Helper
                 _ = _DataSaveEvent.WaitOne();
                 if (Monitor.TryEnter(_EventQLock))
                 {
-                    Tuple<TimeSpan[], double[]> s0_plot_data = new Tuple<TimeSpan[], double[]>(null, null);
-                    _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
+                    _ = Parallel.ForEach(_SaveEventQs, q =>
                     {
-                        s0_plot_data = TransposeDataAndRegisterTR(q.Value);
                         _ = App.SqlDataInit.sqlSugar.UseTran(() =>
                           {
-                              if (s0_plot_data.Item1.Count() > 0)
+                              List<Input> inputs = new List<Input>();
+                              q.Value.ToList().ForEach(x =>
                               {
-                                  for (int i = 0; i < s0_plot_data.Item1.Count(); i++)
+                                  Input input = new Input()
                                   {
-                                      Input input = new Input()
-                                      {
-                                          CameraTime = s0_plot_data.Item1[i].Ticks,
-                                          ChannelId = q.Key,
-                                          Value = s0_plot_data.Item2[i],
-                                          CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
-                                      };
-                                      //App.SqlDataInit.sqlSugar.Insertable();
-                                  }
-                              }
+                                      CameraTime = x.Key,
+                                      ChannelId = q.Key,
+                                      Value = x.Value,
+                                      CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                  };
+                                  inputs.Add(input);
+                              });
+
+                              _ = App.SqlDataInit.sqlSugar.Insertable(inputs).AS("Input" + q.Key).ExecuteCommand();
                           });
+                        q.Value.Clear();
                     });
-
-
                     Monitor.Exit(_EventQLock);
+                }
+
+                if (Monitor.TryEnter(_SaveDataLock))
+                {
+                    _ = Parallel.ForEach(_SaveSignalQs, kv =>
+                    {
+                        List<ChannelRecord> records = new List<ChannelRecord>();
+                        CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
+                        if (App.SqlDataInit.RecordTablePairs.ContainsKey(channel.Type + channel.ChannelId))
+                        {
+                            _ = App.SqlDataInit.sqlSugar.UseTran(() =>
+                              {
+                                  if (App.SqlDataInit.RecordTablePairs[channel.Type + channel.ChannelId].Contains(SignalSettingsTypeEnum.Camera.ToString()))
+                                  {
+                                      foreach (var item in kv.Value.ValuePairs)
+                                      {
+                                          foreach (var value in item.Value)
+                                          {
+                                              ChannelRecord record = new ChannelRecord()
+                                              {
+                                                  ChannelId = kv.Key,
+                                                  Type = item.Key,
+                                                  Value = value.Value,
+                                                  CameraTime = value.Key,
+                                                  CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                              };
+                                              records.Add(record);
+                                          }
+                                          item.Value.Clear();
+                                      }
+                                  }
+                                  else
+                                  {
+                                      kv.Value.ValuePairs[-1].ToList().ForEach(x =>
+                                      {
+                                          ChannelRecord record = new ChannelRecord()
+                                          {
+                                              ChannelId = kv.Key,
+                                              Type = -1,
+                                              Value = x.Value,
+                                              CameraTime = x.Key,
+                                              CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                          };
+                                          records.Add(record);
+                                      });
+                                      kv.Value.ValuePairs[-1].Clear();
+                                  }
+                                  _ = App.SqlDataInit.sqlSugar.Insertable(records).AS(App.SqlDataInit.RecordTablePairs[channel.Type + channel.ChannelId]).ExecuteCommand();
+                              });
+                        }
+                    });
+                    Monitor.Exit(_SaveDataLock);
                 }
             }
         }
@@ -520,11 +617,13 @@ namespace InperStudio.Lib.Helper
             {
                 isFirstRecordTiem = false; isLoop = false;
                 timer.Stop();
+                _DataSaveTimer.Stop();
                 if (frameProcTask != null)
                 {
                     while (frameProcTask.IsCompleted)
                     {
                         frameProcTask.Dispose();
+                        break;
                     }
                 }
                 if (updateTask != null)
@@ -532,8 +631,19 @@ namespace InperStudio.Lib.Helper
                     while (updateTask.IsCompleted)
                     {
                         updateTask.Dispose();
+                        break;
                     }
                 }
+                if (saveDataTask != null)
+                {
+                    while (saveDataTask.IsCompleted)
+                    {
+                        saveDataTask.Dispose();
+                        break;
+                    }
+                }
+                _SaveSignalQs.Clear();
+                _SaveEventQs.Clear();
             }
             catch (Exception ex)
             {
@@ -544,6 +654,7 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
+
                 CameraChannels.ToList().ForEach(x =>
                 {
                     x.RenderableSeries.ToList().ForEach(line =>
@@ -558,18 +669,14 @@ namespace InperStudio.Lib.Helper
                         data.Value.Clear();
                     }
                 }
-                EventChannelChart.RenderableSeries.ToList().ForEach(x =>
-                {
-                    x.DataSeries.Clear();
-                });
-                foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in EventChannelChart.EventQs)
-                {
-                    item.Value.Clear();
-                }
+
                 isFirstRecordTiem = true; isLoop = true;
                 timer.Start();
+                _DataSaveTimer.Start();
+
                 updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
                 frameProcTask = Task.Factory.StartNew(() => { FrameProc(); });
+                saveDataTask = Task.Factory.StartNew(() => { SaveDateProc(); });
             }
             catch (Exception ex)
             {

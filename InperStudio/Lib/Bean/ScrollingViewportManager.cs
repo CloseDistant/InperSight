@@ -8,8 +8,8 @@ namespace InperStudio.Lib.Bean
 {
     public class ScrollingViewportManager : DefaultViewportManager
     {
-        private readonly long _windowSize;
-        public ScrollingViewportManager(long windowSize)
+        private readonly double _windowSize;
+        public ScrollingViewportManager(double windowSize)
         {
             _windowSize = windowSize;
         }
@@ -27,9 +27,9 @@ namespace InperStudio.Lib.Bean
                 return currentVisibleRange;     // Don't scroll if user is zooming
                                                 // The MaxXRange is the VisibleRange on the XAxis if we were to zoom to fit all data
             var maxXRange = xAxis.GetMaximumRange() as TimeSpanRange;
-            long xMax = Math.Max(maxXRange.Max.Ticks, currentVisibleRange.Max.Ticks);
+            double xMax = Math.Max(maxXRange.Max.TotalSeconds, currentVisibleRange.Max.TotalSeconds);
             // Scroll showing latest window size
-            return new TimeSpanRange(TimeSpan.FromTicks(xMax - _windowSize), TimeSpan.FromTicks(xMax));
+            return new TimeSpanRange(TimeSpan.FromSeconds(xMax - _windowSize), TimeSpan.FromSeconds(xMax));
         }
 
     }

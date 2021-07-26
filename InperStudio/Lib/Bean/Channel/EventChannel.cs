@@ -18,7 +18,6 @@ namespace InperStudio.Lib.Bean.Channel
         public string BgColor { get; set; } = Brushes.Red.ToString();
         public string Hotkeys { get; set; }
         public double DeltaF { get; set; }
-        public string Type { get; set; }
     }
     public class EventChannelChart : PropertyChangedBase
     {
@@ -26,7 +25,8 @@ namespace InperStudio.Lib.Bean.Channel
 
         private BindableCollection<IAnnotationViewModel> annotations = new BindableCollection<IAnnotationViewModel>();
         public BindableCollection<IAnnotationViewModel> Annotations { get => annotations; set => SetAndNotify(ref annotations, value); }
-        public ScrollingViewportManager ViewportManager { get; set; } = new ScrollingViewportManager(100000000);
+        private ScrollingViewportManager viewportManager= new ScrollingViewportManager(10);
+        public ScrollingViewportManager ViewportManager { get => viewportManager; set => SetAndNotify(ref viewportManager, value); }
         private IRange range = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
         public IRange XVisibleRange { get => range; set => SetAndNotify(ref range, value); }
 

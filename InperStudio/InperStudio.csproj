@@ -204,6 +204,7 @@
     <Compile Include="Lib\Bean\ListChartValues.cs" />
     <Compile Include="Lib\Bean\ScrollingViewportManager.cs" />
     <Compile Include="Lib\Bean\SignalChannel.cs" />
+    <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
