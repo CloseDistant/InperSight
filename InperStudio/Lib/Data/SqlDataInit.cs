@@ -28,10 +28,7 @@ namespace InperStudio.Lib.Data
             }
 
             string dataPath = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName);
-            //if (!Directory.Exists(dataPath))
-            //{
-            //    _ = Directory.CreateDirectory(dataPath);
-            //}
+            
             string filePath = Path.Combine(dataPath, dataName);
 
             sqlSugar = new SqlSugarScope(new ConnectionConfig()
@@ -42,10 +39,10 @@ namespace InperStudio.Lib.Data
             },
             sqlSugar =>
             {
-                sqlSugar.Aop.OnLogExecuting = (s, p) =>
-                {
-                    App.Log.Info(s);
-                };
+                //sqlSugar.Aop.OnLogExecuting = (s, p) =>
+                //{
+                //    App.Log.Info(s);
+                //};
                 sqlSugar.Aop.OnError = (exp) =>
                 {
                     App.Log.Error(exp);

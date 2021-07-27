@@ -593,7 +593,7 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
-        public void AddMarkerByHotkeys(string text, Color color)
+        public void AddMarkerByHotkeys(int channelId,string text, Color color)
         {
             int count = EventChannelChart.RenderableSeries.First().DataSeries.XValues.Count;
 
@@ -610,6 +610,17 @@ namespace InperStudio.Lib.Helper
                 StrokeThickness = 1,
                 X1 = (IComparable)EventChannelChart.RenderableSeries.First().DataSeries.XValues[count - 1]
             });
+
+            Manual manual = new Manual()
+            {
+                ChannelId = channelId,
+                Color = color.ToString(),
+                CameraTime = (long)EventChannelChart.RenderableSeries.First().DataSeries.XValues[count - 1],
+                Name = text,
+                DateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            };
+
+            App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
         }
         public void StopCollect()
         {

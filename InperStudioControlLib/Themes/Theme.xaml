@@ -4,5 +4,6 @@
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperDialogWindowStyle.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperListBoxStyle.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperIconPathGeometry.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperTextBoxStylet.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

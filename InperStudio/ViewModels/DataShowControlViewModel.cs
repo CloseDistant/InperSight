@@ -154,21 +154,21 @@ namespace InperStudio.ViewModels
                         {
                             if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])))
                             {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
                             }
                         }
                         if (x.HotkeysCount == 2)
                         {
                             if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
                             {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
                             }
                         }
                         if (x.HotkeysCount == 3)
                         {
                             if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
                             {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
                             }
                         }
                     }

@@ -94,6 +94,8 @@
   <ItemGroup>
     <Compile Include="Command\CustomCommands.cs" />
     <Compile Include="Control\Border\InperTagBorder.cs" />
+    <Compile Include="Control\InperAdorner\InperAdornerLayer.cs" />
+    <Compile Include="Control\InperAdorner\InperCustomAdorner.cs" />
     <Compile Include="Control\TextBox\InperTextBox.cs" />
     <Compile Include="Control\Window\InperDialogWindow.cs" />
     <Compile Include="Converter\BoolToVisibilityPositive.cs" />
@@ -156,6 +158,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\InperTagStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\InperTextBoxStylet.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
