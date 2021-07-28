@@ -21,9 +21,9 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public bool IsContinuous { get; set; }
         public bool IsInterval { get; set; }
-        public double Duration { get; set; }
-        public double Interval { get; set; }
-        public double Delay { get; set; }
+        public double Duration { get; set; } = 5;
+        public double Interval { get; set; } = 5;
+        public double Delay { get; set; } = 1;
     }
     public class Channel
     {

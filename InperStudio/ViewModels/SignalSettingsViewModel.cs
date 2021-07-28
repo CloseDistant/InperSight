@@ -33,6 +33,8 @@ namespace InperStudio.ViewModels
         #region properties
         private readonly SignalSettingsTypeEnum @enum;
         private SignalSettingsView view;
+        private System.Timers.Timer _Metronome = new System.Timers.Timer();
+        private bool IsInWorkingPeriod = true;
         //ellipse
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
@@ -79,6 +81,38 @@ namespace InperStudio.ViewModels
                 default:
                     break;
             }
+
+            _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+            _Metronome.Elapsed += (s, e) =>
+            {
+                double next_Interval;
+                if (IsInWorkingPeriod)
+                {
+                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    {
+                        if (x.IsChecked)
+                        {
+                            DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                        }
+                    });
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000;
+                }
+                else
+                {
+                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    {
+                        if (x.IsChecked)
+                        {
+                            DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                            DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                        }
+                    });
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                }
+                _Metronome.Interval = next_Interval;
+                IsInWorkingPeriod = !IsInWorkingPeriod;
+                return;
+            };
 
             if (@enum == SignalSettingsTypeEnum.Analog)
             {
@@ -556,7 +590,26 @@ namespace InperStudio.ViewModels
 
             InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((grid.Children[0] as TextBlock).Text) - 1).Mask = mat;
         }
-
+        public void Interval_Checked(object sender, RoutedEventArgs e)
+        {
+            _Metronome.Enabled = true;
+        }
+        public void Interval_UnChecked(object sender, RoutedEventArgs e)
+        {
+            _Metronome.Enabled = false;
+        }
+        public void Screenshots()
+        {
+            try
+            {
+                InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, "CameraChannelScreen.bmp", InperGlobalClass.DataPath + InperGlobalClass.DataFolderName);
+                Growl.Info(new GrowlInfo() { Message = "成功获取快照", Token = "SuccessMsg", WaitTime = 1 });
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         #endregion
 
         #region methods Analog

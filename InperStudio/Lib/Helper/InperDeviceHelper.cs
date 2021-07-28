@@ -308,12 +308,27 @@ namespace InperStudio.Lib.Helper
                 _DisplayMatQ.Clear();
                 Monitor.Exit(_DisplayQLock);
 
-                if (mmats.Count() > 0)
+                if (mmats.Count() > 0 && mmats.Last().Group == 0)
                 {
                     Mat image_mat = mmats.Last().ImageMat;
                     unsafe
                     {
-                        Marshal.Copy(image_mat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
+                        Mat new_image = new Mat(image_mat.Size(), image_mat.Type());
+                        for (int y = 0; y < image_mat.Rows; y++)
+                        {
+                            for (int x = 0; x < image_mat.Cols; x++)
+                            {
+                                for (int c = 0; c < image_mat.Channels(); c++)
+                                {
+                                    float color = image_mat.At<float>(y, x);
+                                    //new_image.At<Vec3b>(y, x)[c] = image_mat.At<Vec3b>(y, x)[c];
+                                    new_image.Set<float>(y, x, color * 20);
+                                }
+                            }
+                        }
+                        Mat mat = new Mat();
+                        Cv2.GaussianBlur(new_image, mat, new OpenCvSharp.Size(5, 5),0);
+                        Marshal.Copy(mat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
                         System.Windows.Application.Current?.Dispatcher.Invoke(new Action(() =>
                         {
                             _WBMPPreview.Lock();
@@ -593,7 +608,7 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
-        public void AddMarkerByHotkeys(int channelId,string text, Color color)
+        public void AddMarkerByHotkeys(int channelId, string text, Color color)
         {
             int count = EventChannelChart.RenderableSeries.First().DataSeries.XValues.Count;
 

@@ -1,9 +1,11 @@
 ﻿using DirectShowLib;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Text;
+using System.Windows;
 
 namespace InperStudio.Lib.Helper
 {
@@ -225,6 +227,18 @@ namespace InperStudio.Lib.Helper
                 _DeviceIndex++;
             }
             return;
+        }
+        public static void SaveFrameworkElementToImage(FrameworkElement ui, string filename, string path)
+        {
+            System.IO.FileStream ms = new System.IO.FileStream(filename, System.IO.FileMode.Create);
+            System.Windows.Media.Imaging.RenderTargetBitmap bmp = new System.Windows.Media.Imaging.RenderTargetBitmap((int)ui.ActualWidth, (int)ui.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
+            bmp.Render(ui);
+            System.Windows.Media.Imaging.JpegBitmapEncoder encoder = new System.Windows.Media.Imaging.JpegBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bmp));
+            encoder.Save(ms);
+            ms.Close();
+
+            File.Copy(filename, path + filename, true);
         }
     }
 }

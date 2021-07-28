@@ -14,6 +14,7 @@
         Height="580" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
+        <convert:TestModeConvert x:Key="TestModeConvert"/>
         <Style TargetType="TextBlock">
             <Style.Setters>
                 <Setter Property="FontSize" Value="{DynamicResource InperNormalFontSize}"/>
@@ -23,12 +24,12 @@
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
-        <Grid x:Name="camera" Visibility="Hidden">
+        <Grid x:Name="camera" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1.5*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="4*"/>
                     <RowDefinition Height="1*"/>
@@ -51,11 +52,11 @@
                             </WrapPanel>
                             <hc:TextBox TextType="Int" HorizontalAlignment="Right" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Brightness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" VerticalContentAlignment="Center" hc:InfoElement.Title="Brightness" hc:InfoElement.TitlePlacement="Left" Width="120" hc:BorderElement.CornerRadius="0"  Padding="0" HorizontalContentAlignment="Center" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" BorderBrush="{DynamicResource InperDialogButtonColor}"></hc:TextBox>
                         </Grid>
-                        <hc:TextBox Margin="0 15 0 0" TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}"  x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
+                        <hc:TextBox Margin="0 15 0 0" TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Margin="10 0 0 0">
                         <UniformGrid Margin="0 5" Columns="3">
-                            <Button Margin="0" HorizontalAlignment="Left" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="screen" >
+                            <Button Margin="0" HorizontalAlignment="Left" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
                                 <Image Source="/Lib/Images/Signal_Camera_Unknown.png" />
                             </Button>
                             <Button Margin="10 0" Style="{StaticResource InperFreeButton}" Click="{s:Action AddCircle}" Width="20" Height="20" >
@@ -74,11 +75,11 @@
                     <TextBlock Text="Camera Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="80" HorizontalAlignment="Stretch" VerticalAlignment="Center" LineStroke="{DynamicResource InperTheme}" Margin="10 0 0 0" Opacity=".4"/>
                 </WrapPanel>
-                <WrapPanel Margin="0 10">
+                <WrapPanel Margin="0 10"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Exposure (ms)" VerticalAlignment="Center" Margin="0 0 13 0" Width="80"/>
                     <ComboBox Style="{DynamicResource ComboBoxBaseStyle}" ItemsSource="{Binding Exposures,UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Exposure,UpdateSourceTrigger=PropertyChanged}" SelectionChanged="{s:Action Exposure_SelectionChanged}"  hc:BorderElement.CornerRadius="0" Padding="4 0" Margin="20 0 0 0" MinHeight="25" MinWidth="80" FontSize="{DynamicResource InperNormalFontSize}"/>
                 </WrapPanel>
-                <WrapPanel Margin="0 10">
+                <WrapPanel Margin="0 10"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Sampling (fps)" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>
                     <ComboBox ItemsSource="{Binding FPS,UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Sampling}" SelectionChanged="{s:Action FPS_SelectionChanged}" Style="{DynamicResource ComboBoxBaseStyle}" hc:BorderElement.CornerRadius="0" Padding="4 0" Margin="20 0 0 0" MinHeight="25" MinWidth="80" FontSize="{DynamicResource InperNormalFontSize}"/>
                 </WrapPanel>
@@ -86,9 +87,9 @@
                     <TextBlock Text="Record Mode" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="97" HorizontalAlignment="Right" VerticalAlignment="Center" LineStroke="{DynamicResource InperTheme}" Margin="12 0 0 0" Opacity=".4"/>
                 </WrapPanel>
-                <RadioButton Margin="0 10" GroupName="mode" x:Name="continuous" Content="Continuous" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                <WrapPanel Margin="0 10">
-                    <RadioButton GroupName="mode" x:Name="interval" Content="Interval (s)" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <RadioButton IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" Margin="0 10" GroupName="mode" x:Name="continuous" Content="Continuous" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                <WrapPanel Margin="0 10" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                    <RadioButton GroupName="mode" x:Name="interval" Content="Interval (s)" Checked="{s:Action Interval_Checked}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Margin="10 -5 0 0" IsEnabled="{Binding ElementName=interval,Path=IsChecked}">
                         <WrapPanel Margin="0 2">
                             <TextBlock Text="Duration" Width="52" VerticalAlignment="Center"  />
@@ -109,16 +110,24 @@
                     <hc:Divider Width="85" VerticalAlignment="Center" HorizontalAlignment="Right" LineStroke="{DynamicResource InperTheme}" Margin="12 0 0 0" Opacity=".4"/>
                 </WrapPanel>
                 <WrapPanel Margin="0 10">
-                    <TextBlock Text="Light Test Mode" VerticalAlignment="Center" />
-                    <ToggleButton Margin="20 0 0 0" Style="{StaticResource ToggleButtonSwitch}"  IsChecked="True"/>
+                    <TextBlock Text="Light Measure" VerticalAlignment="Center" />
+                    <ToggleButton Margin="20 0 0 0" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False"/>
                 </WrapPanel>
                 <ListBox x:Name="lightMode" Style="{x:Null}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <WrapPanel>
-                                <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" />
+                                <RadioButton GroupName="testMode" Name="testMode_rb" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
+                                <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" />
                                 <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="15 0 10 0"/>
-                                <hc:TextBox IsEnabled="{Binding IsChecked,UpdateSourceTrigger=PropertyChanged}" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" MaxLength="3" TextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" Margin="20 0 0 0"  Padding="0" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="25" hc:InfoElement.ContentHeight="25" Width="50" />
+                                <hc:TextBox Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" MaxLength="3" TextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" Margin="20 0 0 0"  Padding="0" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="25" hc:InfoElement.ContentHeight="25" Width="50">
+                                    <hc:TextBox.IsEnabled>
+                                        <MultiBinding Converter="{StaticResource TestModeConvert}">
+                                            <Binding Source="{x:Reference Name= lightTestMode}" Path="IsChecked" />
+                                            <Binding  Source="{x:Reference Name= testMode_rb}"  Path="IsChecked" />
+                                        </MultiBinding>
+                                    </hc:TextBox.IsEnabled>
+                                </hc:TextBox>
                             </WrapPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

@@ -208,6 +208,7 @@
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
+    <Compile Include="Lib\Convert\TestModeConvert.cs" />
     <Compile Include="Lib\Data\Model\AIROI.cs" />
     <Compile Include="Lib\Data\Model\ChannelRecord.cs" />
     <Compile Include="Lib\Data\Model\ColumnDesc.cs" />
