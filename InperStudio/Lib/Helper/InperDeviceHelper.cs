@@ -68,6 +68,7 @@ namespace InperStudio.Lib.Helper
         #region
         public int VisionWidth = 720;
         public int VisionHeight = 540;
+        public int SelectedWaveType = 1;
 
         public event EventHandler<bool> WaveInitEvent;
 
@@ -308,7 +309,7 @@ namespace InperStudio.Lib.Helper
                 _DisplayMatQ.Clear();
                 Monitor.Exit(_DisplayQLock);
 
-                if (mmats.Count() > 0 && mmats.Last().Group == 0)
+                if (mmats.Count() > 0 && mmats.Last().Group == SelectedWaveType)
                 {
                     Mat image_mat = mmats.Last().ImageMat;
                     unsafe
@@ -320,15 +321,14 @@ namespace InperStudio.Lib.Helper
                             {
                                 for (int c = 0; c < image_mat.Channels(); c++)
                                 {
-                                    float color = image_mat.At<float>(y, x);
-                                    //new_image.At<Vec3b>(y, x)[c] = image_mat.At<Vec3b>(y, x)[c];
-                                    new_image.Set<float>(y, x, color * 20);
+                                    float color = image_mat.At<int>(y, x);
+                                    new_image.Set<float>(y, x, (float)(color * InperGlobalClass.CameraSignalSettings.Brightness));
                                 }
                             }
                         }
                         Mat mat = new Mat();
-                        Cv2.GaussianBlur(new_image, mat, new OpenCvSharp.Size(5, 5),0);
-                        Marshal.Copy(mat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
+                        Cv2.Blur(new_image, mat, new OpenCvSharp.Size(3, 5) );
+                        Marshal.Copy(new_image.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
                         System.Windows.Application.Current?.Dispatcher.Invoke(new Action(() =>
                         {
                             _WBMPPreview.Lock();

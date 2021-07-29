@@ -37,9 +37,9 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition  Width="1*" />
             <ColumnDefinition  Width="2*"  />
+            <ColumnDefinition  Width="1*"  />
             <ColumnDefinition  Width="2*"  />
-            <ColumnDefinition  Width="2*"  />
-            <ColumnDefinition  Width="2*"  />
+            <ColumnDefinition  Width="1*"  />
             <ColumnDefinition  Width="3*"  />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
@@ -85,7 +85,7 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <StackPanel Margin="10 0">
+                <StackPanel Margin="10 0" Visibility="Collapsed">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Analog">
                         <StackPanel>
                             <Image Source="/Lib/Images/Signal_analogInput.png"/>
@@ -120,14 +120,6 @@
             <TextBlock>Addition</TextBlock>
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger">
-                        <StackPanel>
-                            <Image Source="/Lib/Images/Addition_trigger.png"/>
-                            <TextBlock>Trigger</TextBlock>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Video">
                         <StackPanel>
                             <Image Source="/Lib/Images/Addition_Video.png"/>
@@ -145,6 +137,14 @@
                         <StackPanel>
                             <Image Source="/Lib/Images/Record_preview.png"/>
                             <TextBlock>Preview</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Addition_trigger.png"/>
+                            <TextBlock>Trigger</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>

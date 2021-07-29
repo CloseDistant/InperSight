@@ -598,6 +598,10 @@ namespace InperStudio.ViewModels
         {
             _Metronome.Enabled = false;
         }
+        public void WaveView_Selected(object sender, RoutedEventArgs e)
+        {
+            InperDeviceHelper.SelectedWaveType = ((sender as System.Windows.Controls.ComboBox).SelectedItem as WaveGroup).GroupId;
+        }
         public void Screenshots()
         {
             try

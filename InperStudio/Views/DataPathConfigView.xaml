@@ -26,7 +26,7 @@
         <Grid x:Name="Load" Visibility="Collapsed">
             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Height="30">
                 <Button Style="{StaticResource ButtonPrimary}" FontFamily="{DynamicResource InperFontFamily}" Command="{s:Action ChoosePath}" Background="{DynamicResource InperTheme}" Content="Path"  CommandParameter="Load"   hc:BorderElement.CornerRadius="4 0 0 4" />
-                <TextBox hc:InfoElement.Placeholder="Storage Path" Style="{DynamicResource TextBoxExtend}" MinWidth="100" IsEnabled="False" hc:BorderElement.CornerRadius="0" Padding="10 0" x:Name="loadPath"    />
+                <TextBox hc:InfoElement.Placeholder="Storage Path" Style="{DynamicResource TextBoxExtend}" MinWidth="200" IsEnabled="False" hc:BorderElement.CornerRadius="0" Padding="10 0" x:Name="loadPath"    />
             </WrapPanel>
         </Grid>
         <Grid x:Name="Save" Visibility="Collapsed">

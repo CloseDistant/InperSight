@@ -1,6 +1,6 @@
 {
   "start": {
-    "immediately": false,
+    "immediately": true,
     "delay": {
       "isActive": false,
       "value": 0
@@ -20,7 +20,7 @@
     }
   },
   "stop": {
-    "immediately": false,
+    "immediately": true,
     "delay": {
       "isActive": false,
       "value": 0
@@ -42,14 +42,14 @@
   "eventPanelProperties": {
     "heightAuto": true,
     "heightFixed": false,
-    "heightFixedValue": 100,
+    "heightFixedValue": 150,
     "displayLockedBottom": true,
     "displayNameVisible": true
   },
   "cameraSignalSettings": {
     "exposure": 30,
     "sampling": 50,
-    "brightness": 40,
+    "brightness": 4,
     "recordMode": {
       "isContinuous": true,
       "isInterval": false,
@@ -57,34 +57,11 @@
       "interval": 10,
       "delay": 10
     },
-    "lightMode": [
-      {
-        "isActive": false,
-        "groupId": 0,
-        "waveType": "410 nm",
-        "lightPower": 50
-      }
-    ],
-    "cameraChannels": [
-      {
-        "channelId": 0,
-        "name": "test",
-        "roi": 40
-      }
-    ]
+    "lightMode": [],
+    "cameraChannels": []
   },
   "eventSettings": {
-    "channels": [
-      {
-        "channelId": 0,
-        "name": "test",
-        "type": "marker",
-        "isActive": false,
-        "hotkeys": "F1",
-        "deltaF": 1,
-        "bgColor": "#000000"
-      }
-    ],
+    "channels": [],
     "marker": null,
     "output": null
   }

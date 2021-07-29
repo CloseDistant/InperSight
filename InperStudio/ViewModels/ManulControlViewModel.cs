@@ -5,6 +5,7 @@ using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
+using InperStudioControlLib.Lib.Config;
 using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
@@ -64,9 +65,32 @@ namespace InperStudio.ViewModels
                         windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Load));
                         break;
                     case "Save":
-                        windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Save));
+                        JsonConfigSaveAs();
                         break;
                 }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        private void JsonConfigSaveAs()
+        {
+            try
+            {
+                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                dlg.Filter = "Json|*.inper";
+                // 设置默认的文件名。注意！文件扩展名须与Filter匹配
+                dlg.FileName = "UserConfig";
+                // 显示对话框
+                System.Windows.Forms.DialogResult r = dlg.ShowDialog();
+
+                if (r == System.Windows.Forms.DialogResult.Cancel)
+                {
+                    return;
+                }
+                string fname = dlg.FileName;
+                File.Copy(InperJsonConfig.filepath, fname);
             }
             catch (Exception ex)
             {
@@ -214,7 +238,7 @@ namespace InperStudio.ViewModels
             }
             else
             {
-                InperDeviceHelper.Instance.saveDataTask= Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
+                InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
             }
             InperGlobalClass.IsRecord = true;
             InperGlobalClass.IsPreview = true;

@@ -42,9 +42,9 @@ namespace InperStudio
             {
                 File.Copy(Assembly.GetEntryAssembly().Location + ".config", configPath);
             }
-            if (!File.Exists(jsonPath))
+            //if (!File.Exists(jsonPath))
             {
-                File.Copy(Environment.CurrentDirectory + @"\UserConfig.json", jsonPath);
+                File.Copy(Environment.CurrentDirectory + @"\UserConfig.json", jsonPath,true);
             }
             InperConfig.path = configPath;
             RegisterEvents();

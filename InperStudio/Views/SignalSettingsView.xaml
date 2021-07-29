@@ -24,7 +24,7 @@
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
-        <Grid x:Name="camera" Visibility="Visible">
+        <Grid x:Name="camera" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1.5*"/>
@@ -37,7 +37,7 @@
                 <Border Width="1" HorizontalAlignment="Right" Background="{DynamicResource InperDialogButtonColor}" Grid.RowSpan="2" Opacity=".6" />
                 <Grid Grid.Row="0" Margin="20" >
                     <Canvas Background="Transparent" Panel.ZIndex="999" x:Name="ellipseCanvas" Margin="1 0"></Canvas>
-                    <Image Stretch="UniformToFill" MaxWidth="720" MaxHeight="540"  Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
+                    <Image Stretch="Fill" MaxWidth="720" MaxHeight="540"  Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
                 <Grid Grid.Row="1" Margin="20 0">
                     <Grid.ColumnDefinitions>
@@ -48,7 +48,7 @@
                         <Grid>
                             <WrapPanel>
                                 <TextBlock Text="View" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                                <ComboBox Name="waveView" Style="{DynamicResource ComboBoxBaseStyle}"  DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="0" Padding="4 0" Margin="3 0 0 0" MinHeight="30" MinWidth="70" FontSize="{DynamicResource InperNormalFontSize}" />
+                                <ComboBox Name="waveView" Style="{DynamicResource ComboBoxBaseStyle}" SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="0" Padding="4 0" Margin="3 0 0 0" MinHeight="30" MinWidth="70" FontSize="{DynamicResource InperNormalFontSize}" />
                             </WrapPanel>
                             <hc:TextBox TextType="Int" HorizontalAlignment="Right" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Brightness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" VerticalContentAlignment="Center" hc:InfoElement.Title="Brightness" hc:InfoElement.TitlePlacement="Left" Width="120" hc:BorderElement.CornerRadius="0"  Padding="0" HorizontalContentAlignment="Center" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" BorderBrush="{DynamicResource InperDialogButtonColor}"></hc:TextBox>
                         </Grid>

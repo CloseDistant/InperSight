@@ -38,7 +38,7 @@
                 </Border>
             </Grid>
         </Border>
-        <Border  Effect="{DynamicResource EffectShadow1}" Margin="10" Grid.Row="1">
+        <Border  Effect="{DynamicResource EffectShadow1}" Margin="10" Grid.Row="1" Visibility="Collapsed">
             <Grid MinHeight="80" MinWidth="200" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

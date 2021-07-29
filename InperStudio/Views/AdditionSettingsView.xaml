@@ -40,7 +40,7 @@
                         <hc:TextBox Width="40" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <WrapPanel Margin="0 20 0 0" >
+                <WrapPanel Margin="0 20 0 0"  Visibility="Collapsed">
                     <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" VerticalAlignment="Top" x:Name="triggerRad" Margin="0 5 0 0 " IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}"  GroupName="start">
                         <WrapPanel IsEnabled="{Binding ElementName=triggerRad,Path=IsChecked}">
                             <TextBlock Text="Trigger" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
@@ -80,7 +80,7 @@
                         <hc:TextBox Width="40" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <WrapPanel Margin="0 20 0 0" >
+                <WrapPanel Margin="0 20 0 0"  Visibility="Collapsed">
                     <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 5 0 0 " GroupName="stop" IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
                         <WrapPanel  IsEnabled="{Binding ElementName=triggerRadStop,Path=IsChecked}">
                             <TextBlock Text="Trigger" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
