@@ -25,7 +25,7 @@ namespace InperStudio.Lib.Bean.Channel
 
         private BindableCollection<IAnnotationViewModel> annotations = new BindableCollection<IAnnotationViewModel>();
         public BindableCollection<IAnnotationViewModel> Annotations { get => annotations; set => SetAndNotify(ref annotations, value); }
-        private ScrollingViewportManager viewportManager= new ScrollingViewportManager(10);
+        private ScrollingViewportManager viewportManager = new ScrollingViewportManager(10);
         public ScrollingViewportManager ViewportManager { get => viewportManager; set => SetAndNotify(ref viewportManager, value); }
         private IRange range = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
         public IRange XVisibleRange { get => range; set => SetAndNotify(ref range, value); }

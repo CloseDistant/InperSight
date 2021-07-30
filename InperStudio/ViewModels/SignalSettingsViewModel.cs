@@ -133,8 +133,14 @@ namespace InperStudio.ViewModels
 
                 if (InperDeviceHelper.LightWaveLength.Count > 0)
                 {
-                    WaveGroup gruop = InperDeviceHelper.LightWaveLength.FirstOrDefault(x => x.WaveType.Contains("470")) ?? InperDeviceHelper.LightWaveLength.FirstOrDefault(x => x.WaveType.Contains("410"));
-                    view.waveView.SelectedItem = gruop;
+                    if (InperDeviceHelper.LightWaveLength.Count > 1)
+                    {
+                        view.waveView.SelectedItem = InperDeviceHelper.LightWaveLength[1];
+                    }
+                    else
+                    {
+                        view.waveView.SelectedItem = InperDeviceHelper.LightWaveLength[0];
+                    }
 
                     view.lightMode.ItemsSource = InperDeviceHelper.LightWaveLength;
                 }

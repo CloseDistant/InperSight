@@ -29,7 +29,7 @@
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1.5*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="4*"/>
                     <RowDefinition Height="1*"/>
@@ -52,9 +52,9 @@
                             </WrapPanel>
                             <hc:TextBox TextType="Int" HorizontalAlignment="Right" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Brightness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" VerticalContentAlignment="Center" hc:InfoElement.Title="Brightness" hc:InfoElement.TitlePlacement="Left" Width="120" hc:BorderElement.CornerRadius="0"  Padding="0" HorizontalContentAlignment="Center" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" BorderBrush="{DynamicResource InperDialogButtonColor}"></hc:TextBox>
                         </Grid>
-                        <hc:TextBox Margin="0 15 0 0" TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
+                        <hc:TextBox Margin="0 15 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="10 0 0 0">
+                    <StackPanel Grid.Column="1" Margin="10 0 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <UniformGrid Margin="0 5" Columns="3">
                             <Button Margin="0" HorizontalAlignment="Left" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
                                 <Image Source="/Lib/Images/Signal_Camera_Unknown.png" />
@@ -99,7 +99,7 @@
                             <TextBlock Text="Interval" Width="52" VerticalAlignment="Center" />
                             <TextBox Margin="5 0 0 0" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Interval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Padding="0" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="25" hc:InfoElement.ContentHeight="25" Width="45" />
                         </WrapPanel>
-                        <WrapPanel Margin="0 2">
+                        <WrapPanel Margin="0 2" Visibility="Hidden">
                             <TextBlock Text="Delay" Width="52" VerticalAlignment="Center" />
                             <TextBox Margin="5 0 0 0" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Delay,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Padding="0" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="25" hc:InfoElement.ContentHeight="25" Width="45" />
                         </WrapPanel>

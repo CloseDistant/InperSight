@@ -53,7 +53,16 @@ namespace InperStudio.Lib.Enum
         AtTime,
         Trigger
     }
-
+    public enum ChannelTypeEnum
+    {
+        Camera,
+        Analog,
+        Output,
+        Input,
+        Start,
+        Stop,
+        Manual
+    }
     public enum TimerError
     {
         /// <summary>没有错误</summary>

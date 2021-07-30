@@ -7,9 +7,14 @@
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
         xmlns:local="clr-namespace:InperStudio.Views"
         mc:Ignorable="d"
         Title="Marker" Height="500" Width="700" MinHeight="450" MinWidth="600" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
+    <inp:InperDialogWindow.Resources>
+        <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
+        <convert:RoiAIVisibilityConverter x:Key="RoiAIVisibilityConverter" />
+    </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
         <Grid x:Name="Marker" Margin="30 0" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
@@ -65,18 +70,18 @@
                         </ComboBox.Style>
                     </ComboBox>
                 </Grid>
-                <Grid Margin="0 20 0 0" >
+                <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
                     <hc:TextBox TextType="Double" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0" hc:TitleElement.TitleWidth="65" hc:TitleElement.Background="Red" hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="δF/F (%)" />
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}"  TextChanged="{s:Action MarkerName_TextChanged}" x:Name="MarkerName" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"  Width="160" />
+                    <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}" MaxLength="21"  TextChanged="{s:Action MarkerName_TextChanged}" x:Name="MarkerName" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"  Width="160" />
                 </Grid>
                 <Grid Margin="0 20 0 0" x:Name="conditionGrid" Visibility="Collapsed">
                     <TextBlock VerticalAlignment="Center" Text="Conditions"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <ComboBox Margin="20 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}"/>
                 </Grid>
-                <Grid Margin="0 20 0 0" >
+                <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Type,Converter={StaticResource ChannelTypeToVisibilityConverter}}">
                     <TextBlock VerticalAlignment="Center" Text="Hotkeys"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <Button Margin="20 0" Height="30" PreviewKeyDown="{s:Action Hotkeys_PreviewKeyDown}" x:Name="hotkeys" Content="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Hotkeys}" HorizontalAlignment="Right"  Width="160" />
                 </Grid>

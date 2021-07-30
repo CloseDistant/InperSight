@@ -36,17 +36,18 @@ namespace InperStudio
             {
                 _ = Directory.CreateDirectory(appConfigDir);
             }
-            string configPath = Path.Combine(appConfigDir, assemblyName + ".exe.config");
+            string configPath = Path.Combine(appConfigDir, "ProductConfig.config");
+
             string jsonPath = Path.Combine(appConfigDir, "UserConfig.json");
             if (!File.Exists(configPath))
             {
-                File.Copy(Assembly.GetEntryAssembly().Location + ".config", configPath);
+                File.Copy(Environment.CurrentDirectory + @"\ProductConfig.config", configPath);
             }
             //if (!File.Exists(jsonPath))
             {
                 File.Copy(Environment.CurrentDirectory + @"\UserConfig.json", jsonPath,true);
             }
-            InperConfig.path = configPath;
+  
             RegisterEvents();
             #endregion
             InperGlobalClass.DataPath = InperGlobalClass.DataPath == string.Empty ? Environment.CurrentDirectory + @"\Data\" : InperGlobalClass.DataPath;

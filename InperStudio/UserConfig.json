@@ -3,7 +3,7 @@
     "immediately": true,
     "delay": {
       "isActive": false,
-      "value": 0
+      "value": 10
     },
     "atTime": {
       "isActive": false,
@@ -23,7 +23,7 @@
     "immediately": true,
     "delay": {
       "isActive": false,
-      "value": 0
+      "value": 10
     },
     "atTime": {
       "isActive": false,
@@ -47,7 +47,7 @@
     "displayNameVisible": true
   },
   "cameraSignalSettings": {
-    "exposure": 30,
+    "exposure": 20,
     "sampling": 50,
     "brightness": 4,
     "recordMode": {

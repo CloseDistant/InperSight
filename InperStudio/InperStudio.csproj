@@ -207,7 +207,9 @@
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
+    <Compile Include="Lib\Convert\ChannelTypeToVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
+    <Compile Include="Lib\Convert\RoiAIVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\TestModeConvert.cs" />
     <Compile Include="Lib\Data\Model\AIROI.cs" />
     <Compile Include="Lib\Data\Model\ChannelRecord.cs" />
@@ -228,6 +230,7 @@
     <Compile Include="Lib\Helper\InperComputerInfoHelper.cs" />
     <Compile Include="Lib\Helper\InperDeviceHelper.cs" />
     <Compile Include="Lib\Helper\InperJsonHelper.cs" />
+    <Compile Include="Lib\Helper\InpertProductConfig.cs" />
     <Compile Include="Lib\Helper\JsonBean\AdditionRecordConditions.cs" />
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventPanelProperties.cs" />
@@ -299,7 +302,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="ProductConfig.config" />
+    <None Include="ProductConfig.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

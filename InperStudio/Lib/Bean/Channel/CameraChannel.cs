@@ -37,6 +37,11 @@ namespace InperStudio.Lib.Bean.Channel
         private IRange yrange = new DoubleRange(0, 10);
         public IRange YVisibleRange { get => yrange; set => SetAndNotify(ref yrange, value); }
     }
+    public class DioChannel : ChannelBase
+    {
+        public bool Offset { get; set; }
+        public Filters Filters { get; set; } = new Filters();
+    }
     public class LightMode<TX, TY> : PropertyChangedBase
         where TX : IComparable
         where TY : IComparable
