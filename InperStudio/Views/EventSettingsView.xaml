@@ -13,7 +13,46 @@
         Title="Marker" Height="500" Width="700" MinHeight="450" MinWidth="600" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
+        <convert:VisibilityToVisibilityReConverter x:Key="VisibilityToVisibilityReConverter" />
+        <convert:EventTypeConverter x:Key="EventTypeConverter" />
+        <convert:EventOutputConverter x:Key="EventOutputConverter" />
         <convert:RoiAIVisibilityConverter x:Key="RoiAIVisibilityConverter" />
+        <Style BasedOn="{StaticResource ComboBoxBaseStyle}" x:Key="InperComboBoxStyle" TargetType="ComboBox">
+            <Style.Setters>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style BasedOn="{StaticResource ComboBoxItemBaseStyle}" TargetType="ComboBoxItem">
+                            <Setter Property="Visibility" Value="{Binding IsActive,Converter={StaticResource Boolean2VisibilityReConverter},UpdateSourceTrigger=PropertyChanged}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ComboBoxItem">
+                                        <Border Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="IsSelected" Value="False" />
+                                                    <Condition Property="IsMouseOver" Value="True" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="Bd" Value="{DynamicResource SecondaryRegionBrush}" Property="Background" />
+                                            </MultiTrigger>
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions>
+                                                    <Condition Property="IsSelected" Value="True" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter TargetName="Bd" Value="{DynamicResource PrimaryBrush}" Property="Background" />
+                                                <Setter Property="Foreground" Value="White" />
+                                            </MultiTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style.Setters>
+        </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
         <Grid x:Name="Marker" Margin="30 0" VerticalAlignment="Center">
@@ -27,63 +66,56 @@
                     <TextBlock Text="Channels Setting" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="130" VerticalAlignment="Center" HorizontalAlignment="Right"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" Opacity=".4" />
                 </Grid>
-                <Grid Margin="0 20 0 0" >
+                <Grid Margin="0 20 0 0" x:Name="conditionGrid"  Visibility="Collapsed">
                     <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <ComboBox Margin="20 0"  HorizontalAlignment="Right"  ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="MarkerChannelCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}">
-                        <ComboBox.Style>
-                            <Style BasedOn="{StaticResource ComboBoxBaseStyle}" TargetType="ComboBox">
-                                <Style.Setters>
-                                    <Setter Property="ItemContainerStyle">
-                                        <Setter.Value>
-                                            <Style BasedOn="{StaticResource ComboBoxItemBaseStyle}" TargetType="ComboBoxItem">
-                                                <Setter Property="Visibility" Value="{Binding IsActive,Converter={StaticResource Boolean2VisibilityReConverter},UpdateSourceTrigger=PropertyChanged}"/>
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="ComboBoxItem">
-                                                            <Border Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <MultiTrigger>
-                                                                    <MultiTrigger.Conditions>
-                                                                        <Condition Property="IsSelected" Value="False" />
-                                                                        <Condition Property="IsMouseOver" Value="True" />
-                                                                    </MultiTrigger.Conditions>
-                                                                    <Setter TargetName="Bd" Value="{DynamicResource SecondaryRegionBrush}" Property="Background" />
-                                                                </MultiTrigger>
-                                                                <MultiTrigger>
-                                                                    <MultiTrigger.Conditions>
-                                                                        <Condition Property="IsSelected" Value="True" />
-                                                                    </MultiTrigger.Conditions>
-                                                                    <Setter TargetName="Bd" Value="{DynamicResource PrimaryBrush}" Property="Background" />
-                                                                    <Setter Property="Foreground" Value="White" />
-                                                                </MultiTrigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style.Setters>
-                            </Style>
-                        </ComboBox.Style>
-                    </ComboBox>
+                    <ComboBox Margin="20 0"  Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}"/>
                 </Grid>
-                <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
-                    <hc:TextBox TextType="Double" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0" hc:TitleElement.TitleWidth="65" hc:TitleElement.Background="Red" hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="δF/F (%)" />
+                <Grid Margin="0 20 0 0" >
+                    <TextBlock VerticalAlignment="Center" Text="Conditions"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="MarkerChannelCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}" />
+                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionChannelCombox"/>
+                </Grid>
+                <Grid Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" >
+                    <StackPanel Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
+                        <Grid>
+                            <TextBlock VerticalAlignment="Center" Text="δF/F (%)"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                            <hc:TextBox TextType="Double" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0"/>
+                        </Grid>
+                        <WrapPanel HorizontalAlignment="Right" Margin="0 10 20 0">
+                            <hc:TextBox Text="0.2" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
+                            <hc:TextBox Text="0.75" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
+                            <hc:TextBox Text="3" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Grid>
+                <Grid Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}">
+                    <StackPanel Margin="0 20 0 0" Visibility="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
+                        <Grid>
+                            <TextBlock VerticalAlignment="Center" Text="δF/F (%)"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                            <hc:TextBox TextType="Double" HorizontalContentAlignment="Center" Text="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="outputdeltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0"/>
+                        </Grid>
+                        <WrapPanel HorizontalAlignment="Right" Margin="0 10 20 0">
+                            <hc:TextBox Text="0.2" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
+                            <hc:TextBox Text="0.75" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
+                            <hc:TextBox Text="31" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
+                        </WrapPanel>
+                    </StackPanel>
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}" MaxLength="21"  TextChanged="{s:Action MarkerName_TextChanged}" x:Name="MarkerName" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"  Width="160" />
                 </Grid>
-                <Grid Margin="0 20 0 0" x:Name="conditionGrid" Visibility="Collapsed">
-                    <TextBlock VerticalAlignment="Center" Text="Conditions"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <ComboBox Margin="20 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}"/>
+                <Grid Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" >
+                    <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Type,Converter={StaticResource ChannelTypeToVisibilityConverter}}">
+                        <TextBlock VerticalAlignment="Center" Text="Hotkeys"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <Button Margin="20 0" Height="30" PreviewKeyDown="{s:Action Hotkeys_PreviewKeyDown}" x:Name="hotkeys" Content="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Hotkeys}" HorizontalAlignment="Right"  Width="160" />
+                    </Grid>
                 </Grid>
-                <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Type,Converter={StaticResource ChannelTypeToVisibilityConverter}}">
-                    <TextBlock VerticalAlignment="Center" Text="Hotkeys"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <Button Margin="20 0" Height="30" PreviewKeyDown="{s:Action Hotkeys_PreviewKeyDown}" x:Name="hotkeys" Content="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Hotkeys}" HorizontalAlignment="Right"  Width="160" />
+                <Grid Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" >
+                    <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.Type,Converter={StaticResource ChannelTypeToVisibilityConverter}}">
+                        <TextBlock VerticalAlignment="Center" Text="Hotkeys"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <Button Margin="20 0" Height="30" PreviewKeyDown="{s:Action Hotkeys_PreviewKeyDown}" x:Name="outputHotkeys" Content="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.Hotkeys}" HorizontalAlignment="Right"  Width="160" />
+                    </Grid>
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Color"  FontSize="{DynamicResource InperLargeFontSize}"/>

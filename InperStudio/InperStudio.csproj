@@ -208,9 +208,13 @@
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
     <Compile Include="Lib\Convert\ChannelTypeToVisibilityConverter.cs" />
+    <Compile Include="Lib\Convert\EventOutputConverter.cs" />
+    <Compile Include="Lib\Convert\EventTypeConverter.cs" />
+    <Compile Include="Lib\Convert\EventTypeMultiConverter.cs" />
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
     <Compile Include="Lib\Convert\RoiAIVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\TestModeConvert.cs" />
+    <Compile Include="Lib\Convert\VisibilityToVisibilityReConverter.cs" />
     <Compile Include="Lib\Data\Model\AIROI.cs" />
     <Compile Include="Lib\Data\Model\ChannelRecord.cs" />
     <Compile Include="Lib\Data\Model\ColumnDesc.cs" />
@@ -238,6 +242,7 @@
     <Compile Include="ViewModels\AdditionSettingsViewModel.cs" />
     <Compile Include="ViewModels\DataPathConfigViewModel.cs" />
     <Compile Include="ViewModels\DataShowControlViewModel.cs" />
+    <Compile Include="ViewModels\EventOutputSettingViewModel.cs" />
     <Compile Include="ViewModels\EventPanelPropertiesViewModel.cs" />
     <Compile Include="ViewModels\EventSettingsViewModel.cs" />
     <Compile Include="ViewModels\LeftToolsControlViewModel.cs" />
@@ -257,6 +262,9 @@
     </Compile>
     <Compile Include="Views\DataShowControlView.xaml.cs">
       <DependentUpon>DataShowControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EventOutputSettingView.xaml.cs">
+      <DependentUpon>EventOutputSettingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EventPanelPropertiesView.xaml.cs">
       <DependentUpon>EventPanelPropertiesView.xaml</DependentUpon>
@@ -330,6 +338,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DataShowControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EventOutputSettingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

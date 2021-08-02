@@ -29,14 +29,18 @@ namespace InperStudio.ViewModels
         private readonly EventSettingsTypeEnum @enum;
         private EventSettingsView view;
 
+        public string EventType { get; set; }
         private List<EventChannel> manualChannels = new List<EventChannel>();
         private BindableCollection<EventChannel> markerChannels = new BindableCollection<EventChannel>();
         public BindableCollection<EventChannel> MarkerChannels { get => markerChannels; set => SetAndNotify(ref markerChannels, value); }
+        private BindableCollection<EventChannel> conditionsChannels = new BindableCollection<EventChannel>();
+        public BindableCollection<EventChannel> ConditionsChannels { get => conditionsChannels; set => SetAndNotify(ref conditionsChannels, value); }
         public List<string> EventColorList { get; set; } = InperColorHelper.ColorPresetList;
         #endregion
         public EventSettingsViewModel(EventSettingsTypeEnum typeEnum)
         {
             @enum = typeEnum;
+            EventType = typeEnum.ToString();
         }
         protected override void OnViewLoaded()
         {
@@ -54,10 +58,6 @@ namespace InperStudio.ViewModels
             }
             //读取所有通道
             {
-                //for (int i = 0; i < 8; i++)
-                //{
-                //    MarkerChannels.Add(new EventChannel() { IsActive = false, ChannelId = i, Name = "DIO-" + (i + 1) + "-PFC", BgColor = InperColorHelper.ColorPresetList[i], Hotkeys = InperColorHelper.HotkeysList[i] });
-                //}
                 foreach (DioChannel item in InpertProductConfig.GetAllNodes())
                 {
                     markerChannels.Add(new EventChannel()
@@ -69,20 +69,26 @@ namespace InperStudio.ViewModels
                         //Type = item.Type ?? ChannelTypeEnum.Input.ToString()
                     });
                 }
+
+                foreach (Channel item in InperGlobalClass.CameraSignalSettings.CameraChannels)
+                {
+                    var channel = new EventChannel()
+                    {
+                        IsActive = false,
+                        ChannelId = item.ChannelId,
+                        Name = item.Name,
+                        DeltaF = item.DeltaF == 0 ? 5 : item.DeltaF,
+                        BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
+                        Type = item.Type ?? ChannelTypeEnum.Camera.ToString()
+                    };
+                    if (@enum == EventSettingsTypeEnum.Marker)
+                    {
+                        markerChannels.Add(channel);
+                    }
+                    ConditionsChannels.Add(channel);
+                }
                 if (@enum == EventSettingsTypeEnum.Marker)
                 {
-                    foreach (Channel item in InperGlobalClass.CameraSignalSettings.CameraChannels)
-                    {
-                        markerChannels.Add(new EventChannel()
-                        {
-                            IsActive = false,
-                            ChannelId = item.ChannelId,
-                            Name = item.Name,
-                            DeltaF = item.DeltaF == 0 ? 5 : item.DeltaF,
-                            BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
-                            Type = item.Type ?? ChannelTypeEnum.Camera.ToString()
-                        });
-                    }
                     markerChannels.Add(new EventChannel()
                     {
                         IsActive = false,
@@ -108,6 +114,31 @@ namespace InperStudio.ViewModels
                         Type = ChannelTypeEnum.Manual.ToString()
                     });
                 }
+
+                ConditionsChannels.Add(new EventChannel()
+                {
+                    IsActive = false,
+                    ChannelId = 0,
+                    Name = "Start",
+                    BgColor = InperColorHelper.ColorPresetList[0],
+                    Type = ChannelTypeEnum.Start.ToString()
+                });
+                ConditionsChannels.Add(new EventChannel()
+                {
+                    IsActive = false,
+                    ChannelId = 1,
+                    Name = "Stop",
+                    BgColor = InperColorHelper.ColorPresetList[1],
+                    Type = ChannelTypeEnum.Stop.ToString()
+                });
+                ConditionsChannels.Add(new EventChannel()
+                {
+                    IsActive = false,
+                    ChannelId = -1,
+                    Name = "Manual",
+                    BgColor = InperColorHelper.ColorPresetList[0],
+                    Type = ChannelTypeEnum.Manual.ToString()
+                });
             }
             //配置文件匹配  并设置当前可用通道
             foreach (EventChannelJson item in InperGlobalClass.EventSettings.Channels)
@@ -157,6 +188,10 @@ namespace InperStudio.ViewModels
 
             }
             view.MarkerChannelCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
+            if(@enum == EventSettingsTypeEnum.Output)
+            {
+                view.ConditionChannelCombox.SelectedIndex = 0;
+            }
         }
 
         #region method Marker
