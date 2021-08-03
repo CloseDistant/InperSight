@@ -12,6 +12,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public double Exposure { get; set; }
         public double Sampling { get; set; }
+        public double Gain { get; set; } = 0;
         public double Brightness { get; set; }
         public RecordMode RecordMode { get; set; }
         public List<WaveGroup> LightMode { get; set; }
@@ -32,6 +33,9 @@ namespace InperStudio.Lib.Helper.JsonBean
         public string Type { get; set; }
         public double ROI { get; set; }
         public double DeltaF { get; set; }
+        public double Tau1 { get; set; } = 0.2;
+        public double Tau2 { get; set; } = 0.75;
+        public double Tau3 { get; set; } = 3;
         public double Left { get; set; }
         public double Top { get; set; }
         public double YTop { get; set; }

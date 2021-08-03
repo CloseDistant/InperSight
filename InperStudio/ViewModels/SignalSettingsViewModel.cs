@@ -39,7 +39,7 @@ namespace InperStudio.ViewModels
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
         private bool isDown = false;
-        private int diameter = 40;
+        private int diameter = 75;
         private Grid moveGrid = null;
         public Grid MoveGrid { get => moveGrid; set => SetAndNotify(ref moveGrid, value); }
         public int Diameter { get => diameter; set => SetAndNotify(ref diameter, value); }
@@ -462,6 +462,7 @@ namespace InperStudio.ViewModels
                             WaveColor = sen.GroupId == 1 ? InperColorHelper.SCBrushes[item.ChannelId % 9] : (sen.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
                             XyDataSeries = new XyDataSeries<TimeSpan, double>()
                         };
+                        item.LightModes.Add(mode);
                     }
                     LineRenderableSeriesViewModel fast = null;
                     foreach (LineRenderableSeriesViewModel line in item.RenderableSeries)
@@ -481,6 +482,18 @@ namespace InperStudio.ViewModels
 
                 }
                 e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void Gain_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                double gain = double.Parse((sender as System.Windows.Controls.TextBox).Text);
+                _ = DevPhotometry.Instance.SetGain(gain);
             }
             catch (Exception ex)
             {

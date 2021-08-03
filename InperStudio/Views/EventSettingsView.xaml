@@ -73,7 +73,7 @@
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Conditions"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="MarkerChannelCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}" />
-                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionChannelCombox"/>
+                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionChannelCombox" SelectionChanged="{s:Action ConditionsChannelCombox_SelectionChanged}"/>
                 </Grid>
                 <Grid Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" >
                     <StackPanel Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
@@ -82,9 +82,9 @@
                             <hc:TextBox TextType="Double" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0"/>
                         </Grid>
                         <WrapPanel HorizontalAlignment="Right" Margin="0 10 20 0">
-                            <hc:TextBox Text="0.2" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
-                            <hc:TextBox Text="0.75" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
-                            <hc:TextBox Text="3" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
+                            <hc:TextBox Text="{Binding  ElementName=MarkerChannelCombox,Path=SelectedItem.Tau1,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
+                            <hc:TextBox Text="{Binding  ElementName=MarkerChannelCombox,Path=SelectedItem.Tau2,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
+                            <hc:TextBox Text="{Binding  ElementName=MarkerChannelCombox,Path=SelectedItem.Tau3,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
                         </WrapPanel>
                     </StackPanel>
                 </Grid>
@@ -95,15 +95,15 @@
                             <hc:TextBox TextType="Double" HorizontalContentAlignment="Center" Text="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.DeltaF,UpdateSourceTrigger=PropertyChanged}" Name="outputdeltaValue" HorizontalAlignment="Right" Style="{StaticResource TextBoxExtend}" Width="160" Margin="20 0"/>
                         </Grid>
                         <WrapPanel HorizontalAlignment="Right" Margin="0 10 20 0">
-                            <hc:TextBox Text="0.2" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
-                            <hc:TextBox Text="0.75" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
-                            <hc:TextBox Text="31" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
+                            <hc:TextBox Text="{Binding  ElementName=ConditionChannelCombox,Path=SelectedItem.Tau1,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
+                            <hc:TextBox Text="{Binding  ElementName=ConditionChannelCombox,Path=SelectedItem.Tau2,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
+                            <hc:TextBox Text="{Binding  ElementName=ConditionChannelCombox,Path=SelectedItem.Tau3,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
                         </WrapPanel>
                     </StackPanel>
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}" MaxLength="21"  TextChanged="{s:Action MarkerName_TextChanged}" x:Name="MarkerName" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"  Width="160" />
+                    <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}" MaxLength="21"  TextChanged="{s:Action MarkerName_TextChanged}" x:Name="MarkerName"  HorizontalAlignment="Right"  Width="160" />
                 </Grid>
                 <Grid Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" >
                     <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Type,Converter={StaticResource ChannelTypeToVisibilityConverter}}">

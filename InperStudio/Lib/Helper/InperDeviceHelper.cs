@@ -123,11 +123,13 @@ namespace InperStudio.Lib.Helper
                 {
                     foreach (var item in CameraChannels)
                     {
+                        item.Offset = false;
                         _SaveSignalQs.Add(item.ChannelId, new SignalData());
                         if (item.LightModes.Count > 0)
                         {
                             item.LightModes.ForEach(x =>
                             {
+                                x.OffsetValue = 0;
                                 _SaveSignalQs[item.ChannelId].ValuePairs.Add(x.LightType, new Queue<KeyValuePair<long, double>>());
                             });
                         }
@@ -314,21 +316,21 @@ namespace InperStudio.Lib.Helper
                     Mat image_mat = mmats.Last().ImageMat;
                     unsafe
                     {
-                        Mat new_image = new Mat(image_mat.Size(), image_mat.Type());
-                        for (int y = 0; y < image_mat.Rows; y++)
-                        {
-                            for (int x = 0; x < image_mat.Cols; x++)
-                            {
-                                for (int c = 0; c < image_mat.Channels(); c++)
-                                {
-                                    float color = image_mat.At<int>(y, x);
-                                    new_image.Set<float>(y, x, (float)(color * InperGlobalClass.CameraSignalSettings.Brightness));
-                                }
-                            }
-                        }
-                        Mat mat = new Mat();
-                        Cv2.Blur(new_image, mat, new OpenCvSharp.Size(3, 5) );
-                        Marshal.Copy(new_image.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
+                        //Mat new_image = new Mat(image_mat.Size(), image_mat.Type());
+                        //for (int y = 0; y < image_mat.Rows; y++)
+                        //{
+                        //    for (int x = 0; x < image_mat.Cols; x++)
+                        //    {
+                        //        for (int c = 0; c < image_mat.Channels(); c++)
+                        //        {
+                        //            float color = image_mat.At<int>(y, x);
+                        //            new_image.Set<float>(y, x, (float)(color * InperGlobalClass.CameraSignalSettings.Brightness));
+                        //        }
+                        //    }
+                        //}
+                        //Mat mat = new Mat();
+                        //Cv2.Blur(new_image, mat, new OpenCvSharp.Size(3, 5));
+                        Marshal.Copy(image_mat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
                         System.Windows.Application.Current?.Dispatcher.Invoke(new Action(() =>
                         {
                             _WBMPPreview.Lock();
@@ -368,12 +370,25 @@ namespace InperStudio.Lib.Helper
                             _ = Parallel.ForEach(CameraChannels, mask =>
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
+                                  if (mask.Offset)
+                                  {
+                                      LightMode<TimeSpan, double> offsetValue = mask.LightModes.FirstOrDefault(x => x.LightType == m.Group);
+                                      XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
+                                      if (linedata.Count > mask.OffsetWindowSize && offsetValue.OffsetValue == 0)
+                                      {
+                                          offsetValue.OffsetValue = linedata.YValues.ToList().GetRange(linedata.Count - mask.OffsetWindowSize, mask.OffsetWindowSize).Average();
+                                      }
+                                      Console.WriteLine(offsetValue.OffsetValue);
+                                      r -= offsetValue.OffsetValue;
+                                  }
                                   ploting_data[mask.ChannelId] = r;
                               });
 
                             this.AppendData(ploting_data, m.Group, ts);
-                            this.SaveData(ploting_data, ts, m.Group);
+                            if (InperGlobalClass.IsRecord)
+                            {
+                                this.SaveData(ploting_data, ts, m.Group);
+                            }
                         }
                     }
                 }

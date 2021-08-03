@@ -66,7 +66,7 @@ namespace InperStudio.ViewModels
                         ChannelId = item.ChannelId,
                         Name = item.Name,
                         BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
-                        //Type = item.Type ?? ChannelTypeEnum.Input.ToString()
+                        Type = ChannelTypeEnum.DIO.ToString()
                     });
                 }
 
@@ -78,6 +78,9 @@ namespace InperStudio.ViewModels
                         ChannelId = item.ChannelId,
                         Name = item.Name,
                         DeltaF = item.DeltaF == 0 ? 5 : item.DeltaF,
+                        Tau1 = item.Tau1,
+                        Tau2 = item.Tau2,
+                        Tau3 = item.Tau3,
                         BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
                         Type = item.Type ?? ChannelTypeEnum.Camera.ToString()
                     };
@@ -188,9 +191,10 @@ namespace InperStudio.ViewModels
 
             }
             view.MarkerChannelCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
-            if(@enum == EventSettingsTypeEnum.Output)
+            if (@enum == EventSettingsTypeEnum.Output)
             {
                 view.ConditionChannelCombox.SelectedIndex = 0;
+                view.ConditionsCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
             }
         }
 
@@ -202,8 +206,10 @@ namespace InperStudio.ViewModels
                 TextBox tb = sender as TextBox;
                 if (tb.IsFocused)
                 {
-                    EventChannel ch = this.view.MarkerChannelCombox.SelectedItem as EventChannel;
-                    if (ch.Name.StartsWith("DIO"))
+                    EventChannel ch = @enum == EventSettingsTypeEnum.Marker
+                        ? this.view.MarkerChannelCombox.SelectedItem as EventChannel
+                        : this.view.ConditionsCombox.SelectedItem as EventChannel;
+                    if (ch.Name.StartsWith("DIO") || ch.Type == ChannelTypeEnum.DIO.ToString())
                     {
                         if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + (view.MarkerChannelCombox.SelectedIndex + 1) + "-"))
                         {
@@ -332,6 +338,66 @@ namespace InperStudio.ViewModels
                         view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.BgColor));
                     }
                     view.hotkeys.Content = item.Hotkeys;
+                    view.MarkerName.Text = item.Name;
+                    if (@enum == EventSettingsTypeEnum.Output)
+                    {
+                        view.MarkerName.Text += view.ConditionChannelCombox.Text;
+                        if ((view.ConditionChannelCombox.SelectedItem as EventChannel)?.Type == ChannelTypeEnum.Manual.ToString())
+                        {
+                            view.outputHotkeys.Content = (view.ConditionChannelCombox.SelectedItem as EventChannel).Hotkeys = "F" + item.ChannelId;
+                        }
+                        var con = view.ConditionChannelCombox.SelectedItem as EventChannel ?? null;
+                        if (con != null)
+                        {
+                            item.Condition = new EventChannelJson()
+                            {
+                                ChannelId = con.ChannelId,
+                                BgColor = con.BgColor,
+                                Hotkeys = con.Hotkeys,
+                                DeltaF = con.DeltaF,
+                                Tau1 = con.Tau1,
+                                Tau2 = con.Tau2,
+                                Tau3 = con.Tau3,
+                                Name = con.Name,
+                                Type = con.Type
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void ConditionsChannelCombox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                EventChannel item = (sender as System.Windows.Controls.ComboBox).SelectedItem as EventChannel;
+                EventChannel channel = view.ConditionsCombox.SelectedItem as EventChannel;
+                if (item != null)
+                {
+                    view.MarkerName.Text = view.ConditionsCombox.Text + item.Name;
+                    if (item.Type == ChannelTypeEnum.Manual.ToString())
+                    {
+                        view.outputHotkeys.Content = item.Hotkeys = "F" + channel.ChannelId;
+                    }
+                    if (channel != null)
+                    {
+                        channel.Condition = new EventChannelJson()
+                        {
+                            ChannelId = item.ChannelId,
+                            BgColor = item.BgColor,
+                            Hotkeys = item.Hotkeys,
+                            DeltaF = item.DeltaF,
+                            Tau1 = item.Tau1,
+                            Tau2 = item.Tau2,
+                            Tau3 = item.Tau3,
+                            Name = item.Name,
+                            Type = item.Type
+                        };
+                    }
                 }
             }
             catch (Exception ex)
@@ -355,13 +421,15 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                EventChannel ch = this.view.MarkerChannelCombox.SelectedItem as EventChannel;
+                EventChannel ch = @enum == EventSettingsTypeEnum.Marker
+                    ? view.MarkerChannelCombox.SelectedItem as EventChannel
+                    : view.ConditionsCombox.SelectedItem as EventChannel;
                 EventChannel ch_active = this.view.markerActiveChannel.SelectedItem as EventChannel;
                 if (moveType == "leftMove")//右移是激活 左移是取消激活
                 {
                     if (ch_active != null)
                     {
-                        if (ch.Type != ChannelTypeEnum.Manual.ToString())
+                        if (ch_active.Type != ChannelTypeEnum.Manual.ToString())
                         {
                             MarkerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ch_active.Type).IsActive = false;
                         }
@@ -387,6 +455,10 @@ namespace InperStudio.ViewModels
                                 manualChannels.Remove(ch_active);
                             }
                         }
+                    }
+                    if (@enum == EventSettingsTypeEnum.Output)
+                    {
+                        this.view.ConditionsCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
                     }
                 }
                 else
@@ -419,7 +491,11 @@ namespace InperStudio.ViewModels
                                 Name = ch.Name,
                                 BgColor = ch.BgColor,
                                 DeltaF = ch.DeltaF,
+                                Tau1 = ch.Tau1,
+                                Tau2 = ch.Tau2,
+                                Tau3 = ch.Tau3,
                                 Hotkeys = ch.Hotkeys,
+                                Condition = ch.Condition,
                                 Type = type
                             };
 
@@ -460,8 +536,15 @@ namespace InperStudio.ViewModels
                             InperDeviceHelper.Instance.EventChannelChart.EventQs.Add(ch.ChannelId, new Queue<KeyValuePair<long, double>>());
                             Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
                         }
-                        view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(MarkerChannels.FirstOrDefault(x => x.IsActive == false).BgColor));
-                        view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
+                        view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(MarkerChannels.FirstOrDefault(x => x.IsActive == false)?.BgColor ?? "#000000"));
+                        if (@enum == EventSettingsTypeEnum.Marker)
+                        {
+                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
+                        }
+                        else
+                        {
+                            view.ConditionsCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
+                        }
                     }
                 }
             }

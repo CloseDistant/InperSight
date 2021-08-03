@@ -22,7 +22,8 @@ namespace InperStudio.ViewModels
         private SignalPropertiesTypeEnum @enum;
         private readonly int _ChannleId = 999;
         public CameraSignalSettings CameraSignalSettings { get; set; } = InperGlobalClass.CameraSignalSettings;
-        public BindableCollection<Channel> Channels { get; set; } = new BindableCollection<Channel>();
+        private BindableCollection<Channel> channels = new BindableCollection<Channel>();
+        public BindableCollection<Channel> Channels { get => channels; set => SetAndNotify(ref channels, value); }
         #endregion
         public SignalPropertiesViewModel(SignalPropertiesTypeEnum @enum)
         {
@@ -66,6 +67,12 @@ namespace InperStudio.ViewModels
             {
                 Channels.Add(new Channel() { ChannelId = _ChannleId, Name = "All", YTop = 1, YBottom = 0.01, Filters = new Lib.Helper.JsonBean.Filters(), Offset = false });
             }
+            view.offsetChannel.SelectionChanged += (s, e) =>
+            {
+                var channel = (s as System.Windows.Controls.ComboBox).SelectedItem as Channel;
+                view.offset.IsEnabled = !channel.Offset;
+                view.cancle.IsEnabled = channel.Offset;
+            };
         }
         public void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -139,11 +146,25 @@ namespace InperStudio.ViewModels
                         {
                             x.Offset = false;
                         });
+                        _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                        {
+                            chn.Offset = false;
+                        });
+                        item.Offset = false;
                     }
                     else
                     {
                         CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = false;
+                        _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                        {
+                            if (chn.ChannelId == item.ChannelId)
+                            {
+                                chn.Offset = false;
+                            }
+                        });
                     }
+                    view.offset.IsEnabled = true;
+                    view.cancle.IsEnabled = false;
                 }
                 else
                 {
@@ -153,11 +174,25 @@ namespace InperStudio.ViewModels
                         {
                             x.Offset = true;
                         });
+                        _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                          {
+                              chn.Offset = true;
+                          });
+                        item.Offset = true;
                     }
                     else
                     {
                         CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = true;
+                        _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                        {
+                            if (chn.ChannelId == item.ChannelId)
+                            {
+                                chn.Offset = true;
+                            }
+                        });
                     }
+                    view.cancle.IsEnabled = true;
+                    view.offset.IsEnabled = false;
                 }
             }
             catch (Exception ex)

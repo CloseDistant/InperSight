@@ -31,6 +31,10 @@ namespace InperStudio.Lib.Helper.JsonBean
             }
         }
         public double DeltaF { get; set; }
+        public double Tau1 { get; set; }
+        public double Tau2 { get; set; }
+        public double Tau3 { get; set; }
+        public EventChannelJson Condition { get; set; }
         /// <summary>
         /// 类型  区分是mark通道还是output通道
         /// </summary>

@@ -57,6 +57,7 @@ namespace InperStudio.Lib.Enum
     {
         Camera,
         Analog,
+        DIO,
         Output,
         Input,
         Start,

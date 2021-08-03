@@ -1,4 +1,5 @@
-﻿using SciChart.Charting.Model.ChartSeries;
+﻿using InperStudio.Lib.Helper.JsonBean;
+using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Visuals.Annotations;
 using SciChart.Data.Model;
 using Stylet;
@@ -18,6 +19,10 @@ namespace InperStudio.Lib.Bean.Channel
         public string BgColor { get; set; } = Brushes.Red.ToString();
         public string Hotkeys { get; set; }
         public double DeltaF { get; set; }
+        public double Tau1 { get; set; }
+        public double Tau2 { get; set; }
+        public double Tau3 { get; set; }
+        public EventChannelJson Condition { get; set; }
     }
     public class EventChannelChart : PropertyChangedBase
     {

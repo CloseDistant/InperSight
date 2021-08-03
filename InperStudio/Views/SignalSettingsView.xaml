@@ -11,7 +11,7 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         mc:Ignorable="d" Title="Camera Signal Settings"  IsShowMaxButton="False" IsShowMiniButton="False" 
-        Height="580" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}">
+        Height="590" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
         <convert:TestModeConvert x:Key="TestModeConvert"/>
@@ -50,7 +50,7 @@
                                 <TextBlock Text="View" VerticalAlignment="Center" Margin="0 0 10 0"/>
                                 <ComboBox Name="waveView" Style="{DynamicResource ComboBoxBaseStyle}" SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="0" Padding="4 0" Margin="3 0 0 0" MinHeight="30" MinWidth="70" FontSize="{DynamicResource InperNormalFontSize}" />
                             </WrapPanel>
-                            <hc:TextBox TextType="Int" HorizontalAlignment="Right" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Brightness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" VerticalContentAlignment="Center" hc:InfoElement.Title="Brightness" hc:InfoElement.TitlePlacement="Left" Width="120" hc:BorderElement.CornerRadius="0"  Padding="0" HorizontalContentAlignment="Center" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" BorderBrush="{DynamicResource InperDialogButtonColor}"></hc:TextBox>
+                            <!--<hc:TextBox TextType="Int" HorizontalAlignment="Right" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Brightness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" VerticalContentAlignment="Center" hc:InfoElement.Title="Brightness" hc:InfoElement.TitlePlacement="Left" Width="120" hc:BorderElement.CornerRadius="0"  Padding="0" HorizontalContentAlignment="Center" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" BorderBrush="{DynamicResource InperDialogButtonColor}"></hc:TextBox>-->
                         </Grid>
                         <hc:TextBox Margin="0 15 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
                     </StackPanel>
@@ -83,6 +83,10 @@
                     <TextBlock Text="Sampling (fps)" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>
                     <ComboBox ItemsSource="{Binding FPS,UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Sampling}" SelectionChanged="{s:Action FPS_SelectionChanged}" Style="{DynamicResource ComboBoxBaseStyle}" hc:BorderElement.CornerRadius="0" Padding="4 0" Margin="20 0 0 0" MinHeight="25" MinWidth="80" FontSize="{DynamicResource InperNormalFontSize}"/>
                 </WrapPanel>
+                <WrapPanel Margin="0 10"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                    <TextBlock Text="Gain" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>
+                    <TextBox Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action Gain_TextChanged}" HorizontalContentAlignment="Center" Padding="0"  hc:BorderElement.CornerRadius="0"  MinWidth="80"  Margin="20 0 0 0" MinHeight="25" />
+                </WrapPanel>
                 <WrapPanel Margin="0 10">
                     <TextBlock Text="Record Mode" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="97" HorizontalAlignment="Right" VerticalAlignment="Center" LineStroke="{DynamicResource InperTheme}" Margin="12 0 0 0" Opacity=".4"/>
@@ -99,7 +103,7 @@
                             <TextBlock Text="Interval" Width="52" VerticalAlignment="Center" />
                             <TextBox Margin="5 0 0 0" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Interval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Padding="0" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="25" hc:InfoElement.ContentHeight="25" Width="45" />
                         </WrapPanel>
-                        <WrapPanel Margin="0 2" Visibility="Hidden">
+                        <WrapPanel Margin="0 2" Visibility="Collapsed">
                             <TextBlock Text="Delay" Width="52" VerticalAlignment="Center" />
                             <TextBox Margin="5 0 0 0" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Delay,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Padding="0" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="25" hc:InfoElement.ContentHeight="25" Width="45" />
                         </WrapPanel>
