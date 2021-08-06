@@ -54,6 +54,7 @@ namespace InperStudio.Lib.Bean.Channel
         public double OffsetValue { get; set; }
         private XyDataSeries<TX, TY> dataSeries = new XyDataSeries<TX, TY>();
         public XyDataSeries<TX, TY> XyDataSeries { get => dataSeries; set => SetAndNotify(ref dataSeries, value); }
+        public Derivative Derivative { get; set; } = new Derivative(30);
         public SolidColorBrush WaveColor { get; set; }
     }
     public class Filters
@@ -64,7 +65,7 @@ namespace InperStudio.Lib.Bean.Channel
         public double HighPass { get; set; }
         public bool IsNotch { get; set; }
         public double Notch { get; set; }
-        public bool IsSmooth { get; set; }
-        public double Smooth { get; set; }
+        public bool IsSmooth { get; set; } = true;
+        public double Smooth { get; set; } = 5;
     }
 }

@@ -56,7 +56,7 @@
                     </RadioButton>
                 </WrapPanel>
             </StackPanel>
-            <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" DataContext="{Binding AdditionRecordStop}">
+            <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" DataContext="{Binding AdditionRecordStop,UpdateSourceTrigger=PropertyChanged}">
                 <Grid Margin="0 20 0 0" >
                     <TextBlock Text="Stop" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="Auto" VerticalAlignment="Center" Opacity=".4" HorizontalAlignment="Stretch"  LineStroke="{DynamicResource InperTheme}" Margin="46 0 0 0"  />

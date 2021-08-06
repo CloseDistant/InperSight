@@ -227,7 +227,7 @@ namespace InperStudio.ViewModels
             grid.SetValue(Canvas.LeftProperty, left);
             grid.SetValue(Canvas.TopProperty, top);
             grid.MouseLeftButtonDown += Grid_MouseDown;
-            grid.MouseMove += Grid_MouseMove;
+            //grid.MouseMove += Grid_MouseMove;
             grid.MouseLeftButtonUp += Grid_MouseUp;
             Ellipse ellipse = new Ellipse()
             {
@@ -442,6 +442,7 @@ namespace InperStudio.ViewModels
                 if (sen.IsChecked)
                 {
                     DevPhotometry.Instance.SwitchLight(sen.GroupId, true);
+                    DevPhotometry.Instance.SetLightPower(sen.GroupId, sen.LightPower);
 
                     WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId);
                     if (wg == null)
@@ -460,7 +461,7 @@ namespace InperStudio.ViewModels
                         {
                             LightType = sen.GroupId,
                             WaveColor = sen.GroupId == 1 ? InperColorHelper.SCBrushes[item.ChannelId % 9] : (sen.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
-                            XyDataSeries = new XyDataSeries<TimeSpan, double>()
+                            XyDataSeries = new XyDataSeries<TimeSpan, double>(),
                         };
                         item.LightModes.Add(mode);
                     }

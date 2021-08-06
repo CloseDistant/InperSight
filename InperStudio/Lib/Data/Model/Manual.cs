@@ -15,6 +15,7 @@ namespace InperStudio.Lib.Data.Model
         public int ChannelId { get; set; }
         public string Name { get; set; }
         public string Color { get; set; }
+        public string Type { get; set; }
         public long CameraTime { get; set; }
         public DateTime DateTime { get; set; }
     }

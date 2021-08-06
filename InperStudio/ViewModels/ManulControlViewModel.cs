@@ -6,6 +6,7 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
+using InperStudioControlLib.Lib.DeviceAgency;
 using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
@@ -198,9 +199,10 @@ namespace InperStudio.ViewModels
             }
             if (!InperDeviceHelper.Instance.InitDataStruct())
             {
-                InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                InperGlobalClass.ShowReminderInfo("数据初始化失败");
                 return;
             }
+            InperDeviceHelper.Instance.AllLightOpen();
             InperDeviceHelper.Instance.StartCollect();
 
             InperGlobalClass.IsPreview = true;
@@ -210,55 +212,165 @@ namespace InperStudio.ViewModels
 
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
-        private void StartRecord()
+        private async void StartRecord()
         {
-
-            if (!InperGlobalClass.IsPreview)
+            if (InperGlobalClass.IsPreview)
             {
-                InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
-                InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
-                InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-                if (!InperDeviceHelper.Instance.InitDataStruct())
-                {
-                    InperGlobalClass.ShowReminderInfo("未配置数据通道");
-                    return;
-                }
+                StopRecord();
+            }
+
+            InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
+            InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
+            InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
+            if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
+            {
+                InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                return;
+            }
+            if (!InperDeviceHelper.Instance.InitDataStruct())
+            {
+                InperGlobalClass.ShowReminderInfo("数据初始化失败");
+                return;
             }
 
             if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
             {
                 _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
             }
-            //数据库优先初始化
-            App.SqlDataInit = new Lib.Data.SqlDataInit();
 
-            if (!InperGlobalClass.IsPreview)
+            Task task = StartTriggerStrategy();
+            if (task != null)
             {
-                InperDeviceHelper.Instance.StartCollect();
+                await task;
             }
             else
             {
-                InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
+                InperDeviceHelper.Instance.AllLightOpen();
             }
+
+            //数据库优先初始化
+            App.SqlDataInit = new Lib.Data.SqlDataInit();
+
+            InperDeviceHelper.Instance.StartCollect();
+
             InperGlobalClass.IsRecord = true;
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsStop = false;
+            (this.View as ManulControlView).Root_Gird.IsEnabled = true;
+
+            InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
+
 
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
-        private void StopRecord()
+        private async void StopRecord()
         {
+            if (InperGlobalClass.IsRecord)
+            {
+                Task task = StopTriggerStrategy();
+                if (task != null)
+                {
+                    await task;
+                }
+            }
+
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsPreview = false;
             InperGlobalClass.IsStop = true;
+            (this.View as ManulControlView).Root_Gird.IsEnabled = true;
             InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+            await Task.Delay(3000);
 
             InperDeviceHelper.Instance.StopCollect();
 
-            while (InperClassHelper.GetWindowByNameChar("Video Window") != null)
+            InperDeviceHelper.Instance.AllLightClose();
+            //while (InperClassHelper.GetWindowByNameChar("Video Window") != null)
+            //{
+            //    InperClassHelper.GetWindowByNameChar("Video Window").Close();
+            //}
+        }
+        private Task StartTriggerStrategy()
+        {
+            (this.View as ManulControlView).Root_Gird.IsEnabled = false;
+            var obj = InperJsonHelper.GetAdditionRecordJson();
+            if (InperGlobalClass.AdditionRecordConditionsStart == AdditionRecordConditionsTypeEnum.Delay)
             {
-                InperClassHelper.GetWindowByNameChar("Video Window").Close();
+
+                return Task.Factory.StartNew(() =>
+                {
+                    InperDeviceHelper.Instance.AllLightClose();
+                    DateTime time = DateTime.Now.AddSeconds(obj.Delay.Value);
+                    while (true)
+                    {
+                        if (DateTime.Now.Ticks >= time.Ticks)
+                        {
+                            break;
+                        }
+                        Task.Delay(10);
+                    }
+                    InperDeviceHelper.Instance.AllLightOpen();
+                });
             }
+            if (InperGlobalClass.AdditionRecordConditionsStart == AdditionRecordConditionsTypeEnum.AtTime)
+            {
+
+                return Task.Factory.StartNew(() =>
+                {
+                    InperDeviceHelper.Instance.AllLightClose();
+                    TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
+                    while (true)
+                    {
+                        var currentTime = TimeSpan.Parse(DateTime.Now.ToLongTimeString()).Ticks;
+                        if (currentTime >= time.Ticks)
+                        {
+                            break;
+                        }
+                        Task.Delay(10);
+                    }
+                    InperDeviceHelper.Instance.AllLightOpen();
+                });
+            }
+            return null;
+        }
+        private Task StopTriggerStrategy()
+        {
+            (this.View as ManulControlView).Root_Gird.IsEnabled = false;
+            var obj = InperJsonHelper.GetAdditionRecordJson("stop");
+
+            if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.Delay)
+            {
+                return Task.Factory.StartNew(() =>
+                {
+                    DateTime time = DateTime.Now.AddSeconds(obj.Delay.Value);
+                    while (true)
+                    {
+                        if (DateTime.Now.Ticks >= time.Ticks)
+                        {
+                            break;
+                        }
+                        Task.Delay(10);
+                    }
+                });
+            }
+            if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
+            {
+
+                return Task.Factory.StartNew(() =>
+                {
+                    TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
+                    while (true)
+                    {
+                        var currentTime = TimeSpan.Parse(DateTime.Now.ToLongTimeString()).Ticks;
+                        if (currentTime >= time.Ticks)
+                        {
+                            break;
+                        }
+                        Task.Delay(10);
+                    }
+                });
+            }
+            return null;
         }
         #endregion
     }

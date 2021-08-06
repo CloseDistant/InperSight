@@ -11,7 +11,7 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         mc:Ignorable="d" Title="Camera Signal Settings"  IsShowMaxButton="False" IsShowMiniButton="False" 
-        Height="590" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}">
+        Height="620" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
         <convert:TestModeConvert x:Key="TestModeConvert"/>
@@ -24,7 +24,7 @@
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
-        <Grid x:Name="camera" Visibility="Hidden">
+        <Grid x:Name="camera" Visibility="Visible" IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1.5*"/>
@@ -36,8 +36,8 @@
                 </Grid.RowDefinitions>
                 <Border Width="1" HorizontalAlignment="Right" Background="{DynamicResource InperDialogButtonColor}" Grid.RowSpan="2" Opacity=".6" />
                 <Grid Grid.Row="0" Margin="20" >
-                    <Canvas Background="Transparent" Panel.ZIndex="999" x:Name="ellipseCanvas" Margin="1 0"></Canvas>
-                    <Image Stretch="Fill" MaxWidth="720" MaxHeight="540"  Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
+                    <Canvas Background="Transparent" Panel.ZIndex="999" x:Name="ellipseCanvas" Margin="1 0" MouseMove="{s:Action Grid_MouseMove}"></Canvas>
+                    <Image Stretch="Uniform" MaxWidth="720" MaxHeight="540"  Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
                 <Grid Grid.Row="1" Margin="20 0">
                     <Grid.ColumnDefinitions>
@@ -85,7 +85,7 @@
                 </WrapPanel>
                 <WrapPanel Margin="0 10"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Gain" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>
-                    <TextBox Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action Gain_TextChanged}" HorizontalContentAlignment="Center" Padding="0"  hc:BorderElement.CornerRadius="0"  MinWidth="80"  Margin="20 0 0 0" MinHeight="25" />
+                    <TextBox FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action Gain_TextChanged}" Padding="3 0 0 0"  hc:BorderElement.CornerRadius="0"  MinWidth="80"  Margin="20 0 0 0" MinHeight="25" />
                 </WrapPanel>
                 <WrapPanel Margin="0 10">
                     <TextBlock Text="Record Mode" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
@@ -117,7 +117,7 @@
                     <TextBlock Text="Light Measure" VerticalAlignment="Center" />
                     <ToggleButton Margin="20 0 0 0" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False"/>
                 </WrapPanel>
-                <ListBox x:Name="lightMode" Style="{x:Null}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lightMode" Height="120" Style="{x:Null}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <WrapPanel>

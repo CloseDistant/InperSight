@@ -104,12 +104,13 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var grid = sender as Grid;
+                Grid grid = sender as Grid;
+                CameraChannel channel = grid.DataContext as CameraChannel;
                 if (e.ClickCount == 2)
                 {
                     if (grid.Name.Equals("chartItem"))
                     {
-                        this.windowManager.ShowDialog(new SignalPropertiesViewModel(SignalPropertiesTypeEnum.Camera));
+                        this.windowManager.ShowDialog(new SignalPropertiesViewModel(SignalPropertiesTypeEnum.Camera, channel.ChannelId));
                     }
                     else
                     {
@@ -147,28 +148,28 @@ namespace InperStudio.ViewModels
             {
                 InperGlobalClass.EventSettings.Channels.ForEach(x =>
                 {
-                    if (x.IsActive && x.Type == EventSettingsTypeEnum.Marker.ToString())
+                    if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         string[] hotkeys = x.Hotkeys.Split('+');
                         if (x.HotkeysCount == 1)
                         {
                             if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])))
                             {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor), ChannelTypeEnum.Manual.ToString());
                             }
                         }
                         if (x.HotkeysCount == 2)
                         {
                             if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
                             {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor), ChannelTypeEnum.Manual.ToString());
                             }
                         }
                         if (x.HotkeysCount == 3)
                         {
                             if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
                             {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor), ChannelTypeEnum.Manual.ToString());
                             }
                         }
                     }
@@ -203,14 +204,9 @@ namespace InperStudio.ViewModels
             try
             {
                 CameraChannel channel = sender as CameraChannel;
-                double value = ((double)channel.YVisibleRange.Min - 1) < 0 ? 0 : ((double)channel.YVisibleRange.Min - 1);
+                double value = (double)channel.YVisibleRange.Min - 1;
 
                 channel.YVisibleRange.Min = Math.Round(value, 2);
-
-                if (value <= 0.01)
-                {
-                    Growl.Info("已达到最小值", "SuccessMsg");
-                }
             }
             catch (Exception ex)
             {

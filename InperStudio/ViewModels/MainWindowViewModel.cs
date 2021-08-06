@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.DeviceAgency;
@@ -13,6 +14,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace InperStudio.ViewModels
@@ -85,6 +89,7 @@ namespace InperStudio.ViewModels
                 this.windowView.main.ColumnDefinitions[1].Width = GridLength.Auto;
             }
         }
+     
         #endregion
 
         public void InperFile()

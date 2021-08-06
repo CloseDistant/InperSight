@@ -499,6 +499,20 @@ namespace InperStudio.ViewModels
                                 Type = type
                             };
 
+                            if (type == ChannelTypeEnum.Camera.ToString() || type == ChannelTypeEnum.Analog.ToString())
+                            {
+                                Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                                {
+                                    if (chn.ChannelId == channle.ChannelId)
+                                    {
+                                        chn.LightModes.ForEach(x =>
+                                        {
+                                            x.Derivative = new Derivative(InperGlobalClass.CameraSignalSettings.Sampling, channle.Tau1, channle.Tau2, channle.Tau3);
+                                        });
+                                    }
+                                });
+                            }
+
                             if (type == ChannelTypeEnum.Manual.ToString())
                             {
                                 if (manualChannels.Count > 0)

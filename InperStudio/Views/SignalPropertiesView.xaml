@@ -9,14 +9,14 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:local="clr-namespace:InperStudio.Views"
         mc:Ignorable="d" FontFamily="{StaticResource InperFontFamily}" IsShowMiniButton="False" IsShowMaxButton="False"
-        Title="Camera Signal Properties" Height="480" Width="620"  d:DataContext="{d:DesignInstance Type=vm:SignalPropertiesViewModel}">
+        Title="Camera Signal Properties" Height="500" Width="620"  d:DataContext="{d:DesignInstance Type=vm:SignalPropertiesViewModel}">
     <Grid Background="{DynamicResource InperDialogContentColor}">
         <Grid x:Name="camera" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Margin="20 20 0 0">
+            <StackPanel Grid.Column="0" Margin="20 10 0 0">
                 <Grid Margin="0 10" >
                     <TextBlock Text="Y Range" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
@@ -41,12 +41,16 @@
                     <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <ComboBox Margin="20 0" x:Name="offsetChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" HorizontalAlignment="Right" SelectedIndex="0"   MinWidth="130" />
                 </Grid>
+                <Grid Margin="0 10">
+                    <TextBlock Text="Window Size" VerticalAlignment="Center"   FontSize="{DynamicResource InperLargeFontSize}"/>
+                    <hc:TextBox Width="130" TextChanged="{s:Action WindowSize_TextChanged}" HorizontalAlignment="Right" Margin="0 0 20 0" Text="{Binding ElementName=offsetChannel,Path=SelectedItem.OffsetWindowSize,Mode=TwoWay}" />
+                </Grid>
                 <WrapPanel Margin="0 10" HorizontalAlignment="Right" >
-                    <Button Content="Cancle" Command="{s:Action CameraOffset}" Name="cancle" CommandParameter="Cancle" />
+                    <Button Content="Cancle" Command="{s:Action CameraOffset}" Name="cancle" IsEnabled="False" CommandParameter="Cancle" />
                     <Button Content="Offset" Command="{s:Action CameraOffset}" Name="offset" CommandParameter="Offset" Margin="20 0"/>
                 </WrapPanel>
             </StackPanel>
-            <StackPanel Grid.Column="1" Margin="20 20 0 0">
+            <StackPanel Grid.Column="1" Margin="20 10 0 0">
                 <Grid Margin="0 10" >
                     <TextBlock Text="Filters" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
@@ -74,10 +78,10 @@
                     <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsNotch}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.Notch}"/>
                 </Grid>
                 <Grid Margin="0 10">
-                    <CheckBox  HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
+                    <CheckBox  HorizontalAlignment="Left" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
                         <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="Smooth (Point)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
-                    <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
+                    <hc:TextBox Width="90" Margin="0 0 20 0" TextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
                 </Grid>
             </StackPanel>
         </Grid>

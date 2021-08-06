@@ -255,16 +255,16 @@ namespace InperStudio.ViewModels
                 RadioButton radio = sender as RadioButton;
                 switch (radio.Name)
                 {
-                    case "immediately":
+                    case "immediatelyStop":
                         InperGlobalClass.AdditionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Immediately;
                         break;
-                    case "delay":
+                    case "delayStop":
                         InperGlobalClass.AdditionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Delay;
                         break;
-                    case "atTime":
+                    case "atTimeStop":
                         InperGlobalClass.AdditionRecordConditionsStop = AdditionRecordConditionsTypeEnum.AtTime;
                         break;
-                    case "triggerRad":
+                    case "triggerRadStop":
                         InperGlobalClass.AdditionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Trigger;
                         break;
                     default:
