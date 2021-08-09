@@ -361,7 +361,7 @@ namespace InperStudio.Lib.Helper
                     foreach (MarkedMat m in mmats)
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
-                        Console.WriteLine(_PlottingStartTime);
+                     
                         if (Monitor.TryEnter(_EventQLock))
                         {
                             EventTimeSet.Enqueue(ts);
