@@ -23,6 +23,6 @@ namespace InperStudio.Views
         public SignalSettingsView()
         {
             InitializeComponent();
-        }     
+        }
     }
 }

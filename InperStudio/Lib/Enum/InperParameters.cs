@@ -10,6 +10,7 @@ namespace InperStudio.Lib.Enum
     {
         public static List<double> Exposures { get; set; } = new List<double>()
         {
+            1,
             6,
             10,
             12,
@@ -22,6 +23,7 @@ namespace InperStudio.Lib.Enum
         };
         public static List<double> FPS { get; set; } = new List<double>()
         {
+            1,
             6,
             10,
             12,

@@ -57,12 +57,10 @@ namespace InperStudio.ViewModels
             try
             {
                 SystemSleepHelper.ResotreSleep();
-                InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
+            
+                InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                 {
-                    if (x.IsChecked)
-                    {
-                        DevPhotometry.Instance.SwitchLight(x.GroupId, false);
-                    }
+                    DevPhotometry.Instance.SwitchLight(x.GroupId, false);
                 });
             }
             catch (Exception ex)
@@ -89,7 +87,7 @@ namespace InperStudio.ViewModels
                 this.windowView.main.ColumnDefinitions[1].Width = GridLength.Auto;
             }
         }
-     
+
         #endregion
 
         public void InperFile()

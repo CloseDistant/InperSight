@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -56,6 +57,28 @@ namespace InperStudio.ViewModels
         public List<double> FPS { get; set; } = InperParameters.FPS;
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
+        private string sampling;
+        public string Sampling
+        {
+            get => sampling;
+            set
+            {
+                SetAndNotify(ref sampling, value);
+                _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
+                InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
+            }
+        }
+        private string expourse;
+        public string Expourse
+        {
+            get => expourse;
+            set
+            {
+                SetAndNotify(ref expourse, value);
+                _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
+                InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(expourse);
+            }
+        }
         #endregion
         public SignalSettingsViewModel(SignalSettingsTypeEnum typeEnum)
         {
@@ -166,15 +189,20 @@ namespace InperStudio.ViewModels
                 {
                     int index = EllipseBorder.Count == 0 ? 1 : int.Parse((EllipseBorder.Last().Children[0] as TextBlock).Text) + 1;
                     Grid grid = DrawCircle(index, Diameter, 10, 0);
-                    if (EllipseBorder.Count > 4)
+                    if (EllipseBorder.Count > 3 && EllipseBorder.Count <= 6)
                     {
                         grid.SetValue(Canvas.LeftProperty, 55.0);
-                        grid.SetValue(Canvas.TopProperty, (double)(EllipseBorder.Count - 4) * Diameter - 20);
+                        grid.SetValue(Canvas.TopProperty, (double)(EllipseBorder.Count - 3) * Diameter - 40);
+                    }
+                    else if (EllipseBorder.Count > 6)
+                    {
+                        grid.SetValue(Canvas.LeftProperty, 105.0);
+                        grid.SetValue(Canvas.TopProperty, (double)(EllipseBorder.Count - 6) * Diameter - 40);
                     }
                     else
                     {
                         grid.SetValue(Canvas.LeftProperty, 10.0);
-                        grid.SetValue(Canvas.TopProperty, (double)EllipseBorder.Count * Diameter - 20);
+                        grid.SetValue(Canvas.TopProperty, (double)EllipseBorder.Count * Diameter - 40);
                     }
                     this.view.ellipseCanvas.Children.Add(grid);
                 }
@@ -209,6 +237,8 @@ namespace InperStudio.ViewModels
                             _ = InperGlobalClass.CameraSignalSettings.CameraChannels.Remove(channel);
                         }
                         view.channelName.Text = InperDeviceHelper.CameraChannels.Count > 0 ? InperDeviceHelper.CameraChannels.Last().Name : "";
+
+                        SetDefaultCircle(EllipseBorder.Last());
                     }
                     if (EllipseBorder.Count == 0)
                     {
@@ -300,8 +330,16 @@ namespace InperStudio.ViewModels
                 SetMat(m, grid);
             }
 
+            SetDefaultCircle(grid);
 
             return grid;
+        }
+        private void SetDefaultCircle(Grid grid)
+        {
+            MouseButtonEventArgs eventArgs = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left);
+            eventArgs.RoutedEvent = Grid.MouseLeftButtonDownEvent;
+            grid.RaiseEvent(eventArgs);
+            isDown = false;
         }
         public void Grid_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -384,9 +422,9 @@ namespace InperStudio.ViewModels
 
                         if (tb.Text.Length < 6 || !tb.Text.StartsWith(verify))
                         {
-                            tb.Text = "ROI-" + (EllipseBorder.Last().Children[0] as TextBlock).Text + "-";
+                            tb.Text = verify;
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Error(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
                         else
@@ -551,16 +589,33 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        public void LightMode_TextChanged(object sender, TextChangedEventArgs e)
+        public void LightTestMode_Checked(object sender, RoutedEventArgs e)
         {
             try
             {
-                WaveGroup sen = (sender as TextBox).DataContext as WaveGroup;
-                if (sen.IsChecked)
+                var tb = sender as ToggleButton;
+                if ((bool)tb.IsChecked)
                 {
-                    DevPhotometry.Instance.SetLightPower(sen.GroupId, sen.LightPower);
-
-                    InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId).LightPower = sen.LightPower;
+                    InperDeviceHelper.AllLightClose();
+                    _ = DevPhotometry.Instance.SetExposure(20);
+                    _ = DevPhotometry.Instance.SetFrameRate(50);
+                }
+                else
+                {
+                    _ = DevPhotometry.Instance.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
+                    _ = DevPhotometry.Instance.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
+                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    {
+                        DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                    });
+                    InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
+                    {
+                        if (x.IsChecked)
+                        {
+                            DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                            DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                        }
+                    });
                 }
             }
             catch (Exception ex)
@@ -568,34 +623,108 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        public void FPS_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void TestMode_rb_Checked(object sender, RoutedEventArgs e)
         {
             try
             {
-                double fps = double.Parse((sender as System.Windows.Controls.ComboBox).SelectedItem.ToString());
-                InperGlobalClass.CameraSignalSettings.Sampling = fps;
-
-                _ = DevPhotometry.Instance.SetFrameRate(fps);
+                WaveGroup sen = (sender as RadioButton).DataContext as WaveGroup;
+                InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                 {
+                     if (x.GroupId == sen.GroupId)
+                     {
+                         //x.IsChecked = true;
+                         DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                         DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                     }
+                     else
+                     {
+                         //x.IsChecked = false;
+                         DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                     }
+                 });
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
         }
-        public void Exposure_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void TestMode_rb_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             try
             {
-                double exposure = double.Parse((sender as System.Windows.Controls.ComboBox).SelectedItem.ToString());
-                InperGlobalClass.CameraSignalSettings.Exposure = exposure;
-
-                _ = DevPhotometry.Instance.SetExposure(exposure);
+                if ((bool)this.view.lightTestMode.IsChecked)
+                {
+                    WaveGroup sen = (sender as RadioButton).DataContext as WaveGroup;
+                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    {
+                        if (x.GroupId == sen.GroupId && (bool)(sender as RadioButton).IsChecked)
+                        {
+                            DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                            DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
         }
+        public void LightMode_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                WaveGroup sen = (sender as TextBox).DataContext as WaveGroup;
+                //if (sen.IsChecked)
+                {
+                    DevPhotometry.Instance.SetLightPower(sen.GroupId, sen.LightPower);
+                    if (!(bool)this.view.lightTestMode.IsChecked)
+                    {
+                        InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId).LightPower = sen.LightPower;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        //public void FPS_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        var item = (sender as System.Windows.Controls.ComboBox).SelectedItem;
+        //        if (item != null)
+        //        {
+        //            double fps = double.Parse((sender as System.Windows.Controls.ComboBox).SelectedItem.ToString());
+        //            InperGlobalClass.CameraSignalSettings.Sampling = fps;
+
+        //            _ = DevPhotometry.Instance.SetFrameRate(fps);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        App.Log.Error(ex.ToString());
+        //    }
+        //}
+        //public void Exposure_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        var item = (sender as System.Windows.Controls.ComboBox).SelectedItem;
+        //        if (item != null)
+        //        {
+        //            double exposure = double.Parse(item.ToString());
+        //            InperGlobalClass.CameraSignalSettings.Exposure = exposure;
+
+        //            _ = DevPhotometry.Instance.SetExposure(exposure);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        App.Log.Error(ex.ToString());
+        //    }
+        //}
         private void SetMat(Mat mat, Grid grid)
         {
             double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth;

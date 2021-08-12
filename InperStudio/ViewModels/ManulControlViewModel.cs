@@ -109,6 +109,10 @@ namespace InperStudio.ViewModels
                         {
                             windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
                         }
+                        else
+                        {
+                            InperClassHelper.GetWindowByNameChar("Camera Signal Settings").Activate();
+                        }
                         break;
                     case "Analog":
                         windowManager.ShowDialog(new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog));
