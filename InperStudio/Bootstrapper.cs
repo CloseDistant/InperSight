@@ -53,6 +53,7 @@ namespace InperStudio
                     }
                 }
             }
+            db.Close();
         }
     }
 }

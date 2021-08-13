@@ -1,7 +1,10 @@
-﻿using InperStudio.Views;
+﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper.JsonBean;
+using InperStudio.Views;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,12 +20,15 @@ namespace InperStudio.ViewModels
     {
         #region properties
         private IWindowManager windowManager;
+        private BindableCollection<EventChannelJson> manualEvents = new BindableCollection<EventChannelJson>();
+        public BindableCollection<EventChannelJson> ManulEvents { get => manualEvents; set => SetAndNotify(ref manualEvents, value); }
         #endregion
 
         #region
         public LeftToolsControlViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
+            ManulEvents = EventSettingsViewModel.ManualEvents;
         }
         public LeftToolsControlViewModel()
         {

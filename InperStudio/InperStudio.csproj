@@ -290,6 +290,9 @@
     <Compile Include="Views\AdditionSettingsView.xaml.cs">
       <DependentUpon>AdditionSettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Control\ProgressDialog.xaml.cs">
+      <DependentUpon>ProgressDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Control\VideoUserControl.xaml.cs">
       <DependentUpon>VideoUserControl.xaml</DependentUpon>
     </Compile>
@@ -362,6 +365,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\AdditionSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Control\ProgressDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -36,6 +36,8 @@ namespace InperStudio.ViewModels
         private BindableCollection<EventChannel> conditionsChannels = new BindableCollection<EventChannel>();
         public BindableCollection<EventChannel> ConditionsChannels { get => conditionsChannels; set => SetAndNotify(ref conditionsChannels, value); }
         public List<string> EventColorList { get; set; } = InperColorHelper.ColorPresetList;
+
+        public static BindableCollection<EventChannelJson> ManualEvents = new BindableCollection<EventChannelJson>();
         #endregion
         public EventSettingsViewModel(EventSettingsTypeEnum typeEnum)
         {
@@ -150,7 +152,7 @@ namespace InperStudio.ViewModels
                 {
                     if (item.Type == ChannelTypeEnum.Output.ToString())
                     {
-                        MarkerChannels.Remove(MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId));
+                        MarkerChannels.Remove(MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.DIO.ToString()));
                     }
                     else
                     {
@@ -161,7 +163,8 @@ namespace InperStudio.ViewModels
                                 ChannelId = item.ChannelId,
                                 BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
                                 Name = item.Name,
-                                IsActive = item.IsActive
+                                IsActive = item.IsActive,
+                                Type = item.Type
                             };
 
                             MarkerChannels.Add(manual);
@@ -169,7 +172,15 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
-                            MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).IsActive = item.IsActive;
+                            if (item.Type == ChannelTypeEnum.Input.ToString())
+                            {
+                                EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Input.ToString()));
+                                chn.IsActive = true; chn.Type = item.Type;
+                            }
+                            else
+                            {
+                                MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).IsActive = item.IsActive;
+                            }
                         }
                     }
                 }
@@ -177,7 +188,7 @@ namespace InperStudio.ViewModels
                 {
                     if (item.Type == ChannelTypeEnum.Input.ToString())
                     {
-                        EventChannel input = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
+                        EventChannel input = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Input.ToString()));
                         if (input != null)
                         {
                             MarkerChannels.Remove(input);
@@ -185,7 +196,8 @@ namespace InperStudio.ViewModels
                     }
                     if (item.Type == ChannelTypeEnum.Output.ToString())
                     {
-                        MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).IsActive = item.IsActive;
+                        var chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Output.ToString()));
+                        chn.IsActive = item.IsActive; chn.Type = item.Type;
                     }
                 }
 
@@ -211,12 +223,12 @@ namespace InperStudio.ViewModels
                         : this.view.ConditionsCombox.SelectedItem as EventChannel;
                     if (ch.Name.StartsWith("DIO") || ch.Type == ChannelTypeEnum.DIO.ToString())
                     {
-                        if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + (view.MarkerChannelCombox.SelectedIndex + 1) + "-"))
+                        if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + ch.ChannelId + "-"))
                         {
-                            tb.Text = "DIO-" + (this.view.MarkerChannelCombox.SelectedIndex + 1) + "-";
+                            tb.Text = "DIO-" + ch.ChannelId + "-";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            //return;
                         }
                     }
                     if (ch.Type == ChannelTypeEnum.Start.ToString())
@@ -226,7 +238,7 @@ namespace InperStudio.ViewModels
                             tb.Text = "Start";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            //return;
                         }
                     }
                     if (ch.Type == ChannelTypeEnum.Stop.ToString())
@@ -236,7 +248,7 @@ namespace InperStudio.ViewModels
                             tb.Text = "Stop";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            //return;
                         }
                     }
                     if (ch.Type == ChannelTypeEnum.Manual.ToString())
@@ -246,7 +258,7 @@ namespace InperStudio.ViewModels
                             tb.Text = "Manual" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            //return;
                         }
                     }
                     if (ch.Type == ChannelTypeEnum.Camera.ToString() && !ch.Name.StartsWith("DIO"))
@@ -256,7 +268,7 @@ namespace InperStudio.ViewModels
                             tb.Text = "ROI-" + ch.ChannelId + "-";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            //return;
                         }
                     }
                     if (ch.Type == ChannelTypeEnum.Analog.ToString())
@@ -266,10 +278,13 @@ namespace InperStudio.ViewModels
                             tb.Text = "AI-" + ch.ChannelId + "-";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            //return;
                         }
                     }
+                    //if (ch.Type != ChannelTypeEnum.Manual.ToString())
+                    //{
                     MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Name = tb.Text;
+                    //}
                 }
             }
             catch (Exception ex)
@@ -307,7 +322,15 @@ namespace InperStudio.ViewModels
                         bt.Content = bt.Content == null ? e.Key.ToString() : bt.Content + "+" + e.Key.ToString();
                     }
                 }
-                MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
+                if (@enum == EventSettingsTypeEnum.Marker)
+                {
+                    MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
+                }
+                else
+                {
+                    EventChannel cha = view.MarkerChannelCombox.SelectedItem as EventChannel;
+                    MarkerChannels.FirstOrDefault(x => x.ChannelId == cha.ChannelId).Condition.Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
+                }
             }
             catch (Exception ex)
             {
@@ -326,6 +349,8 @@ namespace InperStudio.ViewModels
                 if (cb != null)
                 {
                     var item = cb as EventChannel;
+                    view.MarkerName.Text = item.Name;
+
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         view.MarkerName.Text = "Manual" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
@@ -336,9 +361,12 @@ namespace InperStudio.ViewModels
                     else
                     {
                         view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.BgColor));
+                        if (item.Type != ChannelTypeEnum.Start.ToString() || item.Type != ChannelTypeEnum.Stop.ToString())
+                        {
+                            view.MarkerName.Text += "-";
+                        }
                     }
                     view.hotkeys.Content = item.Hotkeys;
-                    view.MarkerName.Text = item.Name;
                     if (@enum == EventSettingsTypeEnum.Output)
                     {
                         view.MarkerName.Text += view.ConditionChannelCombox.Text;
@@ -378,7 +406,7 @@ namespace InperStudio.ViewModels
                 EventChannel channel = view.ConditionsCombox.SelectedItem as EventChannel;
                 if (item != null)
                 {
-                    view.MarkerName.Text = view.ConditionsCombox.Text + item.Name;
+                    view.MarkerName.Text = view.ConditionsCombox.Text + "-" + item.Name;
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         view.outputHotkeys.Content = item.Hotkeys = "F" + channel.ChannelId;
@@ -431,9 +459,23 @@ namespace InperStudio.ViewModels
                     {
                         if (ch_active.Type != ChannelTypeEnum.Manual.ToString())
                         {
-                            MarkerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ch_active.Type).IsActive = false;
+                            EventChannel act = MarkerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ch_active.Type);
+                            act.IsActive = false;
+                            if (act.Type == ChannelTypeEnum.Start.ToString())
+                            {
+                                act.Name = ChannelTypeEnum.Start.ToString();
+                            }
+                            if (act.Type == ChannelTypeEnum.Stop.ToString())
+                            {
+                                act.Name = ChannelTypeEnum.Stop.ToString();
+                            }
+                            if (act.Type == ChannelTypeEnum.Input.ToString() || act.Type == ChannelTypeEnum.Output.ToString() || act.Type == ChannelTypeEnum.DIO.ToString())
+                            {
+                                act.Name = ChannelTypeEnum.DIO.ToString() + "-" + act.ChannelId;
+                            }
                         }
-                        var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ch_active.Type);
+
+                        var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Input.ToString() || x.Type == ChannelTypeEnum.Output.ToString()));
                         if (item != null)
                         {
                             _ = InperGlobalClass.EventSettings.Channels.Remove(item);
@@ -453,6 +495,7 @@ namespace InperStudio.ViewModels
                             {
                                 _ = MarkerChannels.Remove(ch_active);
                                 manualChannels.Remove(ch_active);
+                                markerChannels.FirstOrDefault(x => x.ChannelId == -1 && x.Type == ChannelTypeEnum.Manual.ToString()).Name = ChannelTypeEnum.Manual.ToString();
                             }
                         }
                     }
@@ -465,11 +508,12 @@ namespace InperStudio.ViewModels
                 {
                     if (ch != null)
                     {
+                        EventChannel mc = MarkerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type);
                         if (ch.Type != ChannelTypeEnum.Manual.ToString())
                         {
-                            MarkerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type).IsActive = true;
+                            mc.IsActive = true;
                         }
-
+                        mc.Name = this.view.MarkerName.Text;
                         var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type);
 
                         if (item == null)
@@ -488,7 +532,7 @@ namespace InperStudio.ViewModels
                             {
                                 ChannelId = id,
                                 IsActive = ch.IsActive,
-                                Name = ch.Name,
+                                Name = this.view.MarkerName.Text,
                                 BgColor = ch.BgColor,
                                 DeltaF = ch.DeltaF,
                                 Tau1 = ch.Tau1,
@@ -498,6 +542,47 @@ namespace InperStudio.ViewModels
                                 Condition = ch.Condition,
                                 Type = type
                             };
+                            //output 热键重复排除
+                            if (channle.Condition != null && channle.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                            {
+                                InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                                {
+                                    if (x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                                    {
+                                        if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                                        {
+                                            if (x.Condition.Hotkeys == channle.Condition.Hotkeys)
+                                            {
+                                                Growl.Warning(new GrowlInfo() { Message = "快捷键重复，请修改当前快捷键配置", Token = "SuccessMsg", WaitTime = 1 });
+                                                mc.IsActive = false;
+                                            }
+                                        }
+                                    }
+                                });
+                                if (mc.IsActive == false)
+                                {
+                                    return;
+                                }
+                            }
+
+                            if (ManualEvents.Count > 0)
+                            {
+                                EventChannelJson manual = null;
+                                if (@enum == EventSettingsTypeEnum.Marker)
+                                {
+                                    manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Hotkeys);
+                                }
+                                else
+                                {
+                                    manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Condition.Hotkeys);
+                                }
+                                if (manual != null)
+                                {
+                                    Growl.Warning(new GrowlInfo() { Message = "快捷键重复，请修改当前快捷键配置", Token = "SuccessMsg", WaitTime = 1 });
+                                    mc.IsActive = false;
+                                    return;
+                                }
+                            }
 
                             if (type == ChannelTypeEnum.Camera.ToString() || type == ChannelTypeEnum.Analog.ToString())
                             {
@@ -529,7 +614,7 @@ namespace InperStudio.ViewModels
                                 {
                                     ChannelId = id,
                                     IsActive = true,
-                                    Name = ch.Name,
+                                    Name = this.view.MarkerName.Text,
                                     BgColor = ch.BgColor,
                                     Hotkeys = ch.Hotkeys,
                                     Type = type
@@ -557,6 +642,7 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
+                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
                             view.ConditionsCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
                         }
                     }
@@ -571,6 +657,38 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                ManualEvents.Clear();
+                InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                {
+                    if (x.IsActive)
+                    {
+                        if (x.Type == ChannelTypeEnum.Manual.ToString())
+                        {
+                            if (!ManualEvents.Contains(x))
+                            {
+                                ManualEvents.Add(x);
+                            }
+                        }
+
+                        if (x.Condition?.Type == ChannelTypeEnum.Manual.ToString() && x.Type == ChannelTypeEnum.Output.ToString())
+                        {
+                            if (!ManualEvents.Contains(x))
+                            {
+                                ManualEvents.Add(new EventChannelJson()
+                                {
+                                    ChannelId = x.ChannelId,
+                                    BgColor = x.BgColor,
+                                    Hotkeys = x.Condition.Hotkeys,
+                                    HotkeysCount = x.Condition.HotkeysCount,
+                                    Name = x.Name,
+                                    Type = x.Type,
+                                    IsActive = x.IsActive
+                                });
+                            }
+                        }
+                    }
+                });
+
                 InperJsonHelper.SetEventSettings(InperGlobalClass.EventSettings);
             }
             catch (Exception ex)

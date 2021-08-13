@@ -59,10 +59,42 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Border Height="30" Grid.Row="0" CornerRadius="10,10,0,0" Background="#EEEEEE" >
-                    <TextBlock Style="{DynamicResource TextBlockDefault}" FontSize="{DynamicResource InperNormalFontSize}" HorizontalAlignment="Left" Margin="10 0">Manual Marker</TextBlock>
+                    <TextBlock Style="{DynamicResource TextBlockDefault}" FontSize="{DynamicResource InperNormalFontSize}" HorizontalAlignment="Left" Margin="10 0">Manual Events</TextBlock>
                 </Border>
                 <Border Grid.Row="1" ClipToBounds="True" CornerRadius="0 0 10 10" Background="{DynamicResource InperMainPageColor}">
-                    <ContentPresenter Margin="10" />
+                    <ListBox Margin="10" ScrollViewer.VerticalScrollBarVisibility="Auto" BorderThickness="0" ItemsSource="{Binding ManulEvents,UpdateSourceTrigger=PropertyChanged}">
+                        <ListBox.Style>
+                            <Style BasedOn="{StaticResource ListBoxBaseStyle}" TargetType="ListBox">
+                                <Style.Setters>
+                                    <Setter Property="ItemContainerStyle">
+                                        <Setter.Value>
+                                            <Style BasedOn="{StaticResource ListBoxItemBaseStyle}" TargetType="ListBoxItem">
+                                                <Setter Property="Padding" Value="0,5"/>
+                                                <Setter Property="Margin" Value="0,1"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ListBoxItem">
+                                                            <Grid x:Name="test" Background="{Binding BgColor}" Visibility="{Binding IsActive,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}" >
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="2*"/>
+                                                                    <ColumnDefinition Width="2*"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb1" Margin="5 0 0 0" Grid.Column="0" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Hotkeys}" />
+                                                                <TextBlock Margin="3 0" hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb"  Grid.Column="1" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}"  TextWrapping="NoWrap" Text="{Binding Name}" />
+                                                                <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb2" Margin="0 0 5 0" Grid.Column="2" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Type}" />
+                                                                <Border Grid.ColumnSpan="3" Margin="10 0" CornerRadius="{StaticResource InperDefaultCornerRadius}" VerticalAlignment="Bottom"  BorderBrush="{Binding BgColor}" BorderThickness="1" Opacity=".2"/>
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style.Setters>
+                            </Style>
+                        </ListBox.Style>
+                    </ListBox>
                 </Border>
             </Grid>
         </Border>

@@ -5,6 +5,7 @@ using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
+using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.DeviceAgency;
 using SciChart.Charting.Model.DataSeries;
@@ -264,11 +265,11 @@ namespace InperStudio.ViewModels
 
             InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
 
-
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
         private async void StopRecord()
         {
+            bool isrecord = false;
             if (InperGlobalClass.IsRecord)
             {
                 Task task = StopTriggerStrategy();
@@ -276,17 +277,22 @@ namespace InperStudio.ViewModels
                 {
                     await task;
                 }
+                isrecord = true;
             }
-
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsPreview = false;
             InperGlobalClass.IsStop = true;
             (this.View as ManulControlView).Root_Gird.IsEnabled = true;
-            InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-            await Task.Delay(3000);
-
+            if (isrecord)
+            {
+                var d = Dialog.Show<ProgressDialog>();
+                await Task.Delay(3000);
+                d.Close();
+                isrecord = false;
+            }
             InperDeviceHelper.Instance.StopCollect();
+
+            InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
 
             InperDeviceHelper.Instance.AllLightClose();
             //while (InperClassHelper.GetWindowByNameChar("Video Window") != null)

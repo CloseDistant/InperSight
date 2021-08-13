@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="InperStudio.Views.Control.ProgressDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:local="clr-namespace:InperStudio.Views.Control"
+             mc:Ignorable="d">
+    <Border VerticalAlignment="Center" Background="{DynamicResource InperTheme}" CornerRadius="10">
+        <Grid>
+            <hc:LoadingCircle Style="{StaticResource LoadingCircleLight}" DotDiameter="12" Height="120" Width="120" Margin="10"/>
+            <!--<TextBlock Text="数据保存中..." FontSize="{StaticResource InperLargeFontSize}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>-->
+        </Grid>
+    </Border>
+</UserControl>

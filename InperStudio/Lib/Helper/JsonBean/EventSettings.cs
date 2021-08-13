@@ -36,7 +36,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double Tau3 { get; set; }
         public EventChannelJson Condition { get; set; }
         /// <summary>
-        /// 类型  区分是mark通道还是output通道
+        /// 通道类型
         /// </summary>
         public string Type { get; set; }
     }
