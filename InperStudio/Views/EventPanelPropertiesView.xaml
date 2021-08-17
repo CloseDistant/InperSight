@@ -9,7 +9,7 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:local="clr-namespace:InperStudio.Views" 
-        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False"
+        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" IsShowCancleButton="False" IsShowOtherButton="False"
         Title="Event Panel Properties" Height="300" Width="400" d:DataContext="{d:DesignInstance Type=vm:EventPanelPropertiesViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>

@@ -57,7 +57,7 @@ namespace InperStudio.ViewModels
         public List<double> FPS { get; set; } = InperParameters.FPS;
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
-        private string sampling=InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+        private string sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
         public string Sampling
         {
             get => sampling;
@@ -68,7 +68,7 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
             }
         }
-        private string expourse=InperGlobalClass.CameraSignalSettings.Exposure.ToString();
+        private string expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
         public string Expourse
         {
             get => expourse;
@@ -105,7 +105,7 @@ namespace InperStudio.ViewModels
                     break;
             }
 
-            _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+            _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
             _Metronome.Elapsed += (s, e) =>
             {
                 double next_Interval;
@@ -115,10 +115,10 @@ namespace InperStudio.ViewModels
                     {
                         if (x.IsChecked)
                         {
-                            DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                            DevPhotometry.Instance.SetLightPower(x.GroupId, 0);
                         }
                     });
-                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000;
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                 }
                 else
                 {
@@ -126,11 +126,11 @@ namespace InperStudio.ViewModels
                     {
                         if (x.IsChecked)
                         {
-                            DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                            //DevPhotometry.Instance.SwitchLight(x.GroupId, true);
                             DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
                         }
                     });
-                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                 }
                 _Metronome.Interval = next_Interval;
                 IsInWorkingPeriod = !IsInWorkingPeriod;
@@ -144,6 +144,10 @@ namespace InperStudio.ViewModels
                     AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 1, Name = "AL-" + (i + 1) + "-PFC", BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
                 }
             }
+            view.ConfirmClickEvent += (s, e) =>
+            {
+                RequestClose();
+            };
         }
 
         #region methods  Camera
@@ -317,7 +321,7 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Lib.Helper.JsonBean.Channel()
                     {
                         ChannelId = index - 1,
-                        Name = "ROI-" + index + "-PFC",
+                        Name = "ROI-" + index,
                         Left = double.Parse(grid.GetValue(Canvas.LeftProperty).ToString()),
                         Top = double.Parse(grid.GetValue(Canvas.TopProperty).ToString()),
                         ROI = ellipse.Width,
@@ -743,11 +747,18 @@ namespace InperStudio.ViewModels
         }
         public void Interval_Checked(object sender, RoutedEventArgs e)
         {
-            _Metronome.Enabled = true;
+            _Metronome.Start();
         }
-        public void Interval_UnChecked(object sender, RoutedEventArgs e)
+        public void Continus_Checked(object sender, RoutedEventArgs e)
         {
-            _Metronome.Enabled = false;
+            _Metronome.Stop();
+            InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+            {
+                if (x.IsChecked)
+                {
+                    DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                }
+            });
         }
         public void WaveView_Selected(object sender, RoutedEventArgs e)
         {

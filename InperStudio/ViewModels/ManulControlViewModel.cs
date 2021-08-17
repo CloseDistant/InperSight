@@ -2,6 +2,7 @@
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
@@ -263,8 +265,10 @@ namespace InperStudio.ViewModels
             InperGlobalClass.IsStop = false;
             (this.View as ManulControlView).Root_Gird.IsEnabled = true;
 
+
             InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
 
+            StartAndStopShowMarker(ChannelTypeEnum.Start);
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
         private async void StopRecord()
@@ -282,7 +286,7 @@ namespace InperStudio.ViewModels
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsPreview = false;
             InperGlobalClass.IsStop = true;
-            (this.View as ManulControlView).Root_Gird.IsEnabled = true;
+            (View as ManulControlView).Root_Gird.IsEnabled = true;
             if (isrecord)
             {
                 var d = Dialog.Show<ProgressDialog>();
@@ -291,14 +295,60 @@ namespace InperStudio.ViewModels
                 isrecord = false;
             }
             InperDeviceHelper.Instance.StopCollect();
+            StartAndStopShowMarker(ChannelTypeEnum.Stop);
 
             InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
 
             InperDeviceHelper.Instance.AllLightClose();
-            //while (InperClassHelper.GetWindowByNameChar("Video Window") != null)
-            //{
-            //    InperClassHelper.GetWindowByNameChar("Video Window").Close();
-            //}
+
+        }
+        private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum)
+        {
+           await Task.Factory.StartNew(() =>
+            {
+                while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count <= 0)
+                {
+                    Task.Delay(100);
+                }
+                _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, channel =>
+                  {
+                      if (channel.Type == typeEnum.ToString())
+                      {
+                          InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor));
+                          Manual manual = new Manual()
+                          {
+                              ChannelId = channel.ChannelId,
+                              CameraTime = 0,
+                              Color = channel.BgColor,
+                              Name = channel.Name,
+                              Type = channel.Type,
+                              CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                          };
+                          _ = App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
+                      }
+                      if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
+                      {
+                          if (channel.Condition.Type == typeEnum.ToString())
+                          {
+
+                              int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
+                              TimeSpan time = new TimeSpan();
+                              time = typeEnum == ChannelTypeEnum.Start
+                              ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
+                              : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+                              InperDeviceHelper.Instance.SendCommand();
+                              Output output = new Output()
+                              {
+                                  ChannelId = channel.ChannelId,
+                                  CameraTime = time.Ticks,
+                                  CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                              };
+                              _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+
+                          }
+                      }
+                  });
+            });
         }
         private Task StartTriggerStrategy()
         {
@@ -359,7 +409,7 @@ namespace InperStudio.ViewModels
                         {
                             break;
                         }
-                        Task.Delay(10);
+                        _ = Task.Delay(10);
                     }
                 });
             }

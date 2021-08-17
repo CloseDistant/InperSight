@@ -16,6 +16,7 @@ namespace InperStudio.Lib.Bean.Channel
     public abstract class ChannelBase : PropertyChangedBase
     {
         public int ChannelId { get; set; }
+        public string SymbolName { get; set; }
         private string name;
         public string Name { get => name; set => SetAndNotify(ref name, value); }
         public string Type { get; set; } = "Camera";

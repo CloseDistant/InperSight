@@ -43,12 +43,20 @@ namespace InperStudio.ViewModels
                         CameraInit();
                         break;
                     case SignalPropertiesTypeEnum.Analog:
-                        this.view.analog.Visibility = System.Windows.Visibility.Visible;
+                        this.view.analog.Visibility = Visibility.Visible;
                         this.view.Title = "Analog Signal Properties";
                         break;
                     default:
                         break;
                 }
+                view.ConfirmClickEvent += (s, e) =>
+                {
+                    RequestClose();
+                };
+                view.OtherClickEvent += (e) =>
+                {
+                    InperJsonHelper.SetCameraSignalSettings(CameraSignalSettings);
+                };
             }
             catch (Exception ex)
             {
@@ -371,14 +379,7 @@ namespace InperStudio.ViewModels
         }
         protected override void OnClose()
         {
-            try
-            {
-                InperJsonHelper.SetCameraSignalSettings(CameraSignalSettings);
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
+
         }
     }
 }

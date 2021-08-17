@@ -17,6 +17,6 @@ namespace InperStudio.Lib.Data.Model
         public string Color { get; set; }
         public string Type { get; set; }
         public long CameraTime { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime CreateTime { get; set; }
     }
 }

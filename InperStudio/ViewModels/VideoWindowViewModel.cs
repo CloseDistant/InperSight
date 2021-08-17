@@ -77,7 +77,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-
+                App.Log.Error(ex.ToString());
             }
         }
         protected override void OnClose()

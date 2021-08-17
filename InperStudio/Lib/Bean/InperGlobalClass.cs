@@ -18,6 +18,7 @@ namespace InperStudio.Lib.Bean
         private static bool isRecord = false;
         private static bool isPreview = false;
         private static bool isStop = false;
+        private static bool isExistEvent = false;
         private static string dataPath = string.Empty;
         private static string dataFolderName = string.Empty;
 
@@ -30,6 +31,15 @@ namespace InperStudio.Lib.Bean
         #endregion
 
         #region properties
+        public static bool IsExistEvent
+        {
+            get => isExistEvent;
+            set
+            {
+                isExistEvent = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(IsExistEvent)));
+            }
+        }
         public static bool IsRecord
         {
             get => isRecord;

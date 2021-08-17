@@ -58,12 +58,14 @@ namespace InperStudio.ViewModels
             TextLableFormatting.Add("Seconds");
             TextLableFormatting.Add("ms");
             TextLableFormatting.Add("Time of day");
+            InperGlobalClass.IsExistEvent = true;
         }
         protected override void OnViewLoaded()
         {
             try
             {
                 view = this.View as DataShowControlView;
+                InperGlobalClass.IsExistEvent = false;
 
                 view.sciScroll.SelectedRangeChanged += (s, e) =>
                 {
@@ -184,7 +186,7 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-
+                        InperDeviceHelper.Instance.SendCommand();
                     }
                 }
             }
@@ -198,7 +200,7 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-
+                        InperDeviceHelper.Instance.SendCommand();
                     }
                 }
             }
@@ -212,14 +214,14 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-
+                        InperDeviceHelper.Instance.SendCommand();
                     }
                 }
             }
-            if (type == 0)
+            int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
+            TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+            if (type == 0 && InperGlobalClass.IsRecord)
             {
-                int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-                TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
 
                 Manual manual = new Manual()
                 {
@@ -228,11 +230,22 @@ namespace InperStudio.ViewModels
                     CameraTime = time.Ticks,
                     Name = x.Name,
                     Type = ChannelTypeEnum.Manual.ToString(),
-                    DateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
                 };
 
                 _ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
             }
+            if (type == 1 && InperGlobalClass.IsRecord)
+            {
+                Output output = new Output()
+                {
+                    ChannelId = x.ChannelId,
+                    CameraTime = time.Ticks,
+                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                };
+                _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+            }
+
         }
         public void YaxisAdd(object sender)
         {

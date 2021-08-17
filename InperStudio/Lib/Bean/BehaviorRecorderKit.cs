@@ -58,6 +58,7 @@ namespace InperStudio.Lib.Bean
         public int _CamIndex;
 
         public string Name { get; set; }
+        public string CustomName { get; set; }
 
         public string Path { get; private set; }
 

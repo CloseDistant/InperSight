@@ -13,6 +13,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     public class EventChannelJson
     {
         public int ChannelId { get; set; }
+        public string SymbolName { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public string BgColor { get; set; } = Brushes.Red.ToString();

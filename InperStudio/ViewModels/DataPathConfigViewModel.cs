@@ -67,7 +67,7 @@ namespace InperStudio.ViewModels
                 }
                 if (type == DataConfigPathTypeEnum.Load.ToString())
                 {
-                    var window = InperClassHelper.GetWindowByNameChar("Camera Signal");
+                    System.Windows.Window window = InperClassHelper.GetWindowByNameChar("Camera Signal");
                     if (window != null)
                     {
                         window.Close();
@@ -82,6 +82,11 @@ namespace InperStudio.ViewModels
                         InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
                         InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                         InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
+
+                        if (InperGlobalClass.EventSettings.Channels.Count > 0)
+                        {
+                            InperGlobalClass.IsExistEvent = true;
+                        }
 
                         InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
                         {
@@ -103,7 +108,7 @@ namespace InperStudio.ViewModels
                         {
                             cs.Add(x.ChannelId);
                         });
-                        foreach (var item in InperDeviceHelper.Instance.CameraChannels)
+                        foreach (Lib.Bean.Channel.CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
                         {
                             if (!cs.Contains(item.ChannelId))
                             {
@@ -112,12 +117,12 @@ namespace InperStudio.ViewModels
                         }
                         _cs.ForEach(x =>
                         {
-                            var item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
-                            InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                            InperDeviceHelper.Instance._SignalQs.Remove(x);
+                            Lib.Bean.Channel.CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
+                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
+                            _ = InperDeviceHelper.Instance._SignalQs.Remove(x);
                         });
-                        this.RequestClose();
-                        (App.Current.MainWindow.DataContext as MainWindowViewModel).windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
+                        RequestClose();
+                        (System.Windows.Application.Current.MainWindow.DataContext as MainWindowViewModel).windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
                     }
                 }
             }
@@ -128,7 +133,7 @@ namespace InperStudio.ViewModels
         }
         public void InperDialogWindow_ConfirmClickEvent(object sender, ExecutedRoutedEventArgs e)
         {
-            this.RequestClose();
+            RequestClose();
         }
         #endregion
     }

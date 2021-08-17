@@ -9,7 +9,7 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
         xmlns:local="clr-namespace:InperStudio.Views"
-        mc:Ignorable="d"
+        mc:Ignorable="d" IsShowCancleButton="False" IsShowMaxButton="False" IsShowMiniButton="False" OtherButtonText="Apply"
         Title="Marker" Height="500" Width="700" MinHeight="450" MinWidth="600" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
@@ -68,12 +68,12 @@
                 </Grid>
                 <Grid Margin="0 20 0 0" x:Name="conditionGrid"  Visibility="Collapsed">
                     <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <ComboBox Margin="20 0"  Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}"/>
+                    <ComboBox Margin="20 0"  Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="SymbolName" Width="160" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}"/>
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="Conditions"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="MarkerChannelCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}" />
-                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="ConditionChannelCombox" SelectionChanged="{s:Action ConditionsChannelCombox_SelectionChanged}"/>
+                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="SymbolName" Width="160" x:Name="MarkerChannelCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}" />
+                    <ComboBox Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" Margin="20 0" Style="{StaticResource InperComboBoxStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="SymbolName" Width="160" x:Name="ConditionChannelCombox" SelectionChanged="{s:Action ConditionsChannelCombox_SelectionChanged}"/>
                 </Grid>
                 <Grid Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}" >
                     <StackPanel Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >

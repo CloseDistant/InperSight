@@ -1,4 +1,5 @@
-﻿using InperStudio.Lib.Bean;
+﻿using HandyControl.Controls;
+using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
@@ -102,7 +103,7 @@ namespace InperStudio.Lib.Helper
             VisionHeight = DevPhotometry.Instance.VisionHeight;
             if (DevPhotometry.Instance.VisionWidth == 0)
             {
-                HandyControl.Controls.Growl.Error("Failed to initialize the basler camera","SuccessMsg");
+                HandyControl.Controls.Growl.Error("Failed to initialize the basler camera", "SuccessMsg");
                 return;
             }
             WBMPPreview = new WriteableBitmap(VisionWidth, VisionHeight, 96, 96, PixelFormats.Gray16, null);
@@ -132,7 +133,7 @@ namespace InperStudio.Lib.Helper
                     {
                         item.Offset = false;
                         _SaveSignalQs.Add(item.ChannelId, new SignalData());
-                        FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                        _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         if (item.LightModes.Count > 0)
                         {
                             item.LightModes.ForEach(x =>
@@ -239,6 +240,7 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
+                bool exist = false;
                 if (e.Light0WaveLength > 0)
                 {
                     WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 0);
@@ -252,6 +254,7 @@ namespace InperStudio.Lib.Helper
                     {
                         LightWaveLength.Add(new WaveGroup() { GroupId = 0, WaveType = e.Light0WaveLength + " nm" });
                     }
+                    exist = true;
                 }
                 if (e.Light1WaveLength > 0)
                 {
@@ -266,6 +269,7 @@ namespace InperStudio.Lib.Helper
                     {
                         LightWaveLength.Add(new WaveGroup() { GroupId = 1, WaveType = e.Light1WaveLength + " nm" });
                     }
+                    exist = true;
                 }
                 if (e.Light2WaveLength > 0)
                 {
@@ -280,6 +284,7 @@ namespace InperStudio.Lib.Helper
                     {
                         LightWaveLength.Add(new WaveGroup() { GroupId = 2, WaveType = e.Light2WaveLength + " nm" });
                     }
+                    exist = true;
                 }
                 if (e.Light3WaveLength > 0)
                 {
@@ -294,11 +299,15 @@ namespace InperStudio.Lib.Helper
                     {
                         LightWaveLength.Add(new WaveGroup() { GroupId = 3, WaveType = e.Light3WaveLength + " nm" });
                     }
+                    exist = true;
                 }
-                WaveInitEvent?.Invoke(this, true);
+                WaveInitEvent?.Invoke(this, exist);
+                if (!exist)
+                    Growl.Error("未获取到激发光");
             }
             catch (Exception ex)
             {
+                Growl.Error("获取激发光失败：" + ex.ToString());
                 App.Log.Error(ex.ToString());
             }
         }
@@ -447,7 +456,7 @@ namespace InperStudio.Lib.Helper
                                               Type = x.Type == ChannelTypeEnum.Camera.ToString() ? 0 : 1,
                                               CreateTime = DateTime.Now
                                           };
-                                          App.SqlDataInit.sqlSugar.Insertable(aIROI).ExecuteCommand();
+                                          _ = App.SqlDataInit.sqlSugar.Insertable(aIROI).ExecuteCommand();
                                       }
                                   }
                               });
@@ -695,6 +704,7 @@ namespace InperStudio.Lib.Helper
                     t_sigs[i] = Math.Round(sig_data[i].Value, 2);
                     t_tims[i] = TimeSpan.FromTicks(sig_data[i].Key / 100);
                 }
+                t_tims.OrderBy(x => x.Ticks);
                 return new Tuple<TimeSpan[], double[]>(t_tims, t_sigs);
 
             }
@@ -735,6 +745,10 @@ namespace InperStudio.Lib.Helper
             //};
 
             //_ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
+        }
+        public void SendCommand()
+        {
+
         }
         public void StopCollect()
         {

@@ -118,6 +118,20 @@ namespace InperStudioControlLib.Control.Window
             get => (bool)GetValue(IsShowTitleProperty);
             set => SetValue(IsShowTitleProperty, value);
         }
+        public static readonly DependencyProperty IsShowResizeGripProperty = DependencyProperty.Register(
+            "IsShowResizeGrip", typeof(bool), typeof(InperDialogWindow), new PropertyMetadata(true));
+        public bool IsShowResizeGrip
+        {
+            get => (bool)GetValue(IsShowResizeGripProperty);
+            set => SetValue(IsShowResizeGripProperty, value);
+        }
+        public static readonly DependencyProperty OtherButtonTextProperty = DependencyProperty.Register(
+            "OtherButtonText", typeof(string), typeof(InperDialogWindow), new PropertyMetadata("Other"));
+        public string OtherButtonText
+        {
+            get => (string)GetValue(OtherButtonTextProperty);
+            set => SetValue(OtherButtonTextProperty, value);
+        }
 
         public static readonly DependencyProperty InperCustomDialogBottmProperty = DependencyProperty.Register(
             "InperCustomDialogBottm", typeof(object), typeof(InperDialogWindow), new PropertyMetadata(null));

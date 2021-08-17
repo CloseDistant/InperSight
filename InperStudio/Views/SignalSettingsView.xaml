@@ -10,8 +10,8 @@
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
-        mc:Ignorable="d" Title="Camera Signal Settings"  IsShowMaxButton="False" IsShowMiniButton="False" 
-        Height="620" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}">
+        mc:Ignorable="d" Title="Camera Signal Settings"  IsShowMaxButton="False" IsShowMiniButton="False" ResizeMode="NoResize"
+        Height="620" Width="750" MaxWidth="1200" MaxHeight="900" d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}" IsShowCancleButton="False" IsShowOtherButton="False">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
         <convert:TestModeConvert x:Key="TestModeConvert"/>
@@ -91,7 +91,7 @@
                     <TextBlock Text="Record Mode" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                     <hc:Divider Width="97" HorizontalAlignment="Right" VerticalAlignment="Center" LineStroke="{DynamicResource InperTheme}" Margin="12 0 0 0" Opacity=".4"/>
                 </WrapPanel>
-                <RadioButton IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" Margin="0 10" GroupName="mode" x:Name="continuous" Content="Continuous" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                <RadioButton Checked="{s:Action Continus_Checked}" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" Margin="0 10" GroupName="mode" x:Name="continuous" Content="Continuous" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                 <WrapPanel Margin="0 10" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <RadioButton GroupName="mode" x:Name="interval" Content="Interval (s)" Checked="{s:Action Interval_Checked}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Margin="10 -5 0 0" IsEnabled="{Binding ElementName=interval,Path=IsChecked}">

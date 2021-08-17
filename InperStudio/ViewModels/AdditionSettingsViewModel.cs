@@ -61,12 +61,11 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                this.view = this.View as AdditionSettingsView;
+                view = View as AdditionSettingsView;
 
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
-                    this.view.Height = 450;
-                    this.view.video.Visibility = System.Windows.Visibility.Visible;
+                    this.view.video.Visibility = Visibility.Visible;
 
                     UsedKits = new ObservableCollection<BehaviorRecorderKit>();
                     UnusedKits = new ObservableCollection<BehaviorRecorderKit>();
@@ -83,11 +82,11 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    this.view.trigger.Visibility = System.Windows.Visibility.Visible;
-                    this.view.Title = "Start/Stop Conditions";
+                    view.trigger.Visibility = Visibility.Visible;
+                    view.Title = "Start/Stop Conditions";
                 }
 
-                this.view.ConfirmClickEvent += View_ConfirmClickEvent;
+                view.ConfirmClickEvent += View_ConfirmClickEvent;
             }
             catch (Exception ex)
             {
@@ -184,6 +183,11 @@ namespace InperStudio.ViewModels
                 {
                     if (UnusedKits.Count > 0 && camera != null)
                     {
+                        camera.CustomName = view.CameraName.Text;
+                        if (camera.CustomName.EndsWith("-"))
+                        {
+                            camera.CustomName = camera.CustomName.Substring(0, camera.CustomName.Length - 1);
+                        }
                         _ = UnusedKits.Remove(camera);
                         UsedKits.Add(camera);
 

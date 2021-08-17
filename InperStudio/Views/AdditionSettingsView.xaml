@@ -8,8 +8,8 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
-        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" 
-        Title="Video Settings" Height="600" Width="650" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}"  IsShowCancleButton="False" IsShowOtherButton="False"
+        Title="Video Settings" SizeToContent="Height" MinHeight="450" Width="650" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <Grid  Background="{DynamicResource InperDialogContentColor}">
         <Grid x:Name="trigger" Visibility="Collapsed"  Margin="20 10" >
             <Grid.RowDefinitions>
@@ -142,7 +142,7 @@
                             <DataTemplate>
                                 <Grid Margin="3 5" >
                                     <!--<Label Height="20"  Margin="2 5" Grid.Column="0" Background="{Binding BgColor}" Cursor="Hand"/>-->
-                                    <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperLargeFontSize}" TextWrapping="NoWrap" Text="{Binding Name}" />
+                                    <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperLargeFontSize}" TextWrapping="NoWrap" Text="{Binding CustomName}" />
                                     <Border Width="{Binding ElementName= cameraActiveChannel,Path= ActualWidth}" Margin="0 0 0 -5" BorderBrush="{Binding ElementName= cameraActiveChannel,Path=BorderBrush}" BorderThickness="0 0 0 1"/>
                                 </Grid>
                             </DataTemplate>

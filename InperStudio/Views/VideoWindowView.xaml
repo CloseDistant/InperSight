@@ -9,7 +9,7 @@
         xmlns:ctrl="clr-namespace:InperStudio.Views.Control"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
-        Title="Video Window" Height="450" Width="500" MinWidth="500" MinHeight="450" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}">
+        Title="{Binding BehaviorRecorderKit.CustomName}" Height="450" Width="600" MinWidth="500" MinHeight="450" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}">
     <Grid Background="{DynamicResource InperTitlePageColor}">
         <Image Grid.Row="0" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap}"  />
     </Grid>
