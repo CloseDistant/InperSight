@@ -238,7 +238,8 @@ namespace InperStudio.Lib.Helper
             encoder.Save(ms);
             ms.Close();
 
-            File.Copy(filename, path + filename, true);
+            File.Copy(filename, path + "/" + filename, true);
+            File.Delete(Environment.CurrentDirectory + "/" + filename);
         }
     }
 }

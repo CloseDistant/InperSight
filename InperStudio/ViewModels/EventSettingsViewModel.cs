@@ -283,7 +283,7 @@ namespace InperStudio.ViewModels
                     }
                     //if (ch.Type != ChannelTypeEnum.Manual.ToString())
                     //{
-                    MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Name = tb.Text;
+                    //MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Name = tb.Text;
                     //}
                 }
             }
@@ -354,6 +354,7 @@ namespace InperStudio.ViewModels
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         view.MarkerName.Text = "Manual" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
+                        item.Name = "Manual";
                         MarkerChannels[view.MarkerChannelCombox.SelectedIndex].BgColor = InperColorHelper.ColorPresetList[manualChannels.Count == 0 ? 0 : manualChannels.Last().ChannelId + 1];
                         MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Hotkeys = "F" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
                         view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[manualChannels.Count == 0 ? 0 : manualChannels.Last().ChannelId + 1]));
@@ -513,7 +514,11 @@ namespace InperStudio.ViewModels
                         {
                             mc.IsActive = true;
                         }
-                        mc.Name = this.view.MarkerName.Text;
+                        if (mc.Type != ChannelTypeEnum.Manual.ToString())
+                        {
+                            mc.Name = this.view.MarkerName.Text;
+                        }
+
                         var item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type);
 
                         if (item == null)
@@ -610,7 +615,7 @@ namespace InperStudio.ViewModels
                                     }
                                 }
                                 channle.IsActive = true;
-                                var chn = new EventChannel()
+                                EventChannel chn = new EventChannel()
                                 {
                                     ChannelId = id,
                                     IsActive = true,
@@ -653,6 +658,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+        #endregion
         protected override void OnClose()
         {
             try
@@ -660,16 +666,20 @@ namespace InperStudio.ViewModels
                 ManualEvents.Clear();
                 InperGlobalClass.EventSettings.Channels.ForEach(x =>
                 {
+                    if (x.Name.EndsWith("-"))
+                    {
+                        x.Name = x.Name.Substring(0, x.Name.Length - 1);
+                    }
                     if (x.IsActive)
                     {
                         if (x.Type == ChannelTypeEnum.Manual.ToString())
                         {
                             if (!ManualEvents.Contains(x))
                             {
+
                                 ManualEvents.Add(x);
                             }
                         }
-
                         if (x.Condition?.Type == ChannelTypeEnum.Manual.ToString() && x.Type == ChannelTypeEnum.Output.ToString())
                         {
                             if (!ManualEvents.Contains(x))
@@ -696,6 +706,5 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        #endregion
     }
 }

@@ -100,6 +100,11 @@ namespace InperStudio.Lib.Helper
 
             VisionWidth = DevPhotometry.Instance.VisionWidth;
             VisionHeight = DevPhotometry.Instance.VisionHeight;
+            if (DevPhotometry.Instance.VisionWidth == 0)
+            {
+                HandyControl.Controls.Growl.Error("Failed to initialize the basler camera","SuccessMsg");
+                return;
+            }
             WBMPPreview = new WriteableBitmap(VisionWidth, VisionHeight, 96, 96, PixelFormats.Gray16, null);
 
             timer.Interval = TimeSpan.FromMilliseconds(20);
@@ -364,7 +369,7 @@ namespace InperStudio.Lib.Helper
 
                                   r = Smooth(mask, m.Group, r);
 
-                                  DeltaFCalculate(mask, m.Group, r);
+                                  DeltaFCalculate(mask, m.Group, r, ts);
 
                                   ploting_data[mask.ChannelId] = r;
                               });
@@ -415,7 +420,7 @@ namespace InperStudio.Lib.Helper
             }
             return val;
         }
-        private void DeltaFCalculate(CameraChannel cameraChannel, int group, double r)
+        private void DeltaFCalculate(CameraChannel cameraChannel, int group, double r, long ts)
         {
             InperGlobalClass.EventSettings.Channels.ForEach(x =>
             {
@@ -425,17 +430,27 @@ namespace InperStudio.Lib.Helper
                     {
                         if (x.ChannelId == cameraChannel.ChannelId)
                         {
-                            cameraChannel.LightModes.ForEach(mode =>
-                            {
-                                if (mode.LightType == group)
-                                {
-                                    if (mode.Derivative.ProcessSignal(r) >= (x.DeltaF / 100))
-                                    {
-                                        var light = LightWaveLength.FirstOrDefault(l => l.GroupId == group);
-                                        AddMarkerByHotkeys(cameraChannel.ChannelId, x.Name + light.WaveType, (Color)ColorConverter.ConvertFromString(x.BgColor), x.Type.ToString());
-                                    }
-                                }
-                            });
+                            _ = Parallel.ForEach(cameraChannel.LightModes, mode =>
+                              {
+                                  if (mode.LightType == group)
+                                  {
+                                      double deltaF = mode.Derivative.ProcessSignal(r);
+                                      if (deltaF >= (x.DeltaF / 100))
+                                      {
+                                          WaveGroup light = LightWaveLength.FirstOrDefault(l => l.GroupId == group);
+                                          AddMarkerByHotkeys(cameraChannel.ChannelId, x.Name + light.WaveType, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                                          AIROI aIROI = new AIROI()
+                                          {
+                                              ChannelId = cameraChannel.ChannelId,
+                                              CameraTime = ts,
+                                              DeltaF = deltaF,
+                                              Type = x.Type == ChannelTypeEnum.Camera.ToString() ? 0 : 1,
+                                              CreateTime = DateTime.Now
+                                          };
+                                          App.SqlDataInit.sqlSugar.Insertable(aIROI).ExecuteCommand();
+                                      }
+                                  }
+                              });
                         }
                     }
                 }
@@ -689,7 +704,7 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
-        public void AddMarkerByHotkeys(int channelId, string text, Color color, string type)
+        public void AddMarkerByHotkeys(int channelId, string text, Color color)
         {
             //int count = EventChannelChart.RenderableSeries.First().DataSeries.XValues.Count;
             int count = CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
@@ -707,18 +722,19 @@ namespace InperStudio.Lib.Helper
                 StrokeThickness = 1,
                 X1 = (IComparable)CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1]
             });
-            TimeSpan time = (TimeSpan)CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-            Manual manual = new Manual()
-            {
-                ChannelId = channelId,
-                Color = color.ToString(),
-                CameraTime = time.Ticks,
-                Name = text,
-                Type = type,
-                DateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-            };
+            //TimeSpan time = (TimeSpan)CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
 
-            _ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
+            //Manual manual = new Manual()
+            //{
+            //    ChannelId = channelId,
+            //    Color = color.ToString(),
+            //    CameraTime = time.Ticks,
+            //    Name = text,
+            //    Type = type,
+            //    DateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            //};
+
+            //_ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
         }
         public void StopCollect()
         {

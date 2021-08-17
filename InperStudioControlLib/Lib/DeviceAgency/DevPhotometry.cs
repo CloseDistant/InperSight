@@ -33,10 +33,15 @@ namespace InperStudioControlLib.Lib.DeviceAgency
             try
             {
                 _BaslerCam = _CamAgent.CreateCamera();
+                if (_BaslerCam == null)
+                {
+                    HandyControl.Controls.Growl.Error("Failed to create basler camera");
+                    return;
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("On creat basler camera " + ex.Message);
+                HandyControl.Controls.Growl.Error("On creat basler camera " + ex.Message);
                 return;
             }
 

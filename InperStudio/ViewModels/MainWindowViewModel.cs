@@ -37,10 +37,10 @@ namespace InperStudio.ViewModels
         public MainWindowViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
-            InperDeviceHelper.Instance.DeviceInit();
         }
         public MainWindowViewModel()
         {
+            InperDeviceHelper.Instance.DeviceInit();
             _ = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.DisplayProc(); });
         }
         protected override void OnViewLoaded()
@@ -57,7 +57,7 @@ namespace InperStudio.ViewModels
             try
             {
                 SystemSleepHelper.ResotreSleep();
-            
+
                 InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                 {
                     DevPhotometry.Instance.SwitchLight(x.GroupId, false);

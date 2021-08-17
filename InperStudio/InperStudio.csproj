@@ -247,6 +247,7 @@
     <Compile Include="Lib\Convert\EventOutputConverter.cs" />
     <Compile Include="Lib\Convert\EventTypeConverter.cs" />
     <Compile Include="Lib\Convert\EventTypeMultiConverter.cs" />
+    <Compile Include="Lib\Convert\ManualToMarkConverter.cs" />
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
     <Compile Include="Lib\Convert\RoiAIVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\TestModeConvert.cs" />

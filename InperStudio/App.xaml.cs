@@ -59,6 +59,8 @@ namespace InperStudio
 
             SystemSleepHelper.PreventSleep(true);
 
+            SqlDataInit= new SqlDataInit();
+
             base.OnStartup(e);
         }
         private void RegisterEvents()

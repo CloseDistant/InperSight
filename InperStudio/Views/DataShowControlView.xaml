@@ -36,7 +36,7 @@
                 </Grid.ColumnDefinitions>
                 <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
-                    <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding ChannelId}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock TextWrapping="Wrap" Margin="2 0" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <Grid Grid.Column="1">
                     <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
@@ -62,7 +62,7 @@
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"
-                                DrawMinorGridLines="False"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Always"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                DrawMinorGridLines="False"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >

@@ -35,23 +35,23 @@ namespace InperStudio.ViewModels
         }
         protected override void OnViewLoaded()
         {
-            InperDeviceHelper.Instance.WaveInitEvent += (s, e) =>
-            {
-                if (e)
-                {
-                    _ = View.Dispatcher.BeginInvoke(new Action(() =>
-                      {
-                          if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") == null)
-                          {
-                              windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
-                          }
-                      }));
-                }
-                else
-                {
-                    Growl.Error(new GrowlInfo() { Message = "设备初始化出现问题", Token = "SuccessMsg", WaitTime = 1 });
-                }
-            };
+            //InperDeviceHelper.Instance.WaveInitEvent += (s, e) =>
+            //{
+            //    if (e)
+            //    {
+            //        _ = View.Dispatcher.BeginInvoke(new Action(() =>
+            //          {
+            //              if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") == null)
+            //              {
+            //                  windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
+            //              }
+            //          }));
+            //    }
+            //    else
+            //    {
+            //        Growl.Error(new GrowlInfo() { Message = "设备初始化出现问题", Token = "SuccessMsg", WaitTime = 1 });
+            //    }
+            //};
         }
         #region
         public void DataPathShow(string type)
@@ -254,7 +254,7 @@ namespace InperStudio.ViewModels
             }
 
             //数据库优先初始化
-            App.SqlDataInit = new Lib.Data.SqlDataInit();
+            App.SqlDataInit.RecordInit();
 
             InperDeviceHelper.Instance.StartCollect();
 

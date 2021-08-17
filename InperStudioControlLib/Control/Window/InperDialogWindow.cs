@@ -96,6 +96,20 @@ namespace InperStudioControlLib.Control.Window
             get => (bool)GetValue(IsShowOtherButtonProperty);
             set => SetValue(IsShowOtherButtonProperty, value);
         }
+        public static readonly DependencyProperty IsShowCancleButtonProperty = DependencyProperty.Register(
+            "IsShowCancleButton", typeof(bool), typeof(InperDialogWindow), new PropertyMetadata(true));
+        public bool IsShowCancleButton
+        {
+            get => (bool)GetValue(IsShowCancleButtonProperty);
+            set => SetValue(IsShowCancleButtonProperty, value);
+        }
+        public static readonly DependencyProperty IsShowOkButtonProperty = DependencyProperty.Register(
+           "IsShowOkButton", typeof(bool), typeof(InperDialogWindow), new PropertyMetadata(true));
+        public bool IsShowOkButton
+        {
+            get => (bool)GetValue(IsShowOkButtonProperty);
+            set => SetValue(IsShowOkButtonProperty, value);
+        }
 
         public static readonly DependencyProperty IsShowTitleProperty = DependencyProperty.Register(
             "IsShowTitle", typeof(bool), typeof(InperDialogWindow), new PropertyMetadata(true));

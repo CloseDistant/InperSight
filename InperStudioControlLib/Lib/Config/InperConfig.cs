@@ -19,7 +19,16 @@ namespace InperStudioControlLib.Lib.Config
         private string dataCustomDirectoryPath;
         private string configPath;
         private string version;
-
+        private string conStr;
+        public string ConStr
+        {
+            get => conStr;
+            set
+            {
+                conStr = value;
+                SetConfigValue("conStr", conStr);
+            }
+        }
         public string Version
         {
             get => version;
@@ -86,6 +95,7 @@ namespace InperStudioControlLib.Lib.Config
             dataCustomDirectoryPath = GetConfigValue("dataCustomDirectoryPath");
             configPath = GetConfigValue("configPath");
             version = GetConfigValue("version");
+            conStr = GetConfigValue("conStr");
         }
         #endregion
 

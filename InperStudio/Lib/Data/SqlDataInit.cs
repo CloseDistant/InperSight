@@ -28,7 +28,7 @@ namespace InperStudio.Lib.Data
             }
 
             string dataPath = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName);
-            
+
             string filePath = Path.Combine(dataPath, dataName);
 
             sqlSugar = new SqlSugarScope(new ConnectionConfig()
@@ -39,10 +39,6 @@ namespace InperStudio.Lib.Data
             },
             sqlSugar =>
             {
-                //sqlSugar.Aop.OnLogExecuting = (s, p) =>
-                //{
-                //    App.Log.Info(s);
-                //};
                 sqlSugar.Aop.OnError = (exp) =>
                 {
                     App.Log.Error(exp);
@@ -65,7 +61,10 @@ namespace InperStudio.Lib.Data
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Config));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.AIROI));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Manual));
-
+        }
+        public void RecordInit()
+        {
+            RecordTablePairs.Clear();
             foreach (var item in InperDeviceHelper.Instance.CameraChannels)
             {
                 sqlSugar.MappingTables.Add(nameof(ChannelRecord), nameof(ChannelRecord) + item.Type + item.ChannelId);

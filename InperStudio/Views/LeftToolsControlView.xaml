@@ -5,10 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:InperStudio.ViewModels"
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:con="clr-namespace:InperStudio.Lib.Convert"
              xmlns:local="clr-namespace:InperStudio.Views"
              xmlns:s="https://github.com/canton7/Stylet"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:LeftToolsControlViewModel}">
-
+    <UserControl.Resources>
+        <con:ManualToMarkConverter x:Key="ManualToMarkConverter"/>
+    </UserControl.Resources>
     <Grid Background="{StaticResource InperTitlePageColor}" Name="main">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -82,7 +85,7 @@
                                                                 </Grid.ColumnDefinitions>
                                                                 <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb1" Margin="5 0 0 0" Grid.Column="0" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Hotkeys}" />
                                                                 <TextBlock Margin="3 0" hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb"  Grid.Column="1" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}"  TextWrapping="NoWrap" Text="{Binding Name}" />
-                                                                <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb2" Margin="0 0 5 0" Grid.Column="2" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Type}" />
+                                                                <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb2" Margin="0 0 5 0" Grid.Column="2" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Type,Converter={StaticResource ManualToMarkConverter}}" />
                                                                 <Border Grid.ColumnSpan="3" Margin="10 0" CornerRadius="{StaticResource InperDefaultCornerRadius}" VerticalAlignment="Bottom"  BorderBrush="{Binding BgColor}" BorderThickness="1" Opacity=".2"/>
                                                             </Grid>
                                                         </ControlTemplate>

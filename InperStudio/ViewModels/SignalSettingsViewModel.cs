@@ -57,7 +57,7 @@ namespace InperStudio.ViewModels
         public List<double> FPS { get; set; } = InperParameters.FPS;
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
-        private string sampling;
+        private string sampling=InperGlobalClass.CameraSignalSettings.Sampling.ToString();
         public string Sampling
         {
             get => sampling;
@@ -68,7 +68,7 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
             }
         }
-        private string expourse;
+        private string expourse=InperGlobalClass.CameraSignalSettings.Exposure.ToString();
         public string Expourse
         {
             get => expourse;
@@ -278,14 +278,14 @@ namespace InperStudio.ViewModels
             _ = grid.Children.Add(ellipse);
             EllipseBorder.Add(grid);
 
-            view.channelName.Text = "ROI-" + index + "-PFC";
+            view.channelName.Text = "ROI-";
 
             if (InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1) == null)
             {
                 CameraChannel item = new CameraChannel()
                 {
                     ChannelId = index - 1,
-                    Name = "ROI-" + index + "-PFC",
+                    Name = "ROI-" + index,
                     YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop)
                 };
                 InperDeviceHelper._SignalQs.Add(index - 1, new SignalData());
@@ -418,9 +418,9 @@ namespace InperStudio.ViewModels
                     {
                         string verify = string.Empty;
 
-                        verify = moveGrid == null ? "ROI-" + (EllipseBorder.Last().Children[0] as TextBlock).Text + "-" : "ROI-" + (moveGrid.Children[0] as TextBlock).Text + "-";
+                        verify = moveGrid == null ? "ROI-" + (EllipseBorder.Last().Children[0] as TextBlock).Text : "ROI-" + (moveGrid.Children[0] as TextBlock).Text;
 
-                        if (tb.Text.Length < 6 || !tb.Text.StartsWith(verify))
+                        if (tb.Text.Length < 5 || !tb.Text.StartsWith(verify))
                         {
                             tb.Text = verify;
                             tb.SelectionStart = tb.Text.Length;
@@ -432,10 +432,12 @@ namespace InperStudio.ViewModels
                             if (moveGrid == null)
                             {
                                 InperDeviceHelper.CameraChannels.Last().Name = tb.Text;
+                                InperGlobalClass.CameraSignalSettings.CameraChannels.Last().Name = tb.Text;
                             }
                             else
                             {
                                 InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1).Name = tb.Text;
+                                InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1).Name = tb.Text;
                             }
                         }
                     }

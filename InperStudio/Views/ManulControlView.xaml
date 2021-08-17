@@ -144,7 +144,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
                             <Image Source="/Lib/Images/Addition_trigger.png"/>
-                            <TextBlock>Trigger</TextBlock>
+                            <TextBlock>Setting</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>

@@ -20,6 +20,7 @@ namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
 
         public void Reset()
         {
+            if (cam == null) { return; }
             cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
             cam.Close();
             // Set the acquisition mode to free running continuous acquisition when the camera is opened.
@@ -243,75 +244,111 @@ namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
 
         public double GetCurrentExposure()
         {
-            double exposure = cam.Parameters[PLCamera.ExposureTime].GetValue() / 1000;
-            return (int)(exposure * 100) / 100.0;
+            if (cam != null)
+            {
+                double exposure = cam.Parameters[PLCamera.ExposureTime].GetValue() / 1000;
+                return (int)(exposure * 100) / 100.0;
+            }
+            return default;
         }
 
 
         public double GetCurrentFrameRate()
         {
-            double frame_rate = cam.Parameters[PLCamera.AcquisitionFrameRate].GetValue();
-            return (int)(frame_rate * 100) / 100.0;
+            if (cam != null)
+            {
+                double frame_rate = cam.Parameters[PLCamera.AcquisitionFrameRate].GetValue();
+                return (int)(frame_rate * 100) / 100.0;
+            }
+            return default;
         }
 
 
         public double GetCurrentGain()
         {
-            double gain = cam.Parameters[PLCamera.Gain].GetValue();
-            return (int)(gain * 100) / 100.0;
+            if (cam != null)
+            {
+                double gain = cam.Parameters[PLCamera.Gain].GetValue();
+                return (int)(gain * 100) / 100.0;
+            }
+            return default;
         }
 
 
         public double GetMaximumExposure()
         {
-            double max_exposure = cam.Parameters[PLCamera.ExposureTime].GetMaximum();
-            max_exposure = max_exposure > 100000 ? 100000 : max_exposure;
-            return max_exposure / 1000;
+            if (cam != null)
+            {
+                double max_exposure = cam.Parameters[PLCamera.ExposureTime].GetMaximum();
+                max_exposure = max_exposure > 100000 ? 100000 : max_exposure;
+                return max_exposure / 1000;
+            }
+            return default;
         }
 
 
         public double GetMaximumFrameRate()
         {
-            double max_frame_rate = cam.Parameters[PLCamera.AcquisitionFrameRate].GetMaximum();
-            double exposure = GetCurrentExposure();
-            exposure = exposure > 3 ? exposure : 3;
-            double exposure_frames = 1000 / (exposure + 0.125);
-            max_frame_rate = max_frame_rate > exposure_frames ? exposure_frames : max_frame_rate;
-            return (int)(max_frame_rate * 100) / 100.0;
+            if (cam != null)
+            {
+                double max_frame_rate = cam.Parameters[PLCamera.AcquisitionFrameRate].GetMaximum();
+                double exposure = GetCurrentExposure();
+                exposure = exposure > 3 ? exposure : 3;
+                double exposure_frames = 1000 / (exposure + 0.125);
+                max_frame_rate = max_frame_rate > exposure_frames ? exposure_frames : max_frame_rate;
+                return (int)(max_frame_rate * 100) / 100.0;
+            }
+            return default;
         }
 
 
         public double GetMaximumGain()
         {
-            double max_gain = cam.Parameters[PLCamera.Gain].GetMaximum();
-            return ((int)(max_gain * 100) / 100.0) - 0.01;
+            if (cam != null)
+            {
+                double max_gain = cam.Parameters[PLCamera.Gain].GetMaximum();
+                return ((int)(max_gain * 100) / 100.0) - 0.01;
+            }
+            return default;
         }
 
 
         public double GetMinimumExposure()
         {
-            double min_exposure = cam.Parameters[PLCamera.ExposureTime].GetMinimum();
-            return min_exposure / 1000;
+            if (cam != null)
+            {
+                double min_exposure = cam.Parameters[PLCamera.ExposureTime].GetMinimum();
+                return min_exposure / 1000;
+            }
+            return default;
         }
 
 
         public double GetMinimumFrameRate()
         {
-            double min_frame_rate = cam.Parameters[PLCamera.AcquisitionFrameRate].GetMinimum();
-            return (int)(min_frame_rate * 100) / 100.0 + 0.1;
+            if (cam != null)
+            {
+                double min_frame_rate = cam.Parameters[PLCamera.AcquisitionFrameRate].GetMinimum();
+                return (int)(min_frame_rate * 100) / 100.0 + 0.1;
+            }
+            return default;
         }
 
 
         public double GetMinimumGain()
         {
-            double min_gain = cam.Parameters[PLCamera.Gain].GetMinimum();
-            return ((int)(min_gain * 100) / 100.0) + 0.01;
+            if (cam != null)
+            {
+                double min_gain = cam.Parameters[PLCamera.Gain].GetMinimum();
+                return ((int)(min_gain * 100) / 100.0) + 0.01;
+            }
+            return default;
         }
 
 
         public void Open()
         {
-            cam.Open(30000, TimeoutHandling.Return);
+            cam?.Open(30000, TimeoutHandling.Return);
         }
 
 
@@ -319,7 +356,8 @@ namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
         {
             var exValue = exposure * 1000;
             exValue = exValue < 1000 ? 1000 : exValue;
-            cam.Parameters[PLCamera.ExposureTime].TrySetValue(exValue);
+            if (cam != null)
+                cam.Parameters[PLCamera.ExposureTime].TrySetValue(exValue);
 
             return GetCurrentExposure();
         }
@@ -327,27 +365,39 @@ namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
 
         public double SetFrameRate(double frame_rate)
         {
-            cam.Parameters[PLCamera.AcquisitionFrameRate].SetValue(frame_rate);
-            return GetCurrentFrameRate();
+            if (cam != null)
+            {
+                cam.Parameters[PLCamera.AcquisitionFrameRate].SetValue(frame_rate);
+                return GetCurrentFrameRate();
+            }
+            return default;
         }
 
 
         public double SetGain(double gain)
         {
-            cam.Parameters[PLCamera.Gain].TrySetValue(gain);
-            return (int)(cam.Parameters[PLCamera.Gain].GetValue() * 100) / 100.0;
+            if (cam != null)
+            {
+                cam.Parameters[PLCamera.Gain].TrySetValue(gain);
+                return (int)(cam.Parameters[PLCamera.Gain].GetValue() * 100) / 100.0;
+            }
+            return default;
         }
 
 
         public int GetVisionWidth()
         {
-            return (int)cam.Parameters[PLCamera.Width].GetValue();
+            if (cam != null)
+                return (int)cam.Parameters[PLCamera.Width].GetValue();
+            return default;
         }
 
 
         public int GetVisionHeight()
         {
-            return (int)cam.Parameters[PLCamera.Height].GetValue();
+            if (cam != null)
+                return (int)cam?.Parameters[PLCamera.Height].GetValue();
+            return default;
         }
 
 

@@ -26,7 +26,7 @@ namespace InperStudio
             // Perform any other configuration before the application starts
             SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
             {
-                ConnectionString = "server=120.26.65.180;port=3306;Database=InperUpgrade;Uid=root;Pwd=Inper2021;SslMode=" + MySqlSslMode.None,//连接符字串
+                ConnectionString = InperConfig.Instance.ConStr + MySqlSslMode.None,//连接符字串
                 DbType = DbType.MySql,
                 IsAutoCloseConnection = true //不设成true要手动close
             });

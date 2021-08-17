@@ -207,7 +207,7 @@ namespace InperStudio.ViewModels
                 {
                     tb.Text = "Video - ";
                     tb.SelectionStart = tb.Text.Length;
-                    Growl.Error(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                    Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                     return;
                 }
 

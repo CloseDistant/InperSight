@@ -1,14 +1,17 @@
 ﻿using HandyControl.Controls;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
+using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using SciChart.Charting.Visuals;
 using SciChart.Data.Model;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -150,34 +153,85 @@ namespace InperStudio.ViewModels
                 {
                     if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
                     {
-                        string[] hotkeys = x.Hotkeys.Split('+');
-                        if (x.HotkeysCount == 1)
+                        AddMarkers(x, 0);
+                    }
+
+                    if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                    {
+                        if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
                         {
-                            if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])))
-                            {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor), ChannelTypeEnum.Manual.ToString());
-                            }
-                        }
-                        if (x.HotkeysCount == 2)
-                        {
-                            if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
-                            {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor), ChannelTypeEnum.Manual.ToString());
-                            }
-                        }
-                        if (x.HotkeysCount == 3)
-                        {
-                            if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
-                            {
-                                InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor), ChannelTypeEnum.Manual.ToString());
-                            }
+                            AddMarkers(x.Condition, 1);
                         }
                     }
+
                 });
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
+            }
+        }
+        private void AddMarkers(EventChannelJson x, int type = 0)
+        {
+            string[] hotkeys = x.Hotkeys.Split('+');
+            if (x.HotkeysCount == 1)
+            {
+                if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])))
+                {
+                    if (type == 0)
+                    {
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            if (x.HotkeysCount == 2)
+            {
+                if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
+                {
+                    if (type == 0)
+                    {
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            if (x.HotkeysCount == 3)
+            {
+                if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
+                {
+                    if (type == 0)
+                    {
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            if (type == 0)
+            {
+                int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
+                TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+
+                Manual manual = new Manual()
+                {
+                    ChannelId = x.ChannelId,
+                    Color = x.BgColor,
+                    CameraTime = time.Ticks,
+                    Name = x.Name,
+                    Type = ChannelTypeEnum.Manual.ToString(),
+                    DateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                };
+
+                _ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
             }
         }
         public void YaxisAdd(object sender)
@@ -219,9 +273,7 @@ namespace InperStudio.ViewModels
             {
                 CameraChannel channel = sender as CameraChannel;
 
-                //channel.YVisibleRange.Min = 0;
-                //channel.YVisibleRange.Max = 10;
-                channel.YVisibleRange.SetMinMaxWithLimit(0, 100, new DoubleRange(0, 10));
+                _ = channel.YVisibleRange.SetMinMaxWithLimit(0, 100, new DoubleRange(0, 10));
             }
             catch (Exception ex)
             {
@@ -236,6 +288,10 @@ namespace InperStudio.ViewModels
                 if (!string.IsNullOrEmpty(item))
                 {
                     TextFormat = item;
+                    if (view != null)
+                    {
+                        view.timesAxisSci.XAxis.TextFormatting = TextFormat;
+                    }
                 }
             }
             catch (Exception ex)

@@ -50,17 +50,21 @@ namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
                         try
                         {
                             cam = new BaslerCamera();
-                            cam.Open();
+                            if (cam == null)
+                            {
+                                HandyControl.Controls.Growl.Error("OnDeviceNotifyEvent: device not found.");
+                                return;
+                            }
+                            else
+                            {
+                                cam.Open();
+                            }
                         }
                         catch (Exception ex)
                         {
                             System.Diagnostics.Debug.WriteLine(ex.Message);
                         }
 
-                        if (cam == null)
-                        {
-                            System.Diagnostics.Debug.WriteLine("OnDeviceNotifyEvent: device not found.");
-                        }
                     }
                     else
                     {
@@ -85,16 +89,18 @@ namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
                 try
                 {
                     cam = new BaslerCamera();
-                    cam.Open();
+                    if (cam == null)
+                    {
+                        HandyControl.Controls.Growl.Error("OnDeviceNotifyEvent: device not found.");
+                    }
+                    else
+                    {
+                        cam.Open();
+                    }
                 }
                 catch (Exception e)
                 {
                     System.Diagnostics.Debug.WriteLine(e.Message);
-                }
-
-                if (cam == null)
-                {
-                    throw new Exception("Inper photometry device not found.");
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using Stylet;
@@ -57,9 +58,16 @@ namespace InperStudio.ViewModels
                     if (!string.IsNullOrEmpty(text))
                     {
                         TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
+                        string time = DateTime.Now.ToString("G");
 
-                        tb.Text = DateTime.Now.ToString("G") + @"：" + text;
+                        tb.Text = time + @"：" + text;
                         _ = stack.Children.Add(tb);
+                        
+                        _ = App.SqlDataInit.sqlSugar.Insertable<Note>(new Note()
+                        {
+                            Text = text,
+                            CreateTime = DateTime.Parse(time)
+                        }).ExecuteCommand();
                     }
                 }
             }
