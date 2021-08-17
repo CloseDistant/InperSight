@@ -50,8 +50,7 @@ namespace InperStudio.ViewModels
                     BehaviorRecorderKit.Device.Fps = frame;
                     _ = BehaviorRecorderKit.Device.Set(OpenCvSharp.VideoCaptureProperties.Fps, frame);
                 };
-                //bottomControl.IsRecord.Checked += (s, e) => BehaviorRecorderKit.StartRecord(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss")));
-                //bottomControl.IsRecord.Unchecked += (s, e) => BehaviorRecorderKit.StopRecord();
+                
                 bottomControl.Screen.Click += (s, e) =>
                 {
                     BehaviorRecorderKit._PreviewMat.Clone().ToBitmap().Save(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp"));
