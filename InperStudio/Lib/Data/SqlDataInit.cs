@@ -61,8 +61,9 @@ namespace InperStudio.Lib.Data
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Config));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.AIROI));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Manual));
+            RecordInit();
         }
-        public void RecordInit()
+        private void RecordInit()
         {
             RecordTablePairs.Clear();
             foreach (var item in InperDeviceHelper.Instance.CameraChannels)

@@ -10,28 +10,26 @@ namespace InperStudio.Lib.Enum
     {
         public static List<double> Exposures { get; set; } = new List<double>()
         {
-            1,
-            6,
+            0,
+            5,
             10,
-            12,
             15,
             20,
+            25,
             30,
-            40,
-            50,
-            300
+            50
         };
         public static List<double> FPS { get; set; } = new List<double>()
         {
-            1,
             6,
-            10,
             12,
-            15,
             20,
             30,
             40,
             50,
+            60,
+            80,
+            100,
             200
         };
     }

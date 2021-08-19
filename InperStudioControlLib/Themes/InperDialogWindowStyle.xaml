@@ -22,9 +22,10 @@
             <Setter Property="ResizeMode" Value="CanResizeWithGrip"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="UseLayoutRounding" Value="True"/>
+            <Setter Property="hc:Dialog.Token" Value="Loading"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="inper:InperDialogWindow">
+                    <ControlTemplate TargetType="inper:InperDialogWindow" >
                         <hc:TransitioningContentControl Background="Transparent" TransitionMode="Bottom2TopWithFade">
                             <hc:SimplePanel>
                                 <Border Name="BorderRootEffect" BorderThickness="1" BorderBrush="{StaticResource InperTitlePageColor}" Padding="2" Background="{StaticResource InperTitlePageColor}" CornerRadius="{DynamicResource InperDialogWindowCornerRadius}"  Style="{StaticResource BorderRegion}"  Margin="10" >

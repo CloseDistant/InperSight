@@ -9,8 +9,8 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
         xmlns:local="clr-namespace:InperStudio.Views"
-        mc:Ignorable="d" IsShowCancleButton="False" IsShowMaxButton="False" IsShowMiniButton="False" OtherButtonText="Apply"
-        Title="Marker" Height="500" Width="700" MinHeight="450" MinWidth="600" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
+        mc:Ignorable="d" IsShowCancleButton="False" IsShowTopAllButton="False" IsShowOtherButton="False"
+        Title="Marker" SizeToContent="Height"  Width="700" MinHeight="450" MinWidth="600" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
         <convert:VisibilityToVisibilityReConverter x:Key="VisibilityToVisibilityReConverter" />

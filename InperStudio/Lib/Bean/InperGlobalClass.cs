@@ -3,8 +3,10 @@ using HandyControl.Data;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
+using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -28,6 +30,9 @@ namespace InperStudio.Lib.Bean
 
         private static AdditionRecordConditionsTypeEnum additionRecordConditionsStart = AdditionRecordConditionsTypeEnum.Immediately;
         private static AdditionRecordConditionsTypeEnum additionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Immediately;
+
+        private static ObservableCollection<BehaviorRecorderKit> activeVideos = new ObservableCollection<BehaviorRecorderKit>();
+        private static BindableCollection<EventChannelJson> manualEvents = new BindableCollection<EventChannelJson>();
         #endregion
 
         #region properties
@@ -128,6 +133,24 @@ namespace InperStudio.Lib.Bean
             {
                 additionRecordConditionsStop = value;
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AdditionRecordConditionsStop)));
+            }
+        }
+        public static ObservableCollection<BehaviorRecorderKit> ActiveVideos
+        {
+            get => activeVideos;
+            set
+            {
+                activeVideos = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ActiveVideos)));
+            }
+        }
+        public static BindableCollection<EventChannelJson> ManualEvents
+        {
+            get => manualEvents;
+            set
+            {
+                manualEvents = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ManualEvents)));
             }
         }
         #endregion

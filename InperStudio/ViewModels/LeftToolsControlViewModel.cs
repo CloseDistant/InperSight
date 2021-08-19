@@ -21,15 +21,15 @@ namespace InperStudio.ViewModels
     {
         #region properties
         private IWindowManager windowManager;
-        private BindableCollection<EventChannelJson> manualEvents = new BindableCollection<EventChannelJson>();
-        public BindableCollection<EventChannelJson> ManulEvents { get => manualEvents; set => SetAndNotify(ref manualEvents, value); }
+      
+        public BindableCollection<EventChannelJson> ManulEvents { get; set; }
         #endregion
 
         #region
         public LeftToolsControlViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
-            ManulEvents = EventSettingsViewModel.ManualEvents;
+            ManulEvents = InperGlobalClass.ManualEvents;
         }
         public LeftToolsControlViewModel()
         {

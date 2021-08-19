@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:InperStudio.Views"
              xmlns:sc="http://schemas.abtsoftware.co.uk/scichart"
              xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
              xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
              xmlns:global="clr-namespace:InperStudio.Lib.Bean"
@@ -36,7 +37,11 @@
                 </Grid.ColumnDefinitions>
                 <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
-                    <TextBlock TextWrapping="Wrap" Margin="2 0" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock MaxHeight="30" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" Margin="2 0" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Left" VerticalAlignment="Stretch"  >
+                        <TextBlock.RenderTransform>
+                            <RotateTransform Angle="90" CenterX="15" CenterY="10" />
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
                 </Border>
                 <Grid Grid.Column="1">
                     <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />

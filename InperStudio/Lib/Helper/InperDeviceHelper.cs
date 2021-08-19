@@ -830,13 +830,19 @@ namespace InperStudio.Lib.Helper
             destination = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonStr);
         }
 
-        public void AllLightOpen()
+        public bool AllLightOpen()
         {
+            bool isExistLight = false;
             LightWaveLength.ToList().ForEach(x =>
              {
-                 DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                 DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                 if (x.IsChecked)
+                 {
+                     isExistLight = true;
+                     DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                     DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                 }
              });
+            return isExistLight;
         }
         public void AllLightClose()
         {

@@ -11,7 +11,7 @@
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         IsShowTopAllButton="False" IsShowOtherButton="False" FontFamily="{DynamicResource InperFontFamily}"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataPathConfigViewModel}"
-        Width="600" Height="400" MinWidth="200" MinHeight="200" Title="Config" ConfirmClickEvent="{s:Action InperDialogWindow_ConfirmClickEvent}">
+        Width="600" Height="400" MinWidth="200" MinHeight="200" Title="Config" IsShowCancleButton="False" ConfirmClickEvent="{s:Action InperDialogWindow_ConfirmClickEvent}">
     <inper:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
     </inper:InperDialogWindow.Resources>

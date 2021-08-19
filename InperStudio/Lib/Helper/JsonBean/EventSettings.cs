@@ -8,7 +8,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public List<EventChannelJson> Channels { get; set; }
         public object Marker { get; set; }
-        public object Output { get; set; }
+        public List<EventChannelJson> Output { get; set; }
     }
     public class EventChannelJson
     {

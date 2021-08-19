@@ -83,6 +83,29 @@ namespace InperStudio.ViewModels
                         InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                         InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
 
+                        InperGlobalClass.ManualEvents.Clear();
+                        foreach (Lib.Helper.JsonBean.EventChannelJson item in InperGlobalClass.EventSettings.Channels)
+                        {
+                            if (item.Type == ChannelTypeEnum.Manual.ToString())
+                            {
+                                InperGlobalClass.ManualEvents.Add(item);
+                            }
+                            if (item.Condition?.Type == ChannelTypeEnum.Manual.ToString())
+                            {
+                                InperGlobalClass.ManualEvents.Add(new Lib.Helper.JsonBean.EventChannelJson()
+                                {
+                                    BgColor = item.BgColor,
+                                    ChannelId = item.ChannelId,
+                                    Hotkeys = item.Condition.Hotkeys,
+                                    HotkeysCount = item.Condition.HotkeysCount,
+                                    Name = item.Name,
+                                    SymbolName = item.SymbolName,
+                                    Type = item.Condition.Type,
+                                    IsActive = item.IsActive
+                                });
+                            }
+                        }
+
                         if (InperGlobalClass.EventSettings.Channels.Count > 0)
                         {
                             InperGlobalClass.IsExistEvent = true;
@@ -102,6 +125,7 @@ namespace InperStudio.ViewModels
                                 }
                             }
                         });
+
                         List<int> cs = new List<int>();
                         List<int> _cs = new List<int>();
                         InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>

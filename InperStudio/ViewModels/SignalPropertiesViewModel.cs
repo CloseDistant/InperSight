@@ -52,11 +52,7 @@ namespace InperStudio.ViewModels
                 view.ConfirmClickEvent += (s, e) =>
                 {
                     RequestClose();
-                };
-                view.OtherClickEvent += (e) =>
-                {
-                    InperJsonHelper.SetCameraSignalSettings(CameraSignalSettings);
-                };
+                };  
             }
             catch (Exception ex)
             {
@@ -379,7 +375,7 @@ namespace InperStudio.ViewModels
         }
         protected override void OnClose()
         {
-
+            InperJsonHelper.SetCameraSignalSettings(CameraSignalSettings);
         }
     }
 }

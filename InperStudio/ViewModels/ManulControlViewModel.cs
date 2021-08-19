@@ -95,6 +95,7 @@ namespace InperStudio.ViewModels
                 }
                 string fname = dlg.FileName;
                 File.Copy(InperJsonConfig.filepath, fname);
+                InperJsonConfig.filepath = fname;
             }
             catch (Exception ex)
             {
@@ -209,7 +210,11 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.ShowReminderInfo("数据初始化失败");
                 return;
             }
-            InperDeviceHelper.Instance.AllLightOpen();
+            if (!InperDeviceHelper.Instance.AllLightOpen())
+            {
+                InperGlobalClass.ShowReminderInfo("未设置激发光");
+                return;
+            }
             InperDeviceHelper.Instance.StartCollect();
 
             InperGlobalClass.IsPreview = true;
@@ -252,11 +257,15 @@ namespace InperStudio.ViewModels
             }
             else
             {
-                InperDeviceHelper.Instance.AllLightOpen();
+                if (!InperDeviceHelper.Instance.AllLightOpen())
+                {
+                    InperGlobalClass.ShowReminderInfo("未设置激发光");
+                    return;
+                }
             }
 
             //数据库优先初始化
-            App.SqlDataInit.RecordInit();
+            App.SqlDataInit = new Lib.Data.SqlDataInit();
 
             InperDeviceHelper.Instance.StartCollect();
 
@@ -289,7 +298,7 @@ namespace InperStudio.ViewModels
             (View as ManulControlView).Root_Gird.IsEnabled = true;
             if (isrecord)
             {
-                var d = Dialog.Show<ProgressDialog>();
+                Dialog d = Dialog.Show<ProgressDialog>();
                 await Task.Delay(3000);
                 d.Close();
                 isrecord = false;

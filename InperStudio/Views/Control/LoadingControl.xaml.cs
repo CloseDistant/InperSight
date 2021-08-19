@@ -1,5 +1,4 @@
-﻿using HandyControl.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,18 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace InperStudio.Views
+namespace InperStudio.Views.Control
 {
     /// <summary>
-    /// SignalSettingsView.xaml 的交互逻辑
+    /// LoadingControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SignalSettingsView
+    public partial class LoadingControl : UserControl
     {
-        public SignalSettingsView()
+        public LoadingControl()
         {
             InitializeComponent();
-        } 
+        }
     }
 }

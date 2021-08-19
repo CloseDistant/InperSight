@@ -63,7 +63,7 @@ namespace InperStudio.ViewModels
             get => sampling;
             set
             {
-                SetAndNotify(ref sampling, value);
+                _ = SetAndNotify(ref sampling, value);
                 _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
                 InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
             }
@@ -74,9 +74,8 @@ namespace InperStudio.ViewModels
             get => expourse;
             set
             {
-                SetAndNotify(ref expourse, value);
-                _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
-                InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(expourse);
+                _ = SetAndNotify(ref expourse, value);
+               
             }
         }
         #endregion
@@ -151,6 +150,31 @@ namespace InperStudio.ViewModels
         }
 
         #region methods  Camera
+        public void Exposure_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                System.Windows.Controls.ComboBox com = sender as System.Windows.Controls.ComboBox;
+                if (double.Parse(com.Text) < 0)
+                {
+                    Growl.Warning("不能小于0","SuccessMsg");
+                    com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
+                    return;
+                }
+                if (double.Parse(com.Text) > 100)
+                {
+                    Growl.Warning("不能大于100","SuccessMsg");
+                    com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
+                    return;
+                }
+                _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
+                InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(expourse);
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         private void Init()
         {
             try

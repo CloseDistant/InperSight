@@ -56,7 +56,7 @@ namespace InperStudio.Lib.Bean
         }
 
         public int _CamIndex;
-
+        public bool IsActive { get; set; }
         public string Name { get; set; }
         public string CustomName { get; set; }
 

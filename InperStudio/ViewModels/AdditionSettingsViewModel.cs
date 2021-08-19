@@ -5,6 +5,7 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
+using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
 using Stylet;
 using System;
@@ -15,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace InperStudio.ViewModels
 {
@@ -25,11 +27,12 @@ namespace InperStudio.ViewModels
         private AdditionSettingsView view;
 
         #region video
+        private Dialog loading;
         private BehaviorRecorderKit selectCameraItem;
         private ObservableCollection<BehaviorRecorderKit> unusedKits;
-        private ObservableCollection<BehaviorRecorderKit> usedKits;
+        //private ObservableCollection<BehaviorRecorderKit> usedKits;
         public ObservableCollection<BehaviorRecorderKit> UnusedKits { get => unusedKits; set => SetAndNotify(ref unusedKits, value); }
-        public ObservableCollection<BehaviorRecorderKit> UsedKits { get => usedKits; set => SetAndNotify(ref usedKits, value); }
+        public ObservableCollection<BehaviorRecorderKit> UsedKits { get; set; } = InperGlobalClass.ActiveVideos;
         #endregion
 
         #region trigger
@@ -57,28 +60,49 @@ namespace InperStudio.ViewModels
                     break;
             }
         }
-        protected override void OnViewLoaded()
+        protected async override void OnViewLoaded()
         {
+            base.OnViewLoaded();
             try
             {
                 view = View as AdditionSettingsView;
 
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
-                    this.view.video.Visibility = Visibility.Visible;
-
-                    UsedKits = new ObservableCollection<BehaviorRecorderKit>();
+                    view.video.Visibility = Visibility.Visible;
                     UnusedKits = new ObservableCollection<BehaviorRecorderKit>();
 
-                    InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
-                    foreach (KeyValuePair<int, string> c in CompInfo.ListCamerasData)
-                    {
-                        if (!c.Value.Contains("Basler"))
-                        {
-                            var item = new BehaviorRecorderKit(c.Key, c.Value);
-                            UnusedKits.Add(item);
-                        }
-                    }
+                    await Task.Factory.StartNew(() =>
+                       {
+
+                           InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
+                           foreach (KeyValuePair<int, string> c in CompInfo.ListCamerasData)
+                           {
+                               if (!c.Value.Contains("Basler"))
+                               {
+                                   var item = new BehaviorRecorderKit(c.Key, c.Value);
+                                   view.Dispatcher.Invoke(() =>
+                                   {
+                                       UnusedKits.Add(item);
+                                   });
+                               }
+                           }
+                           if (UsedKits.Count > 0)
+                           {
+                               UsedKits.ToList().ForEach(x =>
+                               {
+                                   BehaviorRecorderKit item = unusedKits.FirstOrDefault(y => y._CamIndex == x._CamIndex);
+                                   if (item != null)
+                                   {
+                                       view.Dispatcher.Invoke(() =>
+                                       {
+                                           unusedKits.Remove(item);
+                                       });
+                                   }
+                               });
+                           }
+                       });
+                    view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
                 }
                 else
                 {
@@ -86,28 +110,38 @@ namespace InperStudio.ViewModels
                     view.Title = "Start/Stop Conditions";
                 }
 
-                view.ConfirmClickEvent += View_ConfirmClickEvent;
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
+            finally
+            {
+                view.ConfirmClickEvent += View_ConfirmClickEvent;
+                view.OtherClickEvent += View_OtherClickEvent;
+            }
         }
 
-        private void View_ConfirmClickEvent(object arg1, System.Windows.Input.ExecutedRoutedEventArgs arg2)
+        private void View_OtherClickEvent(object obj)
         {
             try
             {
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
-                    if (usedKits.Count != 0)
+                    MainWindowViewModel main = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+                    if (UsedKits.Count != 0)
                     {
-                        var main = System.Windows.Application.Current.MainWindow.DataContext as MainWindowViewModel;
-
-                        foreach (BehaviorRecorderKit item in UsedKits)
+                        Parallel.ForEach(UsedKits, item =>
                         {
-                            main.windowManager.ShowWindow(new VideoWindowViewModel(item));
-                        }
+                            if (!item.IsActive)
+                            {
+                                item.IsActive = true;
+                                view.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    main.windowManager.ShowWindow(new VideoWindowViewModel(item));
+                                }));
+                            }
+                        });
                     }
                 }
             }
@@ -115,6 +149,11 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
+            this.RequestClose();
+        }
+
+        private void View_ConfirmClickEvent(object arg1, System.Windows.Input.ExecutedRoutedEventArgs arg2)
+        {
             this.RequestClose();
         }
 
@@ -147,7 +186,6 @@ namespace InperStudio.ViewModels
                 if (selectCameraItem != null)
                 {
                     selectCameraItem.StopPreview();
-                    //selectCameraItem.Dispose();
                 }
                 selectCameraItem = view.CameraCombox.SelectedItem as BehaviorRecorderKit;
 
@@ -161,15 +199,37 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+        public void ActiveVideo_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (e.ClickCount >= 2)
+                {
+                    BehaviorRecorderKit item = (sender as Grid).DataContext as BehaviorRecorderKit;
+                    MainWindowViewModel main = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+                    if (!item.IsActive)
+                    {
+                        item.IsActive = true;
+                        main.windowManager.ShowWindow(new VideoWindowViewModel(item));
+                    }
+                    else
+                    {
+                        Growl.Warning("Do not reactivate", "SuccessMsg");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         public void CameraMove(string moveType)
         {
             try
             {
-                var camera = this.view.CameraCombox.SelectedItem as BehaviorRecorderKit;
-                var camera_active = this.view.cameraActiveChannel.SelectedItem as BehaviorRecorderKit;
                 if (moveType == "leftMove")//右移是激活 左移是取消激活
                 {
-                    if (UsedKits.Count > 0 && camera_active != null)
+                    if (UsedKits.Count > 0 && view.cameraActiveChannel.SelectedItem is BehaviorRecorderKit camera_active)
                     {
                         _ = UsedKits.Remove(camera_active);
                         UnusedKits.Add(camera_active);
@@ -181,7 +241,7 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    if (UnusedKits.Count > 0 && camera != null)
+                    if (UnusedKits.Count > 0 && view.CameraCombox.SelectedItem is BehaviorRecorderKit camera)
                     {
                         camera.CustomName = view.CameraName.Text;
                         if (camera.CustomName.EndsWith("-"))
@@ -207,9 +267,9 @@ namespace InperStudio.ViewModels
             {
                 HandyControl.Controls.TextBox tb = sender as HandyControl.Controls.TextBox;
 
-                if (tb.Text.Length < 8 || !tb.Text.StartsWith("Video - "))
+                if (tb.Text.Length < 6 || !tb.Text.StartsWith("Video-"))
                 {
-                    tb.Text = "Video - ";
+                    tb.Text = "Video-";
                     tb.SelectionStart = tb.Text.Length;
                     Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                     return;
