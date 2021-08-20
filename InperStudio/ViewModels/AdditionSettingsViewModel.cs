@@ -5,18 +5,16 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
-using InperStudio.Views.Control;
-using InperStudioControlLib.Lib.Config;
 using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+
 
 namespace InperStudio.ViewModels
 {
@@ -27,7 +25,7 @@ namespace InperStudio.ViewModels
         private AdditionSettingsView view;
 
         #region video
-        private Dialog loading;
+
         private BehaviorRecorderKit selectCameraItem;
         private ObservableCollection<BehaviorRecorderKit> unusedKits;
         //private ObservableCollection<BehaviorRecorderKit> usedKits;
@@ -108,6 +106,7 @@ namespace InperStudio.ViewModels
                 {
                     view.trigger.Visibility = Visibility.Visible;
                     view.Title = "Start/Stop Conditions";
+                    view.IsShowOtherButton = false;
                 }
 
             }
@@ -284,6 +283,51 @@ namespace InperStudio.ViewModels
         #endregion
 
         #region methods Trigger
+        public void AtTime_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                var tb = sender as HandyControl.Controls.TextBox;
+                if (tb.IsFocused)
+                {
+                    switch (tb.Name)
+                    {
+                        case "startHours":
+                        case "stopHours":
+                            if (double.Parse(tb.Text) < DateTime.Now.Hour)
+                            {
+                                Growl.Warning("Incorrect input time", "SuccessMsg");
+                                tb.Text = DateTime.Now.Hour.ToString();
+                            }
+                            break;
+                        case "startMinutes":
+                            if (AdditionRecordStart.AtTime.Hours == DateTime.Now.Hour)
+                            {
+                                if (double.Parse(tb.Text) < DateTime.Now.Minute)
+                                {
+                                    Growl.Warning("Incorrect input time", "SuccessMsg");
+                                    tb.Text = DateTime.Now.Minute.ToString();
+                                }
+                            }
+                            break;
+                        case "stopMinutes":
+                            if (additionRecordStop.AtTime.Hours == DateTime.Now.Hour)
+                            {
+                                if (double.Parse(tb.Text) < DateTime.Now.Minute)
+                                {
+                                    Growl.Warning("Incorrect input time", "SuccessMsg");
+                                    tb.Text = DateTime.Now.Minute.ToString();
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         public void TriggerStart_Checked(object sender, RoutedEventArgs e)
         {
             try

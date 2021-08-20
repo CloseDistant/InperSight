@@ -12,7 +12,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public double Exposure { get; set; }
         public double Sampling { get; set; }
-        public double Gain { get; set; } = 0;
+        public double Gain { get; set; }
         public double Brightness { get; set; }
         public RecordMode RecordMode { get; set; }
         public List<WaveGroup> LightMode { get; set; }
@@ -22,8 +22,8 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public bool IsContinuous { get; set; }
         public bool IsInterval { get; set; }
-        public double Duration { get; set; } = 5;
-        public double Interval { get; set; } = 5;
+        public double Duration { get; set; } = 3;
+        public double Interval { get; set; } = 2;
         public double Delay { get; set; } = 1;
     }
     public class Channel

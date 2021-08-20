@@ -37,10 +37,13 @@
                 </Grid.ColumnDefinitions>
                 <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
-                    <TextBlock MaxHeight="30" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" Margin="2 0" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Left" VerticalAlignment="Stretch"  >
-                        <TextBlock.RenderTransform>
-                            <RotateTransform Angle="90" CenterX="15" CenterY="10" />
-                        </TextBlock.RenderTransform>
+                    <TextBlock MaxHeight="30" x:Name="test"  TextTrimming="CharacterEllipsis" Margin="2 5" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="100"  >
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                        <TextBlock.ToolTip>
+                            <TextBlock Text="{Binding Name}"/>
+                        </TextBlock.ToolTip>
                     </TextBlock>
                 </Border>
                 <Grid Grid.Column="1">
@@ -111,7 +114,11 @@
                             </Grid.ColumnDefinitions>
                             <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
                             <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                                <TextBlock TextWrapping="Wrap" Text="Event" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center"/>
+                                <TextBlock TextWrapping="Wrap" Text="Event" hc:TextBlockAttach.AutoTooltip="True"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center">
+                                    <TextBlock.LayoutTransform>
+                                        <RotateTransform Angle="90"/>
+                                    </TextBlock.LayoutTransform>
+                                </TextBlock>
                             </Border>
                             <Grid Grid.Column="1">
                                 <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
@@ -161,7 +168,11 @@
                 </Grid.ColumnDefinitions>
                 <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                    <TextBlock TextWrapping="Wrap" Text="Event" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center"/>
+                    <TextBlock TextWrapping="Wrap" Text="Event"  hc:TextBlockAttach.AutoTooltip="True"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
                 </Border>
                 <Grid Grid.Column="1">
                     <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
@@ -244,7 +255,7 @@
                             <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
                         </Button>
                         <!--<TextBox Width="45" Height="25" MinHeight="25" Text="{Binding VisibleValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="5 0" Padding="0" HorizontalContentAlignment="Center"/>-->
-                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperTextType="Double" InperMinValue="10" InperVerify="True" Width="45" Height="25" MinHeight="25" Text="{Binding VisibleValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="5 0" Padding="0" HorizontalContentAlignment="Center" />
+                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperTextType="Double" InperMinValue="1" InperVerify="True" Width="45" Height="25" MinHeight="25" Text="{Binding VisibleValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="5 0" Padding="0" HorizontalContentAlignment="Center" />
                         <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Reduce">
                             <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
                         </Button>

@@ -3,21 +3,19 @@ using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
-using InperStudio.ViewModels;
+using InperStudio.Lib.Helper.JsonBean;
 using InperStudioControlLib.Lib.DeviceAgency;
 using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Annotations;
-using SciChart.Charting.Visuals.RenderableSeries;
 using Stylet;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
@@ -25,7 +23,6 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace InperStudio.Lib.Helper
 {
@@ -519,7 +516,23 @@ namespace InperStudio.Lib.Helper
                     object synSpan = new object();
                     if (CameraChannels.Count > 0)
                     {
-                        _ = Parallel.ForEach(_SignalQs, kv =>
+                        Dictionary<int, SignalData> signalQs = null;
+                        Copy(_SignalQs, ref signalQs);
+                        _ = Parallel.ForEach(_SignalQs, q =>
+                        {
+                            foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in q.Value.ValuePairs)
+                            {
+                                item.Value.Clear();
+                            }
+                        });
+                        Monitor.Exit(_SignalQsLocker);
+
+                        if (signalQs == null)
+                        {
+                            continue;
+                        }
+
+                        _ = Parallel.ForEach(signalQs, kv =>
                         {
                             CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
                             if (channel.LightModes.Count > 0)
@@ -541,11 +554,20 @@ namespace InperStudio.Lib.Helper
                                  });
                             }
                         });
-                        Monitor.Exit(_SignalQsLocker);
 
                         if (Monitor.TryEnter(_EventQLock))
                         {
-                            _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
+                            Dictionary<int, Queue<KeyValuePair<long, double>>> eventQs = EventChannelChart.EventQs;
+                            Copy(EventChannelChart.EventQs, ref eventQs);
+                            _ = Parallel.ForEach(_SaveEventQs, q =>
+                            {
+                                //这里有疑问
+                                eventQs.Add(q.Key, q.Value);
+                                q.Value.Clear();
+                            });
+                            Monitor.Exit(_EventQLock);
+
+                            _ = Parallel.ForEach(eventQs, q =>
                             {
                                 if (EventChannelChart.RenderableSeries.Count > 0)
                                 {
@@ -582,7 +604,6 @@ namespace InperStudio.Lib.Helper
                                     });
                                 }
                             });
-                            Monitor.Exit(_EventQLock);
                         }
 
                     }
@@ -604,6 +625,7 @@ namespace InperStudio.Lib.Helper
                     Copy(_SaveEventQs, ref saveEventQs);
                     _ = Parallel.ForEach(_SaveEventQs, q =>
                     {
+                        //这里有疑问
                         saveEventQs.Add(q.Key, q.Value);
                         q.Value.Clear();
                     });
@@ -637,13 +659,17 @@ namespace InperStudio.Lib.Helper
                     Copy(_SaveSignalQs, ref saveSignalQS);
                     _ = Parallel.ForEach(_SaveSignalQs, kv =>
                     {
-                        foreach (var item in kv.Value.ValuePairs)
+                        foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in kv.Value.ValuePairs)
                         {
                             item.Value.Clear();
                         }
                     });
                     Monitor.Exit(_SaveDataLock);
-                    if (saveSignalQS == null) return;
+                    if (saveSignalQS == null)
+                    {
+                        continue;
+                    }
+
                     _ = Parallel.ForEach(saveSignalQS, kv =>
                     {
                         List<ChannelRecord> records = new List<ChannelRecord>();
@@ -746,9 +772,9 @@ namespace InperStudio.Lib.Helper
 
             //_ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
         }
-        public void SendCommand()
+        public void SendCommand(EventChannelJson channelJson)
         {
-
+            AddMarkerByHotkeys(channelJson.ChannelId,channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor));
         }
         public void StopCollect()
         {

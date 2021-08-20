@@ -345,7 +345,7 @@ namespace InperStudio.ViewModels
                               time = typeEnum == ChannelTypeEnum.Start
                               ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
                               : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                              InperDeviceHelper.Instance.SendCommand();
+                              InperDeviceHelper.Instance.SendCommand(channel);
                               Output output = new Output()
                               {
                                   ChannelId = channel.ChannelId,

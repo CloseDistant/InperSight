@@ -28,7 +28,7 @@ namespace InperStudio.ViewModels
 
                 view.heightAuto.Checked += (s, e) =>
                 {
-                    dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = dataShowControlView.dataList.ActualHeight / dataShowControlView.dataList.Items.Count;
+                    dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = dataShowControlView.dataList.ActualHeight / (dataShowControlView.dataList.Items.Count == 0 ? 1 : dataShowControlView.dataList.Items.Count);
                 };
                 view.heightFixed.Checked += (s, e) =>
                 {

@@ -6,6 +6,7 @@
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:local="clr-namespace:InperStudio.Views"
         mc:Ignorable="d" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False" IsShowCancleButton="False"  IsShowOtherButton="False"
@@ -43,7 +44,7 @@
                 </Grid>
                 <Grid Margin="0 10">
                     <TextBlock Text="Window Size" VerticalAlignment="Center"   FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <hc:TextBox Width="130" TextChanged="{s:Action WindowSize_TextChanged}" HorizontalAlignment="Right" Margin="0 0 20 0" Text="{Binding ElementName=offsetChannel,Path=SelectedItem.OffsetWindowSize,Mode=TwoWay}" />
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="2" Width="130" InperTextChanged="{s:Action WindowSize_TextChanged}" HorizontalAlignment="Right" Margin="0 0 20 0" Text="{Binding ElementName=offsetChannel,Path=SelectedItem.OffsetWindowSize,Mode=TwoWay}" />
                 </Grid>
                 <WrapPanel Margin="0 10" HorizontalAlignment="Right" >
                     <Button Content="Cancle" Command="{s:Action CameraOffset}" Name="cancle" IsEnabled="False" CommandParameter="Cancle" />
@@ -81,7 +82,7 @@
                     <CheckBox  HorizontalAlignment="Left" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
                         <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="Smooth (Point)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
-                    <hc:TextBox Width="90" Margin="0 0 20 0" TextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}"  Width="90" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="2" InperTextType="Int" InperTextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
                 </Grid>
             </StackPanel>
         </Grid>

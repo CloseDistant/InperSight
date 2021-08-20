@@ -73,8 +73,10 @@ namespace InperStudio.ViewModels
                         window.Close();
                     }
 
-                    OpenFileDialog openFileDialog = new OpenFileDialog();
-                    openFileDialog.Filter = "Json|*.inper";
+                    OpenFileDialog openFileDialog = new OpenFileDialog
+                    {
+                        Filter = "Json|*.inper"
+                    };
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         view.loadPath.Text = openFileDialog.FileName;

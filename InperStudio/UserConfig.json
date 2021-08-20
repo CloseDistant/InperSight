@@ -53,8 +53,8 @@
     "recordMode": {
       "isContinuous": true,
       "isInterval": false,
-      "duration": 10,
-      "interval": 10,
+      "duration": 3,
+      "interval": 2,
       "delay": 10
     },
     "lightMode": [],

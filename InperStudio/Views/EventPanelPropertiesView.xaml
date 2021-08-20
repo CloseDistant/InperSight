@@ -6,6 +6,7 @@
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:local="clr-namespace:InperStudio.Views" 
@@ -33,7 +34,7 @@
                 <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" IsChecked="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixed  ,UpdateSourceTrigger=PropertyChanged}">
                     <TextBlock Text="Fixed" Margin="5 0" />
                 </RadioButton>
-                <hc:TextBox Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />
+                <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Double" InperMaxValue="999" InperMinValue="30" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />
             </Grid>
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="20">

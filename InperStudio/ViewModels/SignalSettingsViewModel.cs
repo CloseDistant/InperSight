@@ -6,6 +6,7 @@ using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
+using InperStudioControlLib.Control.TextBox;
 using InperStudioControlLib.Lib.DeviceAgency;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
@@ -58,26 +59,9 @@ namespace InperStudio.ViewModels
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
         private string sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
-        public string Sampling
-        {
-            get => sampling;
-            set
-            {
-                _ = SetAndNotify(ref sampling, value);
-                _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
-                InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
-            }
-        }
+        public string Sampling { get => sampling; set => SetAndNotify(ref sampling, value); }
         private string expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
-        public string Expourse
-        {
-            get => expourse;
-            set
-            {
-                _ = SetAndNotify(ref expourse, value);
-               
-            }
-        }
+        public string Expourse { get => expourse; set => SetAndNotify(ref expourse, value); }
         #endregion
         public SignalSettingsViewModel(SignalSettingsTypeEnum typeEnum)
         {
@@ -157,18 +141,55 @@ namespace InperStudio.ViewModels
                 System.Windows.Controls.ComboBox com = sender as System.Windows.Controls.ComboBox;
                 if (double.Parse(com.Text) < 0)
                 {
-                    Growl.Warning("不能小于0","SuccessMsg");
+                    Growl.Warning("不能小于0", "SuccessMsg");
                     com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                     return;
                 }
                 if (double.Parse(com.Text) > 100)
                 {
-                    Growl.Warning("不能大于100","SuccessMsg");
+                    Growl.Warning("不能大于100", "SuccessMsg");
                     com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                     return;
                 }
                 _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
                 InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(expourse);
+                if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling > 1000)
+                {
+                    InperGlobalClass.CameraSignalSettings.Sampling = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Exposure);
+                    this.view.Sampling.Text = sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                    _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void Sampling_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                System.Windows.Controls.ComboBox com = sender as System.Windows.Controls.ComboBox;
+                if (double.Parse(com.Text) < 1)
+                {
+                    Growl.Warning("不能小于1", "SuccessMsg");
+                    com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                    return;
+                }
+                if (double.Parse(com.Text) > 320)
+                {
+                    Growl.Warning("不能大于320", "SuccessMsg");
+                    com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                    return;
+                }
+                _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
+                InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
+                if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling > 1000)
+                {
+                    InperGlobalClass.CameraSignalSettings.Exposure = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Sampling);
+                    this.view.Exposure.Text = expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
+                    _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
+                }
             }
             catch (Exception ex)
             {
@@ -200,9 +221,9 @@ namespace InperStudio.ViewModels
                 {
                     Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x.Left, x.Top);
 
-                    this.view.ellipseCanvas.Children.Add(grid);
+                    _ = view.ellipseCanvas.Children.Add(grid);
                 });
-
+                _ = DevPhotometry.Instance.SetGain(InperGlobalClass.CameraSignalSettings.Gain);
             }
             catch (Exception ex)
             {
@@ -313,7 +334,7 @@ namespace InperStudio.ViewModels
                 CameraChannel item = new CameraChannel()
                 {
                     ChannelId = index - 1,
-                    Name = "ROI-" + index,
+                    Name = "ROI-" + index + "-",
                     YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop)
                 };
                 InperDeviceHelper._SignalQs.Add(index - 1, new SignalData());
@@ -345,7 +366,7 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Lib.Helper.JsonBean.Channel()
                     {
                         ChannelId = index - 1,
-                        Name = "ROI-" + index,
+                        Name = "ROI-" + index + "-",
                         Left = double.Parse(grid.GetValue(Canvas.LeftProperty).ToString()),
                         Top = double.Parse(grid.GetValue(Canvas.TopProperty).ToString()),
                         ROI = ellipse.Width,
@@ -446,7 +467,7 @@ namespace InperStudio.ViewModels
                     {
                         string verify = string.Empty;
 
-                        verify = moveGrid == null ? "ROI-" + (EllipseBorder.Last().Children[0] as TextBlock).Text : "ROI-" + (moveGrid.Children[0] as TextBlock).Text;
+                        verify = moveGrid == null ? "ROI-" + (EllipseBorder.Last().Children[0] as TextBlock).Text + "-" : "ROI-" + (moveGrid.Children[0] as TextBlock).Text + "-";
 
                         if (tb.Text.Length < 5 || !tb.Text.StartsWith(verify))
                         {
@@ -704,7 +725,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                WaveGroup sen = (sender as TextBox).DataContext as WaveGroup;
+                WaveGroup sen = (sender as InperTextBox).DataContext as WaveGroup;
                 //if (sen.IsChecked)
                 {
                     DevPhotometry.Instance.SetLightPower(sen.GroupId, sen.LightPower);
@@ -901,6 +922,22 @@ namespace InperStudio.ViewModels
             {
                 InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous = IsContinuous;
                 InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval = IsInterval;
+
+                InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
+                {
+                    if (x.Name.EndsWith("-"))
+                    {
+                        x.Name = x.Name.Substring(0, x.Name.Length - 1);
+                    }
+                });
+
+                InperDeviceHelper.CameraChannels.ToList().ForEach(x =>
+                {
+                    if (x.Name.EndsWith("-"))
+                    {
+                        x.Name = x.Name.Substring(0, x.Name.Length - 1);
+                    }
+                });
 
                 InperJsonHelper.SetCameraSignalSettings(InperGlobalClass.CameraSignalSettings);
             }

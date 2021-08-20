@@ -60,14 +60,36 @@ namespace InperStudioControlLib.Control.TextBox
         public InperTextBox()
         {
             this.TextChanged += InperTextBox_TextChanged;
+            this.LostFocus += InperTextBox_LostFocus;
         }
+
+        private void InperTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            InperTextBox tbox = sender as InperTextBox;
+            double res = double.Parse(tbox.Text);
+            if (res < InperMinValue)
+            {
+                this.Foreground = Brushes.Red;
+                Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                this.Text = InperMinValue.ToString();
+                return;
+            }
+            if (res > InperMaxValue && InperMaxValue > InperMinValue)
+            {
+                this.Foreground = Brushes.Red;
+                Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                this.Text = InperMaxValue.ToString();
+                return;
+            }
+        }
+
         public event Action<object, System.Windows.Controls.TextChangedEventArgs> InperTextChanged;
         private void InperTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             InperTextBox tbox = sender as InperTextBox;
             if (InperVerify)
             {
-                if (this.InperTextType == InperTextType.Double)
+                if (this.InperTextType == InperTextType.Double || this.InperTextType==InperTextType.Int)
                 {
                     if (!string.IsNullOrEmpty(tbox.Text))
                     {
@@ -79,12 +101,14 @@ namespace InperStudioControlLib.Control.TextBox
                             {
                                 this.Foreground = Brushes.Red;
                                 Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                                //this.Text = InperMinValue.ToString();
                                 return;
                             }
                             if (res > InperMaxValue && InperMaxValue > InperMinValue)
                             {
                                 this.Foreground = Brushes.Red;
                                 Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                                //this.Text = InperMaxValue.ToString();
                                 return;
                             }
                         }
