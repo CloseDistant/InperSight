@@ -32,6 +32,8 @@ namespace InperStudio.Lib.Helper.JsonBean
             }
         }
         public double DeltaF { get; set; }
+        public string LightIndex { get; set; }
+        public int WindowSize { get; set; } = 50;
         public double Tau1 { get; set; }
         public double Tau2 { get; set; }
         public double Tau3 { get; set; }

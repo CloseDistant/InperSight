@@ -19,9 +19,12 @@ namespace InperStudio.Lib.Bean.Channel
         public string BgColor { get; set; } = Brushes.Red.ToString();
         public string Hotkeys { get; set; }
         public double DeltaF { get; set; }
+        public string LightIndex { get; set; }
+        public int WindowSize { get; set; } = 50;
         public double Tau1 { get; set; }
         public double Tau2 { get; set; }
         public double Tau3 { get; set; }
+
         public EventChannelJson Condition { get; set; }
     }
     public class EventChannelChart : PropertyChangedBase

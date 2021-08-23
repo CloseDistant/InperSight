@@ -14,8 +14,8 @@
         mc:Ignorable="d" Title="Camera Signal Settings" IsShowTopAllButton="False" ResizeMode="NoResize"
          Width="750" Height="600"  d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}" IsShowCancleButton="False" IsShowOtherButton="False">
     <inp:InperDialogWindow.Resources>
-        <global:InperGlobalClass x:Key="InperGlobalClass"/>
-        <convert:TestModeConvert x:Key="TestModeConvert"/>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+        <convert:TestModeConvert x:Key="TestModeConvert" />
         <Style TargetType="TextBlock">
             <Style.Setters>
                 <Setter Property="FontSize" Value="{DynamicResource InperNormalFontSize}"/>
