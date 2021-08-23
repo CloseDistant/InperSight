@@ -78,7 +78,7 @@ namespace InperStudio.ViewModels
 
                     foreach (Channel item in InperGlobalClass.CameraSignalSettings.CameraChannels)
                     {
-                        var channel = new EventChannel()
+                        EventChannel channel = new EventChannel()
                         {
                             IsActive = false,
                             ChannelId = item.ChannelId,
