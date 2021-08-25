@@ -216,6 +216,8 @@ namespace InperStudio.ViewModels
                                 Condition = item.Condition,
                                 BgColor = item.BgColor,
                                 DeltaF = item.DeltaF,
+                                LightIndex = item.LightIndex,
+                                WindowSize = item.WindowSize,
                                 IsActive = item.IsActive,
                                 Name = item.Name,
                                 SymbolName = item.SymbolName,
@@ -235,6 +237,12 @@ namespace InperStudio.ViewModels
                 {
                     RequestClose();
                 };
+
+                view.OutLightSources.ItemsSource = view.LightSources.ItemsSource = InperDeviceHelper.Instance.LightWaveLength.ToList().FindAll(x => x.IsChecked);
+                if (InperDeviceHelper.Instance.LightWaveLength.ToList().FindAll(x => x.IsChecked).Count > 1)
+                {
+                    view.OutLightSources.SelectedIndex = view.LightSources.SelectedIndex = 1;
+                }
             }
             catch (Exception ex)
             {
@@ -285,9 +293,9 @@ namespace InperStudio.ViewModels
                     }
                     if (ch.Type == ChannelTypeEnum.Manual.ToString())
                     {
-                        if (tb.Text.Length < 7 || !tb.Text.StartsWith("Manual" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2)))
+                        if (tb.Text.Length < 9 || !tb.Text.StartsWith("Manual-" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2) + "-"))
                         {
-                            tb.Text = "Manual" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
+                            tb.Text = "Manual-" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2) + "-";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
@@ -380,12 +388,12 @@ namespace InperStudio.ViewModels
                 object cb = (sender as System.Windows.Controls.ComboBox).SelectedItem;
                 if (cb != null)
                 {
-                    var item = cb as EventChannel;
+                    EventChannel item = cb as EventChannel;
                     view.MarkerName.Text = item.Name;
 
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
-                        view.MarkerName.Text = "Manual" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
+                        view.MarkerName.Text = "Manual-" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2) + "-";
                         item.Name = "Manual";
                         MarkerChannels[view.MarkerChannelCombox.SelectedIndex].BgColor = InperColorHelper.ColorPresetList[manualChannels.Count == 0 ? 0 : manualChannels.Last().ChannelId + 1];
                         MarkerChannels[view.MarkerChannelCombox.SelectedIndex].Hotkeys = "F" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2);
@@ -407,7 +415,7 @@ namespace InperStudio.ViewModels
                         {
                             view.outputHotkeys.Content = (view.ConditionChannelCombox.SelectedItem as EventChannel).Hotkeys = "F" + item.ChannelId;
                         }
-                        var con = view.ConditionChannelCombox.SelectedItem as EventChannel ?? null;
+                        EventChannel con = view.ConditionChannelCombox.SelectedItem as EventChannel ?? null;
                         if (con != null)
                         {
                             item.Condition = new EventChannelJson()
@@ -416,12 +424,24 @@ namespace InperStudio.ViewModels
                                 BgColor = con.BgColor,
                                 Hotkeys = con.Hotkeys,
                                 DeltaF = con.DeltaF,
+                                WindowSize = con.WindowSize,
                                 Tau1 = con.Tau1,
                                 Tau2 = con.Tau2,
                                 Tau3 = con.Tau3,
                                 Name = con.Name,
                                 Type = con.Type
                             };
+                            if (item.Condition.Type == ChannelTypeEnum.Camera.ToString() || item.Condition.Type == ChannelTypeEnum.Analog.ToString())
+                            {
+                                item.LightIndex = (view.OutLightSources.SelectedItem as WaveGroup).GroupId;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (item.Type == ChannelTypeEnum.Camera.ToString() || item.Type == ChannelTypeEnum.Analog.ToString())
+                        {
+                            item.LightIndex = view.OutLightSources.SelectedItem != null ? (view.OutLightSources.SelectedItem as WaveGroup).GroupId : -9;
                         }
                     }
                 }
@@ -452,6 +472,7 @@ namespace InperStudio.ViewModels
                             BgColor = item.BgColor,
                             Hotkeys = item.Hotkeys,
                             DeltaF = item.DeltaF,
+                            WindowSize = item.WindowSize,
                             Tau1 = item.Tau1,
                             Tau2 = item.Tau2,
                             Tau3 = item.Tau3,
@@ -599,6 +620,8 @@ namespace InperStudio.ViewModels
                                 Name = view.MarkerName.Text,
                                 BgColor = ch.BgColor,
                                 DeltaF = ch.DeltaF,
+                                LightIndex = ch.LightIndex,
+                                WindowSize = ch.WindowSize,
                                 Tau1 = ch.Tau1,
                                 Tau2 = ch.Tau2,
                                 Tau3 = ch.Tau3,

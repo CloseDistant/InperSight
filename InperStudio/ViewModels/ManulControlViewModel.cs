@@ -19,11 +19,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
-    public class ManulControlViewModel : Screen
+    public class ManulControlViewModel : Stylet.Screen
     {
         #region properties
         private readonly IWindowManager windowManager;
@@ -66,11 +67,99 @@ namespace InperStudio.ViewModels
                         windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Path));
                         break;
                     case "Load":
-                        windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Load));
+                        DefalutFileLoad();
+                        //windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Load));
                         break;
                     case "Save":
                         JsonConfigSaveAs();
                         break;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        private void DefalutFileLoad()
+        {
+            try
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Filter = "Json|*.inper"
+                };
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //view.loadPath.Text = openFileDialog.FileName;
+                    InperJsonConfig.filepath = openFileDialog.FileName;
+                    InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
+                    InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
+                    InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
+
+                    InperGlobalClass.ManualEvents.Clear();
+                    foreach (Lib.Helper.JsonBean.EventChannelJson item in InperGlobalClass.EventSettings.Channels)
+                    {
+                        if (item.Type == ChannelTypeEnum.Manual.ToString())
+                        {
+                            InperGlobalClass.ManualEvents.Add(item);
+                        }
+                        if (item.Condition?.Type == ChannelTypeEnum.Manual.ToString())
+                        {
+                            InperGlobalClass.ManualEvents.Add(new Lib.Helper.JsonBean.EventChannelJson()
+                            {
+                                BgColor = item.BgColor,
+                                ChannelId = item.ChannelId,
+                                Hotkeys = item.Condition.Hotkeys,
+                                HotkeysCount = item.Condition.HotkeysCount,
+                                Name = item.Name,
+                                SymbolName = item.SymbolName,
+                                Type = item.Condition.Type,
+                                IsActive = item.IsActive
+                            });
+                        }
+                    }
+
+                    if (InperGlobalClass.EventSettings.Channels.Count > 0)
+                    {
+                        InperGlobalClass.IsExistEvent = true;
+                    }
+
+                    InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
+                    {
+                        var wg = InperDeviceHelper.Instance.LightWaveLength.FirstOrDefault(y => y.GroupId == x.GroupId);
+                        if (wg != null)
+                        {
+                            wg.IsChecked = x.IsChecked;
+                            wg.LightPower = x.LightPower;
+                            if (x.IsChecked)
+                            {
+                                DevPhotometry.Instance.SwitchLight(wg.GroupId, true);
+                                DevPhotometry.Instance.SetLightPower(wg.GroupId, wg.LightPower);
+                            }
+                        }
+                    });
+
+                    List<int> cs = new List<int>();
+                    List<int> _cs = new List<int>();
+                    InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
+                    {
+                        cs.Add(x.ChannelId);
+                    });
+                    foreach (Lib.Bean.Channel.CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
+                    {
+                        if (!cs.Contains(item.ChannelId))
+                        {
+                            _cs.Add(item.ChannelId);
+                        }
+                    }
+                    _cs.ForEach(x =>
+                    {
+                        Lib.Bean.Channel.CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
+                        _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
+                        _ = InperDeviceHelper.Instance._SignalQs.Remove(x);
+                    });
+
+                    (System.Windows.Application.Current.MainWindow.DataContext as MainWindowViewModel).windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
                 }
             }
             catch (Exception ex)
@@ -217,70 +306,79 @@ namespace InperStudio.ViewModels
             }
             InperDeviceHelper.Instance.StartCollect();
 
+            StartAndStopShowMarker(ChannelTypeEnum.Start);
+
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsStop = false;
-
 
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
         }
         private async void StartRecord()
         {
-            if (InperGlobalClass.IsPreview)
+            try
             {
-                StopRecord();
-            }
-
-            InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
-            InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
-            InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-            if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
-            {
-                InperGlobalClass.ShowReminderInfo("未配置数据通道");
-                return;
-            }
-            if (!InperDeviceHelper.Instance.InitDataStruct())
-            {
-                InperGlobalClass.ShowReminderInfo("数据初始化失败");
-                return;
-            }
-
-            if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-            {
-                _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
-            }
-
-            Task task = StartTriggerStrategy();
-            if (task != null)
-            {
-                await task;
-            }
-            else
-            {
-                if (!InperDeviceHelper.Instance.AllLightOpen())
+                if (InperGlobalClass.IsPreview)
                 {
-                    InperGlobalClass.ShowReminderInfo("未设置激发光");
+                    StopRecord(1);
+                }
+
+                InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
+                InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
+                InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
+                if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
+                {
+                    InperGlobalClass.ShowReminderInfo("未配置数据通道");
                     return;
                 }
+                if (!InperDeviceHelper.Instance.InitDataStruct())
+                {
+                    InperGlobalClass.ShowReminderInfo("数据初始化失败");
+                    return;
+                }
+
+                if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                {
+                    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                }
+
+                Task task = StartTriggerStrategy();
+                if (task != null)
+                {
+                    await task;
+                }
+                else
+                {
+                    if (!InperDeviceHelper.Instance.AllLightOpen())
+                    {
+                        InperGlobalClass.ShowReminderInfo("未设置激发光");
+                        return;
+                    }
+                }
+
+                //数据库优先初始化
+                App.SqlDataInit = new Lib.Data.SqlDataInit();
+
+                InperDeviceHelper.Instance.StartCollect();
+
+                InperGlobalClass.IsRecord = true;
+                InperGlobalClass.IsPreview = true;
+                InperGlobalClass.IsStop = false;
+                (this.View as ManulControlView).Root_Gird.IsEnabled = true;
+
+
+                InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
+
+                StartAndStopShowMarker(ChannelTypeEnum.Start);
+                ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
+
             }
-
-            //数据库优先初始化
-            App.SqlDataInit = new Lib.Data.SqlDataInit();
-
-            InperDeviceHelper.Instance.StartCollect();
-
-            InperGlobalClass.IsRecord = true;
-            InperGlobalClass.IsPreview = true;
-            InperGlobalClass.IsStop = false;
-            (this.View as ManulControlView).Root_Gird.IsEnabled = true;
-
-
-            InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
-
-            StartAndStopShowMarker(ChannelTypeEnum.Start);
-            ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
         }
-        private async void StopRecord()
+        private async void StopRecord(int type = 0)
         {
             bool isrecord = false;
             if (InperGlobalClass.IsRecord)
@@ -304,7 +402,10 @@ namespace InperStudio.ViewModels
                 isrecord = false;
             }
             InperDeviceHelper.Instance.StopCollect();
-            StartAndStopShowMarker(ChannelTypeEnum.Stop);
+            if (type == 0)
+            {
+                StartAndStopShowMarker(ChannelTypeEnum.Stop);
+            }
 
             InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -313,51 +414,57 @@ namespace InperStudio.ViewModels
         }
         private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum)
         {
-           await Task.Factory.StartNew(() =>
-            {
-                while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count <= 0)
-                {
-                    Task.Delay(100);
-                }
-                _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, channel =>
-                  {
-                      if (channel.Type == typeEnum.ToString())
-                      {
-                          InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor));
-                          Manual manual = new Manual()
-                          {
-                              ChannelId = channel.ChannelId,
-                              CameraTime = 0,
-                              Color = channel.BgColor,
-                              Name = channel.Name,
-                              Type = channel.Type,
-                              CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                          };
-                          _ = App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
-                      }
-                      if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
-                      {
-                          if (channel.Condition.Type == typeEnum.ToString())
-                          {
+            await Task.Factory.StartNew(() =>
+             {
+                 while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count <= 0)
+                 {
+                     Task.Delay(100);
+                 }
+                 _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, channel =>
+                   {
+                       if (channel.Type == typeEnum.ToString())
+                       {
+                           InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor));
+                           if (InperGlobalClass.IsRecord)
+                           {
+                               Manual manual = new Manual()
+                               {
+                                   ChannelId = channel.ChannelId,
+                                   CameraTime = 0,
+                                   Color = channel.BgColor,
+                                   Name = channel.Name,
+                                   Type = channel.Type,
+                                   CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                               };
+                               _ = App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
+                           }
+                       }
+                       if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
+                       {
+                           if (channel.Condition.Type == typeEnum.ToString())
+                           {
 
-                              int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-                              TimeSpan time = new TimeSpan();
-                              time = typeEnum == ChannelTypeEnum.Start
-                              ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
-                              : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                              InperDeviceHelper.Instance.SendCommand(channel);
-                              Output output = new Output()
-                              {
-                                  ChannelId = channel.ChannelId,
-                                  CameraTime = time.Ticks,
-                                  CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                              };
-                              _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                               int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
+                               TimeSpan time = new TimeSpan();
+                               time = typeEnum == ChannelTypeEnum.Start
+                               ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
+                               : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+                               InperDeviceHelper.Instance.SendCommand(channel);
+                               if (InperGlobalClass.IsRecord)
+                               {
+                                   Output output = new Output()
+                                   {
+                                       ChannelId = channel.ChannelId,
+                                       CameraTime = time.Ticks,
+                                       CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                                   };
+                                   _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                               }
 
-                          }
-                      }
-                  });
-            });
+                           }
+                       }
+                   });
+             });
         }
         private Task StartTriggerStrategy()
         {

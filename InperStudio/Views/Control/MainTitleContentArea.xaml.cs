@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InperStudio.Lib.Bean;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,18 +11,21 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace InperStudio.Views
+namespace InperStudio.Views.Control
 {
     /// <summary>
-    /// SignalPropertiesView.xaml 的交互逻辑
+    /// MainTitleContentArea.xaml 的交互逻辑
     /// </summary>
-    public partial class SignalPropertiesView
+    public partial class MainTitleContentArea : Border
     {
-        public SignalPropertiesView()
+        public InperGlobalClass InperGlobalClass { get; set; } = new InperGlobalClass();
+        public MainTitleContentArea()
         {
             InitializeComponent();
+            DataContext = this;
         }
     }
 }

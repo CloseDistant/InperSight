@@ -52,7 +52,7 @@ namespace InperStudio.ViewModels
                 view.ConfirmClickEvent += (s, e) =>
                 {
                     RequestClose();
-                };  
+                };
             }
             catch (Exception ex)
             {
@@ -68,6 +68,10 @@ namespace InperStudio.ViewModels
                 {
                     x.Filters = new Lib.Helper.JsonBean.Filters();
                 }
+                //if (x.Name.EndsWith("-"))
+                //{
+                //    x.Name = x.Name.Substring(0, x.Name.Length - 1);
+                //}
                 Channels.Add(x);
             });
             if (Channels.Count > 0)
@@ -119,13 +123,14 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+
         public void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
             {
                 var item = this.view.rangeChannel.SelectedItem as Channel;
 
-                var textbox = sender as HandyControl.Controls.TextBox;
+                var textbox = sender as System.Windows.Controls.TextBox;
                 double value = double.Parse(textbox.Text);
 
                 if (textbox.Name.Contains("rangeTop"))

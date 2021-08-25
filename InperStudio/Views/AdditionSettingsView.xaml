@@ -110,11 +110,11 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" >
                     <Grid Margin="0 20 0 0" >
-                        <TextBlock Text="Camera Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
+                        <TextBlock Text="Video Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                         <hc:Divider Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
                     </Grid>
                     <Grid Margin="0 20 0 0" >
-                        <TextBlock VerticalAlignment="Center" Text="Camera"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <TextBlock VerticalAlignment="Center" Text="Video"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Margin="20 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding UnusedKits,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="CameraCombox" SelectionChanged="{s:Action CameraCombox_SelectionChanged}"/>
                     </Grid>
                     <Grid Margin="0 20 0 0" >
@@ -135,7 +135,7 @@
                 </Grid>
                 <StackPanel Grid.Column="2" Margin="20 0 0 0">
                     <Grid Margin="0 20 0 0">
-                        <TextBlock Text="Active Cameras" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
+                        <TextBlock Text="Active Videos" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                         <hc:Divider Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 0 0" />
                     </Grid>
                     <ListBox Margin="0 20" Height="230"   ScrollViewer.VerticalScrollBarVisibility="Auto" x:Name="cameraActiveChannel" ItemsSource="{Binding UsedKits}">

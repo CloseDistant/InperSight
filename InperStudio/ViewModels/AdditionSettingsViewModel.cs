@@ -297,7 +297,7 @@ namespace InperStudio.ViewModels
                             if (double.Parse(tb.Text) < DateTime.Now.Hour)
                             {
                                 Growl.Warning("Incorrect input time", "SuccessMsg");
-                                tb.Text = DateTime.Now.Hour.ToString();
+                                //tb.Text = DateTime.Now.Hour.ToString();
                             }
                             break;
                         case "startMinutes":
@@ -306,7 +306,7 @@ namespace InperStudio.ViewModels
                                 if (double.Parse(tb.Text) < DateTime.Now.Minute)
                                 {
                                     Growl.Warning("Incorrect input time", "SuccessMsg");
-                                    tb.Text = DateTime.Now.Minute.ToString();
+                                    //tb.Text = DateTime.Now.Minute.ToString();
                                 }
                             }
                             break;
@@ -316,7 +316,7 @@ namespace InperStudio.ViewModels
                                 if (double.Parse(tb.Text) < DateTime.Now.Minute)
                                 {
                                     Growl.Warning("Incorrect input time", "SuccessMsg");
-                                    tb.Text = DateTime.Now.Minute.ToString();
+                                    //tb.Text = DateTime.Now.Minute.ToString();
                                 }
                             }
                             break;

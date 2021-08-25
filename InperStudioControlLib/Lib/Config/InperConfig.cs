@@ -20,6 +20,17 @@ namespace InperStudioControlLib.Lib.Config
         private string configPath;
         private string version;
         private string conStr;
+        private bool isSkip;
+
+        public bool IsSkip
+        {
+            get => isSkip;
+            set
+            {
+                isSkip = value;
+                SetConfigValue("isSkip", isSkip.ToString());
+            }
+        }
         public string ConStr
         {
             get => conStr;
@@ -96,6 +107,7 @@ namespace InperStudioControlLib.Lib.Config
             configPath = GetConfigValue("configPath");
             version = GetConfigValue("version");
             conStr = GetConfigValue("conStr");
+            isSkip = bool.Parse(GetConfigValue("isSkip"));
         }
         #endregion
 

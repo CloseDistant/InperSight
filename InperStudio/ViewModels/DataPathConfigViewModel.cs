@@ -60,6 +60,7 @@ namespace InperStudio.ViewModels
                 if (type == DataConfigPathTypeEnum.Path.ToString())
                 {
                     FolderBrowserDialog openFileDialog = new FolderBrowserDialog();
+                    openFileDialog.SelectedPath = InperGlobalClass.DataPath;
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         view.pathText.Text = openFileDialog.SelectedPath + @"\";
@@ -71,84 +72,6 @@ namespace InperStudio.ViewModels
                     if (window != null)
                     {
                         window.Close();
-                    }
-
-                    OpenFileDialog openFileDialog = new OpenFileDialog
-                    {
-                        Filter = "Json|*.inper"
-                    };
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        view.loadPath.Text = openFileDialog.FileName;
-                        InperJsonConfig.filepath = openFileDialog.FileName;
-                        InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
-                        InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
-                        InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
-
-                        InperGlobalClass.ManualEvents.Clear();
-                        foreach (Lib.Helper.JsonBean.EventChannelJson item in InperGlobalClass.EventSettings.Channels)
-                        {
-                            if (item.Type == ChannelTypeEnum.Manual.ToString())
-                            {
-                                InperGlobalClass.ManualEvents.Add(item);
-                            }
-                            if (item.Condition?.Type == ChannelTypeEnum.Manual.ToString())
-                            {
-                                InperGlobalClass.ManualEvents.Add(new Lib.Helper.JsonBean.EventChannelJson()
-                                {
-                                    BgColor = item.BgColor,
-                                    ChannelId = item.ChannelId,
-                                    Hotkeys = item.Condition.Hotkeys,
-                                    HotkeysCount = item.Condition.HotkeysCount,
-                                    Name = item.Name,
-                                    SymbolName = item.SymbolName,
-                                    Type = item.Condition.Type,
-                                    IsActive = item.IsActive
-                                });
-                            }
-                        }
-
-                        if (InperGlobalClass.EventSettings.Channels.Count > 0)
-                        {
-                            InperGlobalClass.IsExistEvent = true;
-                        }
-
-                        InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
-                        {
-                            var wg = InperDeviceHelper.Instance.LightWaveLength.FirstOrDefault(y => y.GroupId == x.GroupId);
-                            if (wg != null)
-                            {
-                                wg.IsChecked = x.IsChecked;
-                                wg.LightPower = x.LightPower;
-                                if (x.IsChecked)
-                                {
-                                    DevPhotometry.Instance.SwitchLight(wg.GroupId, true);
-                                    DevPhotometry.Instance.SetLightPower(wg.GroupId, wg.LightPower);
-                                }
-                            }
-                        });
-
-                        List<int> cs = new List<int>();
-                        List<int> _cs = new List<int>();
-                        InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
-                        {
-                            cs.Add(x.ChannelId);
-                        });
-                        foreach (Lib.Bean.Channel.CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
-                        {
-                            if (!cs.Contains(item.ChannelId))
-                            {
-                                _cs.Add(item.ChannelId);
-                            }
-                        }
-                        _cs.ForEach(x =>
-                        {
-                            Lib.Bean.Channel.CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
-                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                            _ = InperDeviceHelper.Instance._SignalQs.Remove(x);
-                        });
-                        RequestClose();
-                        (System.Windows.Application.Current.MainWindow.DataContext as MainWindowViewModel).windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
                     }
                 }
             }

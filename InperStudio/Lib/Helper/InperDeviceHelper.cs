@@ -371,11 +371,12 @@ namespace InperStudio.Lib.Helper
                             _ = Parallel.ForEach(CameraChannels, mask =>
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
+                    
                                   r -= Offset(mask, m.Group);
 
-                                  r = Smooth(mask, m.Group, r);
-
                                   DeltaFCalculate(mask, m.Group, r, ts);
+
+                                  r = Smooth(mask, m.Group, r);
 
                                   ploting_data[mask.ChannelId] = r;
                               });
@@ -416,7 +417,7 @@ namespace InperStudio.Lib.Helper
                     FilterData[cameraChannel.ChannelId][group].Enqueue(r);
                     if (FilterData[cameraChannel.ChannelId][group].Count > cameraChannel.Filters.Smooth)
                     {
-                        FilterData[cameraChannel.ChannelId][group].Dequeue();
+                        _ = FilterData[cameraChannel.ChannelId][group].Dequeue();
                     }
                     if (cameraChannel.Filters.IsSmooth)
                     {
@@ -428,39 +429,70 @@ namespace InperStudio.Lib.Helper
         }
         private void DeltaFCalculate(CameraChannel cameraChannel, int group, double r, long ts)
         {
-            InperGlobalClass.EventSettings.Channels.ForEach(x =>
-            {
-                if (x.IsActive)
-                {
-                    if (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString())
-                    {
-                        if (x.ChannelId == cameraChannel.ChannelId)
-                        {
-                            _ = Parallel.ForEach(cameraChannel.LightModes, mode =>
-                              {
-                                  if (mode.LightType == group)
-                                  {
-                                      double deltaF = mode.Derivative.ProcessSignal(r);
-                                      if (deltaF >= (x.DeltaF / 100))
-                                      {
-                                          WaveGroup light = LightWaveLength.FirstOrDefault(l => l.GroupId == group);
-                                          AddMarkerByHotkeys(cameraChannel.ChannelId, x.Name + light.WaveType, (Color)ColorConverter.ConvertFromString(x.BgColor));
-                                          AIROI aIROI = new AIROI()
-                                          {
-                                              ChannelId = cameraChannel.ChannelId,
-                                              CameraTime = ts,
-                                              DeltaF = deltaF,
-                                              Type = x.Type == ChannelTypeEnum.Camera.ToString() ? 0 : 1,
-                                              CreateTime = DateTime.Now
-                                          };
-                                          _ = App.SqlDataInit.sqlSugar.Insertable(aIROI).ExecuteCommand();
-                                      }
-                                  }
-                              });
-                        }
-                    }
-                }
-            });
+            _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, x =>
+               {
+                   if (x.IsActive)
+                   {
+                       if (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString())
+                       {
+                           if (x.ChannelId == cameraChannel.ChannelId && x.LightIndex == group)
+                           {
+                               LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(y => y.LightType == group);
+                               XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
+                               if (linedata.Count >= x.WindowSize)
+                               {
+                                   double deltaF = linedata.YValues.ToList().GetRange(linedata.Count - x.WindowSize, x.WindowSize).Average();
+                                   if (deltaF >= x.DeltaF)
+                                   {
+                                       SetDeltaFEvent(x, ts, deltaF);
+                                   }
+                               }
+                           }
+                       }
+                       else if (x.Type == ChannelTypeEnum.Output.ToString())
+                       {
+                           if (x.Condition != null)
+                           {
+                               if (x.Condition.Type == ChannelTypeEnum.Camera.ToString() || x.Condition.Type == ChannelTypeEnum.Analog.ToString())
+                               {
+                                   if (x.Condition.ChannelId == cameraChannel.ChannelId && x.Condition.LightIndex == group)
+                                   {
+                                       LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(y => y.LightType == group);
+                                       XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
+                                       if (linedata.Count >= x.WindowSize)
+                                       {
+                                           double deltaF = linedata.YValues.ToList().GetRange(linedata.Count - x.WindowSize, x.WindowSize).Average();
+                                           if (deltaF >= x.DeltaF)
+                                           {
+                                               SetDeltaFEvent(x, ts, deltaF);
+                                               SendCommand(x);
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+               });
+        }
+        private void SetDeltaFEvent(EventChannelJson eventChannelJson, long ts, double deltaF)
+        {
+            _ = Task.Factory.StartNew(() =>
+              {
+                  AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor));
+                  if (InperGlobalClass.IsRecord)
+                  {
+                      AIROI aIROI = new AIROI()
+                      {
+                          ChannelId = eventChannelJson.ChannelId,
+                          CameraTime = ts,
+                          DeltaF = deltaF,
+                          Type = eventChannelJson.Type,
+                          CreateTime = DateTime.Now
+                      };
+                      _ = App.SqlDataInit.sqlSugar.Insertable(aIROI).ExecuteCommand();
+                  }
+              });
         }
         #endregion
         private void SaveData(ConcurrentDictionary<int, double> data, long timestamp, int s_group = -1)
@@ -727,7 +759,7 @@ namespace InperStudio.Lib.Helper
                 TimeSpan[] t_tims = new TimeSpan[sig_data.Length];
                 for (int i = 0; i < sig_data.Length; i++)
                 {
-                    t_sigs[i] = Math.Round(sig_data[i].Value, 2);
+                    t_sigs[i] = sig_data[i].Value;
                     t_tims[i] = TimeSpan.FromTicks(sig_data[i].Key / 100);
                 }
                 t_tims.OrderBy(x => x.Ticks);
@@ -742,7 +774,6 @@ namespace InperStudio.Lib.Helper
         }
         public void AddMarkerByHotkeys(int channelId, string text, Color color)
         {
-            //int count = EventChannelChart.RenderableSeries.First().DataSeries.XValues.Count;
             int count = CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
 
             EventChannelChart.Annotations.Add(new VerticalLineAnnotationViewModel()
@@ -758,23 +789,11 @@ namespace InperStudio.Lib.Helper
                 StrokeThickness = 1,
                 X1 = (IComparable)CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1]
             });
-            //TimeSpan time = (TimeSpan)CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
 
-            //Manual manual = new Manual()
-            //{
-            //    ChannelId = channelId,
-            //    Color = color.ToString(),
-            //    CameraTime = time.Ticks,
-            //    Name = text,
-            //    Type = type,
-            //    DateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-            //};
-
-            //_ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
         }
         public void SendCommand(EventChannelJson channelJson)
         {
-            AddMarkerByHotkeys(channelJson.ChannelId,channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor));
+            AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor));
         }
         public void StopCollect()
         {

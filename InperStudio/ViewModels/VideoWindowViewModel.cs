@@ -50,10 +50,12 @@ namespace InperStudio.ViewModels
                     BehaviorRecorderKit.Device.Fps = frame;
                     _ = BehaviorRecorderKit.Device.Set(OpenCvSharp.VideoCaptureProperties.Fps, frame);
                 };
-                
+
                 bottomControl.Screen.Click += (s, e) =>
                 {
-                    BehaviorRecorderKit._PreviewMat.Clone().ToBitmap().Save(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp"));
+                    System.Drawing.Bitmap bit = BehaviorRecorderKit._PreviewMat.Clone().ToBitmap();
+                    string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp");
+                    bit.Save(path);
                     Growl.Info(new GrowlInfo() { Message = "保存成功", Token = "SuccessMsg", WaitTime = 1 });
                 };
                 _ = Task.Factory.StartNew(() =>
@@ -84,6 +86,7 @@ namespace InperStudio.ViewModels
             BehaviorRecorderKit.StopPreview();
             BehaviorRecorderKit.StopRecord();
             BehaviorRecorderKit.Dispose();
+            BehaviorRecorderKit.IsActive = false;
             GC.Collect(0);
         }
     }

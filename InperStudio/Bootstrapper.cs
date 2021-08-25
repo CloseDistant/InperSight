@@ -42,14 +42,13 @@ namespace InperStudio
 
                     if (_new != null)
                     {
-                        MessageBoxResult res = MessageBox.Show("发现新版本 " + list.Last().Version_Number + "，是否更新", "版本升级", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-                        if (res.Equals(MessageBoxResult.Yes))
+                        if (!InperConfig.Instance.IsSkip)
                         {
                             string content = InperConfig.Instance.Version + "," + Environment.CurrentDirectory + "/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe");
                             _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
                             Environment.Exit(0);
                         }
+
                     }
                 }
             }

@@ -56,6 +56,10 @@ namespace InperStudio
             #endregion
             InperGlobalClass.DataPath = InperGlobalClass.DataPath == string.Empty ? Environment.CurrentDirectory + @"\Data\" : InperGlobalClass.DataPath;
             InperGlobalClass.DataFolderName = InperGlobalClass.DataFolderName == string.Empty ? DateTime.Now.ToString("yyyyMMddHHmmss") : InperGlobalClass.DataFolderName;
+            if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+            {
+                _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+            }
 
             SystemSleepHelper.PreventSleep(true);
 

@@ -121,24 +121,31 @@
                     <TextBlock Text="Light Measure" VerticalAlignment="Center" />
                     <ToggleButton Margin="20 0 0 0" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
                 </WrapPanel>
-                <ListBox x:Name="lightMode" Height="120" Style="{x:Null}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <WrapPanel>
-                                <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
-                                <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" />
-                                <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="15 0 10 0"/>
-                                <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" MinHeight="25" InperVerify="True" InperTextType="Int" InperMaxValue="100" InperMinValue="0" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" Margin="20 0 0 0" hc:BorderElement.CornerRadius="0" Padding="0"  Width="50">
-                                    <inper:InperTextBox.IsEnabled>
-                                        <MultiBinding Converter="{StaticResource TestModeConvert}">
-                                            <Binding Source="{x:Reference Name= lightTestMode}" Path="IsChecked" />
-                                            <Binding  Source="{x:Reference Name= testMode_rb}"  Path="IsChecked" />
-                                        </MultiBinding>
-                                    </inper:InperTextBox.IsEnabled>
-                                </inper:InperTextBox>
-                            </WrapPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
+                <ListBox x:Name="lightMode" Height="120" Style="{x:Null}"  Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <WrapPanel Margin="0 3">
+                                            <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
+                                            <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" />
+                                            <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="15 0 10 0"/>
+                                            <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" MinHeight="25" InperVerify="True" InperTextType="Int" InperMaxValue="100" InperMinValue="0" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" Margin="20 0 0 0" hc:BorderElement.CornerRadius="0" Padding="0"  Width="50">
+                                                <inper:InperTextBox.IsEnabled>
+                                                    <MultiBinding Converter="{StaticResource TestModeConvert}">
+                                                        <Binding Source="{x:Reference Name= lightTestMode}" Path="IsChecked" />
+                                                        <Binding  Source="{x:Reference Name= testMode_rb}"  Path="IsChecked" />
+                                                    </MultiBinding>
+                                                </inper:InperTextBox.IsEnabled>
+                                            </inper:InperTextBox>
+                                        </WrapPanel>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                 </ListBox>
             </StackPanel>
         </Grid>

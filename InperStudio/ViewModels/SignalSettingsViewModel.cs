@@ -214,9 +214,8 @@ namespace InperStudio.ViewModels
                         view.waveView.SelectedItem = InperDeviceHelper.LightWaveLength[0];
                     }
 
-                    view.lightMode.ItemsSource = InperDeviceHelper.LightWaveLength;
+                    view.lightMode.ItemsSource = InperDeviceHelper.Instance.LightWaveLength;
                 }
-
                 InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
                 {
                     Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x.Left, x.Top);
@@ -337,6 +336,7 @@ namespace InperStudio.ViewModels
                     Name = "ROI-" + index + "-",
                     YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop)
                 };
+
                 InperDeviceHelper._SignalQs.Add(index - 1, new SignalData());
 
                 foreach (WaveGroup wave in InperDeviceHelper.LightWaveLength)
@@ -346,7 +346,8 @@ namespace InperStudio.ViewModels
                         LightMode<TimeSpan, double> mode = new LightMode<TimeSpan, double>()
                         {
                             LightType = wave.GroupId,
-                            WaveColor = wave.GroupId == 1 ? InperColorHelper.SCBrushes[index % 9] : (wave.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
+                            WaveColor = new SolidColorBrush(InperColorHelper.WavelengthToRGB(int.Parse(wave.WaveType.Split(' ').First()))),
+                            //WaveColor = wave.GroupId == 1 ? InperColorHelper.SCBrushes[index % 9] : (wave.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
                             XyDataSeries = new XyDataSeries<TimeSpan, double>()
                         };
                         item.LightModes.Add(mode);
@@ -450,6 +451,7 @@ namespace InperStudio.ViewModels
             (moveGrid.Children[1] as Ellipse).StrokeThickness = 3;
 
             view.channelName.Text = InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1).Name;
+            view.channelName.SelectionStart = view.channelName.Text.Length;
             view.channelRoi.Text = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1).ROI.ToString();
             view.channelRoi.IsEnabled = true;
 
@@ -549,7 +551,8 @@ namespace InperStudio.ViewModels
                         mode = new LightMode<TimeSpan, double>()
                         {
                             LightType = sen.GroupId,
-                            WaveColor = sen.GroupId == 1 ? InperColorHelper.SCBrushes[item.ChannelId % 9] : (sen.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
+                            WaveColor = new SolidColorBrush(InperColorHelper.WavelengthToRGB(int.Parse(sen.WaveType.Split(' ').First()))),
+                            //WaveColor = sen.GroupId == 1 ? InperColorHelper.SCBrushes[item.ChannelId % 9] : (sen.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
                             XyDataSeries = new XyDataSeries<TimeSpan, double>(),
                         };
                         item.LightModes.Add(mode);

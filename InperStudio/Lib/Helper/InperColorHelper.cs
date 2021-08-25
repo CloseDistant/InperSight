@@ -43,7 +43,7 @@ namespace InperStudio.Lib.Helper
             "#795548",
             "#9e9e9e"
         };
-        public static Color WavelenghToRGB(int Wavelength)
+        public static Color WavelengthToRGB(int Wavelength)
         {
             double Gamma = 0.8;
             int IntensityMax = 215;

@@ -2,6 +2,8 @@
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
+using InperStudio.Views.Control;
+using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.DeviceAgency;
 using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
 using InperStudioControlLib.Lib.Helper;
@@ -51,11 +53,14 @@ namespace InperStudio.ViewModels
             LeftToolsControlViewModel = new LeftToolsControlViewModel(windowManager);
             ManulControlViewModel = new ManulControlViewModel(windowManager);
             ActiveItem = new DataShowControlViewModel(windowManager);
+
+            windowView.NonClientAreaContent = new MainTitleContentArea();
         }
         protected override void OnClose()
         {
             try
             {
+                InperConfig.Instance.IsSkip = false;
                 SystemSleepHelper.ResotreSleep();
 
                 InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>

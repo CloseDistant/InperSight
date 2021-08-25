@@ -70,7 +70,7 @@
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"
-                                DrawMinorGridLines="False"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                DrawMinorGridLines="False" TextFormatting="#."  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -90,22 +90,22 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" Name="dataScroll">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <!-- dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"-->
-                    <ListBox x:Name="dataList" Margin="-3 0 0 0" ItemsSource="{Binding ChartDatas}" ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="True"
-                     ItemTemplate="{StaticResource ListDataTemplate}" ItemContainerStyle="{StaticResource InperBaseListboxStyle}" >
+                    <ListBox x:Name="dataList" Margin="-3 0 0 0" ItemsSource="{Binding ChartDatas}"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="True" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
+                     ItemTemplate="{StaticResource ListDataTemplate}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="1" />
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                     </ListBox>
-                    <Grid Visibility="{Binding Source={StaticResource InperGlobalClass},Path=IsExistEvent,Converter={StaticResource boolToVisibilityPositive}}">
+                    <Grid Grid.Row="1" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=IsExistEvent,Converter={StaticResource boolToVisibilityPositive}}">
                         <Grid MouseDown="{s:Action Grid_MouseDown}"  VerticalAlignment="Bottom" x:Name="relativeBottom" Grid.Row="1" Background="Transparent" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayLockedBottom,Converter={StaticResource boolToVisibilityReverse},UpdateSourceTrigger=PropertyChanged}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
@@ -166,7 +166,7 @@
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
+                <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 1 0 1" />
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
                     <TextBlock TextWrapping="Wrap" Text="Event"  hc:TextBlockAttach.AutoTooltip="True"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center">
                         <TextBlock.LayoutTransform>

@@ -3,6 +3,7 @@ using HandyControl.Data;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
+using InperStudio.ViewModels;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace InperStudio.Lib.Bean
         #region field
         private static bool isRecord = false;
         private static bool isPreview = false;
-        private static bool isStop = false;
+        private static bool isStop = true;
         private static bool isExistEvent = false;
         private static string dataPath = string.Empty;
         private static string dataFolderName = string.Empty;

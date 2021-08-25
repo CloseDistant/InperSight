@@ -69,7 +69,7 @@ namespace InperStudio.ViewModels
 
                 view.sciScroll.SelectedRangeChanged += (s, e) =>
                 {
-                    Parallel.ForEach(ChartDatas, item =>
+                    Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, item =>
                     {
                         item.XVisibleRange = e.SelectedRange;
                         EventChannelChart.XVisibleRange = e.SelectedRange;
@@ -89,7 +89,7 @@ namespace InperStudio.ViewModels
 
                 VisibleValue = ((TimeSpan)this.view.tiemsAxis.VisibleRange.Diff).TotalSeconds;
 
-                if (InperGlobalClass.EventPanelProperties.HeightAuto)
+                if (InperGlobalClass.EventPanelProperties.HeightAuto && this.view.dataList.Items.Count > 0)
                 {
                     this.view.relativeBottom.Height = this.view.fixedBottom.Height = this.view.dataList.ActualHeight / this.view.dataList.Items.Count;
                 }

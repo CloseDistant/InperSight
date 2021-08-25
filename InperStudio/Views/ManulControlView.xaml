@@ -133,18 +133,18 @@
             <TextBlock>Record</TextBlock>
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
-                    <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Preview"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-                        <StackPanel>
-                            <Image Source="/Lib/Images/Record_preview.png"/>
-                            <TextBlock>Preview</TextBlock>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
                             <Image Source="/Lib/Images/Addition_trigger.png"/>
                             <TextBlock>Setting</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="10 0">
+                    <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Preview"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <StackPanel>
+                            <Image Source="/Lib/Images/Record_preview.png"/>
+                            <TextBlock>Preview</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
