@@ -25,5 +25,6 @@ namespace InperStudio.Views
         {
             InitializeComponent();
         }
+
     }
 }

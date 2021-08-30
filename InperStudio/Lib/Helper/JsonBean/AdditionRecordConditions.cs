@@ -15,7 +15,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     }
     public class Delay : AdditionBase
     {
-        public int Value { get; set; }
+        public double Value { get; set; }
     }
     public class AtTime : AdditionBase
     {

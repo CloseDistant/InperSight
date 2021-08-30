@@ -15,16 +15,17 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataShowControlViewModel}" KeyDown="{s:Action MarkerMonitor_KeyUp}">
     <UserControl.Resources>
-        <ItemsPanelTemplate x:Key="YAxesPanel">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-            </Grid>
-        </ItemsPanelTemplate>
+        <Style x:Key="LeftAxisLabelStyle" TargetType="sc:DefaultTickLabel">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Width="30" TextAlignment="Right" Text="{Binding Text}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <convert:BoolToDoubleHeightConvert x:Key="BoolToDoubleHeightConvert"/>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <chart:CustomTimeSpanLableProvider x:Key="TimeSpanProvider" />
@@ -61,21 +62,23 @@
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
-                        <sc:SciChartSurface.XAxis>
+                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes"  XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
+                        <!--<sc:SciChartSurface.XAxis>
                             <sc:TimeSpanAxis DrawMajorBands="False"
                                            DrawMajorGridLines="False"
                                            DrawMinorGridLines="False" Visibility="Collapsed" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        </sc:SciChartSurface.XAxis>
+                        </sc:SciChartSurface.XAxis>-->
                         <sc:SciChartSurface.YAxis>
-                            <sc:NumericAxis DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
+                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"
-                                DrawMinorGridLines="False" TextFormatting="#."  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.00" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
+                                <!--<sc:YAxisDragModifier/>-->
                                 <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection" ZoomExtentsY="False"  ReceiveHandledEvents="True" />
                                 <chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
+                                <!--<sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick" ReceiveHandledEvents="True"/>-->
                             </sc:ModifierGroup>
                         </sc:SciChartSurface.ChartModifier>
                     </sc:SciChartSurface>
@@ -97,7 +100,7 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <!-- dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"-->
-                    <ListBox x:Name="dataList" Margin="-3 0 0 0" ItemsSource="{Binding ChartDatas}"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="True" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
+                    <ListBox x:Name="dataList" Margin="-3 0 0 -3" ItemsSource="{Binding ChartDatas}"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="True" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
                      ItemTemplate="{StaticResource ListDataTemplate}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -113,7 +116,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
-                            <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+                            <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
                                 <TextBlock TextWrapping="Wrap" Text="Event" hc:TextBlockAttach.AutoTooltip="True"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center">
                                     <TextBlock.LayoutTransform>
                                         <RotateTransform Angle="90"/>
@@ -135,16 +138,16 @@
                                 </StackPanel>
                             </Grid>
                             <Grid Grid.Column="2" >
-                                <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
-                                    <sc:SciChartSurface.XAxis>
+                                <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxis,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
+                                    <!--<sc:SciChartSurface.XAxis>
                                         <sc:TimeSpanAxis DrawMajorBands="False"
                                            DrawMajorGridLines="False"
                                            DrawMinorGridLines="False" Visibility="Collapsed" VisibleRange="{Binding XVisibleRange,UpdateSourceTrigger=PropertyChanged}"/>
-                                    </sc:SciChartSurface.XAxis>
+                                    </sc:SciChartSurface.XAxis>-->
                                     <sc:SciChartSurface.YAxis>
-                                        <sc:NumericAxis DrawMajorBands="False"
+                                        <sc:NumericAxis DrawMajorBands="False"  TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"
-                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" BorderBrush="Gray" AxisAlignment="Left" AutoRange="Never" VisibleRange="-1,2"/>
+                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" MaxAutoTicks="6" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="-1,2"/>
                                     </sc:SciChartSurface.YAxis>
                                     <sc:SciChartSurface.ChartModifier>
                                         <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -166,7 +169,7 @@
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 1 0 1" />
+                <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 1 0 1"/>
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
                     <TextBlock TextWrapping="Wrap" Text="Event"  hc:TextBlockAttach.AutoTooltip="True"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center">
                         <TextBlock.LayoutTransform>
@@ -189,16 +192,16 @@
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" x:Name="scichartbottom" Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
-                        <sc:SciChartSurface.XAxis>
+                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" x:Name="scichartbottom" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxisFixed,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
+                        <!--<sc:SciChartSurface.XAxis>
                             <sc:TimeSpanAxis DrawMajorBands="False"
                                            DrawMajorGridLines="False"
                                            DrawMinorGridLines="False" Visibility="Collapsed" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        </sc:SciChartSurface.XAxis>
+                        </sc:SciChartSurface.XAxis>-->
                         <sc:SciChartSurface.YAxis>
-                            <sc:NumericAxis DrawMajorBands="False"
+                            <sc:NumericAxis DrawMajorBands="False"   TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"
-                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" BorderBrush="Gray" AxisAlignment="Left" AutoRange="Never" VisibleRange="-1,2"/>
+                                    DrawMinorGridLines="False" MaxAutoTicks="6" BorderThickness="0 0 1 0" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="-1,2"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -217,20 +220,20 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="85"/>
+                    <ColumnDefinition Width="93"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Border BorderThickness="0 0 0 1" BorderBrush="Gray" Grid.ColumnSpan="3" />
-                <ComboBox Height="24" Width="95" SelectionChanged="{s:Action TextFormat_SelectionChanged}" ItemsSource="{Binding TextLableFormatting}" MinHeight="24" Margin="7 0 0 0" Padding="3 0" Grid.ColumnSpan="2" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Height="24" Width="95" SelectionChanged="{s:Action TextFormat_SelectionChanged}" Margin="12 0 0 0" ItemsSource="{Binding TextLableFormatting}" MinHeight="24" Padding="3 0" Grid.ColumnSpan="2" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 <Grid Grid.Column="0">
                     <Border Width="1"  HorizontalAlignment="Right" Margin="0 0 -29 0" Background="Gray"/>
                 </Grid>
-                <sc:SciChartSurface Name="timesAxisSci" Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" Grid.Column="1"  DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
-                    <sc:SciChartSurface.XAxis>
+                <sc:SciChartSurface Name="timesAxisSci" Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1"  DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
+                    <!--<sc:SciChartSurface.XAxis>
                         <sc:TimeSpanAxis DrawMajorBands="False"
                                            DrawMajorGridLines="False"
                                            DrawMinorGridLines="False" x:Name="tiemsAxis" Visibility="Visible" LabelProvider="{StaticResource TimeSpanProvider}" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                    </sc:SciChartSurface.XAxis>
+                    </sc:SciChartSurface.XAxis>-->
                     <sc:SciChartSurface.YAxis>
                         <sc:NumericAxis DrawMajorBands="False"
                                     DrawMajorGridLines="False"
@@ -246,7 +249,7 @@
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="115"/>
+                    <ColumnDefinition Width="123"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" >

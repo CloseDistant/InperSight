@@ -61,7 +61,7 @@ namespace InperStudio.ViewModels
         }
         private void CameraInit()
         {
-            this.view.camera.Visibility = System.Windows.Visibility.Visible;
+            this.view.camera.Visibility = Visibility.Visible;
             CameraSignalSettings.CameraChannels.ForEach(x =>
             {
                 if (x.Filters == null)
@@ -76,7 +76,13 @@ namespace InperStudio.ViewModels
             });
             if (Channels.Count > 0)
             {
-                Channels.Add(new Channel() { ChannelId = _ChannleId, Name = "All", YTop = 1, YBottom = 0.01, Filters = new Lib.Helper.JsonBean.Filters(), Offset = false });
+                if (CameraSignalSettings.AllChannelConfig == null)
+                {
+                    CameraSignalSettings.AllChannelConfig = new Channel();
+                }
+                CameraSignalSettings.AllChannelConfig.ChannelId = _ChannleId;
+                CameraSignalSettings.AllChannelConfig.Name = "All";
+                Channels.Add(CameraSignalSettings.AllChannelConfig);
             }
             view.rangeChannel.SelectedItem = view.offsetChannel.SelectedItem = view.filtersChannel.SelectedItem = channels.FirstOrDefault(x => x.ChannelId == currentId) ?? channels.First();
             view.cancle.IsEnabled = (bool)(channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset);
@@ -105,6 +111,7 @@ namespace InperStudio.ViewModels
                         chn.OffsetWindowSize = value;
                     });
                     item.OffsetWindowSize = value;
+                    CameraSignalSettings.AllChannelConfig.OffsetWindowSize = value;
                 }
                 else
                 {
@@ -152,6 +159,7 @@ namespace InperStudio.ViewModels
                             {
                                 channel.YVisibleRange.Max = value;
                             }
+                            CameraSignalSettings.AllChannelConfig.YTop = value;
                         }
                         else
                         {
@@ -185,6 +193,7 @@ namespace InperStudio.ViewModels
                             {
                                 channel.YVisibleRange.Min = value;
                             }
+                            CameraSignalSettings.AllChannelConfig.YBottom = value;
                         }
                         else
                         {
@@ -221,6 +230,7 @@ namespace InperStudio.ViewModels
                     {
                         chn.Filters.IsSmooth = true;
                     });
+                    CameraSignalSettings.AllChannelConfig.Filters.IsSmooth = true;
                 }
                 else
                 {
@@ -255,6 +265,7 @@ namespace InperStudio.ViewModels
                     {
                         chn.Filters.IsSmooth = false;
                     });
+                    CameraSignalSettings.AllChannelConfig.Filters.IsSmooth = false;
                 }
                 else
                 {
@@ -278,7 +289,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var item = this.view.rangeChannel.SelectedItem as Channel;
+                var item = this.view.filtersChannel.SelectedItem as Channel;
 
                 var textbox = sender as HandyControl.Controls.TextBox;
                 double value = double.Parse(textbox.Text);
@@ -291,7 +302,16 @@ namespace InperStudio.ViewModels
                     foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                     {
                         channel.Filters.Smooth = value;
+                        if (InperGlobalClass.IsPreview)
+                        {
+                            channel.LightModes.ForEach(x =>
+                            {
+                                InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
+                            });
+                        }
                     }
+                    CameraSignalSettings.AllChannelConfig.Filters.Smooth = value;
+
                 }
                 else
                 {
@@ -301,10 +321,16 @@ namespace InperStudio.ViewModels
                         if (channel.ChannelId == item.ChannelId)
                         {
                             channel.Filters.Smooth = value;
+                            if (InperGlobalClass.IsPreview)
+                            {
+                                channel.LightModes.ForEach(x =>
+                                {
+                                    InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
+                                });
+                            }
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -328,6 +354,7 @@ namespace InperStudio.ViewModels
                         {
                             chn.Offset = false;
                         });
+                        CameraSignalSettings.AllChannelConfig.Offset = false;
                     }
                     else
                     {
@@ -356,6 +383,7 @@ namespace InperStudio.ViewModels
                           {
                               chn.Offset = true;
                           });
+                        CameraSignalSettings.AllChannelConfig.Offset = true;
                     }
                     else
                     {

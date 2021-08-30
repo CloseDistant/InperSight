@@ -4,12 +4,15 @@ using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper.JsonBean;
+using InperStudio.ViewModels;
+using InperStudio.Views;
 using InperStudioControlLib.Lib.DeviceAgency;
 using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Annotations;
+using SciChart.Charting.Visuals.Axes;
 using Stylet;
 using System;
 using System.Collections.Concurrent;
@@ -118,6 +121,30 @@ namespace InperStudio.Lib.Helper
                 _ = _DataSaveEvent.Set();
             };
 
+            EventChannelChart.TimeSpanAxis = new TimeSpanAxis()
+            {
+                DrawMajorBands = false,
+                DrawMajorGridLines = false,
+                DrawMinorGridLines = false,
+                VisibleRange = EventChannelChart.XVisibleRange
+            };
+            EventChannelChart.EventTimeSpanAxis = new TimeSpanAxis()
+            {
+                DrawMajorBands = false,
+                DrawMajorGridLines = false,
+                DrawMinorGridLines = false,
+                VisibleRange = EventChannelChart.XVisibleRange,
+                Visibility = Visibility.Collapsed
+            };
+            EventChannelChart.EventTimeSpanAxisFixed = new TimeSpanAxis()
+            {
+                DrawMajorBands = false,
+                DrawMajorGridLines = false,
+                DrawMinorGridLines = false,
+                VisibleRange = EventChannelChart.XVisibleRange,
+                Visibility = Visibility.Collapsed
+            };
+
         }
         public bool InitDataStruct()
         {
@@ -129,7 +156,10 @@ namespace InperStudio.Lib.Helper
                     foreach (var item in CameraChannels)
                     {
                         item.Offset = false;
-                        _SaveSignalQs.Add(item.ChannelId, new SignalData());
+                        if (!_SaveSignalQs.ContainsKey(item.ChannelId))
+                        {
+                            _SaveSignalQs.Add(item.ChannelId, new SignalData());
+                        }
                         _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         if (item.LightModes.Count > 0)
                         {
@@ -371,7 +401,7 @@ namespace InperStudio.Lib.Helper
                             _ = Parallel.ForEach(CameraChannels, mask =>
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-                    
+
                                   r -= Offset(mask, m.Group);
 
                                   DeltaFCalculate(mask, m.Group, r, ts);
@@ -780,7 +810,7 @@ namespace InperStudio.Lib.Helper
             {
                 VerticalAlignment = VerticalAlignment.Stretch,
                 FontSize = 12,
-                ShowLabel = true,
+                ShowLabel = InperGlobalClass.EventPanelProperties.DisplayNameVisible,
                 Stroke = color,
                 LabelValue = text,
                 LabelTextFormatting = "12",
@@ -847,6 +877,15 @@ namespace InperStudio.Lib.Helper
                     {
                         (line.DataSeries as XyDataSeries<TimeSpan, double>).Clear();
                     });
+                    //x.TimeSpanAxis = new TimeSpanAxis()
+                    //{
+                    //    DrawMajorBands = false,
+                    //    DrawMajorGridLines = false,
+                    //    DrawMinorGridLines = false,
+                    //    VisibleRange = x.XVisibleRange,
+                    //    Visibility = Visibility.Collapsed
+                    //};
+                    //x.TimeSpanAxis.VisibleRangeChanged += TimeSpanAxis_VisibleRangeChanged;
                 });
                 foreach (KeyValuePair<int, SignalData> item in _SignalQs)
                 {
@@ -868,6 +907,19 @@ namespace InperStudio.Lib.Helper
             {
                 App.Log.Error(ex.ToString());
             }
+        }
+
+        public void TimeSpanAxis_VisibleRangeChanged(object sender, SciChart.Charting.Visuals.Events.VisibleRangeChangedEventArgs e)
+        {
+
+            foreach (var item in Instance.CameraChannels)
+            {
+                item.TimeSpanAxis.VisibleRange = e.NewVisibleRange;
+            }
+
+            Instance.EventChannelChart.TimeSpanAxis.VisibleRange = e.NewVisibleRange;
+            Instance.EventChannelChart.EventTimeSpanAxis.VisibleRange = e.NewVisibleRange;
+            Instance.EventChannelChart.EventTimeSpanAxisFixed.VisibleRange = e.NewVisibleRange;
         }
         private void Copy<T>(T source, ref T destination) where T : class
         {

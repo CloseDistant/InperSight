@@ -93,7 +93,7 @@ namespace InperStudioControlLib.Control.TextBox
                 {
                     if (!string.IsNullOrEmpty(tbox.Text))
                     {
-                        Regex rx = new Regex(@"^(0|-?[0-9]\d*)\b$");
+                        Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
                         if (rx.IsMatch(tbox.Text))
                         {
                             double res = double.Parse(tbox.Text);

@@ -29,13 +29,26 @@ namespace InperStudio.ViewModels
                 view.heightAuto.Checked += (s, e) =>
                 {
                     dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = dataShowControlView.dataList.ActualHeight / (dataShowControlView.dataList.Items.Count == 0 ? 1 : dataShowControlView.dataList.Items.Count);
+                    InperGlobalClass.EventPanelProperties.HeightAuto = true;
+                    InperGlobalClass.EventPanelProperties.HeightFixed = false;
                 };
                 view.heightFixed.Checked += (s, e) =>
                 {
                     dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = InperGlobalClass.EventPanelProperties.HeightFixedValue;
+                    InperGlobalClass.EventPanelProperties.HeightAuto = false;
+                    InperGlobalClass.EventPanelProperties.HeightFixed = true;
                 };
                 view.fixedValue.TextChanged += (s, e) => dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = double.Parse(view.fixedValue.Text);
                 view.ConfirmClickEvent += (s, e) => RequestClose();
+
+                if (InperGlobalClass.EventPanelProperties.HeightAuto)
+                {
+                    view.heightAuto.IsChecked = true;
+                }
+                else
+                {
+                    view.heightFixed.IsChecked = true;
+                }
             }
             catch (Exception ex)
             {

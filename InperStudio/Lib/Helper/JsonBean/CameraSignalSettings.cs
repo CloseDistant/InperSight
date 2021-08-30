@@ -16,6 +16,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double Brightness { get; set; }
         public RecordMode RecordMode { get; set; }
         public List<WaveGroup> LightMode { get; set; }
+        public Channel AllChannelConfig { get; set; }
         public List<Channel> CameraChannels { get; set; }
     }
     public class RecordMode
@@ -38,7 +39,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double Tau3 { get; set; } = 3;
         public double Left { get; set; }
         public double Top { get; set; }
-        public double YTop { get; set; } = 20;
+        public double YTop { get; set; } = 10;
         public double YBottom { get; set; } = 0;
         public bool Offset { get; set; }
         public int OffsetWindowSize { get; set; } = 300;

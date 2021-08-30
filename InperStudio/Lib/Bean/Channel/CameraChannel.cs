@@ -1,6 +1,7 @@
 ﻿using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Charting.Visuals.Axes;
 using SciChart.Charting.Visuals.RenderableSeries;
 using SciChart.Data.Model;
 using Stylet;
@@ -29,7 +30,8 @@ namespace InperStudio.Lib.Bean.Channel
         public int OffsetWindowSize { get; set; } = 300;
         public bool Offset { get; set; }
         public Filters Filters { get; set; } = new Filters();
-
+        private TimeSpanAxis timeSpanAxis;
+        public TimeSpanAxis TimeSpanAxis { get => timeSpanAxis; set => SetAndNotify(ref timeSpanAxis, value); }
         private BindableCollection<IRenderableSeriesViewModel> renderableSeriesViewModels = new BindableCollection<IRenderableSeriesViewModel>();
         public BindableCollection<IRenderableSeriesViewModel> RenderableSeries { get => renderableSeriesViewModels; set => SetAndNotify(ref renderableSeriesViewModels, value); }
         public List<LightMode<TimeSpan, double>> LightModes { get; set; } = new List<LightMode<TimeSpan, double>>();

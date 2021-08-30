@@ -4,6 +4,7 @@ using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
+using Newtonsoft.Json;
 using SciChart.Charting.Model.ChartSeries;
 using SqlSugar;
 using System;
@@ -104,6 +105,45 @@ namespace InperStudio.Lib.Data
                 CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
             };
             _ = sqlSugar.Insertable(desc1).ExecuteCommand();
+
+            List<Config> configs = new List<Config>();
+            configs.Add(new Config()
+            {
+                JsonText = JsonConvert.SerializeObject(InperGlobalClass.AdditionRecordConditionsStart),
+                PropertyName = nameof(InperGlobalClass.AdditionRecordConditionsStart),
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            });
+            configs.Add(new Config()
+            {
+                JsonText = JsonConvert.SerializeObject(InperGlobalClass.AdditionRecordConditionsStop),
+                PropertyName = nameof(InperGlobalClass.AdditionRecordConditionsStop),
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            });
+            configs.Add(new Config()
+            {
+                JsonText = JsonConvert.SerializeObject(InperGlobalClass.CameraSignalSettings),
+                PropertyName = nameof(InperGlobalClass.CameraSignalSettings),
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            });
+            configs.Add(new Config()
+            {
+                JsonText = JsonConvert.SerializeObject(InperGlobalClass.EventPanelProperties),
+                PropertyName = nameof(InperGlobalClass.EventPanelProperties),
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            });
+            configs.Add(new Config()
+            {
+                JsonText = JsonConvert.SerializeObject(InperGlobalClass.EventSettings),
+                PropertyName = nameof(InperGlobalClass.EventSettings),
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            });
+            configs.Add(new Config()
+            {
+                JsonText = JsonConvert.SerializeObject(InperGlobalClass.ManualEvents),
+                PropertyName = nameof(InperGlobalClass.EventSettings),
+                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            });
+            _ = sqlSugar.Insertable(configs).ExecuteCommand();
         }
     }
 }

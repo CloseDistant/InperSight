@@ -67,16 +67,6 @@ namespace InperStudio.ViewModels
                 view = this.View as DataShowControlView;
                 InperGlobalClass.IsExistEvent = false;
 
-                view.sciScroll.SelectedRangeChanged += (s, e) =>
-                {
-                    Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, item =>
-                    {
-                        item.XVisibleRange = e.SelectedRange;
-                        EventChannelChart.XVisibleRange = e.SelectedRange;
-                    });
-
-                };
-
                 this.view.dataList.PreviewMouseWheel += (s, e) =>
                 {
                     var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
@@ -86,8 +76,10 @@ namespace InperStudio.ViewModels
                     };
                     this.view.dataList.RaiseEvent(eventArg);
                 };
-
-                VisibleValue = ((TimeSpan)this.view.tiemsAxis.VisibleRange.Diff).TotalSeconds;
+                if (EventChannelChart.TimeSpanAxis != null)
+                {
+                    VisibleValue = ((TimeSpan)EventChannelChart.TimeSpanAxis.VisibleRange.Diff).TotalSeconds;
+                }
 
                 if (InperGlobalClass.EventPanelProperties.HeightAuto && this.view.dataList.Items.Count > 0)
                 {
@@ -103,7 +95,6 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-
         #region methods
         public void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -132,15 +123,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var item = view.dataList.ItemContainerGenerator.ContainerFromIndex(0) as ListBoxItem;
-
-                ContentPresenter myContentPresenter = InperClassHelper.FindVisualChild<ContentPresenter>(item);
-
-                DataTemplate template = myContentPresenter.ContentTemplate;
-
-                SciChartSurface sciChart = (SciChartSurface)template.FindName("sciChartSurface", myContentPresenter);
-                sciChart.XAxis.VisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(VisibleValue));
-                view.sciScroll.Axis = sciChart.XAxis;
+                view.sciScroll.Axis = InperDeviceHelper.Instance.CameraChannels.Last().TimeSpanAxis;
             }
             catch (Exception ex)
             {
@@ -252,14 +235,17 @@ namespace InperStudio.ViewModels
             try
             {
                 CameraChannel channel = sender as CameraChannel;
-                double value = ((double)channel.YVisibleRange.Max + 1) > 100 ? 100 : ((double)channel.YVisibleRange.Max + 1);
+                double value = (double)channel.YVisibleRange.Max - 0.1;
+                double min = (double)channel.YVisibleRange.Min + 0.1;
+
+                if (min >= value)
+                {
+                    Growl.Info("Reached the limit", "SuccessMsg");
+                    return;
+                }
 
                 channel.YVisibleRange.Max = Math.Round(value, 2);
-
-                if (value >= 100)
-                {
-                    Growl.Info("已达到最大值", "SuccessMsg");
-                }
+                channel.YVisibleRange.Min = Math.Round(min, 2);
             }
             catch (Exception ex)
             {
@@ -271,9 +257,17 @@ namespace InperStudio.ViewModels
             try
             {
                 CameraChannel channel = sender as CameraChannel;
-                double value = (double)channel.YVisibleRange.Min - 1;
+                double value = (double)channel.YVisibleRange.Min - 0.5;
+                double maxValue = (double)channel.YVisibleRange.Max + 0.5;
+
+                if (maxValue > 100)
+                {
+                    Growl.Warning("Reached the limit", "SuccessMsg");
+                    return;
+                }
 
                 channel.YVisibleRange.Min = Math.Round(value, 2);
+                channel.YVisibleRange.Max = Math.Round(maxValue, 2);
             }
             catch (Exception ex)
             {
@@ -287,6 +281,7 @@ namespace InperStudio.ViewModels
                 CameraChannel channel = sender as CameraChannel;
 
                 _ = channel.YVisibleRange.SetMinMaxWithLimit(0, 100, new DoubleRange(0, 10));
+
             }
             catch (Exception ex)
             {

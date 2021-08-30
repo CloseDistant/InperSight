@@ -11,6 +11,7 @@ using InperStudioControlLib.Lib.DeviceAgency;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Charting.Visuals.Axes;
 using SciChart.Charting.Visuals.RenderableSeries;
 using SciChart.Data.Model;
 using Stylet;
@@ -54,7 +55,7 @@ namespace InperStudio.ViewModels
         public List<string> AnalogColorList { get; set; } = InperColorHelper.ColorPresetList;
         private InperDeviceHelper deviceHelper;
         public InperDeviceHelper InperDeviceHelper { get => deviceHelper; set => SetAndNotify(ref deviceHelper, value); }
-        public List<double> Exposures { get; set; } = InperParameters.Exposures;
+        public List<string> Exposures { get; set; } = InperParameters.Exposures;
         public List<double> FPS { get; set; } = InperParameters.FPS;
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
@@ -134,6 +135,25 @@ namespace InperStudio.ViewModels
         }
 
         #region methods  Camera
+        public void InperTextBox_InperTextChanged(object arg1, TextChangedEventArgs arg2)
+        {
+            try
+            {
+                InperTextBox sen = arg1 as InperTextBox;
+                if (sen.Name.Equals("duration"))
+                {
+                    //_Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                }
+                else
+                {
+                    //_Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         public void Exposure_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
@@ -334,8 +354,19 @@ namespace InperStudio.ViewModels
                 {
                     ChannelId = index - 1,
                     Name = "ROI-" + index + "-",
-                    YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop)
+                    YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop),
+
                 };
+
+                item.TimeSpanAxis = new TimeSpanAxis()
+                {
+                    DrawMajorBands = false,
+                    DrawMajorGridLines = false,
+                    DrawMinorGridLines = false,
+                    VisibleRange = item.XVisibleRange,
+                    Visibility = Visibility.Collapsed
+                };
+                item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
 
                 InperDeviceHelper._SignalQs.Add(index - 1, new SignalData());
 
@@ -816,7 +847,32 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, "CameraChannelScreen.bmp", InperGlobalClass.DataPath + InperGlobalClass.DataFolderName);
+                //InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp", System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                //获取控件相对于窗口位置
+                GeneralTransform generalTransform = this.view.image.TransformToAncestor(this.view.signal);
+                System.Windows.Point point = generalTransform.Transform(new System.Windows.Point(0, 0));
+
+                //获取窗口相对于屏幕的位置
+                System.Windows.Point ptLeftUp = new System.Windows.Point(0, 0);
+                ptLeftUp = this.view.PointToScreen(ptLeftUp);
+
+                //计算DPI缩放
+                var ct = PresentationSource.FromVisual(view.image)?.CompositionTarget;
+                var matrix = ct == null ? Matrix.Identity : ct.TransformToDevice;
+
+                double x = matrix.M11;
+                double y = matrix.M22;
+
+                int left = (int)ptLeftUp.X + (int)point.X;
+                int top = (int)ptLeftUp.Y + (int)point.Y;
+
+                if (SystemParameters.PrimaryScreenWidth* matrix.M11 >= 3840)
+                {
+                    left += 20;
+                    top += 40;
+                }
+
+                InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)Math.Ceiling(view.image.ActualWidth * x), (int)Math.Ceiling(view.image.ActualHeight * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
                 Growl.Info(new GrowlInfo() { Message = "成功获取快照", Token = "SuccessMsg", WaitTime = 1 });
             }
             catch (Exception ex)

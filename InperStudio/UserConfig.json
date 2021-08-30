@@ -58,6 +58,7 @@
       "delay": 10
     },
     "lightMode": [],
+    "AllChannelConfig": null,
     "cameraChannels": []
   },
   "eventSettings": {

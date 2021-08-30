@@ -1,6 +1,7 @@
 ﻿using InperStudio.Lib.Helper.JsonBean;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Visuals.Annotations;
+using SciChart.Charting.Visuals.Axes;
 using SciChart.Data.Model;
 using Stylet;
 using System;
@@ -30,7 +31,12 @@ namespace InperStudio.Lib.Bean.Channel
     public class EventChannelChart : PropertyChangedBase
     {
         public Dictionary<int, Queue<KeyValuePair<long, double>>> EventQs { get; set; } = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
-
+        private TimeSpanAxis timeSpanAxis;
+        public TimeSpanAxis TimeSpanAxis { get => timeSpanAxis; set => SetAndNotify(ref timeSpanAxis, value); }
+        private TimeSpanAxis eventtimeSpanAxis;
+        public TimeSpanAxis EventTimeSpanAxis { get => eventtimeSpanAxis; set => SetAndNotify(ref eventtimeSpanAxis, value); }
+        private TimeSpanAxis eventtimeSpanAxisFixed;
+        public TimeSpanAxis EventTimeSpanAxisFixed{ get => eventtimeSpanAxisFixed; set => SetAndNotify(ref eventtimeSpanAxisFixed, value); }
         private BindableCollection<IAnnotationViewModel> annotations = new BindableCollection<IAnnotationViewModel>();
         public BindableCollection<IAnnotationViewModel> Annotations { get => annotations; set => SetAndNotify(ref annotations, value); }
         private ScrollingViewportManager viewportManager = new ScrollingViewportManager(10);

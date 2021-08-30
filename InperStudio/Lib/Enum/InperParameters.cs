@@ -8,16 +8,16 @@ namespace InperStudio.Lib.Enum
 {
     public class InperParameters
     {
-        public static List<double> Exposures { get; set; } = new List<double>()
+        public static List<string> Exposures { get; set; } = new List<string>()
         {
-            0,
-            5,
-            10,
-            15,
-            20,
-            25,
-            30,
-            50
+            "0",
+           "5",
+           "10",
+           "15",
+           "20",
+           "25",
+           "30",
+           "50"
         };
         public static List<double> FPS { get; set; } = new List<double>()
         {

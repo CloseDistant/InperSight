@@ -183,7 +183,7 @@ namespace InperStudio.ViewModels
                     return;
                 }
                 string fname = dlg.FileName;
-                File.Copy(InperJsonConfig.filepath, fname);
+                File.Copy(InperJsonConfig.filepath, fname, true);
                 InperJsonConfig.filepath = fname;
             }
             catch (Exception ex)
