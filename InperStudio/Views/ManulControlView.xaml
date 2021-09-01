@@ -3,12 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:vm="clr-namespace:InperStudio.ViewModels"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:global="clr-namespace:InperStudio.Lib.Bean"
-             xmlns:lib="clr-namespace:InperStudio.Lib.Enum"
-             xmlns:local="clr-namespace:InperStudio.Views"
              d:DataContext="{d:DesignInstance vm:ManulControlViewModel}"
              mc:Ignorable="d">
     <UserControl.Resources>

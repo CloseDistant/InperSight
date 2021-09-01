@@ -23,36 +23,43 @@ namespace InperStudio
 
         protected override void Configure()
         {
-            // Perform any other configuration before the application starts
-            SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
+            try
             {
-                ConnectionString = InperConfig.Instance.ConStr + MySqlSslMode.None,//连接符字串
-                DbType = DbType.MySql,
-                IsAutoCloseConnection = true //不设成true要手动close
-            });
-
-            List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
-
-            if (list.Count() > 0)
-            {
-                Tb_Version ver = list.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Version);
-                if (ver != null)
+                SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
                 {
-                    Tb_Version _new = list.FirstOrDefault(x => x.Id > ver.Id);
+                    ConnectionString = InperConfig.Instance.ConStr + MySqlSslMode.None,//连接符字串
+                    DbType = DbType.MySql,
+                    IsAutoCloseConnection = true //不设成true要手动close
+                });
 
-                    if (_new != null)
+                List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
+
+                if (list.Count() > 0)
+                {
+                    Tb_Version ver = list.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Version);
+                    if (ver != null)
                     {
-                        if (!InperConfig.Instance.IsSkip)
-                        {
-                            string content = InperConfig.Instance.Version + "," + Environment.CurrentDirectory + "/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe");
-                            _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
-                            Environment.Exit(0);
-                        }
+                        Tb_Version _new = list.FirstOrDefault(x => x.Id > ver.Id);
 
+                        if (_new != null)
+                        {
+                            if (!InperConfig.Instance.IsSkip)
+                            {
+                                string content = InperConfig.Instance.Version + "," + Environment.CurrentDirectory + "/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe");
+                                _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
+                                Environment.Exit(0);
+                            }
+
+                        }
                     }
                 }
+                db.Close();
             }
-            db.Close();
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+            // Perform any other configuration before the application starts
         }
     }
 }

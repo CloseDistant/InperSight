@@ -336,7 +336,11 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.ShowReminderInfo("数据初始化失败");
                     return;
                 }
-
+                if (!InperDeviceHelper.Instance.AllLightOpen())
+                {
+                    InperGlobalClass.ShowReminderInfo("未设置激发光");
+                    return;
+                }
                 if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
                 {
                     _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
@@ -347,14 +351,14 @@ namespace InperStudio.ViewModels
                 {
                     await task;
                 }
-                else
-                {
-                    if (!InperDeviceHelper.Instance.AllLightOpen())
-                    {
-                        InperGlobalClass.ShowReminderInfo("未设置激发光");
-                        return;
-                    }
-                }
+                //else
+                //{
+                //    if (!InperDeviceHelper.Instance.AllLightOpen())
+                //    {
+                //        InperGlobalClass.ShowReminderInfo("未设置激发光");
+                //        return;
+                //    }
+                //}
 
                 //数据库优先初始化
                 App.SqlDataInit = new Lib.Data.SqlDataInit();

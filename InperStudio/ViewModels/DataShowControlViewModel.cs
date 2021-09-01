@@ -274,13 +274,18 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        public void YaxisNormal(object sender)
+        public void YaxisNormal(object sender, RoutedEventArgs e)
         {
             try
             {
-                CameraChannel channel = sender as CameraChannel;
+                Button but = sender as Button;
 
-                _ = channel.YVisibleRange.SetMinMaxWithLimit(0, 100, new DoubleRange(0, 10));
+                SciChartSurface sci = (SciChartSurface)but.FindName("sciChartSurface");
+
+                sci.ZoomExtentsY();
+                //CameraChannel channel = sender as CameraChannel;
+
+                //_ = channel.YVisibleRange.SetMinMaxWithLimit(0, 100, new DoubleRange(0, 10));
 
             }
             catch (Exception ex)
