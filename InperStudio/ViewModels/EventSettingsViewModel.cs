@@ -174,6 +174,7 @@ namespace InperStudio.ViewModels
                                     ChannelId = item.ChannelId,
                                     BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
                                     SymbolName = item.SymbolName,
+                                    RefractoryPeriod = item.RefractoryPeriod,
                                     Name = item.Name,
                                     IsActive = item.IsActive,
                                     Type = item.Type
@@ -187,11 +188,12 @@ namespace InperStudio.ViewModels
                                 if (item.Type == ChannelTypeEnum.Input.ToString())
                                 {
                                     EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Input.ToString()));
-                                    chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name;
+                                    chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name;chn.BgColor = item.BgColor;
                                 }
                                 else
                                 {
-                                    MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).IsActive = item.IsActive;
+                                    EventChannel chn= MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
+                                    chn.IsActive = item.IsActive;chn.BgColor = item.BgColor;
                                 }
                             }
                         }
@@ -216,6 +218,7 @@ namespace InperStudio.ViewModels
                                 Condition = item.Condition,
                                 BgColor = item.BgColor,
                                 DeltaF = item.DeltaF,
+                                RefractoryPeriod = item.RefractoryPeriod,
                                 LightIndex = item.LightIndex,
                                 WindowSize = item.WindowSize,
                                 IsActive = item.IsActive,
@@ -551,7 +554,7 @@ namespace InperStudio.ViewModels
                                 if (render != null)
                                 {
                                     _ = InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Remove(render);
-                                    _ = InperDeviceHelper.Instance.EventChannelChart.EventQs.Remove(ch_active.ChannelId);
+                                    _ = InperDeviceHelper.Instance.EventChannelChart.EventQs.TryRemove(ch_active.ChannelId);
                                 }
                                 Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
                             }
@@ -618,6 +621,7 @@ namespace InperStudio.ViewModels
                                 IsActive = ch.IsActive,
                                 SymbolName = ch.SymbolName,
                                 Name = view.MarkerName.Text,
+                                RefractoryPeriod = ch.RefractoryPeriod,
                                 BgColor = ch.BgColor,
                                 DeltaF = ch.DeltaF,
                                 LightIndex = ch.LightIndex,
@@ -729,7 +733,7 @@ namespace InperStudio.ViewModels
                         {
                             Monitor.Enter(InperDeviceHelper.Instance._EventQLock);
                             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = ch.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(ch.BgColor) });
-                            InperDeviceHelper.Instance.EventChannelChart.EventQs.Add(ch.ChannelId, new Queue<KeyValuePair<long, double>>());
+                            InperDeviceHelper.Instance.EventChannelChart.EventQs.TryAdd(ch.ChannelId, new Queue<KeyValuePair<long, double>>());
                             Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
                         }
                         view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(MarkerChannels.FirstOrDefault(x => x.IsActive == false)?.BgColor ?? "#000000"));

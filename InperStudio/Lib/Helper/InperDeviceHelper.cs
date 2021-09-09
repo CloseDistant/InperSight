@@ -1,4 +1,5 @@
 ﻿using HandyControl.Controls;
+using InperDeviceManagement;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
@@ -72,15 +73,21 @@ namespace InperStudio.Lib.Helper
         public int SelectedWaveType = 1;
 
         public event EventHandler<bool> WaveInitEvent;
+        public event Action<bool> StartCollectEvent;
+        public PhotometryDevice device;
+        public long time;
 
-        public Queue<MarkedMat> _MatQ = new Queue<MarkedMat>();
-        public Queue<MarkedMat> _DisplayMatQ = new Queue<MarkedMat>();
+        public Queue<InperDeviceManagement.MarkedMat> _MatQ = new Queue<InperDeviceManagement.MarkedMat>();
+        public Queue<InperDeviceManagement.MarkedMat> _DisplayMatQ = new Queue<InperDeviceManagement.MarkedMat>();
         /// <summary>
         /// 每个通道对应的数据
         /// </summary>
-        public Dictionary<int, SignalData> _SignalQs = new Dictionary<int, SignalData>();
+        public ConcurrentDictionary<int, SignalData> _SignalQs = new ConcurrentDictionary<int, SignalData>();
         public ConcurrentDictionary<int, Mat> ROIMasks { get; set; } = new ConcurrentDictionary<int, Mat>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> FilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> OffsetData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> DeltaFData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+
         public BindableCollection<CameraChannel> CameraChannels { get; set; } = new BindableCollection<CameraChannel>();
         public EventChannelChart EventChannelChart { get; set; } = new EventChannelChart();
 
@@ -93,17 +100,51 @@ namespace InperStudio.Lib.Helper
             set => SetAndNotify(ref _WBMPPreview, value);
         }
         #endregion
-        public void DeviceInit()
+        public void DeviceInit(PhotometryDevice device)
         {
-            DevPhotometry.Instance.OnImageGrabbed += Instance_OnImageGrabbed;
-            DevPhotometry.Instance.OnLightStatusChanged += Instance_OnLightStatusChanged;
-            DevPhotometry.Instance.OnPortStatusChanged += Instance_OnPortStatusChanged;
-
-            VisionWidth = DevPhotometry.Instance.VisionWidth;
-            VisionHeight = DevPhotometry.Instance.VisionHeight;
-            if (DevPhotometry.Instance.VisionWidth == 0)
+            this.device = device;
+            device.DidGrabImage += Instance_OnImageGrabbed;
+            //DevPhotometry.Instance.OnImageGrabbed += Instance_OnImageGrabbed;
+            device.LightSourceList.ForEach(e =>
             {
-                HandyControl.Controls.Growl.Error("Failed to initialize the basler camera", "SuccessMsg");
+                try
+                {
+                    bool exist = false;
+                    if (e.WaveLength > 0)
+                    {
+                        WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 0);
+                        if (wg != null)
+                        {
+                            LightWaveLength.Add(wg);
+                            device.SwitchLight((uint)wg.GroupId, true);
+                            device.SetLightPower((uint)wg.GroupId, wg.LightPower);
+                        }
+                        else
+                        {
+                            LightWaveLength.Add(new WaveGroup() { GroupId = (int)e.LightID, WaveType = e.WaveLength + " nm" });
+                        }
+                        exist = true;
+                    }
+                    WaveInitEvent?.Invoke(this, exist);
+                    if (!exist)
+                    {
+                        Growl.Error("未获取到激发光");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Growl.Error("获取激发光失败：" + ex.ToString());
+                    App.Log.Error(ex.ToString());
+                }
+            });
+            //DevPhotometry.Instance.OnLightStatusChanged += Instance_OnLightStatusChanged;
+            //DevPhotometry.Instance.OnPortStatusChanged += Instance_OnPortStatusChanged;
+
+            VisionWidth = device.GetVisionWidth();
+            VisionHeight = device.GetVisionHeight();
+            if (VisionWidth <= 0)
+            {
+                Growl.Error("Failed to initialize the basler camera");
                 return;
             }
             WBMPPreview = new WriteableBitmap(VisionWidth, VisionHeight, 96, 96, PixelFormats.Gray16, null);
@@ -153,6 +194,8 @@ namespace InperStudio.Lib.Helper
                 if (_SignalQs.Count > 0)
                 {
                     FilterData.Clear();
+                    OffsetData.Clear();
+                    DeltaFData.Clear();
                     foreach (var item in CameraChannels)
                     {
                         item.Offset = false;
@@ -161,6 +204,8 @@ namespace InperStudio.Lib.Helper
                             _SaveSignalQs.Add(item.ChannelId, new SignalData());
                         }
                         _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                        _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                        _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         if (item.LightModes.Count > 0)
                         {
                             item.LightModes.ForEach(x =>
@@ -168,6 +213,8 @@ namespace InperStudio.Lib.Helper
                                 x.OffsetValue = 0;
                                 _SaveSignalQs[item.ChannelId].ValuePairs.Add(x.LightType, new Queue<KeyValuePair<long, double>>());
                                 FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
                             });
                         }
                         else
@@ -189,7 +236,7 @@ namespace InperStudio.Lib.Helper
                             EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = x.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(x.BgColor) });
                             if (!EventChannelChart.EventQs.ContainsKey(x.ChannelId))
                             {
-                                EventChannelChart.EventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                                EventChannelChart.EventQs.TryAdd(x.ChannelId, new Queue<KeyValuePair<long, double>>());
                             }
                             _SaveEventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
                         }
@@ -228,7 +275,7 @@ namespace InperStudio.Lib.Helper
             }
 
         }
-        private void Instance_OnImageGrabbed(object sender, MarkedMat e)
+        private void Instance_OnImageGrabbed(object sender, InperDeviceManagement.MarkedMat e)
         {
             try
             {
@@ -340,7 +387,7 @@ namespace InperStudio.Lib.Helper
         }
         public void DisplayProc()
         {
-            _SwapBuffer = new short[DevPhotometry.Instance.VisionWidth * DevPhotometry.Instance.VisionHeight];
+            _SwapBuffer = new short[VisionWidth * VisionHeight];
 
             while (true)
             {
@@ -351,7 +398,7 @@ namespace InperStudio.Lib.Helper
                 }
 
                 Monitor.Enter(_DisplayQLock);
-                MarkedMat[] mmats = _DisplayMatQ.ToArray();
+                InperDeviceManagement.MarkedMat[] mmats = _DisplayMatQ.ToArray();
                 _DisplayMatQ.Clear();
                 Monitor.Exit(_DisplayQLock);
 
@@ -376,7 +423,7 @@ namespace InperStudio.Lib.Helper
         {
             while (isLoop)
             {
-                MarkedMat[] mmats;
+                InperDeviceManagement.MarkedMat[] mmats;
                 _ = _AREvent.WaitOne();
 
                 if (Monitor.TryEnter(_QLock))
@@ -385,10 +432,10 @@ namespace InperStudio.Lib.Helper
                     _MatQ.Clear();
                     Monitor.Exit(_QLock);
 
-                    foreach (MarkedMat m in mmats)
+                    foreach (InperDeviceManagement.MarkedMat m in mmats)
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
-
+                        time = ts;
                         if (Monitor.TryEnter(_EventQLock))
                         {
                             EventTimeSet.Enqueue(ts);
@@ -402,11 +449,17 @@ namespace InperStudio.Lib.Helper
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
 
-                                  r -= Offset(mask, m.Group);
+                                  if (mask.Offset)
+                                  {
+                                      r -= Offset(mask, m.Group, r);
+                                  }
 
                                   DeltaFCalculate(mask, m.Group, r, ts);
 
-                                  r = Smooth(mask, m.Group, r);
+                                  if (mask.Filters.IsSmooth)
+                                  {
+                                      r = Smooth(mask, m.Group, r);
+                                  }
 
                                   ploting_data[mask.ChannelId] = r;
                               });
@@ -422,19 +475,37 @@ namespace InperStudio.Lib.Helper
             }
         }
         #region 滤波 offset smooth
-        private double Offset(CameraChannel cameraChannel, int group)
+        private double Offset(CameraChannel cameraChannel, int group, double r)
         {
-            double value = 0;
-            if (cameraChannel.Offset)
+            double value = r;
+            LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(x => x.LightType == group);
+            if (OffsetData.ContainsKey(cameraChannel.ChannelId))
             {
-                LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(x => x.LightType == group);
-                XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
-                if (linedata.Count > cameraChannel.OffsetWindowSize && offsetValue.OffsetValue == 0)
+                if (OffsetData[cameraChannel.ChannelId].ContainsKey(group))
                 {
-                    offsetValue.OffsetValue = linedata.YValues.ToList().GetRange(linedata.Count - cameraChannel.OffsetWindowSize, cameraChannel.OffsetWindowSize).Average();
+                    OffsetData[cameraChannel.ChannelId][group].Enqueue(r);
+                    if (OffsetData[cameraChannel.ChannelId][group].Count > cameraChannel.OffsetWindowSize)
+                    {
+                        _ = OffsetData[cameraChannel.ChannelId][group].Dequeue();
+                    }
+                    if (offsetValue.OffsetValue == 0)
+                    {
+                        offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
+                    }
+                    value = offsetValue.OffsetValue;
                 }
-                value = offsetValue.OffsetValue;
             }
+
+            //if (cameraChannel.Offset)
+            //{
+            //    LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(x => x.LightType == group);
+            //    XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
+            //    if (linedata.Count > cameraChannel.OffsetWindowSize && offsetValue.OffsetValue == 0)
+            //    {
+            //        offsetValue.OffsetValue = linedata.YValues.ToList().GetRange(linedata.Count - cameraChannel.OffsetWindowSize, cameraChannel.OffsetWindowSize).Average();
+            //    }
+            //    value = offsetValue.OffsetValue;
+            //}
             return value;
         }
         private double Smooth(CameraChannel cameraChannel, int group, double r)
@@ -459,7 +530,7 @@ namespace InperStudio.Lib.Helper
         }
         private void DeltaFCalculate(CameraChannel cameraChannel, int group, double r, long ts)
         {
-            _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, x =>
+            _ = Parallel.ForEach(new ConcurrentBag<EventChannelJson>(InperGlobalClass.EventSettings.Channels), x =>
                {
                    if (x.IsActive)
                    {
@@ -467,14 +538,21 @@ namespace InperStudio.Lib.Helper
                        {
                            if (x.ChannelId == cameraChannel.ChannelId && x.LightIndex == group)
                            {
-                               LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(y => y.LightType == group);
-                               XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
-                               if (linedata.Count >= x.WindowSize)
+
+                               if (DeltaFData.ContainsKey(cameraChannel.ChannelId))
                                {
-                                   double deltaF = linedata.YValues.ToList().GetRange(linedata.Count - x.WindowSize, x.WindowSize).Average();
-                                   if (deltaF >= x.DeltaF)
+                                   if (DeltaFData[cameraChannel.ChannelId].ContainsKey(group))
                                    {
-                                       SetDeltaFEvent(x, ts, deltaF);
+                                       DeltaFData[cameraChannel.ChannelId][group].Enqueue(r);
+                                       if (DeltaFData[cameraChannel.ChannelId][group].Count > x.WindowSize)
+                                       {
+                                           _ = DeltaFData[cameraChannel.ChannelId][group].Dequeue();
+                                           double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average());
+                                           if (deltaF >= x.DeltaF)
+                                           {
+                                               SetDeltaFEvent(x, ts, deltaF);
+                                           }
+                                       }
                                    }
                                }
                            }
@@ -487,15 +565,21 @@ namespace InperStudio.Lib.Helper
                                {
                                    if (x.Condition.ChannelId == cameraChannel.ChannelId && x.Condition.LightIndex == group)
                                    {
-                                       LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(y => y.LightType == group);
-                                       XyDataSeries<TimeSpan, double> linedata = offsetValue.XyDataSeries;
-                                       if (linedata.Count >= x.WindowSize)
+                                       if (DeltaFData.ContainsKey(cameraChannel.ChannelId))
                                        {
-                                           double deltaF = linedata.YValues.ToList().GetRange(linedata.Count - x.WindowSize, x.WindowSize).Average();
-                                           if (deltaF >= x.DeltaF)
+                                           if (DeltaFData[cameraChannel.ChannelId].ContainsKey(group))
                                            {
-                                               SetDeltaFEvent(x, ts, deltaF);
-                                               SendCommand(x);
+                                               DeltaFData[cameraChannel.ChannelId][group].Enqueue(r);
+                                               if (DeltaFData[cameraChannel.ChannelId][group].Count > x.WindowSize)
+                                               {
+                                                   _ = DeltaFData[cameraChannel.ChannelId][group].Dequeue();
+                                                   double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average());
+                                                   if (deltaF >= x.DeltaF)
+                                                   {
+                                                       SetDeltaFEvent(x, ts, deltaF);
+                                                       SendCommand(x);
+                                                   }
+                                               }
                                            }
                                        }
                                    }
@@ -578,8 +662,9 @@ namespace InperStudio.Lib.Helper
                     object synSpan = new object();
                     if (CameraChannels.Count > 0)
                     {
-                        Dictionary<int, SignalData> signalQs = null;
+                        ConcurrentDictionary<int, SignalData> signalQs = null;
                         Copy(_SignalQs, ref signalQs);
+
                         _ = Parallel.ForEach(_SignalQs, q =>
                         {
                             foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in q.Value.ValuePairs)
@@ -619,12 +704,12 @@ namespace InperStudio.Lib.Helper
 
                         if (Monitor.TryEnter(_EventQLock))
                         {
-                            Dictionary<int, Queue<KeyValuePair<long, double>>> eventQs = EventChannelChart.EventQs;
+                            ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>> eventQs = EventChannelChart.EventQs;
                             Copy(EventChannelChart.EventQs, ref eventQs);
                             _ = Parallel.ForEach(_SaveEventQs, q =>
                             {
                                 //这里有疑问
-                                eventQs.Add(q.Key, q.Value);
+                                eventQs.TryAdd(q.Key, q.Value);
                                 q.Value.Clear();
                             });
                             Monitor.Exit(_EventQLock);
@@ -787,13 +872,14 @@ namespace InperStudio.Lib.Helper
             {
                 double[] t_sigs = new double[sig_data.Length];
                 TimeSpan[] t_tims = new TimeSpan[sig_data.Length];
+                TimeSpan[] _t_tims = new TimeSpan[sig_data.Length];
                 for (int i = 0; i < sig_data.Length; i++)
                 {
                     t_sigs[i] = sig_data[i].Value;
                     t_tims[i] = TimeSpan.FromTicks(sig_data[i].Key / 100);
                 }
-                t_tims.OrderBy(x => x.Ticks);
-                return new Tuple<TimeSpan[], double[]>(t_tims, t_sigs);
+                _t_tims = t_tims.OrderBy(x => x.Ticks).ToArray();
+                return new Tuple<TimeSpan[], double[]>(_t_tims, t_sigs);
 
             }
             catch (Exception ex)
@@ -802,23 +888,43 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
-        public void AddMarkerByHotkeys(int channelId, string text, Color color)
+        private readonly object marker = new object();
+        public void AddMarkerByHotkeys(int channelId, string text, Color color, int type = -1)//type 0 start 1 end -1 other
         {
-            int count = CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-
-            EventChannelChart.Annotations.Add(new VerticalLineAnnotationViewModel()
+            lock (marker)
             {
-                VerticalAlignment = VerticalAlignment.Stretch,
-                FontSize = 12,
-                ShowLabel = InperGlobalClass.EventPanelProperties.DisplayNameVisible,
-                Stroke = color,
-                LabelValue = text,
-                LabelTextFormatting = "12",
-                LabelPlacement = LabelPlacement.Left,
-                LabelsOrientation = System.Windows.Controls.Orientation.Vertical,
-                StrokeThickness = 1,
-                X1 = (IComparable)CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1]
-            });
+                TimeSpan _time = new TimeSpan(time / 100);
+                if (type == 0)
+                {
+                    _time = new TimeSpan(0);
+                }
+                if (EventChannelChart.Annotations.Count > 0)
+                {
+                    IAnnotationViewModel obj = EventChannelChart.Annotations.LastOrDefault((x) => (x as VerticalLineAnnotationViewModel).LabelValue.Equals(text));
+                    if (obj != null)
+                    {
+                        TimeSpan tick = _time.Subtract((TimeSpan)(obj as VerticalLineAnnotationViewModel).X1);
+                        EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString()));
+                        if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
+                        {
+                            return;
+                        }
+                    }
+                }
+                EventChannelChart.Annotations.Add(new VerticalLineAnnotationViewModel()
+                {
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    FontSize = 12,
+                    ShowLabel = InperGlobalClass.EventPanelProperties.DisplayNameVisible,
+                    Stroke = color,
+                    LabelValue = text,
+                    LabelTextFormatting = "12",
+                    LabelPlacement = LabelPlacement.Left,
+                    LabelsOrientation = System.Windows.Controls.Orientation.Vertical,
+                    StrokeThickness = 1,
+                    X1 = _time
+                });
+            }
 
         }
         public void SendCommand(EventChannelJson channelJson)
@@ -877,15 +983,6 @@ namespace InperStudio.Lib.Helper
                     {
                         (line.DataSeries as XyDataSeries<TimeSpan, double>).Clear();
                     });
-                    //x.TimeSpanAxis = new TimeSpanAxis()
-                    //{
-                    //    DrawMajorBands = false,
-                    //    DrawMajorGridLines = false,
-                    //    DrawMinorGridLines = false,
-                    //    VisibleRange = x.XVisibleRange,
-                    //    Visibility = Visibility.Collapsed
-                    //};
-                    //x.TimeSpanAxis.VisibleRangeChanged += TimeSpanAxis_VisibleRangeChanged;
                 });
                 foreach (KeyValuePair<int, SignalData> item in _SignalQs)
                 {
@@ -901,6 +998,7 @@ namespace InperStudio.Lib.Helper
 
                 updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
                 frameProcTask = Task.Factory.StartNew(() => { FrameProc(); });
+                StartCollectEvent?.Invoke(true);
                 //saveDataTask = Task.Factory.StartNew(() => { SaveDateProc(); });
             }
             catch (Exception ex)
@@ -935,8 +1033,8 @@ namespace InperStudio.Lib.Helper
                  if (x.IsChecked)
                  {
                      isExistLight = true;
-                     DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                     DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                     device.SwitchLight((uint)x.GroupId, true);
+                     device.SetLightPower((uint)x.GroupId, x.LightPower);
                  }
              });
             return isExistLight;
@@ -945,7 +1043,7 @@ namespace InperStudio.Lib.Helper
         {
             LightWaveLength.ToList().ForEach(x =>
             {
-                DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                device.SwitchLight((uint)x.GroupId, false);
             });
         }
     }

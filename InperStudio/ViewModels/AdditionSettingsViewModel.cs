@@ -26,11 +26,11 @@ namespace InperStudio.ViewModels
 
         #region video
 
-        private BehaviorRecorderKit selectCameraItem;
-        private ObservableCollection<BehaviorRecorderKit> unusedKits;
+        private VideoRecordBean selectCameraItem;
+        private ObservableCollection<VideoRecordBean> unusedKits;
         //private ObservableCollection<BehaviorRecorderKit> usedKits;
-        public ObservableCollection<BehaviorRecorderKit> UnusedKits { get => unusedKits; set => SetAndNotify(ref unusedKits, value); }
-        public ObservableCollection<BehaviorRecorderKit> UsedKits { get; set; } = InperGlobalClass.ActiveVideos;
+        public ObservableCollection<VideoRecordBean> UnusedKits { get => unusedKits; set => SetAndNotify(ref unusedKits, value); }
+        public ObservableCollection<VideoRecordBean> UsedKits { get; set; } = InperGlobalClass.ActiveVideos;
         #endregion
 
         #region trigger
@@ -68,7 +68,7 @@ namespace InperStudio.ViewModels
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
                     view.video.Visibility = Visibility.Visible;
-                    UnusedKits = new ObservableCollection<BehaviorRecorderKit>();
+                    UnusedKits = new ObservableCollection<VideoRecordBean>();
 
                     await Task.Factory.StartNew(() =>
                        {
@@ -78,7 +78,7 @@ namespace InperStudio.ViewModels
                            {
                                if (!c.Value.Contains("Basler"))
                                {
-                                   var item = new BehaviorRecorderKit(c.Key, c.Value);
+                                   var item = new VideoRecordBean(c.Key, c.Value);
                                    view.Dispatcher.Invoke(() =>
                                    {
                                        UnusedKits.Add(item);
@@ -89,7 +89,7 @@ namespace InperStudio.ViewModels
                            {
                                UsedKits.ToList().ForEach(x =>
                                {
-                                   BehaviorRecorderKit item = unusedKits.FirstOrDefault(y => y._CamIndex == x._CamIndex);
+                                   VideoRecordBean item = unusedKits.FirstOrDefault(y => y._CamIndex == x._CamIndex);
                                    if (item != null)
                                    {
                                        view.Dispatcher.Invoke(() =>
@@ -127,7 +127,15 @@ namespace InperStudio.ViewModels
             {
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
-                    MainWindowViewModel main = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+
+                    MainWindowViewModel main = null;
+                    foreach (System.Windows.Window window in Application.Current.Windows)
+                    {
+                        if (window.Name.Contains("MainWindow"))
+                        {
+                            main = window.DataContext as MainWindowViewModel;
+                        }
+                    }
                     if (UsedKits.Count != 0)
                     {
                         Parallel.ForEach(UsedKits, item =>
@@ -186,11 +194,11 @@ namespace InperStudio.ViewModels
                 {
                     selectCameraItem.StopPreview();
                 }
-                selectCameraItem = view.CameraCombox.SelectedItem as BehaviorRecorderKit;
+                selectCameraItem = view.CameraCombox.SelectedItem as VideoRecordBean;
 
                 if (selectCameraItem != null)
                 {
-                    selectCameraItem.StartPreview();
+                    selectCameraItem.StartCapture();
                 }
             }
             catch (Exception ex)
@@ -204,8 +212,15 @@ namespace InperStudio.ViewModels
             {
                 if (e.ClickCount >= 2)
                 {
-                    BehaviorRecorderKit item = (sender as Grid).DataContext as BehaviorRecorderKit;
-                    MainWindowViewModel main = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+                    VideoRecordBean item = (sender as Grid).DataContext as VideoRecordBean;
+                    MainWindowViewModel main = null;
+                    foreach (System.Windows.Window window in Application.Current.Windows)
+                    {
+                        if (window.Name.Contains("MainWindow"))
+                        {
+                            main = window.DataContext as MainWindowViewModel;
+                        }
+                    }
                     if (!item.IsActive)
                     {
                         item.IsActive = true;
@@ -228,7 +243,7 @@ namespace InperStudio.ViewModels
             {
                 if (moveType == "leftMove")//右移是激活 左移是取消激活
                 {
-                    if (UsedKits.Count > 0 && view.cameraActiveChannel.SelectedItem is BehaviorRecorderKit camera_active)
+                    if (UsedKits.Count > 0 && view.cameraActiveChannel.SelectedItem is VideoRecordBean camera_active)
                     {
                         _ = UsedKits.Remove(camera_active);
                         UnusedKits.Add(camera_active);
@@ -240,16 +255,17 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    if (UnusedKits.Count > 0 && view.CameraCombox.SelectedItem is BehaviorRecorderKit camera)
+                    if (UnusedKits.Count > 0 && view.CameraCombox.SelectedItem is VideoRecordBean camera)
                     {
                         camera.CustomName = view.CameraName.Text;
                         if (camera.CustomName.EndsWith("-"))
                         {
                             camera.CustomName = camera.CustomName.Substring(0, camera.CustomName.Length - 1);
                         }
+                        camera.AutoRecord = true;
                         _ = UnusedKits.Remove(camera);
                         UsedKits.Add(camera);
-
+                        camera.StopPreview();
                         //view.PopButton.Background = MarkerChannels.First().BgColor;
                         view.CameraCombox.SelectedIndex = 0;
                     }

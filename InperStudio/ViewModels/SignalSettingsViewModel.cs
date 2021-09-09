@@ -95,23 +95,23 @@ namespace InperStudio.ViewModels
                 double next_Interval;
                 if (IsInWorkingPeriod)
                 {
-                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                     {
                         if (x.IsChecked)
                         {
-                            DevPhotometry.Instance.SetLightPower(x.GroupId, 0);
+                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
                         }
                     });
                     next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                 }
                 else
                 {
-                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                     {
                         if (x.IsChecked)
                         {
                             //DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                            DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
                         }
                     });
                     next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
@@ -171,13 +171,13 @@ namespace InperStudio.ViewModels
                     com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                     return;
                 }
-                _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
+                _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(expourse));
                 InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(expourse);
                 if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling > 1000)
                 {
                     InperGlobalClass.CameraSignalSettings.Sampling = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Exposure);
                     this.view.Sampling.Text = sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
-                    _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
+                    InperDeviceHelper.Instance.device.SetFrameRate(double.Parse(sampling));
                 }
             }
             catch (Exception ex)
@@ -202,13 +202,13 @@ namespace InperStudio.ViewModels
                     com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                     return;
                 }
-                _ = DevPhotometry.Instance.SetFrameRate(double.Parse(sampling));
+                InperDeviceHelper.Instance.device.SetFrameRate(double.Parse(sampling));
                 InperGlobalClass.CameraSignalSettings.Sampling = double.Parse(sampling);
                 if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling > 1000)
                 {
                     InperGlobalClass.CameraSignalSettings.Exposure = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Sampling);
                     this.view.Exposure.Text = expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
-                    _ = DevPhotometry.Instance.SetExposure(double.Parse(expourse));
+                    _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(expourse));
                 }
             }
             catch (Exception ex)
@@ -223,15 +223,15 @@ namespace InperStudio.ViewModels
                 view.camera.Visibility = Visibility.Visible;
                 view.channelRoi.IsEnabled = false;
 
-                if (InperDeviceHelper.LightWaveLength.Count > 0)
+                if (InperDeviceHelper.Instance.LightWaveLength.Count > 0)
                 {
-                    if (InperDeviceHelper.LightWaveLength.Count > 1)
+                    if (InperDeviceHelper.Instance.LightWaveLength.Count > 1)
                     {
-                        view.waveView.SelectedItem = InperDeviceHelper.LightWaveLength[1];
+                        view.waveView.SelectedItem = InperDeviceHelper.Instance.LightWaveLength[1];
                     }
                     else
                     {
-                        view.waveView.SelectedItem = InperDeviceHelper.LightWaveLength[0];
+                        view.waveView.SelectedItem = InperDeviceHelper.Instance.LightWaveLength[0];
                     }
 
                     view.lightMode.ItemsSource = InperDeviceHelper.Instance.LightWaveLength;
@@ -242,7 +242,7 @@ namespace InperStudio.ViewModels
 
                     _ = view.ellipseCanvas.Children.Add(grid);
                 });
-                _ = DevPhotometry.Instance.SetGain(InperGlobalClass.CameraSignalSettings.Gain);
+                _ = InperDeviceHelper.Instance.device.SetGain(InperGlobalClass.CameraSignalSettings.Gain);
             }
             catch (Exception ex)
             {
@@ -297,7 +297,7 @@ namespace InperStudio.ViewModels
 
                         CameraChannel item = InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1);
                         _ = InperDeviceHelper.CameraChannels.Remove(item);
-                        _ = InperDeviceHelper._SignalQs.Remove(int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1);
+                        _ = InperDeviceHelper._SignalQs.TryRemove(int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1);
 
                         Lib.Helper.JsonBean.Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
                         if (channel != null)
@@ -368,9 +368,9 @@ namespace InperStudio.ViewModels
                 };
                 item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
 
-                InperDeviceHelper._SignalQs.Add(index - 1, new SignalData());
+                InperDeviceHelper.Instance._SignalQs.TryAdd(index - 1, new SignalData());
 
-                foreach (WaveGroup wave in InperDeviceHelper.LightWaveLength)
+                foreach (WaveGroup wave in InperDeviceHelper.Instance.LightWaveLength)
                 {
                     if (wave.IsChecked)
                     {
@@ -385,11 +385,11 @@ namespace InperStudio.ViewModels
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = wave.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
 
                         item.RenderableSeries.Add(line);
-                        InperDeviceHelper._SignalQs[index - 1].ValuePairs.Add(mode.LightType, new Queue<KeyValuePair<long, double>>());
+                        InperDeviceHelper.Instance._SignalQs[index - 1].ValuePairs.Add(mode.LightType, new Queue<KeyValuePair<long, double>>());
                     }
                 }
 
-                InperDeviceHelper.CameraChannels.Add(item);
+                InperDeviceHelper.Instance.CameraChannels.Add(item);
 
                 Lib.Helper.JsonBean.Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1);
 
@@ -563,8 +563,8 @@ namespace InperStudio.ViewModels
 
                 if (sen.IsChecked)
                 {
-                    DevPhotometry.Instance.SwitchLight(sen.GroupId, true);
-                    DevPhotometry.Instance.SetLightPower(sen.GroupId, sen.LightPower);
+                    InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, true);
+                    InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
 
                     WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId);
                     if (wg == null)
@@ -617,7 +617,7 @@ namespace InperStudio.ViewModels
             try
             {
                 double gain = double.Parse((sender as System.Windows.Controls.TextBox).Text);
-                _ = DevPhotometry.Instance.SetGain(gain);
+                _ = InperDeviceHelper.Instance.device.SetGain(gain);
             }
             catch (Exception ex)
             {
@@ -632,7 +632,7 @@ namespace InperStudio.ViewModels
 
                 if (!sen.IsChecked)
                 {
-                    DevPhotometry.Instance.SwitchLight(sen.GroupId, false);
+                    InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
 
                     WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId);
                     if (wg != null)
@@ -681,24 +681,26 @@ namespace InperStudio.ViewModels
                 var tb = sender as ToggleButton;
                 if ((bool)tb.IsChecked)
                 {
-                    InperDeviceHelper.AllLightClose();
-                    _ = DevPhotometry.Instance.SetExposure(20);
-                    _ = DevPhotometry.Instance.SetFrameRate(50);
+                    InperDeviceHelper.Instance.device.SetMeasureMode(true);
+                    InperDeviceHelper.Instance.AllLightClose();
+                    _ = InperDeviceHelper.Instance.device.SetExposure(20);
+                    InperDeviceHelper.Instance.device.SetFrameRate(50);
                 }
                 else
                 {
-                    _ = DevPhotometry.Instance.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
-                    _ = DevPhotometry.Instance.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
-                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    InperDeviceHelper.Instance.device.SetMeasureMode(false);
+                    _ = InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
+                    InperDeviceHelper.Instance.device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
+                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                     {
-                        DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                        InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                     });
                     InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
                     {
                         if (x.IsChecked)
                         {
-                            DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                            DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                            InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
+                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
                         }
                     });
                 }
@@ -713,18 +715,18 @@ namespace InperStudio.ViewModels
             try
             {
                 WaveGroup sen = (sender as RadioButton).DataContext as WaveGroup;
-                InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                  {
                      if (x.GroupId == sen.GroupId)
                      {
                          //x.IsChecked = true;
-                         DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                         DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
+                         InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
                      }
                      else
                      {
                          //x.IsChecked = false;
-                         DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                      }
                  });
             }
@@ -740,12 +742,12 @@ namespace InperStudio.ViewModels
                 if ((bool)this.view.lightTestMode.IsChecked)
                 {
                     WaveGroup sen = (sender as RadioButton).DataContext as WaveGroup;
-                    InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                     {
                         if (x.GroupId == sen.GroupId && (bool)(sender as RadioButton).IsChecked)
                         {
-                            DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                            DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                            InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
+                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
                         }
                     });
                 }
@@ -762,7 +764,7 @@ namespace InperStudio.ViewModels
                 WaveGroup sen = (sender as InperTextBox).DataContext as WaveGroup;
                 //if (sen.IsChecked)
                 {
-                    DevPhotometry.Instance.SetLightPower(sen.GroupId, sen.LightPower);
+                    InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
                     if (!(bool)this.view.lightTestMode.IsChecked)
                     {
                         InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId).LightPower = sen.LightPower;
@@ -822,7 +824,7 @@ namespace InperStudio.ViewModels
 
             mat.Circle(center: Center, radius: (int)(ellips_diam / 4), color: Scalar.White, thickness: (int)(ellips_diam / 2));
 
-            InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((grid.Children[0] as TextBlock).Text) - 1).Mask = mat;
+            InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((grid.Children[0] as TextBlock).Text) - 1).Mask = mat;
         }
         public void Interval_Checked(object sender, RoutedEventArgs e)
         {
@@ -831,17 +833,17 @@ namespace InperStudio.ViewModels
         public void Continus_Checked(object sender, RoutedEventArgs e)
         {
             _Metronome.Stop();
-            InperDeviceHelper.LightWaveLength.ToList().ForEach(x =>
+            InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
             {
                 if (x.IsChecked)
                 {
-                    DevPhotometry.Instance.SetLightPower(x.GroupId, x.LightPower);
+                    InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
                 }
             });
         }
         public void WaveView_Selected(object sender, RoutedEventArgs e)
         {
-            InperDeviceHelper.SelectedWaveType = ((sender as System.Windows.Controls.ComboBox).SelectedItem as WaveGroup).GroupId;
+            InperDeviceHelper.Instance.SelectedWaveType = ((sender as System.Windows.Controls.ComboBox).SelectedItem as WaveGroup).GroupId;
         }
         public void Screenshots()
         {

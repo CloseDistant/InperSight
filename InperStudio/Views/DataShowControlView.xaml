@@ -139,11 +139,6 @@
                             </Grid>
                             <Grid Grid.Column="2" >
                                 <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxis,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
-                                    <!--<sc:SciChartSurface.XAxis>
-                                        <sc:TimeSpanAxis DrawMajorBands="False"
-                                           DrawMajorGridLines="False"
-                                           DrawMinorGridLines="False" Visibility="Collapsed" VisibleRange="{Binding XVisibleRange,UpdateSourceTrigger=PropertyChanged}"/>
-                                    </sc:SciChartSurface.XAxis>-->
                                     <sc:SciChartSurface.YAxis>
                                         <sc:NumericAxis DrawMajorBands="False"  TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"

@@ -350,10 +350,18 @@ namespace InperStudio.ViewModels
                         {
                             x.Offset = false;
                         });
-                        _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                         {
-                            chn.Offset = false;
-                        });
+                            channel.Offset = false;
+                            if (InperGlobalClass.IsPreview)
+                            {
+                                channel.LightModes.ForEach(x =>
+                                {
+                                    InperDeviceHelper.Instance.OffsetData[channel.ChannelId][x.LightType].Clear();
+                                    x.OffsetValue = 0;
+                                });
+                            }
+                        }
                         CameraSignalSettings.AllChannelConfig.Offset = false;
                     }
                     else
@@ -364,6 +372,14 @@ namespace InperStudio.ViewModels
                             if (chn.ChannelId == item.ChannelId)
                             {
                                 chn.Offset = false;
+                                if (InperGlobalClass.IsPreview)
+                                {
+                                    chn.LightModes.ForEach(x =>
+                                    {
+                                        InperDeviceHelper.Instance.OffsetData[chn.ChannelId][x.LightType].Clear();
+                                        x.OffsetValue = 0;
+                                    });
+                                }
                             }
                         });
                     }

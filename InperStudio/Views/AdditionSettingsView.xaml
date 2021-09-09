@@ -124,7 +124,7 @@
                     <Grid Margin="0 20 0 0" >
                         <TextBlock VerticalAlignment="Top" Text="View"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <Border HorizontalAlignment="Right" Width="160" Margin="20 0"   Height="120">
-                            <Image Stretch="Fill" Source="{Binding ElementName=CameraCombox,Path=SelectedItem.WriteableBitmap}" />
+                            <Image Stretch="Fill" Source="{Binding ElementName=CameraCombox,Path=SelectedItem.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}" />
                         </Border>
                     </Grid>
 

@@ -14,7 +14,7 @@ using System.Windows;
 
 namespace InperStudio
 {
-    public class Bootstrapper : Bootstrapper<MainWindowViewModel>
+    public class Bootstrapper : Bootstrapper<StartPageViewModel>
     {
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {

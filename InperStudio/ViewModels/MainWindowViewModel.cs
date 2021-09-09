@@ -42,7 +42,7 @@ namespace InperStudio.ViewModels
         }
         public MainWindowViewModel()
         {
-            InperDeviceHelper.Instance.DeviceInit();
+            //InperDeviceHelper.Instance.DeviceInit();
             _ = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.DisplayProc(); });
         }
         protected override void OnViewLoaded()
@@ -65,7 +65,7 @@ namespace InperStudio.ViewModels
 
                 InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                 {
-                    DevPhotometry.Instance.SwitchLight(x.GroupId, false);
+                    InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                 });
             }
             catch (Exception ex)

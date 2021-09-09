@@ -7,10 +7,15 @@
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:ctrl="clr-namespace:InperStudio.Views.Control"
+        xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
         Title="{Binding BehaviorRecorderKit.CustomName}" Height="450" Width="600" MinWidth="500" MinHeight="450" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}">
+    <inp:InperDialogWindow.Resources>
+        <conv:VideoIntToTIme x:Key="VideoIntToTIme"/>
+    </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperTitlePageColor}">
         <Image Grid.Row="0" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap}"  />
+        <TextBlock Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
     </Grid>
 </inp:InperDialogWindow>

@@ -32,6 +32,7 @@ namespace InperStudio.ViewModels
         public List<string> TextLableFormatting { get; set; } = new List<string>();
         public static string TextFormat = "hh:mm:ss";
         private double visibleValue = 10;
+
         public double VisibleValue
         {
             get => visibleValue;
@@ -59,6 +60,13 @@ namespace InperStudio.ViewModels
             TextLableFormatting.Add("ms");
             TextLableFormatting.Add("Time of day");
             InperGlobalClass.IsExistEvent = true;
+        }
+        private void Instance_StartCollectEvent(bool obj)
+        {
+            if (obj)
+            {
+                view.sciScroll.SelectedRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
+            }
         }
         protected override void OnViewLoaded()
         {
@@ -89,6 +97,7 @@ namespace InperStudio.ViewModels
                 {
                     this.view.relativeBottom.Height = this.view.fixedBottom.Height = InperGlobalClass.EventPanelProperties.HeightFixedValue;
                 }
+                InperDeviceHelper.Instance.StartCollectEvent += Instance_StartCollectEvent;
             }
             catch (Exception ex)
             {

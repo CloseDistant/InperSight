@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:global="clr-namespace:InperStudio.Lib.Bean"
-             xmlns:local="clr-namespace:InperStudio.Views.Control"
+             xmlns:local="clr-namespace:InperStudio.Views.Control" 
              mc:Ignorable="d" >
     <UserControl.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
@@ -17,7 +17,7 @@
                 <ComboBoxItem>60</ComboBoxItem>
             </ComboBox>
         </WrapPanel>
-        <ToggleButton Effect="{StaticResource EffectShadow5}" Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Name="IsRecord" IsChecked="True" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" />
+        <ToggleButton Effect="{StaticResource EffectShadow5}" Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Name="IsRecord" IsChecked="{Binding BehaviorRecorderKit.AutoRecord,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" />
         <Button Margin="0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="Screen" >
             <Image Source="/Lib/Images/Signal_Camera_Unknown.png" />
         </Button>

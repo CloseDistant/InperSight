@@ -108,6 +108,14 @@
     <Reference Include="HandyControl, Version=3.2.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
       <HintPath>packages\HandyControl.3.2.0\lib\net472\HandyControl.dll</HintPath>
     </Reference>
+    <Reference Include="InperPhotometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperPhotometry\bin\Debug\InperPhotometry.dll</HintPath>
+    </Reference>
+    <Reference Include="InperProtocolStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperPhotometry\bin\Debug\InperProtocolStack.dll</HintPath>
+    </Reference>
     <Reference Include="K4os.Compression.LZ4, Version=1.1.11.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
       <HintPath>packages\K4os.Compression.LZ4.1.1.11\lib\net46\K4os.Compression.LZ4.dll</HintPath>
     </Reference>
@@ -240,6 +248,7 @@
     <Compile Include="Lib\Bean\ScrollingViewportManager.cs" />
     <Compile Include="Lib\Bean\SignalChannel.cs" />
     <Compile Include="Lib\Bean\Tb_Version.cs" />
+    <Compile Include="Lib\Bean\VideoRecordBean.cs" />
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
@@ -251,6 +260,7 @@
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
     <Compile Include="Lib\Convert\RoiAIVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\TestModeConvert.cs" />
+    <Compile Include="Lib\Convert\VideoIntToTIme.cs" />
     <Compile Include="Lib\Convert\VisibilityToVisibilityReConverter.cs" />
     <Compile Include="Lib\Data\Model\AIROI.cs" />
     <Compile Include="Lib\Data\Model\ChannelRecord.cs" />
@@ -266,6 +276,8 @@
     <Compile Include="Lib\Data\SqlDataInit.cs" />
     <Compile Include="Lib\Enum\InperEnums.cs" />
     <Compile Include="Lib\Enum\InperParameters.cs" />
+    <Compile Include="Lib\Helper\HighAccurateTimer.cs" />
+    <Compile Include="Lib\Helper\InperClassExtensionHelper.cs" />
     <Compile Include="Lib\Helper\InperClassHelper.cs" />
     <Compile Include="Lib\Helper\InperColorHelper.cs" />
     <Compile Include="Lib\Helper\InperComputerInfoHelper.cs" />
@@ -506,6 +518,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Lib\Images\InperSignal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Lib\DLL\Stateless.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Accord.3.8.0\build\Accord.targets" Condition="Exists('packages\Accord.3.8.0\build\Accord.targets')" />

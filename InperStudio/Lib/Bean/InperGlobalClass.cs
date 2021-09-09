@@ -32,7 +32,7 @@ namespace InperStudio.Lib.Bean
         private static AdditionRecordConditionsTypeEnum additionRecordConditionsStart = AdditionRecordConditionsTypeEnum.Immediately;
         private static AdditionRecordConditionsTypeEnum additionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Immediately;
 
-        private static ObservableCollection<BehaviorRecorderKit> activeVideos = new ObservableCollection<BehaviorRecorderKit>();
+        private static ObservableCollection<VideoRecordBean> activeVideos = new ObservableCollection<VideoRecordBean>();
         private static BindableCollection<EventChannelJson> manualEvents = new BindableCollection<EventChannelJson>();
         #endregion
 
@@ -136,7 +136,7 @@ namespace InperStudio.Lib.Bean
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AdditionRecordConditionsStop)));
             }
         }
-        public static ObservableCollection<BehaviorRecorderKit> ActiveVideos
+        public static ObservableCollection<VideoRecordBean> ActiveVideos
         {
             get => activeVideos;
             set

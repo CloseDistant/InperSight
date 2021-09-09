@@ -26,12 +26,16 @@
                 <Grid x:Name="normal" Visibility="Visible">
                     <Image Source="/Lib/Images/InperSignal.png" Width="66" Height="66" VerticalAlignment="Top" Margin="0 45 0 0" />
                     <TextBlock FontFamily="Arial" Foreground="#444444" FontSize="36" Text="InperSignal" HorizontalAlignment="Center" Margin="0 135 0 0"  />
+                    <WrapPanel Margin="0 200 0 0"  HorizontalAlignment="Center">
+                        <hc:LoadingCircle Name="loading" Width="20" Height="20" Foreground="{StaticResource InperTheme}" DotDiameter="3"/>
+                        <TextBlock x:Name="remainder" Margin="10 0 0 0" FontFamily="Arial" Foreground="{StaticResource InperTheme}" FontSize="16" Opacity=".6" Text="The device is being initialized..." VerticalAlignment="Center"/>
+                    </WrapPanel>
                     <TextBlock FontFamily="Arial" Foreground="#888888" FontSize="16" HorizontalAlignment="Right" VerticalAlignment="Bottom" Text="{Binding Version}" Margin="0 0 20 15"/>
                 </Grid>
                 <Grid x:Name="retry" Visibility="Collapsed">
                     <TextBlock Text="No Device was Found" FontSize="28" Foreground="#444444" FontFamily="Arial" HorizontalAlignment="Center"  Margin="0 50 0 0"/>
                     <TextBlock Text="Please check the connection" FontSize="14" Foreground="#555555" FontFamily="Arial" HorizontalAlignment="Center"  Margin="0 110 0 0"/>
-                    <Button x:Name="Skip" Background="#E5E1E1" hc:BorderElement.CornerRadius="4" VerticalAlignment="Bottom"  Margin="0 0 0 40" Cursor="Hand" FontFamily="Arial" FontSize="16" Foreground="#333333" Width="150" Height="40">Retry</Button>
+                    <Button x:Name="Skip" Command="{s:Action SearchAgain}" Background="#E5E1E1" hc:BorderElement.CornerRadius="4" VerticalAlignment="Bottom"  Margin="0 0 0 40" Cursor="Hand" FontFamily="Arial" FontSize="16" Foreground="#333333" Width="150" Height="40">Retry</Button>
                 </Grid>
             </Grid>
         </Grid>
