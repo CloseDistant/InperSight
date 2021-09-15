@@ -15,20 +15,20 @@
         NonClientAreaForeground="White"
         Icon="../inper_studio_icon_96.ico"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
-        Title="inper" Height="800" Width="1282" MinWidth="1000" MinHeight="660" x:Name="MainWindow">
+        Title="inper" ShowTitle="False" Height="800" Width="1282" MinWidth="1000" MinHeight="660" x:Name="MainWindow">
     <Grid Background="{StaticResource InperMainPageColor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="80" />
+            <RowDefinition Height="66" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <hc:TransitioningContentControl Grid.Row="0" TransitionMode="Top2Bottom">
             <Grid Margin="0 5 0 0" Background="{StaticResource InperTitlePageColor}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
-                    <ColumnDefinition Width=".15*"/>
+                    <ColumnDefinition Width=".55*"/>
                 </Grid.ColumnDefinitions>
                 <ContentControl Grid.Column="0" x:Name="manulControl" s:View.Model="{Binding ManulControlViewModel}"/>
-                <ToggleButton Grid.Column="1" Style="{StaticResource ToggleButtonSwitch}" Checked="{s:Action ButtonVisibilitySwitch_Checked}" Unchecked="{s:Action ButtonVisibilitySwitch_Unchecked}" Name="buttonVisibilitySwitch" IsChecked="True"/>
+                <ToggleButton Grid.Column="1" Visibility="Collapsed" Style="{StaticResource ToggleButtonSwitch}" Checked="{s:Action ButtonVisibilitySwitch_Checked}" Unchecked="{s:Action ButtonVisibilitySwitch_Unchecked}" Name="buttonVisibilitySwitch" IsChecked="True"/>
             </Grid>
         </hc:TransitioningContentControl>
         <Border VerticalAlignment="Bottom" BorderBrush="#eee" BorderThickness="1"/>

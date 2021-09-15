@@ -678,11 +678,12 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var tb = sender as ToggleButton;
+                ToggleButton tb = sender as ToggleButton;
                 if ((bool)tb.IsChecked)
                 {
                     InperDeviceHelper.Instance.device.SetMeasureMode(true);
-                    InperDeviceHelper.Instance.AllLightClose();
+                    
+                    //InperDeviceHelper.Instance.AllLightClose();
                     _ = InperDeviceHelper.Instance.device.SetExposure(20);
                     InperDeviceHelper.Instance.device.SetFrameRate(50);
                 }
@@ -691,18 +692,18 @@ namespace InperStudio.ViewModels
                     InperDeviceHelper.Instance.device.SetMeasureMode(false);
                     _ = InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
                     InperDeviceHelper.Instance.device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
-                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
-                    {
-                        InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
-                    });
-                    InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
-                    {
-                        if (x.IsChecked)
-                        {
-                            InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
-                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
-                        }
-                    });
+                    //InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
+                    //{
+                    //    InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                    //});
+                    //InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
+                    //{
+                    //    if (x.IsChecked)
+                    //    {
+                    //        InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
+                    //        InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
+                    //    }
+                    //});
                 }
             }
             catch (Exception ex)
@@ -765,7 +766,7 @@ namespace InperStudio.ViewModels
                 //if (sen.IsChecked)
                 {
                     InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
-                    if (!(bool)this.view.lightTestMode.IsChecked)
+                    //if (!(bool)this.view.lightTestMode.IsChecked)
                     {
                         InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId).LightPower = sen.LightPower;
                     }

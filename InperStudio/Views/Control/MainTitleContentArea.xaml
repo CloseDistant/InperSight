@@ -5,6 +5,58 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:InperStudio.Views.Control"
              xmlns:hc="https://handyorg.github.io/handycontrol"
-             mc:Ignorable="d" MaxWidth="150">
-    <TextBlock x:Name="dic_name" Text="{Binding InperGlobalClass.DataFolderName,UpdateSourceTrigger=PropertyChanged}" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+             mc:Ignorable="d">
+    <Grid HorizontalAlignment="Stretch"  >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Menu Margin="0,-3,0,0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center">
+            <MenuItem Header="InperSignal" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" FontSize="13">
+                <MenuItem Header="Import Config" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Name="ImportConfig" Click="ImportConfig_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/import config.png" Width="14" Height="11" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save Config" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Name="SaveConfig" Click="SaveConfig_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/save config.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem BorderThickness="0 0 0 1" BorderBrush="#E6E6E6"  FontFamily="Arial" Header="Save Config As" Name="SaveConfigAs" Click="SaveConfigAs_Click"  Foreground="#333333" FontSize="12" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/save config as.png" Width="14" Height="11" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Feedback" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/feedback.png" Width="14" Height="13" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Web"  Command="hc:ControlCommands.OpenLink" CommandParameter="https://www.inper.com" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/web.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="About Inper Signal" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/about.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <hc:SimplePanel Grid.Column="1"  MouseDown="Border_MouseDown" Name="move1"/>
+        <Button Grid.Column="2" Cursor="Hand" x:Name="DataFolderName" Click="DataFolderName_Click">
+            <Button.Template>
+                <ControlTemplate>
+                    <Grid>
+                        <TextBlock x:Name="dic_name" Foreground="White"  FontSize="13" Text="{Binding InperGlobalClass.DataFolderName,UpdateSourceTrigger=PropertyChanged}" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <hc:SimplePanel Grid.Column="3"  MouseDown="Border_MouseDown" Name="move2"/>
+    </Grid>
 </Border>

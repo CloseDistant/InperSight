@@ -268,6 +268,7 @@ namespace InperStudio.ViewModels
                         camera.StopPreview();
                         //view.PopButton.Background = MarkerChannels.First().BgColor;
                         view.CameraCombox.SelectedIndex = 0;
+                        view.CameraName.Text = "Video-";
                     }
                 }
             }

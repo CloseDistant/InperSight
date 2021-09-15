@@ -523,6 +523,22 @@
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Lib\Images\New\save config.png" />
+    <Resource Include="Lib\Images\New\start.png" />
+    <Resource Include="Lib\Images\New\stop.png" />
+    <Resource Include="Lib\Images\New\about.png" />
+    <Resource Include="Lib\Images\New\Analog.png" />
+    <Resource Include="Lib\Images\New\feedback.png" />
+    <Resource Include="Lib\Images\New\fibers.png" />
+    <Resource Include="Lib\Images\New\import config.png" />
+    <Resource Include="Lib\Images\New\marker.png" />
+    <Resource Include="Lib\Images\New\note.png" />
+    <Resource Include="Lib\Images\New\open data.png" />
+    <Resource Include="Lib\Images\New\output.png" />
+    <Resource Include="Lib\Images\New\preview.png" />
+    <Resource Include="Lib\Images\New\save config as.png" />
+    <Resource Include="Lib\Images\New\video.png" />
+    <Resource Include="Lib\Images\New\web.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Accord.3.8.0\build\Accord.targets" Condition="Exists('packages\Accord.3.8.0\build\Accord.targets')" />

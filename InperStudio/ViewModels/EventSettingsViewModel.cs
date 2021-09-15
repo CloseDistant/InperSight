@@ -63,15 +63,15 @@ namespace InperStudio.ViewModels
                 }
                 //读取所有通道
                 {
-                    foreach (DioChannel item in InpertProductConfig.GetAllNodes())
+                    foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
                         markerChannels.Add(new EventChannel()
                         {
                             IsActive = false,
-                            ChannelId = item.ChannelId,
-                            SymbolName = item.Name,
-                            Name = item.Name,
-                            BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
+                            ChannelId = (int)item.Value,
+                            SymbolName = item.Key.ToString(),
+                            Name = item.Key.ToString(),
+                            BgColor = InperColorHelper.ColorPresetList[(int)item.Value],
                             Type = ChannelTypeEnum.DIO.ToString()
                         });
                     }
@@ -188,12 +188,12 @@ namespace InperStudio.ViewModels
                                 if (item.Type == ChannelTypeEnum.Input.ToString())
                                 {
                                     EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Input.ToString()));
-                                    chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name;chn.BgColor = item.BgColor;
+                                    chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name; chn.BgColor = item.BgColor;
                                 }
                                 else
                                 {
-                                    EventChannel chn= MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
-                                    chn.IsActive = item.IsActive;chn.BgColor = item.BgColor;
+                                    EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
+                                    chn.IsActive = item.IsActive; chn.BgColor = item.BgColor;
                                 }
                             }
                         }
@@ -500,7 +500,11 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    (view.ConditionsCombox.SelectedItem as EventChannel).BgColor = (sender as ListBox).SelectedValue.ToString();
+                    EventChannel chn = view.ConditionsCombox.SelectedItem as EventChannel;
+                    if (chn != null)
+                    {
+                        chn.BgColor = (sender as ListBox).SelectedValue.ToString();
+                    }
                 }
                 view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString((sender as ListBox).SelectedValue.ToString()));
             }

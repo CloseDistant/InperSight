@@ -6,6 +6,6 @@
     <SolidColorBrush x:Key="InperDialogContentColor">#F6F6F6</SolidColorBrush>
     <SolidColorBrush x:Key="InperTitleTextColor" >#333333</SolidColorBrush>
     <SolidColorBrush x:Key="InperDialogButtonColor">#D7D7D7</SolidColorBrush>
-    <SolidColorBrush x:Key="InperListboxEvenColor">#FDFAFF</SolidColorBrush>
-    <SolidColorBrush x:Key="InperListboxOddColor">#FDFDFD</SolidColorBrush>
+    <SolidColorBrush x:Key="InperListboxEvenColor">#FEFEFE</SolidColorBrush>
+    <SolidColorBrush x:Key="InperListboxOddColor">#FBFDFF</SolidColorBrush>
 </ResourceDictionary>

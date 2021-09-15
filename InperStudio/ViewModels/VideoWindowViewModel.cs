@@ -21,7 +21,6 @@ namespace InperStudio.ViewModels
         private VideoWindowView view;
         private VideoRecordBean kit;
         private VideoUserControl bottomControl;
-        private bool isLoop = true;
         public VideoRecordBean BehaviorRecorderKit { get => kit; set => SetAndNotify(ref kit, value); }
         #endregion
         public VideoWindowViewModel(VideoRecordBean behaviorRecorderKit)

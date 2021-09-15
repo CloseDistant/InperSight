@@ -130,8 +130,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-
-        public void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        public void Range_LostFocus(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -145,7 +144,7 @@ namespace InperStudio.ViewModels
                     if (value <= item.YBottom)
                     {
                         textbox.Text = (item.YBottom + 0.01).ToString();
-                        Growl.Error(new GrowlInfo() { Message = "Top值不能小于Bottom值", Token = "SuccessMsg", WaitTime = 1 });
+                        Growl.Warning(new GrowlInfo() { Message = "Top值不能小于Bottom值", Token = "SuccessMsg", WaitTime = 1 });
                     }
                     else
                     {
@@ -179,7 +178,7 @@ namespace InperStudio.ViewModels
                     if (value >= item.YTop)
                     {
                         textbox.Text = (item.YTop - 0.01).ToString();
-                        Growl.Error(new GrowlInfo() { Message = "Bottom值不能大于Top值", Token = "SuccessMsg", WaitTime = 1 });
+                        Growl.Warning(new GrowlInfo() { Message = "Bottom值不能大于Top值", Token = "SuccessMsg", WaitTime = 1 });
                     }
                     else
                     {
@@ -209,6 +208,92 @@ namespace InperStudio.ViewModels
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+
+        }
+        public void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                var item = this.view.rangeChannel.SelectedItem as Channel;
+
+                var textbox = sender as System.Windows.Controls.TextBox;
+                if (!textbox.IsFocused) return;
+                double value = double.Parse(textbox.Text);
+
+                if (textbox.Name.Contains("rangeTop"))
+                {
+                    //if (value <= item.YBottom)
+                    //{
+                    //    textbox.Text = (item.YBottom + 0.01).ToString();
+                    //    Growl.Warning(new GrowlInfo() { Message = "Top值不能小于Bottom值", Token = "SuccessMsg", WaitTime = 1 });
+                    //}
+                    //else
+                    //{
+                    if (item.ChannelId == _ChannleId)
+                    {
+                        CameraSignalSettings.CameraChannels.ForEach(x =>
+                        {
+                            x.YTop = value;
+                        });
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            channel.YVisibleRange.Max = value;
+                        }
+                        CameraSignalSettings.AllChannelConfig.YTop = value;
+                    }
+                    else
+                    {
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).YTop = value;
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            if (channel.ChannelId == item.ChannelId)
+                            {
+                                channel.YVisibleRange.Max = value;
+                            }
+                        }
+                    }
+                    //}
+                }
+                else
+                {
+                    //if (value >= item.YTop)
+                    //{
+                    //    textbox.Text = (item.YTop - 0.01).ToString();
+                    //    Growl.Warning(new GrowlInfo() { Message = "Bottom值不能大于Top值", Token = "SuccessMsg", WaitTime = 1 });
+                    //}
+                    //else
+                    //{
+                    if (item.ChannelId == _ChannleId)
+                    {
+                        CameraSignalSettings.CameraChannels.ForEach(x =>
+                        {
+                            x.YBottom = value;
+                        });
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            channel.YVisibleRange.Min = value;
+                        }
+                        CameraSignalSettings.AllChannelConfig.YBottom = value;
+                    }
+                    else
+                    {
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).YBottom = value;
+
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            if (channel.ChannelId == item.ChannelId)
+                            {
+                                channel.YVisibleRange.Min = value;
+                            }
+                        }
+                    }
+                }
+                //}
             }
             catch (Exception ex)
             {

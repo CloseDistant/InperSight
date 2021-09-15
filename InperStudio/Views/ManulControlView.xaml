@@ -13,7 +13,7 @@
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontFamily" Value="Arial" />
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="#7D7D7D"/>
+            <Setter Property="Foreground" Value="#555555"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0 3"/>
         </Style>
@@ -32,73 +32,37 @@
     </UserControl.Resources>
     <Grid x:Name="Root_Gird">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition  Width="1*" />
-            <ColumnDefinition  Width="2*"  />
             <ColumnDefinition  Width="1*"  />
             <ColumnDefinition  Width="2*"  />
             <ColumnDefinition  Width="1*"  />
             <ColumnDefinition  Width="3*"  />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-            <TextBlock>File</TextBlock>
-            <StackPanel HorizontalAlignment="Center">
-                <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DataPathShow}" CommandParameter="Path" >
-                    <StackPanel>
-                        <Image Source="/Lib/Images/InperFile.png"/>
-                        <TextBlock>Path</TextBlock>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </StackPanel>
-        <StackPanel Grid.Column="1"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-            <TextBlock>Config</TextBlock>
-            <WrapPanel HorizontalAlignment="Center">
-                <StackPanel Margin="10 0">
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DataPathShow}" CommandParameter="Load">
-                        <StackPanel>
-                            <Image Source="/Lib/Images/Config_Load.png"/>
-                            <TextBlock>Load</TextBlock>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel Margin="10 0">
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DataPathShow}" CommandParameter="Save">
-                        <StackPanel>
-                            <Image Source="/Lib/Images/Config_Save.png"/>
-                            <TextBlock>Save</TextBlock>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </WrapPanel>
-        </StackPanel>
-        <StackPanel Grid.Column="2"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-            <TextBlock>Signal</TextBlock>
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" >
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Camera">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Signal_Camera.png"/>
-                            <TextBlock>Camera</TextBlock>
+                            <Image Source="/Lib/Images/New/fibers.png" Width="20" Height="20" Stretch="Uniform" />
+                            <TextBlock>Fibers</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
                 <StackPanel Margin="10 0" Visibility="Collapsed">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Analog">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Signal_analogInput.png"/>
+                            <Image Source="/Lib/Images/New/Analog.png" Width="23" Height="20" Stretch="Uniform" />
                             <TextBlock>Analog</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="3"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-            <TextBlock>Event</TextBlock>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Event_marker.png"/>
+                            <Image Source="/Lib/Images/New/marker.png"  Width="18" Height="20" Stretch="Uniform" />
                             <TextBlock>Marker</TextBlock>
                         </StackPanel>
                     </Button>
@@ -106,41 +70,39 @@
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Output">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Event_output.png"/>
+                            <Image Source="/Lib/Images/New/output.png" Width="16" Height="20" Stretch="Uniform" />
                             <TextBlock>Output</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </WrapPanel>
         </StackPanel>
-        <StackPanel Grid.Column="4"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-            <TextBlock>Addition</TextBlock>
+        <StackPanel Grid.Column="2" VerticalAlignment="Center"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Video">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Addition_Video.png"/>
+                            <Image Source="/Lib/Images/New/video.png"  Width="30" Height="20" Stretch="Uniform" />
                             <TextBlock>Video</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </WrapPanel>
         </StackPanel>
-        <StackPanel Grid.Column="5">
-            <TextBlock>Record</TextBlock>
+        <StackPanel Grid.Column="3" VerticalAlignment="Center">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Addition_trigger.png"/>
-                            <TextBlock>Setting</TextBlock>
+                            <Image Source="/Lib/Images/New/start.png" Width="20" Height="20" Stretch="Uniform" />
+                            <TextBlock>Trigger</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Preview"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Record_preview.png"/>
+                            <Image Source="/Lib/Images/New/preview.png"  Width="24" Height="20" Stretch="Uniform" />
                             <TextBlock>Preview</TextBlock>
                         </StackPanel>
                     </Button>
@@ -148,7 +110,7 @@
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Start"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Record_start.png"/>
+                            <Image Source="/Lib/Images/New/start.png" Width="20" Height="20" Stretch="Uniform" />
                             <TextBlock>Start</TextBlock>
                         </StackPanel>
                     </Button>
@@ -156,7 +118,7 @@
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" x:Name="stop"  Command="{s:Action RecordSettingsShow}" CommandParameter="Stop"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsStop,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
-                            <Image Source="/Lib/Images/Record_stop.png"/>
+                            <Image Source="/Lib/Images/New/stop.png" Width="20" Height="20" Stretch="Uniform" />
                             <TextBlock>Stop</TextBlock>
                         </StackPanel>
                     </Button>

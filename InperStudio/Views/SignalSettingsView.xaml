@@ -53,9 +53,9 @@
                             </WrapPanel>
                             <!--<hc:TextBox TextType="Int" HorizontalAlignment="Right" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Brightness,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" VerticalContentAlignment="Center" hc:InfoElement.Title="Brightness" hc:InfoElement.TitlePlacement="Left" Width="120" hc:BorderElement.CornerRadius="0"  Padding="0" HorizontalContentAlignment="Center" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" BorderBrush="{DynamicResource InperDialogButtonColor}"></hc:TextBox>-->
                         </Grid>
-                        <hc:TextBox Margin="0 15 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
+                        <hc:TextBox Margin="0 15 0 0"  TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName" hc:InfoElement.Title="Name" hc:InfoElement.TitlePlacement="Left" hc:BorderElement.CornerRadius="0" hc:InfoElement.MinContentHeight="30" hc:InfoElement.ContentHeight="30" />
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="10 0 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                    <StackPanel Grid.Column="1" Margin="10 0 0 0">
                         <UniformGrid Margin="0 5" Columns="3">
                             <Button Margin="0" HorizontalAlignment="Left" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
                                 <Image Source="/Lib/Images/Signal_Camera_Unknown.png" />
@@ -122,7 +122,6 @@
                     <ToggleButton Margin="20 0 0 0" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
                 </WrapPanel>
                 <ListBox x:Name="lightMode" Height="120" Style="{x:Null}"  Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Template">
@@ -132,13 +131,13 @@
                                             <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
                                             <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" />
                                             <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="15 0 10 0"/>
-                                            <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" MinHeight="25" InperVerify="True" InperTextType="Int" InperMaxValue="100" InperMinValue="0" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" Margin="20 0 0 0" hc:BorderElement.CornerRadius="0" Padding="0"  Width="50">
-                                                <inper:InperTextBox.IsEnabled>
+                                            <inper:InperTextBox IsEnabled="True" Style="{StaticResource TextBoxBaseStyle}" MinHeight="25" InperVerify="True" InperTextType="Int" InperMaxValue="100" InperMinValue="0" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" Margin="20 0 0 0" hc:BorderElement.CornerRadius="0" Padding="0"  Width="50">
+                                                <!--<inper:InperTextBox.IsEnabled>
                                                     <MultiBinding Converter="{StaticResource TestModeConvert}">
                                                         <Binding Source="{x:Reference Name= lightTestMode}" Path="IsChecked" />
                                                         <Binding  Source="{x:Reference Name= testMode_rb}"  Path="IsChecked" />
                                                     </MultiBinding>
-                                                </inper:InperTextBox.IsEnabled>
+                                                </inper:InperTextBox.IsEnabled>-->
                                             </inper:InperTextBox>
                                         </WrapPanel>
                                     </ControlTemplate>

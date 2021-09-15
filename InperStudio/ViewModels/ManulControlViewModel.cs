@@ -64,132 +64,16 @@ namespace InperStudio.ViewModels
                 switch (type)
                 {
                     case "Path":
-                        windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Path));
+                        //windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Path));
                         break;
                     case "Load":
-                        DefalutFileLoad();
+                        //DefalutFileLoad();
                         //windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Load));
                         break;
                     case "Save":
-                        JsonConfigSaveAs();
+                        //JsonConfigSaveAs();
                         break;
                 }
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-        }
-        private void DefalutFileLoad()
-        {
-            try
-            {
-                OpenFileDialog openFileDialog = new OpenFileDialog
-                {
-                    Filter = "Json|*.inper"
-                };
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    //view.loadPath.Text = openFileDialog.FileName;
-                    InperJsonConfig.filepath = openFileDialog.FileName;
-                    InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
-                    InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
-                    InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
-
-                    InperGlobalClass.ManualEvents.Clear();
-                    foreach (Lib.Helper.JsonBean.EventChannelJson item in InperGlobalClass.EventSettings.Channels)
-                    {
-                        if (item.Type == ChannelTypeEnum.Manual.ToString())
-                        {
-                            InperGlobalClass.ManualEvents.Add(item);
-                        }
-                        if (item.Condition?.Type == ChannelTypeEnum.Manual.ToString())
-                        {
-                            InperGlobalClass.ManualEvents.Add(new Lib.Helper.JsonBean.EventChannelJson()
-                            {
-                                BgColor = item.BgColor,
-                                ChannelId = item.ChannelId,
-                                Hotkeys = item.Condition.Hotkeys,
-                                HotkeysCount = item.Condition.HotkeysCount,
-                                Name = item.Name,
-                                SymbolName = item.SymbolName,
-                                Type = item.Condition.Type,
-                                IsActive = item.IsActive
-                            });
-                        }
-                    }
-
-                    if (InperGlobalClass.EventSettings.Channels.Count > 0)
-                    {
-                        InperGlobalClass.IsExistEvent = true;
-                    }
-
-                    InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
-                    {
-                        var wg = InperDeviceHelper.Instance.LightWaveLength.FirstOrDefault(y => y.GroupId == x.GroupId);
-                        if (wg != null)
-                        {
-                            wg.IsChecked = x.IsChecked;
-                            wg.LightPower = x.LightPower;
-                            if (x.IsChecked)
-                            {
-                                InperDeviceHelper.Instance.device.SwitchLight((uint)wg.GroupId, true);
-                                InperDeviceHelper.Instance.device.SetLightPower((uint)wg.GroupId, wg.LightPower);
-                            }
-                        }
-                    });
-
-                    List<int> cs = new List<int>();
-                    List<int> _cs = new List<int>();
-                    InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
-                    {
-                        cs.Add(x.ChannelId);
-                    });
-                    foreach (Lib.Bean.Channel.CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
-                    {
-                        if (!cs.Contains(item.ChannelId))
-                        {
-                            _cs.Add(item.ChannelId);
-                        }
-                    }
-                    _cs.ForEach(x =>
-                    {
-                        Lib.Bean.Channel.CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
-                        _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                        InperDeviceHelper.Instance._SignalQs.TryRemove(x);
-                    });
-                    foreach (Window window in System.Windows.Application.Current.Windows)
-                    {
-                        if (window.Name.Contains("MainWindow"))
-                        {
-                            (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-        }
-        private void JsonConfigSaveAs()
-        {
-            try
-            {
-                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.Filter = "Json|*.inper";
-                // 设置默认的文件名。注意！文件扩展名须与Filter匹配
-                dlg.FileName = "UserConfig";
-                // 显示对话框
-                System.Windows.Forms.DialogResult r = dlg.ShowDialog();
-
-                if (r == System.Windows.Forms.DialogResult.Cancel)
-                {
-                    return;
-                }
-                string fname = dlg.FileName;
-                File.Copy(InperJsonConfig.filepath, fname, true);
-                InperJsonConfig.filepath = fname;
             }
             catch (Exception ex)
             {
@@ -293,7 +177,7 @@ namespace InperStudio.ViewModels
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-            InperDeviceHelper.Instance.device.SetMeasureMode(false);
+            InperDeviceHelper.Instance.device.Sart();
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
@@ -332,7 +216,7 @@ namespace InperStudio.ViewModels
                 InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-                InperDeviceHelper.Instance.device.SetMeasureMode(false);
+                //InperDeviceHelper.Instance.device.Sart();
 
                 if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
                 {
@@ -433,16 +317,20 @@ namespace InperStudio.ViewModels
 
             InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-            InperDeviceHelper.Instance.AllLightClose();
+            //InperDeviceHelper.Instance.device.Stop();
+            //InperDeviceHelper.Instance.AllLightClose();
 
         }
         private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum, int type = 1)
         {
             await Task.Factory.StartNew(() =>
              {
-                 while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count <= 0)
+                 if (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.Count > 0)
                  {
-                     Task.Delay(100);
+                     while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.FirstOrDefault().DataSeries.XValues.Count <= 0)
+                     {
+                         Task.Delay(100);
+                     }
                  }
                  _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, channel =>
                    {
