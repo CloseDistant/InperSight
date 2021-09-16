@@ -463,6 +463,7 @@ namespace InperStudio.ViewModels
 
                         Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
                         SetMat(mat, moveGrid);
+                        Console.WriteLine(123);
                     }));
                 }
             }
