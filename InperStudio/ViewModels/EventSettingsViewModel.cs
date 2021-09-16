@@ -268,7 +268,7 @@ namespace InperStudio.ViewModels
                     {
                         if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + ch.ChannelId + "-"))
                         {
-                            tb.Text = "DIO-" + ch.ChannelId + "-";
+                            tb.Text = "DIO-" + ch.ChannelId + 1 + "-";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;

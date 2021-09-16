@@ -43,7 +43,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Camera">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/fibers.png" Width="20" Height="20" Stretch="Uniform" />
-                            <TextBlock>Fibers</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Fibers</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -51,7 +51,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Analog">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/Analog.png" Width="23" Height="20" Stretch="Uniform" />
-                            <TextBlock>Analog</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Analog</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -63,7 +63,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/marker.png"  Width="18" Height="20" Stretch="Uniform" />
-                            <TextBlock>Marker</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Marker</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -71,7 +71,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Output">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/output.png" Width="16" Height="20" Stretch="Uniform" />
-                            <TextBlock>Output</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Output</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -83,7 +83,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Video">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/video.png"  Width="30" Height="20" Stretch="Uniform" />
-                            <TextBlock>Video</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Video</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -95,7 +95,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/start.png" Width="20" Height="20" Stretch="Uniform" />
-                            <TextBlock>Trigger</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Trigger</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -103,7 +103,7 @@
                     <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Preview"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/preview.png"  Width="24" Height="20" Stretch="Uniform" />
-                            <TextBlock>Preview</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Preview</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -111,7 +111,7 @@
                     <Button Style="{StaticResource InperFreeButton}"  Command="{s:Action RecordSettingsShow}" CommandParameter="Start"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/start.png" Width="20" Height="20" Stretch="Uniform" />
-                            <TextBlock>Start</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Start</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -119,7 +119,7 @@
                     <Button Style="{StaticResource InperFreeButton}" x:Name="stop"  Command="{s:Action RecordSettingsShow}" CommandParameter="Stop"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsStop,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/stop.png" Width="20" Height="20" Stretch="Uniform" />
-                            <TextBlock>Stop</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Stop</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>

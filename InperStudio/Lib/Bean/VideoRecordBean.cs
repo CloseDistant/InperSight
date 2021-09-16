@@ -173,13 +173,13 @@ namespace InperStudio.Lib.Bean
                     _capturedFrame = _videoCapture.RetrieveMat();
                     if (_videoCapture.IsOpened())
                     {
-                        //Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        //{
-                        //    WriteableBitmap = _capturedFrame.Clone().ToWriteableBitmap();
-                        //}));
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            WriteableBitmap = _capturedFrame.Clone().ToWriteableBitmap();
+                        }));
 
-                        Cv2.ImShow("test", _capturedFrame);
-                        Cv2.WaitKey(1);
+                        //Cv2.ImShow("test", _capturedFrame);
+                        //Cv2.WaitKey(1);
                     }
                 }
                 catch (Exception ex)
@@ -260,9 +260,14 @@ namespace InperStudio.Lib.Bean
         }
         public void StopPreview()
         {
+            if (_videoCapture.IsDisposed)
+            {
+                return;
+            }
+
             if (_videoCapture != null && _videoCapture.IsOpened())
             {
-                Cv2.DestroyWindow("test");
+                //Cv2.DestroyWindow("test");
                 _videoCapture.Release();
                 _videoCapture.Dispose();
                 if (_readThread != null)

@@ -9,17 +9,32 @@
     <UserControl.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
     </UserControl.Resources>
-    <UniformGrid Columns="3" HorizontalAlignment="Stretch">
-        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Framerate" VerticalAlignment="Center"  />
-            <ComboBox Margin="20 0" SelectedIndex="0"   x:Name="FramerateCombox">
-                <ComboBoxItem>30</ComboBoxItem>
-                <ComboBoxItem>60</ComboBoxItem>
-            </ComboBox>
-        </WrapPanel>
-        <ToggleButton Effect="{StaticResource EffectShadow5}" Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Name="IsRecord" IsChecked="{Binding BehaviorRecorderKit.AutoRecord,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" />
-        <Button Margin="0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="Screen" >
-            <Image Source="/Lib/Images/Signal_Camera_Unknown.png" />
+    <Grid HorizontalAlignment="Stretch">
+        <!--<ToggleButton Effect="{StaticResource EffectShadow5}" Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Name="IsRecord" IsChecked="{Binding BehaviorRecorderKit.AutoRecord,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" />-->
+
+        <Button Margin="0 0 120 0" Style="{StaticResource InperFreeButton}" Width="70" Height="20" x:Name="record" HorizontalAlignment="Right" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <Border Background="#DBE2EB" CornerRadius="2">
+                <Grid>
+                    <TextBlock Text="RECORD" FontFamily="{StaticResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                    <Ellipse Fill="#0B8800" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                </Grid>
+            </Border>
         </Button>
-    </UniformGrid>
+        <Button Margin="0 0 120 0" Style="{StaticResource InperFreeButton}" Width="70" Height="20" Visibility="Collapsed" x:Name="no_record" HorizontalAlignment="Right" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <Border Background="#DBE2EB" CornerRadius="2">
+                <Grid>
+                    <TextBlock Text="RECORD" FontFamily="{StaticResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="#999999" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                    <Ellipse Fill="#999999" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                </Grid>
+            </Border>
+        </Button>
+        <Button Margin="0 0 20 0" Style="{StaticResource InperFreeButton}" Width="70" Height="20" x:Name="Screen" HorizontalAlignment="Right" >
+            <Border Background="#DBE2EB" CornerRadius="2">
+                <Grid>
+                    <TextBlock Text="PHOTO" FontFamily="{StaticResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                    <Ellipse Fill="#E0A22A" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                </Grid>
+            </Border>
+        </Button>
+    </Grid>
 </UserControl>

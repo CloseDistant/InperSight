@@ -28,15 +28,15 @@
                     <ControlTemplate TargetType="inper:InperDialogWindow" >
                         <hc:TransitioningContentControl Background="Transparent" TransitionMode="Bottom2TopWithFade">
                             <hc:SimplePanel>
-                                <Border Name="BorderRootEffect" BorderThickness="1" BorderBrush="{StaticResource InperTitlePageColor}" Padding="2" Background="{StaticResource InperTitlePageColor}" CornerRadius="{DynamicResource InperDialogWindowCornerRadius}"  Style="{StaticResource BorderRegion}"  Margin="10" >
+                                <Border Name="BorderRootEffect" BorderThickness="1" BorderBrush="{StaticResource InperTitlePageColor}" Padding="2" Background="{StaticResource InperTitlePageColor}" CornerRadius="{DynamicResource InperDefaultCornerRadius}"  Style="{StaticResource BorderRegion}"  Margin="10" >
                                     <Border.Effect>
-                                        <DropShadowEffect BlurRadius="15" ShadowDepth="3" Direction="270" Color="Black" Opacity=".2" RenderingBias="Performance" />
+                                        <DropShadowEffect BlurRadius="15" ShadowDepth="3" Direction="270" Color="Black" Opacity=".4" RenderingBias="Performance" />
                                     </Border.Effect>
                                     <Grid >
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="32"/>
                                             <RowDefinition Height="*"/>
-                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="32"/>
                                         </Grid.RowDefinitions>
                                         <Grid Grid.Row="0"  Background="{StaticResource InperTitlePageColor}">
                                             <Grid.ColumnDefinitions>
@@ -44,7 +44,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{TemplateBinding Title}" Visibility="{TemplateBinding IsShowTitle,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{DynamicResource InperNormalFontSize}" VerticalAlignment="Center" Margin="3 0" Foreground="{DynamicResource InperTitleTextColor}"/>
+                                            <TextBlock Text="{TemplateBinding Title}" Visibility="{TemplateBinding IsShowTitle,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{DynamicResource InperNormalFontSize}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center" Margin="5 0" Foreground="{DynamicResource InperTitleTextColor}"/>
                                             <hc:SimplePanel Grid.Column="1" Name="MovePanel" Background="{DynamicResource InperTitlePageColor}"/>
                                             <StackPanel Visibility="{TemplateBinding IsShowTopAllButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="0 0 5 0"  Name="SystemButtonPanel" WindowChrome.IsHitTestVisibleInChrome="True" UseLayoutRounding="True" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Right" Orientation="Horizontal">
                                                 <Button Cursor="Hand" Visibility="{TemplateBinding IsShowMiniButton,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{TemplateBinding FontSize}" Background="{DynamicResource InperTitlePageColor}" Foreground="{DynamicResource InperTitleTextColor}" Command="SystemCommands.MinimizeWindowCommand" IsTabStop="False" Name="ButtonMin" Height="29"  Style="{StaticResource ButtonIcon}" Width="45" hc:IconElement.Geometry="{StaticResource WindowMinGeometry}" BorderThickness="1,0,1,0" hc:IconElement.Width="10" hc:IconElement.Height="10" />
@@ -65,9 +65,9 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel  Visibility="{TemplateBinding IsShowBottomAllButton,Converter={StaticResource boolToVisibilityPositive}}" x:Name="CustomButtonPanel" Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 10 0" UseLayoutRounding="True">
-                                                <Button Cursor="Hand" Visibility="{TemplateBinding IsShowCancleButton,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{TemplateBinding FontSize}" Margin="5 10" MinWidth="60" Background="{DynamicResource InperDialogButtonColor}" Effect="{StaticResource EffectShadow1}" Command="{x:Static Member=cmd:CustomCommands.CancleCommand}">Cancel</Button>
-                                                <Button Cursor="Hand"  Visibility="{TemplateBinding IsShowOtherButton,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{TemplateBinding FontSize}" Margin="5 10" MinWidth="60" Background="{DynamicResource InperDialogButtonColor}" Command="{x:Static Member=cmd:CustomCommands.OtherCommand}" Effect="{StaticResource EffectShadow1}" Content="{TemplateBinding OtherButtonText}" />
-                                                <Button Cursor="Hand" Visibility="{TemplateBinding IsShowOkButton,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{TemplateBinding FontSize}" Margin="5 10" MinWidth="60" Background="{DynamicResource InperDialogButtonColor}" Effect="{StaticResource EffectShadow1}" Command="{x:Static Member=cmd:CustomCommands.ConfirmCommand}">OK</Button>
+                                                <Button  Style="{DynamicResource InperBottomButtonStyle}"  Visibility="{TemplateBinding IsShowCancleButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"  Command="{x:Static Member=cmd:CustomCommands.CancleCommand}" ContentStringFormat="Cancel"/>
+                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" Visibility="{TemplateBinding IsShowOtherButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"   Command="{x:Static Member=cmd:CustomCommands.OtherCommand}" ContentStringFormat="{TemplateBinding OtherButtonText}" />
+                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" ContentStringFormat="OK" Visibility="{TemplateBinding IsShowOkButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"  Command="{x:Static Member=cmd:CustomCommands.ConfirmCommand}" />
                                             </StackPanel>
                                             <ContentPresenter Margin="0 5" WindowChrome.IsHitTestVisibleInChrome="True" Grid.Column="0" x:Name="ContentPresenterMain" Content="{TemplateBinding InperCustomDialogBottm}"/>
                                         </Grid>

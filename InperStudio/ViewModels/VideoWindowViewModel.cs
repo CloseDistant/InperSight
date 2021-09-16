@@ -35,20 +35,6 @@ namespace InperStudio.ViewModels
                 view = View as VideoWindowView;
                 view.InperCustomDialogBottm = bottomControl = new VideoUserControl();
 
-                //view.Dispatcher.Invoke(() =>
-                //{
-                //    BehaviorRecorderKit.StartCapture();
-                //    //BehaviorRecorderKit.StartRecord(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss")));
-                //});
-
-
-                bottomControl.FramerateCombox.SelectionChanged += (s, e) =>
-                {
-                    double frame = double.Parse((bottomControl.FramerateCombox.SelectedValue as ComboBoxItem).Content.ToString());
-                    //BehaviorRecorderKit.Device.Fps = frame;
-                    //_ = BehaviorRecorderKit.Device.Set(OpenCvSharp.VideoCaptureProperties.Fps, frame);
-                };
-
                 bottomControl.Screen.Click += (s, e) =>
                 {
                     System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
@@ -56,29 +42,25 @@ namespace InperStudio.ViewModels
                     bit.Save(path);
                     Growl.Info(new GrowlInfo() { Message = "保存成功", Token = "SuccessMsg", WaitTime = 1 });
                 };
-                //_ = Task.Factory.StartNew(() =>
-                //  {
-                //      while (isLoop)
-                //      {
-                //          if (InperGlobalClass.IsRecord)
-                //          {
-                //              view.Dispatcher.Invoke(() =>
-                //              {
-                //                  if ((bool)bottomControl.IsRecord.IsChecked)
-                //                  {
-                //                      BehaviorRecorderKit.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + BehaviorRecorderKit._CamIndex));
-                //                  }
-                //              });
-                //              isLoop = false;
-                //          }
-                //      }
-                //  });
+                bottomControl.record.Click += (s, e) =>
+                {
+                    BehaviorRecorderKit.AutoRecord = true;
+                    bottomControl.no_record.Visibility = System.Windows.Visibility.Visible;
+                    bottomControl.record.Visibility = System.Windows.Visibility.Collapsed;
+                };
+                bottomControl.no_record.Click += (s, e) =>
+                {
+                    BehaviorRecorderKit.AutoRecord = false;
+                    bottomControl.no_record.Visibility = System.Windows.Visibility.Collapsed;
+                    bottomControl.record.Visibility = System.Windows.Visibility.Visible;
+                };
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
         }
+
         protected override void OnClose()
         {
             BehaviorRecorderKit.StopPreview();

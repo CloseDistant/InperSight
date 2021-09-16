@@ -16,7 +16,7 @@
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <SolidColorBrush Color="#8400FF" x:Key="InperTheme"/>
+            <SolidColorBrush Color="#6523A5" x:Key="InperTheme"/>
             <FontFamily x:Key="InperFontFamily">Arial</FontFamily>
         </ResourceDictionary>
     </Application.Resources>

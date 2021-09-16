@@ -33,17 +33,17 @@
         </hc:TransitioningContentControl>
         <Border VerticalAlignment="Bottom" BorderBrush="#eee" BorderThickness="1"/>
         <Grid Grid.Row="1" Name="main">
-            <Grid.ColumnDefinitions>
+            <!--<Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width=".2*" />
-            </Grid.ColumnDefinitions>
+            </Grid.ColumnDefinitions>-->
             <hc:TransitioningContentControl TransitionMode="Left2Right">
                 <ContentControl s:View.Model="{Binding ActiveItem}"/>
             </hc:TransitioningContentControl>
-            <hc:TransitioningContentControl Grid.Column="1" TransitionMode="Right2Left">
+            <!--<hc:TransitioningContentControl Grid.Column="1" TransitionMode="Right2Left">
                 <local:LeftToolsControlView x:Name="RightToolsView" DataContext="{Binding LeftToolsControlViewModel}" />
             </hc:TransitioningContentControl>
-            <GridSplitter Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="1" Opacity=".2"  />
+            <GridSplitter Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="1" Opacity=".2"  />-->
         </Grid>
         <ResizeGrip Width="10" Height="10" x:Name="ResizeGrip" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="1" IsTabStop="False" Visibility="Visible" WindowChrome.ResizeGripDirection="BottomRight" />
         <ScrollViewer Grid.RowSpan="2" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right" Panel.ZIndex="9999">

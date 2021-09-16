@@ -177,7 +177,7 @@ namespace InperStudio.ViewModels
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-            InperDeviceHelper.Instance.device.Sart();
+            InperDeviceHelper.Instance.device.Start();
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
@@ -196,7 +196,7 @@ namespace InperStudio.ViewModels
             }
             InperDeviceHelper.Instance.StartCollect();
 
-            StartAndStopShowMarker(ChannelTypeEnum.Start);
+            StartAndStopShowMarker(ChannelTypeEnum.Start,0);
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
@@ -216,7 +216,7 @@ namespace InperStudio.ViewModels
                 InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-                //InperDeviceHelper.Instance.device.Sart();
+                InperDeviceHelper.Instance.device.Start();
 
                 if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
                 {
@@ -317,7 +317,7 @@ namespace InperStudio.ViewModels
 
             InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-            //InperDeviceHelper.Instance.device.Stop();
+            InperDeviceHelper.Instance.device.Stop();
             //InperDeviceHelper.Instance.AllLightClose();
 
         }

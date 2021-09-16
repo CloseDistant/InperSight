@@ -10,7 +10,7 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib" OtherButtonText="Open all"
         mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="True"
-        Title="Video Settings" SizeToContent="Height" MinHeight="450" Width="650" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        Title="Video Settings" SizeToContent="Height" MinHeight="440" Height="440" Width="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <Grid  Background="{DynamicResource InperDialogContentColor}">
         <Grid x:Name="trigger" Visibility="Collapsed"  Margin="20 10" >
             <Grid.RowDefinitions>
@@ -102,48 +102,47 @@
         </Grid>
 
         <Grid x:Name="video" Visibility="Collapsed">
-            <Grid x:Name="Marker" Margin="30 0" VerticalAlignment="Center">
+            <Grid x:Name="Marker" Margin="20 0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.5*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" >
-                    <Grid Margin="0 20 0 0" >
-                        <TextBlock Text="Video Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
-                        <hc:Divider Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
+                    <Grid Margin="0 0 0 0" >
+                        <TextBlock Text="Video Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
+                        <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
                     </Grid>
                     <Grid Margin="0 20 0 0" >
-                        <TextBlock VerticalAlignment="Center" Text="Video"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                        <ComboBox Margin="20 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding UnusedKits,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="160" x:Name="CameraCombox" SelectionChanged="{s:Action CameraCombox_SelectionChanged}"/>
+                        <TextBlock VerticalAlignment="Center" Text="Video"  FontSize="{DynamicResource InperNormalFontSize}"/>
+                        <ComboBox Margin="20 0" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding UnusedKits,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="170" x:Name="CameraCombox" SelectionChanged="{s:Action CameraCombox_SelectionChanged}"/>
                     </Grid>
                     <Grid Margin="0 20 0 0" >
-                        <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                        <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}"  x:Name="CameraName" TextChanged="{s:Action CameraName_TextChanged}" Text="Video-" HorizontalAlignment="Right"  Width="160" />
+                        <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource  InperNormalFontSize}"/>
+                        <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}" FontSize="{StaticResource InperNormalFontSize}" x:Name="CameraName" TextChanged="{s:Action CameraName_TextChanged}" Text="Video-" HorizontalAlignment="Right"  Width="170" />
                     </Grid>
                     <Grid Margin="0 20 0 0" >
-                        <TextBlock VerticalAlignment="Top" Text="View"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                        <Border HorizontalAlignment="Right" Width="160" Margin="20 0"   Height="120">
+                        <Border HorizontalAlignment="Left" Width="240" Margin="0"   Height="150">
                             <Image Stretch="Fill" Source="{Binding ElementName=CameraCombox,Path=SelectedItem.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}" />
                         </Border>
                     </Grid>
 
                 </StackPanel>
-                <Grid Grid.Column="1" Margin="20 0">
-                    <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action CameraMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="40" Margin="0 0 0 70" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
-                    <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action CameraMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="40"  Margin="0 30 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
+                <Grid Grid.Column="1" Margin="0">
+                    <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action CameraMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="36" Height="24" Margin="0 0 0 130" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
+                    <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action CameraMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="36" Height="24"   Margin="0 -30 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
                 </Grid>
                 <StackPanel Grid.Column="2" Margin="20 0 0 0">
-                    <Grid Margin="0 20 0 0">
-                        <TextBlock Text="Active Videos" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
+                    <Grid Margin="0 0 0 0">
+                        <TextBlock Text="Active Videos" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
                         <hc:Divider Width="80" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 0 0" />
                     </Grid>
-                    <ListBox Margin="0 20" Height="230"   ScrollViewer.VerticalScrollBarVisibility="Auto" x:Name="cameraActiveChannel" ItemsSource="{Binding UsedKits}">
+                    <ListBox Margin="0 20" Height="190" ScrollViewer.VerticalScrollBarVisibility="Auto" x:Name="cameraActiveChannel" ItemsSource="{Binding UsedKits}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="3 5" MouseLeftButtonDown="{s:Action ActiveVideo_MouseLeftButtonDown}">
+                                <Grid Margin="-10 0"  MouseLeftButtonDown="{s:Action ActiveVideo_MouseLeftButtonDown}">
                                     <!--<Label Height="20"  Margin="2 5" Grid.Column="0" Background="{Binding BgColor}" Cursor="Hand"/>-->
-                                    <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperLargeFontSize}" TextWrapping="NoWrap" Text="{Binding CustomName}" />
+                                    <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding CustomName}" />
                                     <Border Width="{Binding ElementName= cameraActiveChannel,Path= ActualWidth}" Margin="0 0 0 -5" BorderBrush="{Binding ElementName= cameraActiveChannel,Path=BorderBrush}" BorderThickness="0 0 0 1"/>
                                 </Grid>
                             </DataTemplate>
