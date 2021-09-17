@@ -26,7 +26,52 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- Define style for the SciChartScrollbar -->
+        <Style TargetType="sc:SciChartScrollbar">
+            <Setter Property="GripsThickness" Value="10"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <!-- Define style for resizing grips -->
+            <Setter Property="GripsStyle">
+                <Setter.Value>
+                    <Style TargetType="Control">
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Control">
+                                    <Border BorderThickness="1" CornerRadius="3" BorderBrush="{StaticResource InperTheme}" Opacity=".5" Background="#F1F1F1" Height="20">
+                                        <!--<Line Stroke="Black" X1="0" Y1="0" X2="0" Y2="1" Stretch="Fill" StrokeThickness="2"/>-->
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <!-- Define style for viewport area -->
+            <Setter Property="ViewportStyle">
+                <Setter.Value>
+                    <Style TargetType="Control">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Control">
+                                    <Border BorderThickness="0" BorderBrush="Black" Background="LightSlateGray" Opacity=".6"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <!-- Define style for non selected area -->
+            <Setter Property="NonSelectedAreaStyle">
+                <Setter.Value>
+                    <Style TargetType="Path">
+                        <Setter Property="Fill" Value="Transparent"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <convert:BoolToDoubleHeightConvert x:Key="BoolToDoubleHeightConvert"/>
+        <convert:ChannelNameSplitConverter x:Key="ChannelNameSplitConverter" />
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <chart:CustomTimeSpanLableProvider x:Key="TimeSpanProvider" />
         <DataTemplate x:Key="ListDataTemplate">
@@ -38,7 +83,7 @@
                 </Grid.ColumnDefinitions>
                 <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
                 <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
-                    <TextBlock MaxHeight="30" x:Name="test"  TextTrimming="CharacterEllipsis" Margin="2 5" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="100"  >
+                    <TextBlock MaxHeight="30" x:Name="test"  TextTrimming="CharacterEllipsis" Margin="2 5" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource ChannelNameSplitConverter}}"  HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="100"  >
                         <TextBlock.LayoutTransform>
                             <RotateTransform Angle="90"/>
                         </TextBlock.LayoutTransform>
@@ -63,11 +108,6 @@
                 </Grid>
                 <Grid Grid.Column="2">
                     <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes"  XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
-                        <!--<sc:SciChartSurface.XAxis>
-                            <sc:TimeSpanAxis DrawMajorBands="False"
-                                           DrawMajorGridLines="False"
-                                           DrawMinorGridLines="False" Visibility="Collapsed" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        </sc:SciChartSurface.XAxis>-->
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"
@@ -188,11 +228,6 @@
                 </Grid>
                 <Grid Grid.Column="2">
                     <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" x:Name="scichartbottom" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxisFixed,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
-                        <!--<sc:SciChartSurface.XAxis>
-                            <sc:TimeSpanAxis DrawMajorBands="False"
-                                           DrawMajorGridLines="False"
-                                           DrawMinorGridLines="False" Visibility="Collapsed" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        </sc:SciChartSurface.XAxis>-->
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis DrawMajorBands="False"   TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"
@@ -224,11 +259,6 @@
                     <Border Width="1"  HorizontalAlignment="Right" Margin="0 0 -29 0" Background="Gray"/>
                 </Grid>
                 <sc:SciChartSurface Name="timesAxisSci" Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1"  DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
-                    <!--<sc:SciChartSurface.XAxis>
-                        <sc:TimeSpanAxis DrawMajorBands="False"
-                                           DrawMajorGridLines="False"
-                                           DrawMinorGridLines="False" x:Name="tiemsAxis" Visibility="Visible" LabelProvider="{StaticResource TimeSpanProvider}" VisibleRange="{Binding XVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                    </sc:SciChartSurface.XAxis>-->
                     <sc:SciChartSurface.YAxis>
                         <sc:NumericAxis DrawMajorBands="False"
                                     DrawMajorGridLines="False"
@@ -260,7 +290,7 @@
                     </WrapPanel>
                     <Border Width="1" Padding="0 18"  HorizontalAlignment="Right" Background="Gray"/>
                 </Grid>
-                <sc:SciChartScrollbar Name="sciScroll" Grid.Column="1" Height="25" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path=IsPreview}" />
+                <sc:SciChartScrollbar Name="sciScroll" Grid.Column="1" Height="20" Background="#33000000" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsAllowDragScroll,UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </Grid>
     </Grid>

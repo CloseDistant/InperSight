@@ -188,12 +188,18 @@ namespace InperStudio.ViewModels
                                 if (item.Type == ChannelTypeEnum.Input.ToString())
                                 {
                                     EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Input.ToString()));
-                                    chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name; chn.BgColor = item.BgColor;
+                                    if (chn != null)
+                                    {
+                                        chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name; chn.BgColor = item.BgColor;
+                                    }
                                 }
                                 else
                                 {
                                     EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
-                                    chn.IsActive = item.IsActive; chn.BgColor = item.BgColor;
+                                    if (chn != null)
+                                    {
+                                        chn.IsActive = item.IsActive; chn.BgColor = item.BgColor;
+                                    }
                                 }
                             }
                         }

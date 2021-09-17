@@ -51,12 +51,12 @@
                                                 <Button Cursor="Hand" Visibility="{TemplateBinding IsShowMaxButton,Converter={StaticResource boolToVisibilityPositive}}" FontSize="{TemplateBinding FontSize}"  Background="{DynamicResource InperTitlePageColor}" Foreground="{DynamicResource InperTitleTextColor}" Command="SystemCommands.MaximizeWindowCommand" IsTabStop="False" Name="ButtonMax" Height="29" Style="{StaticResource ButtonIcon}" Width="46" hc:IconElement.Geometry="{StaticResource WindowMaxGeometry}" BorderThickness="1,0,1,0" hc:IconElement.Width="10" hc:IconElement.Height="10" />
                                                 <Button Cursor="Hand" FontSize="{TemplateBinding FontSize}"  Background="{DynamicResource InperTitlePageColor}" Foreground="{DynamicResource InperTitleTextColor}" Command="SystemCommands.CloseWindowCommand" IsTabStop="False" Name="ButtonClose" Height="29" Style="{StaticResource ButtonIcon}" Width="46" hc:IconElement.Geometry="{StaticResource CloseGeometry}" BorderThickness="1,0,0,0" hc:IconElement.Width="10" hc:IconElement.Height="10" />
                                             </StackPanel>
-                                            <Border VerticalAlignment="Bottom" BorderBrush="Black" Grid.ColumnSpan="3" Opacity=".1" BorderThickness="0 0 0 1"/>
+                                            <Border VerticalAlignment="Bottom" BorderBrush="Black" Grid.ColumnSpan="3" Opacity=".1" BorderThickness="0 0 0 1" Margin="-4 0"/>
                                         </Grid>
                                         <AdornerDecorator Grid.Row="1">
                                             <Grid  Background="{DynamicResource InperMainPageColor}">
                                                 <ContentPresenter/>
-                                                <Border VerticalAlignment="Bottom" BorderBrush="Black" Opacity=".1" BorderThickness="0 0 0 1"/>
+                                                <Border VerticalAlignment="Bottom" BorderBrush="Black" Opacity=".1" BorderThickness="0 0 0 1" Margin="-4 0"/>
                                             </Grid>
                                         </AdornerDecorator>
                                         <Grid Grid.Row="2" Background="{StaticResource InperTitlePageColor}">

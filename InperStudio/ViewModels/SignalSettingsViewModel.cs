@@ -42,7 +42,7 @@ namespace InperStudio.ViewModels
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
         private bool isDown = false;
-        private int diameter = 75;
+        private int diameter = 65;
         private Grid moveGrid = null;
         public Grid MoveGrid { get => moveGrid; set => SetAndNotify(ref moveGrid, value); }
         public int Diameter { get => diameter; set => SetAndNotify(ref diameter, value); }
@@ -683,7 +683,7 @@ namespace InperStudio.ViewModels
                 if ((bool)tb.IsChecked)
                 {
                     InperDeviceHelper.Instance.device.SetMeasureMode(true);
-                    
+
                     //InperDeviceHelper.Instance.AllLightClose();
                     _ = InperDeviceHelper.Instance.device.SetExposure(20);
                     InperDeviceHelper.Instance.device.SetFrameRate(50);
@@ -767,7 +767,7 @@ namespace InperStudio.ViewModels
                 //if (sen.IsChecked)
                 {
                     InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
-                    //if (!(bool)this.view.lightTestMode.IsChecked)
+                    if (InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId) != null)
                     {
                         InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId).LightPower = sen.LightPower;
                     }
@@ -778,42 +778,6 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        //public void FPS_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        var item = (sender as System.Windows.Controls.ComboBox).SelectedItem;
-        //        if (item != null)
-        //        {
-        //            double fps = double.Parse((sender as System.Windows.Controls.ComboBox).SelectedItem.ToString());
-        //            InperGlobalClass.CameraSignalSettings.Sampling = fps;
-
-        //            _ = DevPhotometry.Instance.SetFrameRate(fps);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        App.Log.Error(ex.ToString());
-        //    }
-        //}
-        //public void Exposure_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        var item = (sender as System.Windows.Controls.ComboBox).SelectedItem;
-        //        if (item != null)
-        //        {
-        //            double exposure = double.Parse(item.ToString());
-        //            InperGlobalClass.CameraSignalSettings.Exposure = exposure;
-
-        //            _ = DevPhotometry.Instance.SetExposure(exposure);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        App.Log.Error(ex.ToString());
-        //    }
-        //}
         private void SetMat(Mat mat, Grid grid)
         {
             double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth;
@@ -864,19 +828,13 @@ namespace InperStudio.ViewModels
                 var ct = PresentationSource.FromVisual(view.image)?.CompositionTarget;
                 var matrix = ct == null ? Matrix.Identity : ct.TransformToDevice;
 
-                double x = matrix.M11;
-                double y = matrix.M22;
+                double x = matrix.M11 == 0 ? 1 : matrix.M11;
+                double y = matrix.M22 == 0 ? 1 : matrix.M22;
 
-                int left = (int)ptLeftUp.X + (int)point.X;
-                int top = (int)ptLeftUp.Y + (int)point.Y;
+                int left = (int)ptLeftUp.X + (int)(point.X * x);
+                int top = (int)ptLeftUp.Y + (int)(point.Y * y);
 
-                if (SystemParameters.PrimaryScreenWidth* matrix.M11 >= 3840)
-                {
-                    left += 20;
-                    top += 40;
-                }
-
-                InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)Math.Ceiling(view.image.ActualWidth * x), (int)Math.Ceiling(view.image.ActualHeight * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
+                InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
                 Growl.Info(new GrowlInfo() { Message = "成功获取快照", Token = "SuccessMsg", WaitTime = 1 });
             }
             catch (Exception ex)

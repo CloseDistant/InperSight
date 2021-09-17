@@ -252,6 +252,7 @@
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
+    <Compile Include="Lib\Convert\ChannelNameSplitConverter.cs" />
     <Compile Include="Lib\Convert\ChannelTypeToVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\EventOutputConverter.cs" />
     <Compile Include="Lib\Convert\EventTypeConverter.cs" />

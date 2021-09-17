@@ -11,6 +11,8 @@
         BorderBrush="{DynamicResource InperTheme}"
         CloseButtonHoverBackground="{DynamicResource DarkMaskBrush}"
         CloseButtonHoverForeground="{StaticResource PrimaryTextBrush}"
+        OtherButtonForeground="White"
+        CloseButtonForeground="White"
         NonClientAreaBackground="{DynamicResource InperTheme}"
         NonClientAreaForeground="White"
         Icon="../inper_studio_icon_96.ico"

@@ -275,5 +275,6 @@ namespace InperStudio.Lib.Helper
 
             image.Save(path, System.Drawing.Imaging.ImageFormat.Bmp);
         }
+        
     }
 }

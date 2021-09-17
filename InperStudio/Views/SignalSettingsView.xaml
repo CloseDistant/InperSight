@@ -24,7 +24,7 @@
             </Style.Setters>
         </Style>
     </inp:InperDialogWindow.Resources>
-    <Grid Background="{DynamicResource InperDialogContentColor}">
+    <Grid Background="{DynamicResource InperDialogContentColor}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
         <Grid x:Name="camera" Visibility="Visible" IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

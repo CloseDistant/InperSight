@@ -7,6 +7,7 @@
         xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
         xmlns:local="clr-namespace:InperStudio.Views"
@@ -18,6 +19,7 @@
         <convert:EventTypeConverter x:Key="EventTypeConverter" />
         <convert:EventOutputConverter x:Key="EventOutputConverter" />
         <convert:RoiAIVisibilityConverter x:Key="RoiAIVisibilityConverter" />
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
         <Style BasedOn="{StaticResource ComboBoxBaseStyle}" x:Key="InperComboBoxStyle" TargetType="ComboBox">
             <Style.Setters>
                 <Setter Property="ItemContainerStyle">
@@ -55,7 +57,7 @@
             </Style.Setters>
         </Style>
     </inp:InperDialogWindow.Resources>
-    <Grid Background="{DynamicResource InperDialogContentColor}">
+    <Grid Background="{DynamicResource InperDialogContentColor}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
         <Grid x:Name="Marker" Margin="20 0" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.8*"/>

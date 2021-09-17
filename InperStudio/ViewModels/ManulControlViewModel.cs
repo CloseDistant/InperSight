@@ -196,13 +196,14 @@ namespace InperStudio.ViewModels
             }
             InperDeviceHelper.Instance.StartCollect();
 
-            StartAndStopShowMarker(ChannelTypeEnum.Start,0);
+            StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsStop = false;
 
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
+            InperGlobalClass.IsAllowDragScroll = true;
         }
         private async void StartRecord()
         {
@@ -267,7 +268,7 @@ namespace InperStudio.ViewModels
 
                 StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
                 ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
-
+                InperGlobalClass.IsAllowDragScroll = true;
             }
             catch (Exception ex)
             {

@@ -22,6 +22,7 @@ namespace InperStudio.Lib.Bean
         private static bool isPreview = false;
         private static bool isStop = true;
         private static bool isExistEvent = false;
+        private static bool isAllowDragScroll = false;
         private static string dataPath = string.Empty;
         private static string dataFolderName = string.Empty;
 
@@ -37,6 +38,15 @@ namespace InperStudio.Lib.Bean
         #endregion
 
         #region properties
+        public static bool IsAllowDragScroll
+        {
+            get => isAllowDragScroll;
+            set
+            {
+                isAllowDragScroll = true;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(IsAllowDragScroll)));
+            }
+        }
         public static bool IsExistEvent
         {
             get => isExistEvent;

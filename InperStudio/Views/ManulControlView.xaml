@@ -37,7 +37,7 @@
             <ColumnDefinition  Width="1*"  />
             <ColumnDefinition  Width="3*"  />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" >
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Camera">
@@ -57,7 +57,7 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1" VerticalAlignment="Center"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker">
@@ -77,7 +77,7 @@
                 </StackPanel>
             </WrapPanel>
         </StackPanel>
-        <StackPanel Grid.Column="2" VerticalAlignment="Center"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+        <StackPanel Grid.Column="2" VerticalAlignment="Center">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Video">
@@ -92,7 +92,7 @@
         <StackPanel Grid.Column="3" VerticalAlignment="Center">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="10 0">
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger">
                         <StackPanel>
                             <Image Source="/Lib/Images/New/start.png" Width="20" Height="20" Stretch="Uniform" />
                             <TextBlock Margin="0 5 0 0">Trigger</TextBlock>

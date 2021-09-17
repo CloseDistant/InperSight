@@ -78,7 +78,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="Transparent">
+                        <Border Background="Transparent" Name="bd">
                             <!--<Border.Effect>
                                 <DropShadowEffect Color="#aaa" Direction="230" Opacity=".3" x:Name="effect" BlurRadius="4" ShadowDepth="5"/>
                             </Border.Effect>-->

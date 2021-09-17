@@ -81,7 +81,11 @@ namespace InperStudio.ViewModels
                                    var item = new VideoRecordBean(c.Key, c.Value);
                                    view.Dispatcher.Invoke(() =>
                                    {
-                                       UnusedKits.Add(item);
+                                       VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == c.Key || x.Name == c.Value);
+                                       if (it == null)
+                                       {
+                                           UnusedKits.Add(item);
+                                       }
                                    });
                                }
                            }
@@ -265,7 +269,7 @@ namespace InperStudio.ViewModels
                         camera.AutoRecord = true;
                         _ = UnusedKits.Remove(camera);
                         UsedKits.Add(camera);
-                        camera.StopPreview();
+                        //camera.StopPreview();
                         //view.PopButton.Background = MarkerChannels.First().BgColor;
                         view.CameraCombox.SelectedIndex = 0;
                         view.CameraName.Text = "Video-";
