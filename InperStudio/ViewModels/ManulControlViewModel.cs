@@ -139,6 +139,16 @@ namespace InperStudio.ViewModels
                     case "Video":
                         _ = windowManager.ShowDialog(new AdditionSettingsViewModel(AdditionSettingsTypeEnum.Video));
                         break;
+                    case "Note":
+                        if (InperClassHelper.GetWindowByNameChar("Note") == null)
+                        {
+                            windowManager.ShowWindow(new NoteSettingViewModel());
+                        }
+                        else
+                        {
+                            InperClassHelper.GetWindowByNameChar("Note").Activate();
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -247,6 +257,11 @@ namespace InperStudio.ViewModels
 
                 //数据库优先初始化
                 App.SqlDataInit = new Lib.Data.SqlDataInit();
+
+                if (NoteSettingViewModel.NotesCache.Count > 0)
+                {
+                    App.SqlDataInit.sqlSugar.Insertable<List<Note>>(NoteSettingViewModel.NotesCache).ExecuteCommand();
+                }
 
                 InperDeviceHelper.Instance.StartCollect();
 

@@ -66,19 +66,19 @@
                 </Grid>
                 <Grid Margin="0 10">
                     <CheckBox VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsLowPass}">
-                        <TextBlock Margin="10 0 0 0" Text="Low Pass (HZ)"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <TextBlock Margin="10 0 0 0" Text="Low Pass (Hz)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
                     <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsLowPass}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.LowPass}"/>
                 </Grid>
                 <Grid Margin="0 10">
                     <CheckBox VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay, Path=SelectedItem.Filters.IsHighPass}">
-                        <TextBlock Margin="10 0 0 0" Text="High Pass (HZ)"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <TextBlock Margin="10 0 0 0" Text="High Pass (Hz)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
                     <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsHighPass}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.HighPass}"/>
                 </Grid>
                 <Grid Margin="0 10">
                     <CheckBox  HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsNotch}">
-                        <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="Notch (HZ)"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="Notch (Hz)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
                     <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsNotch}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.Notch}"/>
                 </Grid>

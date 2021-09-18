@@ -149,7 +149,9 @@ namespace InperStudio.ViewModels
                                 item.IsActive = true;
                                 view.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    main.windowManager.ShowWindow(new VideoWindowViewModel(item));
+                                    var window = new VideoWindowViewModel(item);
+                                    main.windowManager.ShowWindow(window);
+                                    window.ActivateWith(main);
                                 }));
                             }
                         });
@@ -228,7 +230,9 @@ namespace InperStudio.ViewModels
                     if (!item.IsActive)
                     {
                         item.IsActive = true;
-                        main.windowManager.ShowWindow(new VideoWindowViewModel(item));
+                        var window = new VideoWindowViewModel(item);
+                        main.windowManager.ShowWindow(window);
+                        window.ActivateWith(main);
                     }
                     else
                     {

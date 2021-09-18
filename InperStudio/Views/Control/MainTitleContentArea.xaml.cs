@@ -60,6 +60,10 @@ namespace InperStudio.Views.Control
                 };
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") != null)
+                    {
+                        InperClassHelper.GetWindowByNameChar("Camera Signal Settings").Close();
+                    }
                     //view.loadPath.Text = openFileDialog.FileName;
                     InperJsonConfig.filepath = openFileDialog.FileName;
                     InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
@@ -128,6 +132,7 @@ namespace InperStudio.Views.Control
                         _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
                         _ = InperDeviceHelper.Instance._SignalQs.TryRemove(x);
                     });
+                  
                     foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
                     {
                         if (window.Name.Contains("MainWindow"))

@@ -65,21 +65,32 @@ namespace InperStudioControlLib.Control.TextBox
 
         private void InperTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            InperTextBox tbox = sender as InperTextBox;
-            double res = double.Parse(tbox.Text);
-            if (res < InperMinValue)
+            try
             {
-                this.Foreground = Brushes.Red;
-                Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
-                this.Text = InperMinValue.ToString();
-                return;
+                InperTextBox tbox = sender as InperTextBox;
+                if (string.IsNullOrEmpty(tbox.Text))
+                {
+                    return;
+                }
+                double res = double.Parse(tbox.Text);
+                if (res < InperMinValue)
+                {
+                    this.Foreground = Brushes.Red;
+                    Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                    this.Text = InperMinValue.ToString();
+                    return;
+                }
+                if (res > InperMaxValue && InperMaxValue > InperMinValue)
+                {
+                    this.Foreground = Brushes.Red;
+                    Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                    this.Text = InperMaxValue.ToString();
+                    return;
+                }
+
             }
-            if (res > InperMaxValue && InperMaxValue > InperMinValue)
+            finally
             {
-                this.Foreground = Brushes.Red;
-                Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
-                this.Text = InperMaxValue.ToString();
-                return;
             }
         }
 
@@ -89,7 +100,7 @@ namespace InperStudioControlLib.Control.TextBox
             InperTextBox tbox = sender as InperTextBox;
             if (InperVerify)
             {
-                if (this.InperTextType == InperTextType.Double || this.InperTextType==InperTextType.Int)
+                if (this.InperTextType == InperTextType.Double || this.InperTextType == InperTextType.Int)
                 {
                     if (!string.IsNullOrEmpty(tbox.Text))
                     {

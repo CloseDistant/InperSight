@@ -24,8 +24,8 @@
             </Style.Setters>
         </Style>
     </inp:InperDialogWindow.Resources>
-    <Grid Background="{DynamicResource InperDialogContentColor}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-        <Grid x:Name="camera" Visibility="Visible" IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
+    <Grid Background="{DynamicResource InperDialogContentColor}">
+        <Grid x:Name="camera" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="220"/>
@@ -37,10 +37,10 @@
                 </Grid.RowDefinitions>
                 <Border Width="1" HorizontalAlignment="Right" Background="{DynamicResource InperDialogButtonColor}" Grid.RowSpan="2" Opacity=".6" />
                 <Grid Grid.Row="0" Margin="15 15 15 10" Background="Transparent">
-                    <Canvas Panel.ZIndex="999999" x:Name="ellipseCanvas" Margin="1 0" Width="343" Height="257"  MouseMove="{s:Action Grid_MouseMove}" VerticalAlignment="Top"></Canvas>
-                    <Image Stretch="Uniform" Name="image" MaxWidth="720" MaxHeight="540" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+                    <Canvas IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="999999" x:Name="ellipseCanvas" Margin="1 0" Width="343" Height="257"  MouseMove="{s:Action Grid_MouseMove}" VerticalAlignment="Top"></Canvas>
+                    <Image IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Stretch="Uniform" Name="image" MaxWidth="720" MaxHeight="540" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                     <Grid Background="#D6D6D6" VerticalAlignment="Bottom" Margin="0 0 0 8" Height="28" HorizontalAlignment="Stretch">
-                        <Grid VerticalAlignment="Center">
+                        <Grid VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                             <WrapPanel>
                                 <TextBlock Text="View" VerticalAlignment="Center" Margin="10 0 8 0" FontSize="{StaticResource InperSmallFontSize}"/>
                                 <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="0" Padding="5 0" Margin="3 0 0 0" Width="75" Height="20" FontSize="{DynamicResource InperSmallFontSize}" />
@@ -56,7 +56,7 @@
                         </Button>
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="1" Margin="15 0">
+                <Grid Grid.Row="1" Margin="15 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                     <WrapPanel VerticalAlignment="Center" Margin="0 0 0 10">
                         <TextBlock Text="Name" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
                         <hc:TextBox Margin="10 0 0 0" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center"  TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="0" Width="140"  Height="20"  />
@@ -73,7 +73,7 @@
                     </WrapPanel>
                 </Grid>
             </Grid>
-            <StackPanel Grid.Column="1" Margin="20 11 0 0">
+            <StackPanel Grid.Column="1" Margin="20 11 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                 <WrapPanel>
                     <TextBlock Text="Camera Settings" Width="96" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
                     <hc:Divider Width="80" LineStroke="{DynamicResource InperTheme}" Margin="5 0 0 0" VerticalAlignment="Center" Opacity=".4"/>
@@ -88,7 +88,7 @@
                 </WrapPanel>
                 <WrapPanel Margin="0 10"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Gain" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>
-                    <inper:InperTextBox InperVerify="True" InperTextType="Int" InperMaxValue="24" InperMinValue="0"  Style="{StaticResource TextBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action Gain_TextChanged}"  Padding="3 0 0 0"  hc:BorderElement.CornerRadius="0"  MinHeight="20" MinWidth="66"  Margin="20 0 0 0" />
+                    <inper:InperTextBox InperVerify="True" InperTextType="Int" InperMaxValue="24" InperMinValue="0" Style="{StaticResource TextBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action Gain_TextChanged}"  Padding="4 0 0 0"  hc:BorderElement.CornerRadius="0"  MinHeight="20" MinWidth="66"  Margin="20 0 0 0" />
                 </WrapPanel>
                 <WrapPanel Margin="0 10 0 0">
                     <TextBlock Text="Record Mode" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />

@@ -298,6 +298,7 @@
     <Compile Include="ViewModels\LeftToolsControlViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ManulControlViewModel.cs" />
+    <Compile Include="ViewModels\NoteSettingViewModel.cs" />
     <Compile Include="ViewModels\SignalPropertiesViewModel.cs" />
     <Compile Include="ViewModels\SignalSettingsViewModel.cs" />
     <Compile Include="ViewModels\StartPageViewModel.cs" />
@@ -340,6 +341,9 @@
     </Compile>
     <Compile Include="Views\ManulControlView.xaml.cs">
       <DependentUpon>ManulControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NoteSettingView.xaml.cs">
+      <DependentUpon>NoteSettingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SignalPropertiesView.xaml.cs">
       <DependentUpon>SignalPropertiesView.xaml</DependentUpon>
@@ -437,6 +441,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ManulControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NoteSettingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

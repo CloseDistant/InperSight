@@ -272,9 +272,9 @@ namespace InperStudio.ViewModels
                         : this.view.ConditionsCombox.SelectedItem as EventChannel;
                     if (ch.Name.StartsWith("DIO") || ch.Type == ChannelTypeEnum.DIO.ToString())
                     {
-                        if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + ch.ChannelId + "-"))
+                        if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + (ch.ChannelId + 1) + "-"))
                         {
-                            tb.Text = "DIO-" + ch.ChannelId + 1 + "-";
+                            tb.Text = "DIO-" + (ch.ChannelId + 1) + "-";
                             tb.SelectionStart = tb.Text.Length;
                             Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
@@ -378,7 +378,12 @@ namespace InperStudio.ViewModels
                 else
                 {
                     EventChannel cha = view.MarkerChannelCombox.SelectedItem as EventChannel;
-                    MarkerChannels.FirstOrDefault(x => x.ChannelId == cha.ChannelId).Condition.Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
+
+                    EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == cha.ChannelId);
+                    if (chn != null)
+                    {
+                        chn.Condition.Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
+                    }
                 }
             }
             catch (Exception ex)
@@ -394,7 +399,14 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                object cb = (sender as System.Windows.Controls.ComboBox).SelectedItem;
+                var comb = sender as System.Windows.Controls.ComboBox;
+
+                if (comb.Visibility == Visibility.Collapsed || comb.Visibility == Visibility.Hidden)
+                {
+                    return;
+                }
+
+                object cb = comb.SelectedItem;
                 if (cb != null)
                 {
                     EventChannel item = cb as EventChannel;
@@ -422,7 +434,7 @@ namespace InperStudio.ViewModels
                         view.MarkerName.Text += view.ConditionChannelCombox.Text;
                         if ((view.ConditionChannelCombox.SelectedItem as EventChannel)?.Type == ChannelTypeEnum.Manual.ToString())
                         {
-                            view.outputHotkeys.Content = (view.ConditionChannelCombox.SelectedItem as EventChannel).Hotkeys = "F" + item.ChannelId;
+                            view.outputHotkeys.Content = (view.ConditionChannelCombox.SelectedItem as EventChannel).Hotkeys = "F" + (item.ChannelId + 1);
                         }
                         EventChannel con = view.ConditionChannelCombox.SelectedItem as EventChannel ?? null;
                         if (con != null)
@@ -471,7 +483,7 @@ namespace InperStudio.ViewModels
                     view.MarkerName.Text = view.ConditionsCombox.Text + "-" + item.Name;
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
-                        view.outputHotkeys.Content = item.Hotkeys = "F" + channel.ChannelId;
+                        view.outputHotkeys.Content = item.Hotkeys = "F" + (channel.ChannelId + 1);
                     }
                     if (channel != null)
                     {
@@ -650,6 +662,11 @@ namespace InperStudio.ViewModels
                             //output 热键重复排除
                             if (channle.Condition != null && channle.Condition.Type == ChannelTypeEnum.Manual.ToString())
                             {
+                                if (string.IsNullOrEmpty(channle.Condition.Hotkeys))
+                                {
+                                    mc.IsActive = false;
+                                    return;
+                                }
                                 InperGlobalClass.EventSettings.Channels.ForEach(x =>
                                 {
                                     if (x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
@@ -675,6 +692,11 @@ namespace InperStudio.ViewModels
                                 EventChannelJson manual = null;
                                 if (@enum == EventSettingsTypeEnum.Marker)
                                 {
+                                    if (string.IsNullOrEmpty(channle.Hotkeys))
+                                    {
+                                        mc.IsActive = false;
+                                        return;
+                                    }
                                     manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Hotkeys);
                                 }
                                 else
@@ -728,6 +750,7 @@ namespace InperStudio.ViewModels
                                 {
                                     chn.Name = chn.Name.Substring(0, chn.Name.Length - 1);
                                 }
+                             
                                 manualChannels.Add(chn);
                                 MarkerChannels.Add(chn);
                             }

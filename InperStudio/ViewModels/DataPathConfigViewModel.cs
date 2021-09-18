@@ -43,9 +43,9 @@ namespace InperStudio.ViewModels
                     view.Save.Visibility = System.Windows.Visibility.Visible;
                     break;
             }
-            if (string.IsNullOrEmpty(view.pathText.Text))
+            if (string.IsNullOrEmpty(view.pathText.Content.ToString()))
             {
-                view.pathText.Text = Environment.CurrentDirectory + @"\Data\";
+                view.pathText.Content = Environment.CurrentDirectory + @"\Data\";
             }
             if (string.IsNullOrEmpty(view.fileName.Text))
             {
@@ -63,7 +63,7 @@ namespace InperStudio.ViewModels
                     openFileDialog.SelectedPath = InperGlobalClass.DataPath;
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        view.pathText.Text = openFileDialog.SelectedPath + @"\";
+                        view.pathText.Content = openFileDialog.SelectedPath + @"\";
                     }
                 }
                 if (type == DataConfigPathTypeEnum.Load.ToString())

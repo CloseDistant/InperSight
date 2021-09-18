@@ -95,7 +95,7 @@
                                 <EventTrigger.Actions>
                                     <BeginStoryboard>
                                         <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="effect" Duration="0:0:0.2" Storyboard.TargetProperty="(DropShadowEffect.Opacity)" From=".3" To=".7" />
+                                            <DoubleAnimation Storyboard.TargetName="bd" Duration="0:0:0.2" Storyboard.TargetProperty="(DropShadowEffect.Opacity)" From=".3" To=".7" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger.Actions>
