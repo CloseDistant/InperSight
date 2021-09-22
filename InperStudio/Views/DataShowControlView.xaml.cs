@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean.Channel;
+using SciChart.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -20,7 +20,7 @@
                     <Border
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="Transparent"
-                                BorderThickness="1">
+                                BorderThickness="1" Height="{Binding Height}">
                         <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                     </Border>
                 </ControlTemplate>

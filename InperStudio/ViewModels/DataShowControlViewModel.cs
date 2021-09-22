@@ -128,6 +128,18 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+        public void NumericAxis_VisibleRangeChanged(object sender, SciChart.Charting.Visuals.Events.VisibleRangeChangedEventArgs e)
+        {
+            try
+            {
+                SciChart.Charting.Visuals.Axes.NumericAxis axis = sender as SciChart.Charting.Visuals.Axes.NumericAxis;
+                axis.VisibleRange = new DoubleRange(-1, 2);
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         public void SciScrollSet()
         {
             try

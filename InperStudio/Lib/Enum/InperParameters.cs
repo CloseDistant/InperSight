@@ -10,7 +10,7 @@ namespace InperStudio.Lib.Enum
     {
         public static List<string> Exposures { get; set; } = new List<string>()
         {
-            "0",
+           "0",
            "5",
            "10",
            "15",

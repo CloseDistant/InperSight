@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace InperStudio.ViewModels
         public CameraSignalSettings CameraSignalSettings { get; set; } = InperGlobalClass.CameraSignalSettings;
         private BindableCollection<Channel> channels = new BindableCollection<Channel>();
         public BindableCollection<Channel> Channels { get => channels; set => SetAndNotify(ref channels, value); }
+        public Channel ActiveChannel { get; set; }
         #endregion
         public SignalPropertiesViewModel(SignalPropertiesTypeEnum @enum, int ChannelId)
         {
@@ -58,6 +60,7 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
+            base.OnViewLoaded();
         }
         private void CameraInit()
         {
@@ -84,7 +87,8 @@ namespace InperStudio.ViewModels
                 CameraSignalSettings.AllChannelConfig.Name = "All";
                 Channels.Add(CameraSignalSettings.AllChannelConfig);
             }
-            view.rangeChannel.SelectedItem = view.offsetChannel.SelectedItem = view.filtersChannel.SelectedItem = channels.FirstOrDefault(x => x.ChannelId == currentId) ?? channels.First();
+            ActiveChannel = Channels.FirstOrDefault(x => x.ChannelId == currentId);
+            //view.heightChannel.SelectedItem = view.rangeChannel.SelectedItem = view.offsetChannel.SelectedItem = view.filtersChannel.SelectedItem = chn;
             view.cancle.IsEnabled = (bool)(channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset);
             view.offset.IsEnabled = (bool)!channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset;
             view.offsetChannel.SelectionChanged += (s, e) =>
@@ -93,6 +97,124 @@ namespace InperStudio.ViewModels
                 view.offset.IsEnabled = !channel.Offset;
                 view.cancle.IsEnabled = channel.Offset;
             };
+        }
+        public void HeightAuto_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var rb = sender as RadioButton;
+                Channel item = view.heightChannel.SelectedItem as Channel;
+                if (rb.Name.Equals("heightAuto"))
+                {
+                    if (item.ChannelId == _ChannleId)
+                    {
+                        CameraSignalSettings.CameraChannels.ForEach(x =>
+                        {
+                            x.Height = double.NaN;
+                        });
+                        _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                        {
+                            chn.Height = double.NaN;
+                        });
+                        CameraSignalSettings.AllChannelConfig.Height = double.NaN;
+                    }
+                    else
+                    {
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Height = double.NaN;
+                        InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+                        {
+                            if (chn.ChannelId == item.ChannelId)
+                            {
+                                chn.Height = double.NaN;
+                            }
+                        });
+                    }
+                }
+                if (rb.Name.Equals("heightFixed"))
+                {
+                    if (item.Height.ToString() == "NaN" || item.Height == 0)
+                    {
+                        foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+                        {
+                            if (window.Name.Contains("MainWindow"))
+                            {
+                                if (item.ChannelId == _ChannleId)
+                                {
+                                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                                    {
+                                        x.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                    });
+                                    InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+                                     {
+                                         chn.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                     });
+                                    CameraSignalSettings.AllChannelConfig.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                }
+                                else
+                                {
+                                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Height = double.NaN;
+                                    InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+                                    {
+                                        if (chn.ChannelId == item.ChannelId)
+                                        {
+                                            chn.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                        }
+                                    });
+                                }
+
+                                this.view.fixedValue.Text = ((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1)).ToString("0.00");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void FixedValue_InperTextChanged(object arg1, TextChangedEventArgs arg2)
+        {
+            try
+            {
+                var tb = arg1 as InperStudioControlLib.Control.TextBox.InperTextBox;
+                if (tb.IsFocused)
+                {
+                    Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
+                    if (rx.IsMatch(tb.Text))
+                    {
+                        Channel item = view.heightChannel.SelectedItem as Channel;
+                        double value = double.Parse(tb.Text);
+                        if (item.ChannelId == _ChannleId)
+                        {
+                            CameraSignalSettings.CameraChannels.ForEach(x =>
+                            {
+                                x.Height = value;
+                            });
+                            InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+                            {
+                                chn.Height = value;
+                            });
+                            CameraSignalSettings.AllChannelConfig.Height = value;
+                        }
+                        else
+                        {
+                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Height = value;
+                            InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+                            {
+                                if (chn.ChannelId == item.ChannelId)
+                                {
+                                    chn.Height = value;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
         }
         public void WindowSize_TextChanged(object sender, TextChangedEventArgs e)
         {

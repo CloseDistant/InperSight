@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Bean.Channel
@@ -27,6 +28,8 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public Mat Mask { get; set; }
         public double ROI { get; set; }
+        private double height= double.NaN;
+        public double Height { get => height; set => SetAndNotify(ref height, value); }
         public int OffsetWindowSize { get; set; } = 300;
         public bool Offset { get; set; }
         public Filters Filters { get; set; } = new Filters();

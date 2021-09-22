@@ -20,7 +20,7 @@
                 <Setter.Value>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBlock Width="30" TextAlignment="Right" Text="{Binding Text}"/>
+                            <TextBlock Width="50" TextAlignment="Right" Text="{Binding Text}"/>
                         </StackPanel>
                     </DataTemplate>
                 </Setter.Value>
@@ -75,7 +75,7 @@
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <chart:CustomTimeSpanLableProvider x:Key="TimeSpanProvider" />
         <DataTemplate x:Key="ListDataTemplate">
-            <Grid  MouseDown="{s:Action Grid_MouseDown}" x:Name="chartItem" Background="Transparent" Margin="0 -1">
+            <Grid  MouseDown="{s:Action Grid_MouseDown}" x:Name="chartItem" Background="Transparent" Margin="0 -1" Height="{Binding Height,UpdateSourceTrigger=PropertyChanged}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="40"/>
@@ -94,7 +94,7 @@
                 </Border>
                 <Grid Grid.Column="1">
                     <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 20">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Button Command="{s:Action YaxisAdd}" CommandParameter="{Binding DataContext,RelativeSource={RelativeSource Mode=Self}}" Margin="0 10 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
                             <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
                         </Button>
@@ -111,7 +111,7 @@
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"
-                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.00" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Always"   VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -133,14 +133,14 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" Name="dataScroll">
+            <ScrollViewer Name="dataScroll">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <!-- dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"-->
-                    <ListBox x:Name="dataList" Margin="-3 0 0 -3" ItemsSource="{Binding ChartDatas}"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="True" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
+                    <ListBox x:Name="dataList" Margin="-3 0 0 -3" ItemsSource="{Binding ChartDatas}" hc:ScrollViewerAttach.AutoHide="False"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="False" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
                      ItemTemplate="{StaticResource ListDataTemplate}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -182,7 +182,7 @@
                                     <sc:SciChartSurface.YAxis>
                                         <sc:NumericAxis DrawMajorBands="False"  TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"
-                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" MaxAutoTicks="6" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="-1,2"/>
+                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" MaxAutoTicks="6" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRangeChanged="{s:Action NumericAxis_VisibleRangeChanged}" VisibleRange="-1,2"/>
                                     </sc:SciChartSurface.YAxis>
                                     <sc:SciChartSurface.ChartModifier>
                                         <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -197,7 +197,7 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <Grid Grid.Row="1"  Visibility="{Binding Source={StaticResource InperGlobalClass},Path=IsExistEvent,Converter={StaticResource boolToVisibilityPositive}}">
+        <Grid Grid.Row="1" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=IsExistEvent,Converter={StaticResource boolToVisibilityPositive}}">
             <Grid x:Name="fixedBottom" MouseDown="{s:Action Grid_MouseDown}"  Background="Transparent"  Visibility="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.DisplayLockedBottom,Converter={StaticResource boolToVisibilityPositive},UpdateSourceTrigger=PropertyChanged}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
@@ -231,7 +231,7 @@
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis DrawMajorBands="False"   TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"
-                                    DrawMinorGridLines="False" MaxAutoTicks="6" BorderThickness="0 0 1 0" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="-1,2"/>
+                                    DrawMinorGridLines="False" MaxAutoTicks="6" BorderThickness="0 0 1 0" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRangeChanged="{s:Action NumericAxis_VisibleRangeChanged}" VisibleRange="-1,2"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -250,11 +250,11 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="93"/>
+                    <ColumnDefinition Width="113"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border BorderThickness="0 0 0 1" BorderBrush="Gray" Grid.ColumnSpan="3" />
-                <ComboBox Height="24" Width="95" SelectionChanged="{s:Action TextFormat_SelectionChanged}" Margin="12 0 0 0" ItemsSource="{Binding TextLableFormatting}" MinHeight="24" Padding="3 0" Grid.ColumnSpan="2" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <Border BorderThickness="0 0 0 1" Margin="141 0 0 0" BorderBrush="Gray" Grid.ColumnSpan="3" />
+                <ComboBox Height="24" Width="95" SelectionChanged="{s:Action TextFormat_SelectionChanged}" Margin="25 0 0 0" ItemsSource="{Binding TextLableFormatting}" MinHeight="24" Padding="3 0" Grid.ColumnSpan="2" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 <Grid Grid.Column="0">
                     <Border Width="1"  HorizontalAlignment="Right" Margin="0 0 -29 0" Background="Gray"/>
                 </Grid>
@@ -274,7 +274,7 @@
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="122.5"/>
+                    <ColumnDefinition Width="142.5"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" >

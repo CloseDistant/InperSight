@@ -322,81 +322,6 @@ namespace InperStudio.Lib.Helper
                 App.Log.Error(ex.ToString());
             }
         }
-        private void Instance_OnLightStatusChanged(object sender, LightStatusChangedEventArgs e)
-        {
-            try
-            {
-                bool exist = false;
-                if (e.Light0WaveLength > 0)
-                {
-                    WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 0);
-                    if (wg != null)
-                    {
-                        LightWaveLength.Add(wg);
-                        DevPhotometry.Instance.SwitchLight(wg.GroupId, true);
-                        DevPhotometry.Instance.SetLightPower(wg.GroupId, wg.LightPower);
-                    }
-                    else
-                    {
-                        LightWaveLength.Add(new WaveGroup() { GroupId = 0, WaveType = e.Light0WaveLength + " nm" });
-                    }
-                    exist = true;
-                }
-                if (e.Light1WaveLength > 0)
-                {
-                    WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 1);
-                    if (wg != null)
-                    {
-                        LightWaveLength.Add(wg);
-                        DevPhotometry.Instance.SwitchLight(wg.GroupId, true);
-                        DevPhotometry.Instance.SetLightPower(wg.GroupId, wg.LightPower);
-                    }
-                    else
-                    {
-                        LightWaveLength.Add(new WaveGroup() { GroupId = 1, WaveType = e.Light1WaveLength + " nm" });
-                    }
-                    exist = true;
-                }
-                if (e.Light2WaveLength > 0)
-                {
-                    WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 2);
-                    if (wg != null)
-                    {
-                        LightWaveLength.Add(wg);
-                        DevPhotometry.Instance.SwitchLight(wg.GroupId, true);
-                        DevPhotometry.Instance.SetLightPower(wg.GroupId, wg.LightPower);
-                    }
-                    else
-                    {
-                        LightWaveLength.Add(new WaveGroup() { GroupId = 2, WaveType = e.Light2WaveLength + " nm" });
-                    }
-                    exist = true;
-                }
-                if (e.Light3WaveLength > 0)
-                {
-                    WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 3);
-                    if (wg != null)
-                    {
-                        LightWaveLength.Add(wg);
-                        DevPhotometry.Instance.SwitchLight(wg.GroupId, true);
-                        DevPhotometry.Instance.SetLightPower(wg.GroupId, wg.LightPower);
-                    }
-                    else
-                    {
-                        LightWaveLength.Add(new WaveGroup() { GroupId = 3, WaveType = e.Light3WaveLength + " nm" });
-                    }
-                    exist = true;
-                }
-                WaveInitEvent?.Invoke(this, exist);
-                if (!exist)
-                    Growl.Error("未获取到激发光");
-            }
-            catch (Exception ex)
-            {
-                Growl.Error("获取激发光失败：" + ex.ToString());
-                App.Log.Error(ex.ToString());
-            }
-        }
         public void DisplayProc()
         {
             _SwapBuffer = new short[VisionWidth * VisionHeight];
@@ -461,7 +386,7 @@ namespace InperStudio.Lib.Helper
                             _ = Parallel.ForEach(CameraChannels, mask =>
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
+                                  //Console.WriteLine(ts + "=======" + m.Group + "=-====" + r);
                                   if (mask.Offset)
                                   {
                                       r -= Offset(mask, m.Group, r);

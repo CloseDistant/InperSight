@@ -37,10 +37,17 @@ namespace InperStudio.ViewModels
 
                 bottomControl.Screen.Click += (s, e) =>
                 {
-                    System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
-                    string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp");
-                    bit.Save(path);
-                    Growl.Info(new GrowlInfo() { Message = "保存成功", Token = "SuccessMsg", WaitTime = 1 });
+                    try
+                    {
+                        System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
+                        string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp");
+                        bit.Save(path);
+                        Growl.Info(new GrowlInfo() { Message = "保存成功", Token = "SuccessMsg", WaitTime = 1 });
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Log.Error(ex.ToString());
+                    }
                 };
                 bottomControl.record.Click += (s, e) =>
                 {
