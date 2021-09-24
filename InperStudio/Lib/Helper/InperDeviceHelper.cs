@@ -235,7 +235,7 @@ namespace InperStudio.Lib.Helper
                     DeltaFData.Clear();
                     foreach (var item in CameraChannels)
                     {
-                        item.Offset = false;
+                        //item.Offset = false;
                         if (!_SaveSignalQs.ContainsKey(item.ChannelId))
                         {
                             _SaveSignalQs.Add(item.ChannelId, new SignalData());
@@ -293,6 +293,7 @@ namespace InperStudio.Lib.Helper
             {
                 if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
                 {
+                    //Console.WriteLine(e.Group);
                     if (isFirstRecordTiem)
                     {
                         _PlottingStartTime = e.Timestamp;
@@ -373,6 +374,7 @@ namespace InperStudio.Lib.Helper
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
                         time = ts;
+                        System.Diagnostics.Debug.WriteLine(m.Group + " ====== " + ts);
                         if (Monitor.TryEnter(_EventQLock))
                         {
                             EventTimeSet.Enqueue(ts);
@@ -386,7 +388,6 @@ namespace InperStudio.Lib.Helper
                             _ = Parallel.ForEach(CameraChannels, mask =>
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-                                  //Console.WriteLine(ts + "=======" + m.Group + "=-====" + r);
                                   if (mask.Offset)
                                   {
                                       r -= Offset(mask, m.Group, r);
@@ -570,51 +571,52 @@ namespace InperStudio.Lib.Helper
         private void AppendData(ConcurrentDictionary<int, double> data, int s_group, long timestamp)
         {
 
-            if (Monitor.TryEnter(_SignalQsLocker))
+            Monitor.Enter(_SignalQsLocker);
+            try
             {
-                try
-                {
-                    _ = Parallel.ForEach(data, kv =>
+                _ = Parallel.ForEach(data, kv =>
+                  {
+                      if (_SignalQs.ContainsKey(kv.Key))
                       {
-                          if (_SignalQs.ContainsKey(kv.Key))
+                          if (_SignalQs[kv.Key].ValuePairs.ContainsKey(s_group))
                           {
-                              if (_SignalQs[kv.Key].ValuePairs.ContainsKey(s_group))
-                              {
-                                  _SignalQs[kv.Key].ValuePairs[s_group].Enqueue(new KeyValuePair<long, double>(timestamp, kv.Value));
-                              }
+                              _SignalQs[kv.Key].ValuePairs[s_group].Enqueue(new KeyValuePair<long, double>(timestamp, kv.Value));
                           }
-                      });
-                }
-                finally
-                {
-                    Monitor.Exit(_SignalQsLocker);
-                }
-
+                      }
+                  });
+            }
+            finally
+            {
+                Monitor.Exit(_SignalQsLocker);
             }
 
             return;
         }
+        private bool isFirstAppend = true;
         public void UpdateDataProc()
         {
             while (isLoop)
             {
                 _ = _DataEvent.WaitOne();
-                Monitor.Enter(_SignalQsLocker);
                 try
                 {
                     if (CameraChannels.Count > 0)
                     {
                         ConcurrentDictionary<int, SignalData> signalQs = null;
-                        Copy(_SignalQs, ref signalQs);
-
-                        _ = Parallel.ForEach(_SignalQs, q =>
+                        if (Monitor.TryEnter(_SignalQsLocker))
                         {
-                            foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in q.Value.ValuePairs)
+
+                            Copy(_SignalQs, ref signalQs);
+
+                            _ = Parallel.ForEach(_SignalQs, q =>
                             {
-                                item.Value.Clear();
-                            }
-                        });
-                        Monitor.Exit(_SignalQsLocker);
+                                foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in q.Value.ValuePairs)
+                                {
+                                    item.Value.Clear();
+                                }
+                            });
+                            Monitor.Exit(_SignalQsLocker);
+                        }
 
                         if (signalQs == null)
                         {
@@ -635,9 +637,10 @@ namespace InperStudio.Lib.Helper
                                          Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(kv.Value.ValuePairs[id]);
                                          if (s0_plot_data.Item1.Length > 0)
                                          {
-                                             kv.Value.ValuePairs[id].Clear();
+                                             //System.Diagnostics.Debug.WriteLine(channel.ChannelId + " ==== " + item.DataSeries.Count);
                                              (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
                                          }
+                                         kv.Value.ValuePairs[id].Clear();
                                      }
                                  });
                             }
@@ -645,7 +648,16 @@ namespace InperStudio.Lib.Helper
 
                         if (Monitor.TryEnter(_EventQLock))
                         {
+                            ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>> eventQs = null;
+                            Copy(EventChannelChart.EventQs, ref eventQs);
+
                             _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
+                            {
+                                q.Value.Clear();
+                            });
+                            Monitor.Exit(_EventQLock);
+
+                            _ = Parallel.ForEach(eventQs, q =>
                             {
                                 if (EventChannelChart.RenderableSeries.Count > 0)
                                 {
@@ -664,17 +676,19 @@ namespace InperStudio.Lib.Helper
                                                     s0_plot_data.Item1[0] = new TimeSpan(time / 100);
                                                     s0_plot_data.Item2[0] = item.DataSeries.YValues.Count > 0 ? (double)item.DataSeries.YValues[item.DataSeries.YValues.Count - 1] : 0;
                                                 }
-                                                if (s0_plot_data.Item1.Count() != 0)
+                                                if (isFirstAppend)
                                                 {
-                                                    (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                                    s0_plot_data.Item1[0] = new TimeSpan(0);
+                                                    isFirstAppend = false;
                                                 }
+                                                //System.Diagnostics.Debug.WriteLine(id + " event==== " + item.DataSeries.Count);
+                                                (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
                                                 q.Value.Clear();
                                             }
                                         }
                                     });
                                 }
                             });
-                            Monitor.Exit(_EventQLock);
                         }
                     }
                 }
@@ -866,7 +880,7 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
-                isFirstRecordTiem = false; isLoop = false;
+                isFirstRecordTiem = false; isLoop = false; isFirstAppend = true;
                 timer.Stop();
                 _DataSaveTimer.Stop();
                 if (frameProcTask != null)

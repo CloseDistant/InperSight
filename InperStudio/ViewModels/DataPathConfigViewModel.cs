@@ -1,4 +1,6 @@
-﻿using InperStudio.Lib.Bean;
+﻿using HandyControl.Controls;
+using InperStudio.Lib.Bean;
+using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
@@ -7,12 +9,14 @@ using InperStudioControlLib.Lib.DeviceAgency;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Screen = Stylet.Screen;
+using Tag = InperStudio.Lib.Data.Model.Tag;
 
 namespace InperStudio.ViewModels
 {
@@ -21,6 +25,15 @@ namespace InperStudio.ViewModels
         #region properties
         private readonly DataConfigPathTypeEnum typeEnum;
         private DataPathConfigView view;
+        public static ObservableCollection<Tag> DataList { get; set; } = new ObservableCollection<Tag>();
+        private string _tagName;
+
+        public string TagName
+        {
+            get => _tagName;
+            set => SetAndNotify(ref _tagName, value);
+        }
+
         #endregion
 
         #region method
@@ -45,14 +58,27 @@ namespace InperStudio.ViewModels
             }
             if (string.IsNullOrEmpty(view.pathText.Content.ToString()))
             {
-                view.pathText.Content = Environment.CurrentDirectory + @"\Data\";
+                view.pathText.Content = System.Environment.CurrentDirectory + @"\Data\";
             }
             if (string.IsNullOrEmpty(view.fileName.Text))
             {
                 view.fileName.Text = DateTime.Now.ToString("yyyyMMddHHmmss");
             }
         }
-
+        public void AddItemCmd()
+        {
+            if (string.IsNullOrEmpty(TagName))
+            {
+                return;
+            }
+            DataList.Insert(0, new Tag
+            {
+                Value = TagName,
+                Type = 0,
+                DateTime = DateTime.Now
+            });
+            TagName = string.Empty;
+        }
         public void ChoosePath(string type)
         {
             try

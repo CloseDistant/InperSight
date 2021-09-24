@@ -20,7 +20,16 @@ namespace InperStudio.ViewModels
         }
         protected override void OnViewLoaded()
         {
-            (this.View as NoteSettingView).ConfirmClickEvent += NoteSettingViewModel_ConfirmClickEvent;
+            (View as NoteSettingView).ConfirmClickEvent += NoteSettingViewModel_ConfirmClickEvent;
+            if (NotesCache.Count > 0)
+            {
+                NotesCache.ForEach(x =>
+                {
+                    TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
+                    tb.Text = x.CreateTime + @"：" + x.Text;
+                    (View as NoteSettingView).TagListValue.Children.Add(tb);
+                });
+            }
         }
 
         private void NoteSettingViewModel_ConfirmClickEvent(object arg1, ExecutedRoutedEventArgs arg2)

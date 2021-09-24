@@ -250,13 +250,13 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="113"/>
+                    <ColumnDefinition Width="82"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Border BorderThickness="0 0 0 1" Margin="141 0 0 0" BorderBrush="Gray" Grid.ColumnSpan="3" />
                 <ComboBox Height="24" Width="95" SelectionChanged="{s:Action TextFormat_SelectionChanged}" Margin="25 0 0 0" ItemsSource="{Binding TextLableFormatting}" MinHeight="24" Padding="3 0" Grid.ColumnSpan="2" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 <Grid Grid.Column="0">
-                    <Border Width="1"  HorizontalAlignment="Right" Margin="0 0 -29 0" Background="Gray"/>
+                    <Border Width="1"  HorizontalAlignment="Right" Margin="0 0 -60.5 0" Background="Gray"/>
                 </Grid>
                 <sc:SciChartSurface Name="timesAxisSci" Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1"  DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
                     <sc:SciChartSurface.YAxis>

@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Tag = InperStudio.Lib.Data.Model.Tag;
 
 namespace InperStudio.ViewModels
 {
@@ -262,6 +263,13 @@ namespace InperStudio.ViewModels
                 {
                     App.SqlDataInit.sqlSugar.Insertable<List<Note>>(NoteSettingViewModel.NotesCache).ExecuteCommand();
                 }
+                if (DataPathConfigViewModel.DataList.Count > 0)
+                {
+                    DataPathConfigViewModel.DataList.ToList().ForEach(x =>
+                    {
+                        App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
+                    });
+                }
 
                 InperDeviceHelper.Instance.StartCollect();
 
@@ -308,6 +316,9 @@ namespace InperStudio.ViewModels
             (View as ManulControlView).Root_Gird.IsEnabled = true;
             if (isrecord)
             {
+                NoteSettingViewModel.NotesCache.Clear();
+                DataPathConfigViewModel.DataList.Clear();
+
                 _ = Parallel.ForEach(InperGlobalClass.ActiveVideos, item =>
                 {
                     if (item.IsActive && item.AutoRecord)
@@ -322,7 +333,7 @@ namespace InperStudio.ViewModels
                 {
                     d.Close();
                 }
-                Console.WriteLine("d.stop");
+
                 isrecord = false;
             }
             InperDeviceHelper.Instance.StopCollect();

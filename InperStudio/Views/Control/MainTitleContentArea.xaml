@@ -16,6 +16,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Menu Margin="0,-3,0,0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center">
             <MenuItem Header="InperSignal" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" FontSize="13">
@@ -34,7 +35,7 @@
                         <Image Source="/Lib/Images/New/save config as.png" Width="14" Height="11" Stretch="Uniform"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Feedback" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180">
+                <MenuItem Header="Feedback" Foreground="#333333"  Command="hc:ControlCommands.OpenLink" CommandParameter="mailto:support@inper.com" FontSize="12" FontFamily="Arial" Width="180">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/feedback.png" Width="14" Height="13" Stretch="Uniform"/>
                     </MenuItem.Icon>
@@ -62,5 +63,19 @@
             </Button.Template>
         </Button>
         <hc:SimplePanel Grid.Column="3"  MouseDown="Border_MouseDown" Name="move2"/>
+        <Button Grid.Column="4" Name="skin" Style="{StaticResource InperFreeButton}" Click="Skin_Click"  Margin="0 0 10 0" Width="16" Height="16" VerticalAlignment="Center">
+           <Image Source="/Lib/Images/New/skin.png" Stretch="Fill" />
+        </Button>
+        <Popup AllowsTransparency="True" Grid.Column="1" PlacementTarget="{Binding ElementName=skin}" HorizontalOffset="-80" Name="PopupConfig" VerticalOffset="15" StaysOpen="False">
+            <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="4" Margin="16" Effect="{StaticResource EffectShadow3}">
+                <ListBox x:Name="SkinList" SelectionChanged="SkinList_SelectionChanged"  Background="Transparent" BorderThickness="0" Margin="10" HorizontalAlignment="Stretch" Width="210"  Style="{StaticResource WrapPanelHorizontalListBox}" ItemsSource="{Binding SkinColorList,UpdateSourceTrigger=PropertyChanged}" >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Label Height="30" Width="30" Margin="2 5" Background="{Binding}" Cursor="Hand"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Popup>
     </Grid>
 </Border>

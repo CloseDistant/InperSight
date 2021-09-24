@@ -30,6 +30,7 @@ namespace InperStudio.Views.Control
     public partial class MainTitleContentArea : Border
     {
         public InperGlobalClass InperGlobalClass { get; set; } = new InperGlobalClass();
+        public List<string> SkinColorList { get; set; } = InperColorHelper.ColorPresetList;
         public MainTitleContentArea()
         {
             InitializeComponent();
@@ -132,7 +133,7 @@ namespace InperStudio.Views.Control
                         _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
                         _ = InperDeviceHelper.Instance._SignalQs.TryRemove(x);
                     });
-                  
+
                     foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
                     {
                         if (window.Name.Contains("MainWindow"))
@@ -196,5 +197,14 @@ namespace InperStudio.Views.Control
                 }
             }
         }
+
+        private void SkinList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var item = (sender as System.Windows.Controls.ListBox).SelectedItem;
+
+            System.Windows.Application.Current.Resources["InperTheme"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(item.ToString()));
+        }
+
+        private void Skin_Click(object sender, RoutedEventArgs e) => PopupConfig.IsOpen = true;
     }
 }

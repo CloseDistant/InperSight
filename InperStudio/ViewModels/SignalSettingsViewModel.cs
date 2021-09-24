@@ -5,6 +5,7 @@ using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
+using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
 using InperStudioControlLib.Lib.DeviceAgency;
@@ -238,7 +239,7 @@ namespace InperStudio.ViewModels
                 }
                 InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
                 {
-                    Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x.Left, x.Top);
+                    Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x);
 
                     _ = view.ellipseCanvas.Children.Add(grid);
                 });
@@ -319,11 +320,11 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        private Grid DrawCircle(int index, double diameter, double ytop, double ybottom, double left = 1, double top = 1)
+        private Grid DrawCircle(int index, double diameter, double ytop, double ybottom, Channel _channel = null)
         {
             Grid grid = new Grid() { Cursor = Cursors.Hand, Background = Brushes.Transparent, Name = "ROI_" + index };
-            grid.SetValue(Canvas.LeftProperty, left);
-            grid.SetValue(Canvas.TopProperty, top);
+            grid.SetValue(Canvas.LeftProperty, _channel.Left);
+            grid.SetValue(Canvas.TopProperty, _channel.Top);
             grid.MouseLeftButtonDown += Grid_MouseDown;
             //grid.MouseMove += Grid_MouseMove;
             grid.MouseLeftButtonUp += Grid_MouseUp;
@@ -348,15 +349,19 @@ namespace InperStudio.ViewModels
 
             view.channelName.Text = "ROI-";
 
-            if (InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1) == null)
+            if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1) == null)
             {
                 CameraChannel item = new CameraChannel()
                 {
                     ChannelId = index - 1,
                     Name = "ROI-" + index + "-",
                     YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop),
-
+                    Offset = _channel.Offset,
+                    OffsetWindowSize = _channel.OffsetWindowSize,
+                    Height = _channel.Height
                 };
+                item.Filters.IsSmooth = _channel.Filters.IsSmooth;
+                item.Filters.Smooth = _channel.Filters.Smooth;
 
                 item.TimeSpanAxis = new TimeSpanAxis()
                 {
@@ -420,6 +425,10 @@ namespace InperStudio.ViewModels
             MouseButtonEventArgs eventArgs = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left);
             eventArgs.RoutedEvent = Grid.MouseLeftButtonDownEvent;
             grid.RaiseEvent(eventArgs);
+            isDown = false;
+        }
+        public void EllipseCanvas_MouseLeave(object sender, MouseEventArgs e)
+        {
             isDown = false;
         }
         public void Grid_MouseUp(object sender, MouseButtonEventArgs e)

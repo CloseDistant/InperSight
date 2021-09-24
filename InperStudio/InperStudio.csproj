@@ -510,6 +510,7 @@
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Lib\Images\New\skin.png" />
     <Resource Include="Lib\Images\New\save config.png" />
     <Resource Include="Lib\Images\New\start.png" />
     <Resource Include="Lib\Images\New\stop.png" />

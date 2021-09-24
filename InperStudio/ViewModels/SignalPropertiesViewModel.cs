@@ -27,7 +27,8 @@ namespace InperStudio.ViewModels
         public CameraSignalSettings CameraSignalSettings { get; set; } = InperGlobalClass.CameraSignalSettings;
         private BindableCollection<Channel> channels = new BindableCollection<Channel>();
         public BindableCollection<Channel> Channels { get => channels; set => SetAndNotify(ref channels, value); }
-        public Channel ActiveChannel { get; set; }
+        private Channel activeChannel;
+        public Channel ActiveChannel { get => activeChannel; set => SetAndNotify(ref activeChannel, value); }
         #endregion
         public SignalPropertiesViewModel(SignalPropertiesTypeEnum @enum, int ChannelId)
         {
