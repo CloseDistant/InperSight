@@ -595,6 +595,7 @@ namespace InperStudio.Lib.Helper
         private bool isFirstAppend = true;
         public void UpdateDataProc()
         {
+            isFirstAppend = true;
             while (isLoop)
             {
                 _ = _DataEvent.WaitOne();
@@ -880,7 +881,7 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
-                isFirstRecordTiem = false; isLoop = false; isFirstAppend = true;
+                isFirstRecordTiem = false; isLoop = false;
                 timer.Stop();
                 _DataSaveTimer.Stop();
                 if (frameProcTask != null)

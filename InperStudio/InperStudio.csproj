@@ -447,33 +447,6 @@
     <Resource Include="inper_studio_icon_96.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Lib\Images\InperFile.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\Signal_analogInput.png" />
-    <Resource Include="Lib\Images\Signal_camera.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\Addition_trigger.png" />
-    <Resource Include="Lib\Images\Addition_Video.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\Record_preview.png" />
-    <Resource Include="Lib\Images\Record_start.png" />
-    <Resource Include="Lib\Images\Record_stop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\System_setting.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\Config_load.png" />
-    <Resource Include="Lib\Images\Config_save.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\Event_marker.png" />
-    <Resource Include="Lib\Images\Event_output.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.7.2 %28x86 和 x64%29</ProductName>
@@ -484,9 +457,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Lib\Images\Signal_Camera_Unknown.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InperStudioControlLib\InperStudioControlLib.csproj">

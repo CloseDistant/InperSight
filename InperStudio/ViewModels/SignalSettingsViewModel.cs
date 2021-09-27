@@ -322,6 +322,15 @@ namespace InperStudio.ViewModels
         }
         private Grid DrawCircle(int index, double diameter, double ytop, double ybottom, Channel _channel = null)
         {
+            if (_channel == null)
+            {
+                _channel = new Channel()
+                {
+                    Left = 0,
+                    Top = 0,
+                    Offset = false,
+                };
+            }
             Grid grid = new Grid() { Cursor = Cursors.Hand, Background = Brushes.Transparent, Name = "ROI_" + index };
             grid.SetValue(Canvas.LeftProperty, _channel.Left);
             grid.SetValue(Canvas.TopProperty, _channel.Top);

@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Chart;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
@@ -72,7 +73,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                view = this.View as DataShowControlView;
+                view = View as DataShowControlView;
                 InperGlobalClass.IsExistEvent = false;
 
                 this.view.dataList.PreviewMouseWheel += (s, e) =>
@@ -98,6 +99,8 @@ namespace InperStudio.ViewModels
                     this.view.relativeBottom.Height = this.view.fixedBottom.Height = InperGlobalClass.EventPanelProperties.HeightFixedValue;
                 }
                 InperDeviceHelper.Instance.StartCollectEvent += Instance_StartCollectEvent;
+
+                view.timesAxisSci.XAxis.LabelProvider = new CustomTimeSpanLableProvider();
             }
             catch (Exception ex)
             {
