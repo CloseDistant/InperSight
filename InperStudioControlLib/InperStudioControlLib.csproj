@@ -105,6 +105,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Lang.resx</DependentUpon>
     </Compile>
+    <Compile Include="Langs\Lang_en.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Lang_en.resx</DependentUpon>
+    </Compile>
     <Compile Include="Lib\Config\InperConfig.cs" />
     <Compile Include="Lib\Config\InperJsonConfig.cs" />
     <Compile Include="Lib\DeviceAgency\CameraDept\BaslerCamera.cs" />
@@ -129,6 +134,10 @@
     <EmbeddedResource Include="Langs\Lang.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Lang.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Langs\Lang_en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Lang_en.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

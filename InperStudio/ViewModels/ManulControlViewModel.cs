@@ -188,7 +188,7 @@ namespace InperStudio.ViewModels
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-            InperDeviceHelper.Instance.device.Start();
+            //InperDeviceHelper.Instance.device.Start();
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
