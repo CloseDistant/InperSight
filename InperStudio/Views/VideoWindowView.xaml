@@ -15,7 +15,7 @@
         <conv:VideoIntToTIme x:Key="VideoIntToTIme"/>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperTitlePageColor}">
-        <Image Grid.Row="0" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap}"  />
+        <Image Grid.Row="0" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
         <TextBlock Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
     </Grid>
 </inp:InperDialogWindow>

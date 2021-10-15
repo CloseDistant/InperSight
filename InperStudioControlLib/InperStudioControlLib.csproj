@@ -117,6 +117,7 @@
     <Compile Include="Lib\DeviceAgency\ControlDept\SerialPortAgent.cs" />
     <Compile Include="Lib\DeviceAgency\ControlDept\USARTOperator.cs" />
     <Compile Include="Lib\DeviceAgency\DevPhotometry.cs" />
+    <Compile Include="Lib\Helper\EnAndDecryption.cs" />
     <Compile Include="Lib\Helper\SystemSleepHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

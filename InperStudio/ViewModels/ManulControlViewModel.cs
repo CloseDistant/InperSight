@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
+using InperPhotometry;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
@@ -188,7 +189,7 @@ namespace InperStudio.ViewModels
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-            //InperDeviceHelper.Instance.device.Start();
+            InperDeviceHelper.Instance.device.Start();
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
@@ -261,7 +262,11 @@ namespace InperStudio.ViewModels
 
                 if (NoteSettingViewModel.NotesCache.Count > 0)
                 {
-                    App.SqlDataInit.sqlSugar.Insertable<List<Note>>(NoteSettingViewModel.NotesCache).ExecuteCommand();
+                    NoteSettingViewModel.NotesCache.ForEach(x =>
+                    {
+                        App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
+                    });
+                    NoteSettingViewModel.NotesCache.Clear();
                 }
                 if (DataPathConfigViewModel.DataList.Count > 0)
                 {
@@ -273,13 +278,13 @@ namespace InperStudio.ViewModels
 
                 InperDeviceHelper.Instance.StartCollect();
 
-                _ = Parallel.ForEach(InperGlobalClass.ActiveVideos, item =>
-                  {
-                      if (item.IsActive && item.AutoRecord)
-                      {
-                          item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item._CamIndex));
-                      }
-                  });
+                foreach (var item in InperGlobalClass.ActiveVideos)
+                {
+                    if (item.IsActive && item.AutoRecord)
+                    {
+                        item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item._CamIndex));
+                    }
+                }
 
                 InperGlobalClass.IsRecord = true;
                 InperGlobalClass.IsPreview = true;
@@ -300,52 +305,62 @@ namespace InperStudio.ViewModels
         }
         private async void StopRecord(int type = 0)
         {
-            bool isrecord = false;
-            if (InperGlobalClass.IsRecord)
+            try
             {
-                Task task = StopTriggerStrategy();
-                if (task != null)
-                {
-                    await task;
-                }
-                isrecord = true;
-            }
-            InperGlobalClass.IsRecord = false;
-            InperGlobalClass.IsPreview = false;
-            InperGlobalClass.IsStop = true;
-            (View as ManulControlView).Root_Gird.IsEnabled = true;
-            if (isrecord)
-            {
-                NoteSettingViewModel.NotesCache.Clear();
-                DataPathConfigViewModel.DataList.Clear();
 
-                _ = Parallel.ForEach(InperGlobalClass.ActiveVideos, item =>
+                bool isrecord = false;
+                if (InperGlobalClass.IsRecord)
                 {
-                    if (item.IsActive && item.AutoRecord)
+                    Task task = StopTriggerStrategy();
+                    if (task != null)
                     {
-                        item.StopRecording();
+                        await task;
                     }
-                });
-                Dialog d = Dialog.Show<ProgressDialog>();
-                await Task.Delay(3000);
-                d.Close();
-                if (d.IsClosed == false)
+                    isrecord = true;
+                }
+                InperGlobalClass.IsRecord = false;
+                InperGlobalClass.IsPreview = false;
+                InperGlobalClass.IsStop = true;
+                (View as ManulControlView).Root_Gird.IsEnabled = true;
+                if (isrecord)
                 {
+                    NoteSettingViewModel.NotesCache.Clear();
+                    DataPathConfigViewModel.DataList.Clear();
+
+                    foreach (VideoRecordBean item in InperGlobalClass.ActiveVideos)
+                    {
+                        if (item.IsActive && item.AutoRecord)
+                        {
+                            item.StopRecording();
+                        }
+                    }
+                    Dialog d = Dialog.Show<ProgressDialog>("MainDialog");
+                    await Task.Delay(3000);
                     d.Close();
+
+                    isrecord = false;
+                }
+                InperDeviceHelper.Instance.StopCollect();
+                if (type == 0)
+                {
+                    StartAndStopShowMarker(ChannelTypeEnum.Stop);
                 }
 
-                isrecord = false;
+                InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                InperDeviceHelper.Instance.device.Stop();
+                InperDeviceHelper.Instance.AllLightClose();
             }
-            InperDeviceHelper.Instance.StopCollect();
-            if (type == 0)
+            catch (Exception ex)
             {
-                StartAndStopShowMarker(ChannelTypeEnum.Stop);
+                App.Log.Error(ex.ToString());
             }
-
-            InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-            InperDeviceHelper.Instance.device.Stop();
-            //InperDeviceHelper.Instance.AllLightClose();
+            finally
+            {
+                InperGlobalClass.IsRecord = false;
+                InperGlobalClass.IsPreview = false;
+                InperGlobalClass.IsStop = true;
+            }
 
         }
         private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum, int type = 1)
@@ -356,14 +371,14 @@ namespace InperStudio.ViewModels
                  {
                      while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.FirstOrDefault().DataSeries.XValues.Count <= 0)
                      {
-                         Task.Delay(100);
+                         _ = Task.Delay(100);
                      }
                  }
                  _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, channel =>
                    {
                        if (channel.Type == typeEnum.ToString())
                        {
-                           InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
+                           _ = InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
                            if (InperGlobalClass.IsRecord)
                            {
                                Manual manual = new Manual()

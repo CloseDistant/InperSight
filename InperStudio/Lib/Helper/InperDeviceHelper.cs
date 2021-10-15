@@ -340,7 +340,7 @@ namespace InperStudio.Lib.Helper
                 _DisplayMatQ.Clear();
                 Monitor.Exit(_DisplayQLock);
 
-                if (mmats.Count() > 0 && mmats.Last().Group == SelectedWaveType)
+                if (mmats.Count() > 0 && (mmats.Last().Group == SelectedWaveType || InperGlobalClass.IsPreview || InperGlobalClass.IsRecord))
                 {
                     Mat image_mat = mmats.Last().ImageMat;
                     unsafe
@@ -374,7 +374,7 @@ namespace InperStudio.Lib.Helper
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
                         time = ts;
-                        System.Diagnostics.Debug.WriteLine(m.Group + " ====== " + ts);
+                        //System.Diagnostics.Debug.WriteLine(m.Group + " ====== " + ts);
                         if (Monitor.TryEnter(_EventQLock))
                         {
                             EventTimeSet.Enqueue(ts);
@@ -416,25 +416,30 @@ namespace InperStudio.Lib.Helper
         #region 滤波 offset smooth
         private double Offset(CameraChannel cameraChannel, int group, double r)
         {
-            double value = r;
+            //double value = r;
             LightMode<TimeSpan, double> offsetValue = cameraChannel.LightModes.FirstOrDefault(x => x.LightType == group);
             if (OffsetData.ContainsKey(cameraChannel.ChannelId))
             {
                 if (OffsetData[cameraChannel.ChannelId].ContainsKey(group))
                 {
-                    OffsetData[cameraChannel.ChannelId][group].Enqueue(r);
-                    if (OffsetData[cameraChannel.ChannelId][group].Count > cameraChannel.OffsetWindowSize)
+                    if (OffsetData[cameraChannel.ChannelId][group].Count < cameraChannel.OffsetWindowSize)
                     {
-                        _ = OffsetData[cameraChannel.ChannelId][group].Dequeue();
-                    }
-                    if (offsetValue.OffsetValue == 0)
-                    {
+                        OffsetData[cameraChannel.ChannelId][group].Enqueue(r);
+                        //_ = OffsetData[cameraChannel.ChannelId][group].Dequeue();
                         offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
                     }
-                    value = offsetValue.OffsetValue;
+                    //else
+                    //{
+                    //    offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
+                    //}
+                    //if (offsetValue.OffsetValue == 0)
+                    //{
+                    //    offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
+                    //}
+                    //value = offsetValue.OffsetValue;
                 }
             }
-            return value;
+            return offsetValue.OffsetValue;
         }
         private double Smooth(CameraChannel cameraChannel, int group, double r)
         {
@@ -521,14 +526,11 @@ namespace InperStudio.Lib.Helper
                    }
                });
         }
-        private readonly object _SaveSyncObj = new object();
         private void SetDeltaFEvent(EventChannelJson eventChannelJson, long ts, double deltaF)
         {
-            if (Monitor.TryEnter(_SaveSyncObj))
+            try
             {
-                //_ = Task.Factory.StartNew(() =>
-                //  {
-                try
+                if (AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor)))
                 {
                     if (InperGlobalClass.IsRecord)
                     {
@@ -543,13 +545,10 @@ namespace InperStudio.Lib.Helper
 
                         _ = App.SqlDataInit.sqlSugar.Insertable(aIROI).ExecuteCommand();
                     }
-                    AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor));
                 }
-                finally
-                {
-                    Monitor.Exit(_SaveSyncObj);
-                }
-                //});
+            }
+            finally
+            {
             }
         }
         #endregion
@@ -638,8 +637,11 @@ namespace InperStudio.Lib.Helper
                                          Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(kv.Value.ValuePairs[id]);
                                          if (s0_plot_data.Item1.Length > 0)
                                          {
+                                             if ((TimeSpan)item.DataSeries.XMax < s0_plot_data.Item1.First())
+                                             {
+                                                 (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                             }
                                              //System.Diagnostics.Debug.WriteLine(channel.ChannelId + " ==== " + item.DataSeries.Count);
-                                             (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
                                          }
                                          kv.Value.ValuePairs[id].Clear();
                                      }
@@ -682,8 +684,10 @@ namespace InperStudio.Lib.Helper
                                                     s0_plot_data.Item1[0] = new TimeSpan(0);
                                                     isFirstAppend = false;
                                                 }
-                                                //System.Diagnostics.Debug.WriteLine(id + " event==== " + item.DataSeries.Count);
-                                                (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                                if ((TimeSpan)item.DataSeries.XMax < s0_plot_data.Item1.First())
+                                                {
+                                                    (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                                }
                                                 q.Value.Clear();
                                             }
                                         }
@@ -706,7 +710,7 @@ namespace InperStudio.Lib.Helper
                 try
                 {
                     _ = _DataSaveEvent.WaitOne();
-                    Monitor.Enter(_SaveSyncObj);
+                
                     if (Monitor.TryEnter(_EventQLock))
                     {
                         Dictionary<int, Queue<KeyValuePair<long, double>>> saveEventQs = null;
@@ -805,7 +809,7 @@ namespace InperStudio.Lib.Helper
                 }
                 finally
                 {
-                    Monitor.Exit(_SaveSyncObj);
+                    
                 }
 
             }
@@ -834,7 +838,7 @@ namespace InperStudio.Lib.Helper
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
         private readonly object marker = new object();
-        public void AddMarkerByHotkeys(int channelId, string text, Color color, int type = -1)//type 0 start 1 end -1 other
+        public bool AddMarkerByHotkeys(int channelId, string text, Color color, int type = -1)//type 0 start 1 end -1 other
         {
             lock (marker)
             {
@@ -852,7 +856,7 @@ namespace InperStudio.Lib.Helper
                         EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString()));
                         if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
                         {
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -869,6 +873,7 @@ namespace InperStudio.Lib.Helper
                     StrokeThickness = 1,
                     X1 = _time
                 });
+                return true;
             }
 
         }
@@ -1010,6 +1015,7 @@ namespace InperStudio.Lib.Helper
             LightWaveLength.ToList().ForEach(x =>
             {
                 device.SwitchLight((uint)x.GroupId, false);
+                device.SetLightPower((uint)x.GroupId, 0);
             });
         }
     }

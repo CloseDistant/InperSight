@@ -46,6 +46,7 @@ namespace InperStudio.Lib.Bean
         private VideoCaptureAPIs _videoCaptureApi = VideoCaptureAPIs.DSHOW;
         private readonly ManualResetEventSlim _writerReset = new ManualResetEventSlim(false);
         private readonly ManualResetEventSlim _readEvent = new ManualResetEventSlim(false);
+        private readonly AutoResetEvent _writeCheckEvent = new AutoResetEvent(true);
         private VideoCapture _videoCapture;
         private VideoWriter _videoWriter;
         private Task _readThread;
@@ -112,22 +113,23 @@ namespace InperStudio.Lib.Bean
 
             _videoWriter = new VideoWriter(path, FourCC.DIVX, FPS - 5, new OpenCvSharp.Size(_videoCapture.FrameWidth, _videoCapture.FrameHeight));
 
+            timeChange = 0;
+
+            accurateTimer = new HighAccurateTimer();
+            accurateTimer.Interval = 1 * 1000;
+            accurateTimer.Elapsed += AccurateTimer_Elapsed;
 
             _writerReset.Reset();
             _writerThread = new Task(AddCameraFrameToRecordingThread, writeToken);
             _writerThread.Start();
             //isStartWrite = true;
-
-            accurateTimer.Interval = 1 * 1000;
-            accurateTimer.Elapsed += AccurateTimer_Elapsed;
-            accurateTimer.Enabled = true;
         }
 
         private void AccurateTimer_Elapsed(object sender, TimerEventArgs e)
         {
             try
             {
-                Monitor.Enter(countCheckObject);
+                _ = _writeCheckEvent.WaitOne();
                 TimeSpan ts = TimeSpan.FromTicks(InperDeviceHelper.Instance.time / 100);
                 long actualFps = (long)(ts.TotalMilliseconds / 40);
                 if (actualFps == AllWriteCount)
@@ -138,11 +140,14 @@ namespace InperStudio.Lib.Bean
                 if (actualFps > AllWriteCount)
                 {
                     timeChange = ts.TotalMilliseconds / actualFps - ts.TotalMilliseconds / AllWriteCount - 2;//
-
                 }
                 else
                 {
                     timeChange = ts.TotalMilliseconds / actualFps - ts.TotalMilliseconds / AllWriteCount + 1;//
+                }
+                if (double.IsInfinity(timeChange))
+                {
+                    timeChange = 0;
                 }
             }
             catch (Exception ex)
@@ -151,7 +156,6 @@ namespace InperStudio.Lib.Bean
             }
             finally
             {
-                Monitor.Exit(countCheckObject);
             }
         }
 
@@ -190,9 +194,12 @@ namespace InperStudio.Lib.Bean
         }
         private void AddCameraFrameToRecordingThread()
         {
+            accurateTimer.Enabled = true;
+
             double delay = 1000 / (FPS - 5);
             double iWaitKeyTime = 0;
             double _waitS = 0;
+            uint checkCount = 0;
             while (!_writerReset.Wait(0))
             {
                 try
@@ -202,6 +209,7 @@ namespace InperStudio.Lib.Bean
                     {
                         if (writeToken.IsCancellationRequested)
                         {
+                            Monitor.Exit(countCheckObject);
                             return;
                         }
                         if (!_videoCapture.IsDisposed)
@@ -209,11 +217,21 @@ namespace InperStudio.Lib.Bean
                             _videoWriter.Write(_capturedFrame);
                         }
                         AllWriteCount++;
+                        checkCount++;
+                        if (checkCount >= 100)
+                        {
+                            _ = _writeCheckEvent.Set();
+                            checkCount = 0;
+                        }
                         timer.Stop();
 
                         double duration = timer.Duration;
 
                         timer.Start();
+                        if (double.IsNaN(timeChange))
+                        {
+                            timeChange = 0;
+                        }
                         iWaitKeyTime = iWaitKeyTime < 0 ? 0 : iWaitKeyTime;
                         double waitTime = delay - duration - iWaitKeyTime + timeChange;
 
@@ -224,8 +242,8 @@ namespace InperStudio.Lib.Bean
                             _wait += 1;
                             _waitS -= 1;
                         }
-                        Cv2.WaitKey(_wait);
-                        Console.WriteLine("waitTime:" + waitTime + "_wait:" + _wait + " _waitS:" + _waitS + " iWaitKeyTime:" + iWaitKeyTime + " timeChange:" + timeChange);
+                        _wait = _wait < 0 ? 40 : _wait;
+                        _ = Cv2.WaitKey(_wait);
                         timer.Stop();
                         iWaitKeyTime = timer.Duration * 1000 - _wait + 1;
                         //
@@ -245,6 +263,8 @@ namespace InperStudio.Lib.Bean
         public void StopRecording()
         {
             accurateTimer.Enabled = false;
+            accurateTimer.Elapsed -= AccurateTimer_Elapsed;
+            accurateTimer.Destroy();
             AllWriteCount = 0;
             if (_writerThread != null)
             {
@@ -344,5 +364,4 @@ namespace InperStudio.Lib.Bean
             }
         }
     }
-
 }

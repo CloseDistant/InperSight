@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:local="clr-namespace:InperStudio.Views.Control"
-             mc:Ignorable="d">
+             mc:Ignorable="d" Name="LoadingControl">
     <Border VerticalAlignment="Center" Background="{DynamicResource InperTheme}" CornerRadius="10">
         <Grid>
             <hc:LoadingCircle Style="{StaticResource LoadingCircleLight}" DotDiameter="12" Height="120" Width="120" Margin="10"/>

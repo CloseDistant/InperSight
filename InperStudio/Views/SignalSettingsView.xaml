@@ -127,10 +127,10 @@
                                 <Setter.Value>
                                     <ControlTemplate>
                                         <WrapPanel Margin="0 2">
-                                            <RadioButton Checked="{s:Action TestMode_rb_Checked}"  GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
+                                            <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
                                             <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" />
                                             <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="10 0 0 0" FontSize="{StaticResource InperNormalFontSize}"/>
-                                            <inper:InperTextBox IsEnabled="True" Style="{StaticResource BaseStyle}" Height="20" InperVerify="True" InperTextType="Int" InperMaxValue="100" InperMinValue="0" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action LightMode_TextChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="22 0 0 0"  Padding="0"  Width="66" />
+                                            <inper:InperTextBox IsEnabled="True" Style="{StaticResource BaseStyle}" Height="20" InperVerify="True" InperTextType="Int" InperMaxValue="100" InperMinValue="0" InperTextChanged="{s:Action LightMode_TextChanged}" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="22 0 0 0"  Padding="0"  Width="66" />
                                         </WrapPanel>
                                     </ControlTemplate>
                                 </Setter.Value>

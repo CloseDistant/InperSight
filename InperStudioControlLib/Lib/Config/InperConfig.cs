@@ -106,8 +106,8 @@ namespace InperStudioControlLib.Lib.Config
             dataPath = GetConfigValue("dataPath");
             dataCustomDirectoryPath = GetConfigValue("dataCustomDirectoryPath");
             configPath = GetConfigValue("configPath");
-            version = GetConfigValue("version");
-            conStr = GetConfigValue("conStr");
+            version =GetConfigValue("version");
+            conStr =  Helper.EnAndDecryption.Decrypt(GetConfigValue("conStr"));
             isSkip = bool.Parse(GetConfigValue("isSkip"));
         }
         #endregion

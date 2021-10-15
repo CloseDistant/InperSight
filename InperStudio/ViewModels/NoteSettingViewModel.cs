@@ -21,6 +21,20 @@ namespace InperStudio.ViewModels
         protected override void OnViewLoaded()
         {
             (View as NoteSettingView).ConfirmClickEvent += NoteSettingViewModel_ConfirmClickEvent;
+
+            if (App.SqlDataInit != null)
+            {
+                List<Note> notes = App.SqlDataInit.sqlSugar.Queryable<Note>().ToList();
+                if (notes.Count > 0)
+                {
+                    notes.ForEach(x =>
+                    {
+                        TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
+                        tb.Text = x.CreateTime + @"：" + x.Text;
+                        (View as NoteSettingView).TagListValue.Children.Add(tb);
+                    });
+                }
+            }
             if (NotesCache.Count > 0)
             {
                 NotesCache.ForEach(x =>

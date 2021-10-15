@@ -223,7 +223,8 @@ namespace InperStudio.ViewModels
             {
                 view.camera.Visibility = Visibility.Visible;
                 view.channelRoi.IsEnabled = false;
-
+                view.waveView.IsEnabled = false;
+                InperDeviceHelper.Instance.SelectedWaveType = -1;
                 if (InperDeviceHelper.Instance.LightWaveLength.Count > 0)
                 {
                     if (InperDeviceHelper.Instance.LightWaveLength.Count > 1)
@@ -581,8 +582,10 @@ namespace InperStudio.ViewModels
 
                 if (sen.IsChecked)
                 {
-                    InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, true);
-                    InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
+                    //InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, true);
+                    //InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
+
+                    this.view.waveView.SelectedItem = sen;
 
                     WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId);
                     if (wg == null)
@@ -650,7 +653,7 @@ namespace InperStudio.ViewModels
 
                 if (!sen.IsChecked)
                 {
-                    InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
+                    //InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
 
                     WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == sen.GroupId);
                     if (wg != null)
@@ -699,29 +702,23 @@ namespace InperStudio.ViewModels
                 ToggleButton tb = sender as ToggleButton;
                 if ((bool)tb.IsChecked)
                 {
-                    InperDeviceHelper.Instance.device.SetMeasureMode(true);
-
-                    //InperDeviceHelper.Instance.AllLightClose();
+                    this.view.waveView.IsEnabled = true;
+                    InperDeviceHelper.Instance.device.Start();
                     _ = InperDeviceHelper.Instance.device.SetExposure(20);
                     InperDeviceHelper.Instance.device.SetFrameRate(50);
                 }
                 else
                 {
-                    InperDeviceHelper.Instance.device.SetMeasureMode(false);
+                    InperDeviceHelper.Instance.device.Stop();
+                    this.view.waveView.IsEnabled = false;
+                    InperDeviceHelper.Instance.SelectedWaveType = -1;
                     _ = InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
                     InperDeviceHelper.Instance.device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
-                    //InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
-                    //{
-                    //    InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
-                    //});
-                    //InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
-                    //{
-                    //    if (x.IsChecked)
-                    //    {
-                    //        InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
-                    //        InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
-                    //    }
-                    //});
+                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
+                    {
+                        InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                        InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
+                    });
                 }
             }
             catch (Exception ex)
@@ -741,13 +738,17 @@ namespace InperStudio.ViewModels
                          //x.IsChecked = true;
                          InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
                          InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
+
+                         this.view.waveView.SelectedItem = x;
                      }
                      else
                      {
                          //x.IsChecked = false;
                          InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                         InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
                      }
                  });
+
             }
             catch (Exception ex)
             {
@@ -767,6 +768,8 @@ namespace InperStudio.ViewModels
                         {
                             InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
                             InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
+
+                            InperDeviceHelper.Instance.SelectedWaveType = x.GroupId;
                         }
                     });
                 }
@@ -826,7 +829,10 @@ namespace InperStudio.ViewModels
         }
         public void WaveView_Selected(object sender, RoutedEventArgs e)
         {
-            InperDeviceHelper.Instance.SelectedWaveType = ((sender as System.Windows.Controls.ComboBox).SelectedItem as WaveGroup).GroupId;
+            if ((bool)view.lightTestMode.IsChecked)
+            {
+                InperDeviceHelper.Instance.SelectedWaveType = ((sender as System.Windows.Controls.ComboBox).SelectedItem as WaveGroup).GroupId;
+            }
         }
         public void Screenshots()
         {

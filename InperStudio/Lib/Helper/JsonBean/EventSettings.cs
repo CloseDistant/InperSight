@@ -16,7 +16,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public string SymbolName { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        public int RefractoryPeriod { get; set; } = 3;
+        public int RefractoryPeriod { get; set; } = 1;
         public string BgColor { get; set; } = Brushes.Red.ToString();
         public int HotkeysCount { get; set; } = 0;
         private string hotkeys;
