@@ -66,7 +66,10 @@ namespace InperStudio.ViewModels
                 InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                 {
                     InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                    InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
+                    Thread.Sleep(50);
                 });
+                InperDeviceHelper.Instance.device.Stop();
             }
             catch (Exception ex)
             {

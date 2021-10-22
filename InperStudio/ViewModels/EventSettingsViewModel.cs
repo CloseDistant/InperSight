@@ -172,7 +172,7 @@ namespace InperStudio.ViewModels
                                 EventChannel manual = new EventChannel
                                 {
                                     ChannelId = item.ChannelId,
-                                    BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
+                                    BgColor = item.BgColor,
                                     SymbolName = item.SymbolName,
                                     RefractoryPeriod = item.RefractoryPeriod,
                                     Name = item.Name,
@@ -559,7 +559,7 @@ namespace InperStudio.ViewModels
                             }
                             if (act.Type == ChannelTypeEnum.Input.ToString() || act.Type == ChannelTypeEnum.Output.ToString() || act.Type == ChannelTypeEnum.DIO.ToString())
                             {
-                                act.Name = ChannelTypeEnum.DIO.ToString() + "-" + act.ChannelId;
+                                act.Name = ChannelTypeEnum.DIO.ToString() + "-" + (act.ChannelId + 1);
                             }
                         }
                         EventChannelJson item = @enum == EventSettingsTypeEnum.Marker
@@ -687,7 +687,7 @@ namespace InperStudio.ViewModels
                                 }
                             }
 
-                            if (ManualEvents.Count > 0)
+                            if (ManualEvents.Count > 0 && (channle.Type == ChannelTypeEnum.Manual.ToString() || channle.Condition?.Type == ChannelTypeEnum.Manual.ToString()))
                             {
                                 EventChannelJson manual = null;
                                 if (@enum == EventSettingsTypeEnum.Marker)
@@ -750,7 +750,7 @@ namespace InperStudio.ViewModels
                                 {
                                     chn.Name = chn.Name.Substring(0, chn.Name.Length - 1);
                                 }
-                             
+
                                 manualChannels.Add(chn);
                                 MarkerChannels.Add(chn);
                             }

@@ -16,7 +16,7 @@ namespace InperStudio.Lib.Convert
         {
             Visibility visibility = Visibility.Collapsed;
 
-            if (((string)value).StartsWith("ROI") || ((string)value).StartsWith("AI"))
+            if (((string)value).Contains("ROI") || ((string)value).StartsWith("AI"))
             {
                 visibility = Visibility.Visible;
             }

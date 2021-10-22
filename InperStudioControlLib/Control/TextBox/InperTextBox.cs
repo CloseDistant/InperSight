@@ -72,22 +72,25 @@ namespace InperStudioControlLib.Control.TextBox
                 {
                     return;
                 }
-                double res = double.Parse(tbox.Text);
-                if (res < InperMinValue)
+                Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
+                if (rx.IsMatch(tbox.Text))
                 {
-                    this.Foreground = Brushes.Red;
-                    Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
-                    this.Text = InperMinValue.ToString();
-                    return;
+                    double res = double.Parse(tbox.Text);
+                    if (res < InperMinValue)
+                    {
+                        this.Foreground = Brushes.Red;
+                        Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                        this.Text = InperMinValue.ToString();
+                        return;
+                    }
+                    if (res > InperMaxValue && InperMaxValue > InperMinValue)
+                    {
+                        this.Foreground = Brushes.Red;
+                        Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                        this.Text = InperMaxValue.ToString();
+                        return;
+                    }
                 }
-                if (res > InperMaxValue && InperMaxValue > InperMinValue)
-                {
-                    this.Foreground = Brushes.Red;
-                    Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
-                    this.Text = InperMaxValue.ToString();
-                    return;
-                }
-
             }
             finally
             {
@@ -100,48 +103,55 @@ namespace InperStudioControlLib.Control.TextBox
             InperTextBox tbox = sender as InperTextBox;
             if (InperVerify)
             {
-                if (this.InperTextType == InperTextType.Double || this.InperTextType == InperTextType.Int)
+                try
                 {
-                    if (!string.IsNullOrEmpty(tbox.Text))
+                    if (this.InperTextType == InperTextType.Double || this.InperTextType == InperTextType.Int)
                     {
-                        Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
-                        if (rx.IsMatch(tbox.Text))
+                        if (!string.IsNullOrEmpty(tbox.Text))
                         {
-                            double res = double.Parse(tbox.Text);
-                            if (res < InperMinValue)
+                            Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
+                            if (rx.IsMatch(tbox.Text))
                             {
-                                this.Foreground = Brushes.Red;
-                                Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
-                                //this.Text = InperMinValue.ToString();
-                                return;
+                                double res = double.Parse(tbox.Text);
+                                if (res < InperMinValue)
+                                {
+                                    this.Foreground = Brushes.Red;
+                                    Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                                    //this.Text = InperMinValue.ToString();
+                                    return;
+                                }
+                                if (res > InperMaxValue && InperMaxValue > InperMinValue)
+                                {
+                                    this.Foreground = Brushes.Red;
+                                    Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                                    //this.Text = InperMaxValue.ToString();
+                                    return;
+                                }
                             }
-                            if (res > InperMaxValue && InperMaxValue > InperMinValue)
+                            else
                             {
                                 this.Foreground = Brushes.Red;
-                                Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
-                                //this.Text = InperMaxValue.ToString();
+                                Growl.Warning(new GrowlInfo() { Message = "数据类型不符合", Token = "SuccessMsg", WaitTime = 1 });
                                 return;
                             }
                         }
-                        else
+                    }
+                    if (this.InperTextType == InperTextType.String)
+                    {
+                        if (!string.IsNullOrEmpty(tbox.Text))
                         {
-                            this.Foreground = Brushes.Red;
-                            Growl.Warning(new GrowlInfo() { Message = "数据类型不符合", Token = "SuccessMsg", WaitTime = 1 });
-                            return;
+                            if (tbox.Text.Length > InperStringLength)
+                            {
+                                this.Foreground = Brushes.Red;
+                                Growl.Warning(new GrowlInfo() { Message = "数据长度不符合，最大字符串长度为：" + InperStringLength, Token = "SuccessMsg", WaitTime = 1 });
+                                return;
+                            }
                         }
                     }
                 }
-                if (this.InperTextType == InperTextType.String)
+                catch (Exception ex)
                 {
-                    if (!string.IsNullOrEmpty(tbox.Text))
-                    {
-                        if (tbox.Text.Length > InperStringLength)
-                        {
-                            this.Foreground = Brushes.Red;
-                            Growl.Warning(new GrowlInfo() { Message = "数据长度不符合，最大字符串长度为：" + InperStringLength, Token = "SuccessMsg", WaitTime = 1 });
-                            return;
-                        }
-                    }
+                    Console.WriteLine(ex.ToString());
                 }
             }
             this.Foreground = Brushes.Black;

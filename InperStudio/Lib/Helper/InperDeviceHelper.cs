@@ -78,6 +78,9 @@ namespace InperStudio.Lib.Helper
         public PhotometryDevice device;
         public long time;
 
+        public System.Timers.Timer _Metronome = new System.Timers.Timer();
+        private bool IsInWorkingPeriod = true;
+
         public Queue<InperDeviceManagement.MarkedMat> _MatQ = new Queue<InperDeviceManagement.MarkedMat>();
         public Queue<InperDeviceManagement.MarkedMat> _DisplayMatQ = new Queue<InperDeviceManagement.MarkedMat>();
         /// <summary>
@@ -160,6 +163,40 @@ namespace InperStudio.Lib.Helper
                 _ = _DataEvent.Set();
             };
 
+            _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+            _Metronome.Elapsed += (s, e) =>
+            {
+                double next_Interval;
+                if (IsInWorkingPeriod)
+                {
+                    LightWaveLength.ToList().ForEach(x =>
+                    {
+                        if (x.IsChecked)
+                        {
+                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
+                            Thread.Sleep(50);
+                        }
+                    });
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                }
+                else
+                {
+                    LightWaveLength.ToList().ForEach(x =>
+                    {
+                        if (x.IsChecked)
+                        {
+                            //DevPhotometry.Instance.SwitchLight(x.GroupId, true);
+                            device.SetLightPower((uint)x.GroupId, x.LightPower);
+                            Thread.Sleep(50);
+                        }
+                    });
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                }
+                _Metronome.Interval = next_Interval;
+                IsInWorkingPeriod = !IsInWorkingPeriod;
+                return;
+            };
+
             _DataSaveTimer.Interval = TimeSpan.FromSeconds(3);
             _DataSaveTimer.Tick += (s, e) =>
             {
@@ -205,6 +242,7 @@ namespace InperStudio.Lib.Helper
                         if (dev.IOID == item.Key)
                         {
                             item.Value.Enqueue(new KeyValuePair<long, double>(EventTimeSet.Last(), dev.Status));
+                            //Console.WriteLine(dev.IOID + ":" + dev.Status);
                         }
                     }
                     if (InperGlobalClass.IsRecord)
@@ -388,25 +426,31 @@ namespace InperStudio.Lib.Helper
                             _ = Parallel.ForEach(CameraChannels, mask =>
                               {
                                   double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-                                  if (mask.Offset)
+
+                                  if (r > 0)
                                   {
-                                      r -= Offset(mask, m.Group, r);
+                                      if (mask.Offset)
+                                      {
+                                          r -= Offset(mask, m.Group, r);
+                                      }
+
+                                      DeltaFCalculate(mask, m.Group, r, ts);
+
+                                      if (mask.Filters.IsSmooth)
+                                      {
+                                          r = Smooth(mask, m.Group, r);
+                                      }
+
+                                      ploting_data[mask.ChannelId] = r;
                                   }
-
-                                  DeltaFCalculate(mask, m.Group, r, ts);
-
-                                  if (mask.Filters.IsSmooth)
-                                  {
-                                      r = Smooth(mask, m.Group, r);
-                                  }
-
-                                  ploting_data[mask.ChannelId] = r;
                               });
-
-                            this.AppendData(ploting_data, m.Group, ts);
-                            if (InperGlobalClass.IsRecord)
+                            if (ploting_data.Count > 0)
                             {
-                                this.SaveData(ploting_data, ts, m.Group);
+                                this.AppendData(ploting_data, m.Group, ts);
+                                if (InperGlobalClass.IsRecord)
+                                {
+                                    this.SaveData(ploting_data, ts, m.Group);
+                                }
                             }
                         }
                     }
@@ -426,17 +470,11 @@ namespace InperStudio.Lib.Helper
                     {
                         OffsetData[cameraChannel.ChannelId][group].Enqueue(r);
                         //_ = OffsetData[cameraChannel.ChannelId][group].Dequeue();
-                        offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
+                        if (OffsetData[cameraChannel.ChannelId][group].Count == cameraChannel.OffsetWindowSize)
+                        {
+                            offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
+                        }
                     }
-                    //else
-                    //{
-                    //    offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
-                    //}
-                    //if (offsetValue.OffsetValue == 0)
-                    //{
-                    //    offsetValue.OffsetValue = OffsetData[cameraChannel.ChannelId][group].ToList().Average();
-                    //}
-                    //value = offsetValue.OffsetValue;
                 }
             }
             return offsetValue.OffsetValue;
@@ -591,10 +629,8 @@ namespace InperStudio.Lib.Helper
 
             return;
         }
-        private bool isFirstAppend = true;
         public void UpdateDataProc()
         {
-            isFirstAppend = true;
             while (isLoop)
             {
                 _ = _DataEvent.WaitOne();
@@ -673,21 +709,21 @@ namespace InperStudio.Lib.Helper
                                             {
                                                 Tuple<TimeSpan[], double[]> s0_plot_data = TransposeDataAndRegisterTR(q.Value);
 
-                                                if (s0_plot_data.Item1.Count() == 0)
-                                                {
-                                                    s0_plot_data = new Tuple<TimeSpan[], double[]>(new TimeSpan[1], new double[1]);
-                                                    s0_plot_data.Item1[0] = new TimeSpan(time / 100);
-                                                    s0_plot_data.Item2[0] = item.DataSeries.YValues.Count > 0 ? (double)item.DataSeries.YValues[item.DataSeries.YValues.Count - 1] : 0;
-                                                }
-                                                if (isFirstAppend)
-                                                {
-                                                    s0_plot_data.Item1[0] = new TimeSpan(0);
-                                                    isFirstAppend = false;
-                                                }
-                                                if ((TimeSpan)item.DataSeries.XMax < s0_plot_data.Item1.First())
-                                                {
-                                                    (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
-                                                }
+                                                //if (s0_plot_data.Item1.Count() == 0)
+                                                //{
+                                                //    s0_plot_data = new Tuple<TimeSpan[], double[]>(new TimeSpan[1], new double[1]);
+                                                //    s0_plot_data.Item1[0] = new TimeSpan(time / 100);
+                                                //    s0_plot_data.Item2[0] = item.DataSeries.YValues.Count > 0 ? (double)item.DataSeries.YValues[item.DataSeries.YValues.Count - 1] : 0;
+                                                //}
+                                                //if (isFirstAppend)
+                                                //{
+                                                //    s0_plot_data.Item1[0] = new TimeSpan(0);
+                                                //    isFirstAppend = false;
+                                                //}
+                                                //if ((TimeSpan)item.DataSeries.XMax < s0_plot_data.Item1.First())
+                                                //{
+                                                (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(s0_plot_data.Item1, s0_plot_data.Item2);
+                                                //}
                                                 q.Value.Clear();
                                             }
                                         }
@@ -710,7 +746,7 @@ namespace InperStudio.Lib.Helper
                 try
                 {
                     _ = _DataSaveEvent.WaitOne();
-                
+
                     if (Monitor.TryEnter(_EventQLock))
                     {
                         Dictionary<int, Queue<KeyValuePair<long, double>>> saveEventQs = null;
@@ -809,7 +845,7 @@ namespace InperStudio.Lib.Helper
                 }
                 finally
                 {
-                    
+
                 }
 
             }
@@ -840,7 +876,7 @@ namespace InperStudio.Lib.Helper
         private readonly object marker = new object();
         public bool AddMarkerByHotkeys(int channelId, string text, Color color, int type = -1)//type 0 start 1 end -1 other
         {
-            lock (marker)
+            //lock (marker)
             {
                 TimeSpan _time = new TimeSpan(time / 100);
                 if (type == 0)
@@ -854,9 +890,12 @@ namespace InperStudio.Lib.Helper
                     {
                         TimeSpan tick = _time.Subtract((TimeSpan)(obj as VerticalLineAnnotationViewModel).X1);
                         EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString()));
-                        if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
+                        if (chn != null)
                         {
-                            return false;
+                            if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
+                            {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -879,8 +918,13 @@ namespace InperStudio.Lib.Helper
         }
         public void SendCommand(EventChannelJson channelJson)
         {
-            AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor));
-            device.OuputIO((uint)channelJson.ChannelId, 1);
+            if (AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor)))
+            {
+                device.OuputIO((uint)channelJson.ChannelId, 1);
+                Thread.Sleep(50);
+                device.OuputIO((uint)channelJson.ChannelId, 0);
+            }
+
         }
         public void StopCollect()
         {
@@ -928,6 +972,9 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
+                _ = device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
+                device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
+
                 CameraChannels.ToList().ForEach(x =>
                 {
                     x.RenderableSeries.ToList().ForEach(line =>

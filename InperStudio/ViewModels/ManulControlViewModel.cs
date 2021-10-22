@@ -322,6 +322,10 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.IsPreview = false;
                 InperGlobalClass.IsStop = true;
                 (View as ManulControlView).Root_Gird.IsEnabled = true;
+                if (type == 0)
+                {
+                    StartAndStopShowMarker(ChannelTypeEnum.Stop);
+                }
                 if (isrecord)
                 {
                     NoteSettingViewModel.NotesCache.Clear();
@@ -341,10 +345,6 @@ namespace InperStudio.ViewModels
                     isrecord = false;
                 }
                 InperDeviceHelper.Instance.StopCollect();
-                if (type == 0)
-                {
-                    StartAndStopShowMarker(ChannelTypeEnum.Stop);
-                }
 
                 InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
 

@@ -39,10 +39,13 @@ namespace InperStudio.ViewModels
                 {
                     try
                     {
-                        System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
-                        string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp");
-                        bit.Save(path);
-                        Growl.Info(new GrowlInfo() { Message = "保存成功", Token = "SuccessMsg", WaitTime = 1 });
+                        this.view.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
+                            string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp");
+                            bit.Save(path);
+                            Growl.Info(new GrowlInfo() { Message = "保存成功", Token = "SuccessMsg", WaitTime = 1 });
+                        }));
                     }
                     catch (Exception ex)
                     {
@@ -51,13 +54,13 @@ namespace InperStudio.ViewModels
                 };
                 bottomControl.record.Click += (s, e) =>
                 {
-                    BehaviorRecorderKit.AutoRecord = true;
+                    BehaviorRecorderKit.AutoRecord = false;
                     bottomControl.no_record.Visibility = System.Windows.Visibility.Visible;
                     bottomControl.record.Visibility = System.Windows.Visibility.Collapsed;
                 };
                 bottomControl.no_record.Click += (s, e) =>
                 {
-                    BehaviorRecorderKit.AutoRecord = false;
+                    BehaviorRecorderKit.AutoRecord = true;
                     bottomControl.no_record.Visibility = System.Windows.Visibility.Collapsed;
                     bottomControl.record.Visibility = System.Windows.Visibility.Visible;
                 };

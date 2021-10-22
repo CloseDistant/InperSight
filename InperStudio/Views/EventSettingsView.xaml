@@ -138,7 +138,7 @@
                     </Grid>
                 </Grid>
                 <Grid>
-                    <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}">
+                    <Grid Margin="0 20 0 0"  Visibility="{Binding ElementName=MarkerName,Path=Text,Converter={StaticResource RoiAIVisibilityConverter}}">
                         <TextBlock VerticalAlignment="Center" Text="RP (s)"  FontSize="{DynamicResource InperNormalFontSize}"/>
                         <inper:InperTextBox Margin="20 0" FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.RefractoryPeriod,Mode=TwoWay}" Style="{DynamicResource TextBoxBaseStyle}" InperTextType="Double" InperVerify="True" InperMinValue="0" InperMaxValue="99999"  HorizontalAlignment="Right"  Width="170" />
                     </Grid>

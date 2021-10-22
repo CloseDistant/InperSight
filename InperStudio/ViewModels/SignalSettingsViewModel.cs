@@ -37,13 +37,12 @@ namespace InperStudio.ViewModels
         #region properties
         private readonly SignalSettingsTypeEnum @enum;
         private SignalSettingsView view;
-        private System.Timers.Timer _Metronome = new System.Timers.Timer();
-        private bool IsInWorkingPeriod = true;
+        
         //ellipse
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
         private bool isDown = false;
-        private int diameter = 65;
+        private int diameter = 55;
         private Grid moveGrid = null;
         public Grid MoveGrid { get => moveGrid; set => SetAndNotify(ref moveGrid, value); }
         public int Diameter { get => diameter; set => SetAndNotify(ref diameter, value); }
@@ -89,38 +88,6 @@ namespace InperStudio.ViewModels
                 default:
                     break;
             }
-
-            _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
-            _Metronome.Elapsed += (s, e) =>
-            {
-                double next_Interval;
-                if (IsInWorkingPeriod)
-                {
-                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
-                    {
-                        if (x.IsChecked)
-                        {
-                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
-                        }
-                    });
-                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
-                }
-                else
-                {
-                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
-                    {
-                        if (x.IsChecked)
-                        {
-                            //DevPhotometry.Instance.SwitchLight(x.GroupId, true);
-                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
-                        }
-                    });
-                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
-                }
-                _Metronome.Interval = next_Interval;
-                IsInWorkingPeriod = !IsInWorkingPeriod;
-                return;
-            };
 
             if (@enum == SignalSettingsTypeEnum.Analog)
             {
@@ -702,13 +669,30 @@ namespace InperStudio.ViewModels
                 ToggleButton tb = sender as ToggleButton;
                 if ((bool)tb.IsChecked)
                 {
+                    if ((bool)this.view.interval.IsChecked)
+                    {
+                        InperDeviceHelper.Instance._Metronome.Stop();
+                    }
                     this.view.waveView.IsEnabled = true;
+                    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
+                    {
+                        //if (x.IsChecked)
+                        {
+                            InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
+                            Thread.Sleep(50);
+                        }
+                    });
                     InperDeviceHelper.Instance.device.Start();
                     _ = InperDeviceHelper.Instance.device.SetExposure(20);
                     InperDeviceHelper.Instance.device.SetFrameRate(50);
                 }
                 else
                 {
+                    if ((bool)this.view.interval.IsChecked)
+                    {
+                        InperDeviceHelper.Instance._Metronome.Start();
+                    }
                     InperDeviceHelper.Instance.device.Stop();
                     this.view.waveView.IsEnabled = false;
                     InperDeviceHelper.Instance.SelectedWaveType = -1;
@@ -718,6 +702,7 @@ namespace InperStudio.ViewModels
                     {
                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                         InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
+                        Thread.Sleep(50);
                     });
                 }
             }
@@ -814,16 +799,17 @@ namespace InperStudio.ViewModels
         }
         public void Interval_Checked(object sender, RoutedEventArgs e)
         {
-            _Metronome.Start();
+           InperDeviceHelper.Instance._Metronome.Start();
         }
         public void Continus_Checked(object sender, RoutedEventArgs e)
         {
-            _Metronome.Stop();
+            InperDeviceHelper.Instance._Metronome.Stop();
             InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
             {
                 if (x.IsChecked)
                 {
                     InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
+                    Thread.Sleep(50);
                 }
             });
         }
@@ -838,27 +824,30 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                //InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp", System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
-                //获取控件相对于窗口位置
-                GeneralTransform generalTransform = this.view.image.TransformToAncestor(this.view.signal);
-                System.Windows.Point point = generalTransform.Transform(new System.Windows.Point(0, 0));
+                view.Dispatcher.BeginInvoke(new Action(() =>
+                 {
+                    //InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp", System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    //获取控件相对于窗口位置
+                    GeneralTransform generalTransform = this.view.image.TransformToAncestor(this.view.signal);
+                     System.Windows.Point point = generalTransform.Transform(new System.Windows.Point(0, 0));
 
-                //获取窗口相对于屏幕的位置
-                System.Windows.Point ptLeftUp = new System.Windows.Point(0, 0);
-                ptLeftUp = this.view.PointToScreen(ptLeftUp);
+                    //获取窗口相对于屏幕的位置
+                    System.Windows.Point ptLeftUp = new System.Windows.Point(0, 0);
+                     ptLeftUp = this.view.PointToScreen(ptLeftUp);
 
-                //计算DPI缩放
-                var ct = PresentationSource.FromVisual(view.image)?.CompositionTarget;
-                var matrix = ct == null ? Matrix.Identity : ct.TransformToDevice;
+                    //计算DPI缩放
+                    var ct = PresentationSource.FromVisual(view.image)?.CompositionTarget;
+                     var matrix = ct == null ? Matrix.Identity : ct.TransformToDevice;
 
-                double x = matrix.M11 == 0 ? 1 : matrix.M11;
-                double y = matrix.M22 == 0 ? 1 : matrix.M22;
+                     double x = matrix.M11 == 0 ? 1 : matrix.M11;
+                     double y = matrix.M22 == 0 ? 1 : matrix.M22;
 
-                int left = (int)ptLeftUp.X + (int)(point.X * x);
-                int top = (int)ptLeftUp.Y + (int)(point.Y * y);
+                     int left = (int)ptLeftUp.X + (int)(point.X * x);
+                     int top = (int)ptLeftUp.Y + (int)(point.Y * y);
 
-                InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
-                Growl.Info(new GrowlInfo() { Message = "成功获取快照", Token = "SuccessMsg", WaitTime = 1 });
+                     InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
+                     Growl.Info(new GrowlInfo() { Message = "成功获取快照", Token = "SuccessMsg", WaitTime = 1 });
+                 }));
             }
             catch (Exception ex)
             {
@@ -964,6 +953,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                this.view.lightTestMode.IsChecked = false;
                 InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous = IsContinuous;
                 InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval = IsInterval;
 

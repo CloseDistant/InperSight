@@ -118,9 +118,9 @@
                 </WrapPanel>
                 <WrapPanel Margin="0 10">
                     <TextBlock Text="Light Measure" VerticalAlignment="Center" />
-                    <ToggleButton Margin="20 0 0 0"  Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
+                    <ToggleButton Margin="20 0 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter}}" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
                 </WrapPanel>
-                <ListBox x:Name="lightMode"  Style="{x:Null}"  Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lightMode"  Style="{x:Null}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Template">
