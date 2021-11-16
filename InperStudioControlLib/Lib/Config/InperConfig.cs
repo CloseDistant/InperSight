@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Text;
@@ -22,7 +23,7 @@ namespace InperStudioControlLib.Lib.Config
         private string version;
         private string conStr;
         private bool isSkip;
-
+        private string upgradeKey;
         public bool IsSkip
         {
             get => isSkip;
@@ -39,6 +40,15 @@ namespace InperStudioControlLib.Lib.Config
             {
                 conStr = value;
                 SetConfigValue("conStr", conStr);
+            }
+        }
+        public string UpgradeKey
+        {
+            get => upgradeKey;
+            set
+            {
+                upgradeKey = value;
+                SetConfigValue("upgradeKey", upgradeKey);
             }
         }
         public string Version
@@ -109,6 +119,7 @@ namespace InperStudioControlLib.Lib.Config
             version =GetConfigValue("version");
             conStr =  Helper.EnAndDecryption.Decrypt(GetConfigValue("conStr"));
             isSkip = bool.Parse(GetConfigValue("isSkip"));
+            upgradeKey = GetConfigValue("upgradeKey");
         }
         #endregion
 

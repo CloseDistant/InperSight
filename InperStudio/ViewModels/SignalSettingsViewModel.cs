@@ -245,7 +245,7 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    Growl.Info(new GrowlInfo() { Message = "已达到最大数量", Token = "SuccessMsg", WaitTime = 1 });
+                    Growl.Info(new GrowlInfo() { Message = "No more than 9 channels", Token = "SuccessMsg", WaitTime = 1 });
                 }
             }
             catch (Exception ex)
@@ -339,6 +339,12 @@ namespace InperStudio.ViewModels
                 };
                 item.Filters.IsSmooth = _channel.Filters.IsSmooth;
                 item.Filters.Smooth = _channel.Filters.Smooth;
+                item.Filters.IsHighPass = _channel.Filters.IsHighPass;
+                item.Filters.HighPass = _channel.Filters.HighPass;
+                item.Filters.IsLowPass = _channel.Filters.IsLowPass;
+                item.Filters.LowPass = _channel.Filters.LowPass;
+                item.Filters.IsNotch = _channel.Filters.IsNotch;
+                item.Filters.Notch = _channel.Filters.Notch;
 
                 item.TimeSpanAxis = new TimeSpanAxis()
                 {
@@ -846,7 +852,7 @@ namespace InperStudio.ViewModels
                      int top = (int)ptLeftUp.Y + (int)(point.Y * y);
 
                      InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
-                     Growl.Info(new GrowlInfo() { Message = "成功获取快照", Token = "SuccessMsg", WaitTime = 1 });
+                     Growl.Info(new GrowlInfo() { Message = "Saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
                  }));
             }
             catch (Exception ex)

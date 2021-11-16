@@ -193,7 +193,7 @@ namespace InperStudio.ViewModels
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
-                InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                InperGlobalClass.ShowReminderInfo("No data channels");
                 return;
             }
             if (!InperDeviceHelper.Instance.InitDataStruct())
@@ -203,7 +203,7 @@ namespace InperStudio.ViewModels
             }
             if (!InperDeviceHelper.Instance.AllLightOpen())
             {
-                InperGlobalClass.ShowReminderInfo("未设置激发光");
+                InperGlobalClass.ShowReminderInfo("No lights");
                 return;
             }
             InperDeviceHelper.Instance.StartCollect();

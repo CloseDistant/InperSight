@@ -10,6 +10,7 @@ using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -108,7 +109,14 @@ namespace InperStudio.ViewModels
         }
         public void InperDialogWindow_ConfirmClickEvent(object sender, ExecutedRoutedEventArgs e)
         {
-            RequestClose();
+            if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+            {
+                Growl.Warning("Filename exsited", "SuccessMsg");
+            }
+            else
+            {
+                RequestClose();
+            }
         }
         #endregion
     }

@@ -89,6 +89,9 @@ namespace InperStudio.Lib.Helper
         public ConcurrentDictionary<int, SignalData> _SignalQs = new ConcurrentDictionary<int, SignalData>();
         public ConcurrentDictionary<int, Mat> ROIMasks { get; set; } = new ConcurrentDictionary<int, Mat>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> FilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> LowFilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> HeightFilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> NotchFilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> OffsetData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> DeltaFData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
 
@@ -269,6 +272,9 @@ namespace InperStudio.Lib.Helper
                 if (_SignalQs.Count > 0)
                 {
                     FilterData.Clear();
+                    LowFilterData.Clear();
+                    HeightFilterData.Clear();
+                    NotchFilterData.Clear();
                     OffsetData.Clear();
                     DeltaFData.Clear();
                     foreach (var item in CameraChannels)
@@ -279,6 +285,9 @@ namespace InperStudio.Lib.Helper
                             _SaveSignalQs.Add(item.ChannelId, new SignalData());
                         }
                         _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                        _ = LowFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                        _ = HeightFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                        _ = NotchFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         if (item.LightModes.Count > 0)
@@ -288,6 +297,10 @@ namespace InperStudio.Lib.Helper
                                 x.OffsetValue = 0;
                                 _SaveSignalQs[item.ChannelId].ValuePairs.Add(x.LightType, new Queue<KeyValuePair<long, double>>());
                                 FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                LowFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                HeightFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                NotchFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+
                                 OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
                                 DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
                             });
@@ -441,6 +454,19 @@ namespace InperStudio.Lib.Helper
                                           r = Smooth(mask, m.Group, r);
                                       }
 
+                                      if (mask.Filters.IsHighPass)
+                                      {
+                                          r = HighPass(mask, m.Group, r);
+                                      }
+
+                                      if (mask.Filters.IsLowPass)
+                                      {
+                                          r = LowPass(mask, m.Group, r);
+                                      }
+                                      if (mask.Filters.IsNotch)
+                                      {
+                                          r = NotchPass(mask, m.Group, r);
+                                      }
                                       ploting_data[mask.ChannelId] = r;
                                   }
                               });
@@ -490,14 +516,50 @@ namespace InperStudio.Lib.Helper
                     if (FilterData[cameraChannel.ChannelId][group].Count > cameraChannel.Filters.Smooth)
                     {
                         _ = FilterData[cameraChannel.ChannelId][group].Dequeue();
-                    }
-                    if (cameraChannel.Filters.IsSmooth)
-                    {
                         val = FilterData[cameraChannel.ChannelId][group].ToList().Average();
                     }
                 }
             }
             return val;
+        }
+        private double HighPass(CameraChannel cameraChannel, int group, double r)
+        {
+            double val = r;
+            if (HeightFilterData.ContainsKey(cameraChannel.ChannelId))
+            {
+                if (HeightFilterData[cameraChannel.ChannelId].ContainsKey(group))
+                {
+                    HeightFilterData[cameraChannel.ChannelId][group].Enqueue(r);
+                    if (HeightFilterData[cameraChannel.ChannelId][group].Count >= 5)
+                    {
+                        val = FilterTools.FiltterTool.RCHighFilter(HeightFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.HighPass, InperGlobalClass.CameraSignalSettings.Sampling / InperGlobalClass.CameraSignalSettings.CameraChannels.Count);
+                        _ = HeightFilterData[cameraChannel.ChannelId][group].Dequeue();
+                    }
+                }
+            }
+            return val;
+        }
+        private double LowPass(CameraChannel cameraChannel, int group, double r)
+        {
+            double val = r;
+            if (LowFilterData.ContainsKey(cameraChannel.ChannelId))
+            {
+                if (LowFilterData[cameraChannel.ChannelId].ContainsKey(group))
+                {
+                    LowFilterData[cameraChannel.ChannelId][group].Enqueue(r);
+                    if (LowFilterData[cameraChannel.ChannelId][group].Count >= 5)
+                    {
+                        val = FilterTools.FiltterTool.RCLowPass(LowFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.LowPass, InperGlobalClass.CameraSignalSettings.Sampling / InperGlobalClass.CameraSignalSettings.CameraChannels.Count);
+                        _ = LowFilterData[cameraChannel.ChannelId][group].Dequeue();
+                    }
+                }
+            }
+            return val;
+        }
+        private double NotchPass(CameraChannel cameraChannel, int group, double r)
+        {
+            r = FilterTools.FiltterTool.NotchPass(r, InperGlobalClass.CameraSignalSettings.Sampling / InperGlobalClass.CameraSignalSettings.CameraChannels.Count, cameraChannel.Filters.Notch);
+            return r;
         }
         private readonly object deltaFObj = new object();
         private void DeltaFCalculate(CameraChannel cameraChannel, int group, double r, long ts)
@@ -521,7 +583,7 @@ namespace InperStudio.Lib.Helper
                                            if (DeltaFData[cameraChannel.ChannelId][group].Count > x.WindowSize)
                                            {
                                                _ = DeltaFData[cameraChannel.ChannelId][group].Dequeue();
-                                               double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / x.WindowSize * 100;
+                                               double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / DeltaFData[cameraChannel.ChannelId][group].ToList().Average() * 100;
                                                if (deltaF >= x.DeltaF)
                                                {
                                                    SetDeltaFEvent(x, ts, deltaF);
@@ -547,7 +609,7 @@ namespace InperStudio.Lib.Helper
                                                    if (DeltaFData[cameraChannel.ChannelId][group].Count > x.WindowSize)
                                                    {
                                                        _ = DeltaFData[cameraChannel.ChannelId][group].Dequeue();
-                                                       double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / x.WindowSize * 100;
+                                                       double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / DeltaFData[cameraChannel.ChannelId][group].ToList().Average() * 100;
                                                        if (deltaF >= x.DeltaF)
                                                        {
                                                            SetDeltaFEvent(x, ts, deltaF);

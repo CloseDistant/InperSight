@@ -71,25 +71,25 @@
                     <ComboBox Margin="20 0" x:Name="filtersChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" HorizontalAlignment="Right"  SelectedItem="{Binding ActiveChannel,UpdateSourceTrigger=PropertyChanged}" MinWidth="130" />
                 </Grid>
                 <Grid Margin="0 10 0 0">
-                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsLowPass}">
+                    <CheckBox VerticalAlignment="Center" Name="lowpass" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsLowPass,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
                         <TextBlock Margin="10 0 0 0" Text="Low Pass (Hz)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
-                    <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsLowPass}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.LowPass}"/>
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" Width="90" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Low_TextChanged}" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsLowPass}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.LowPass}"/>
                 </Grid>
                 <Grid Margin="0 10 0 0">
-                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay, Path=SelectedItem.Filters.IsHighPass}">
+                    <CheckBox VerticalAlignment="Center" Name="highpass" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel, Path=SelectedItem.Filters.IsHighPass,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
                         <TextBlock Margin="10 0 0 0" Text="High Pass (Hz)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
-                    <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsHighPass}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.HighPass}"/>
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" Width="90" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action High_TextChanged}" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsHighPass}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.HighPass}"/>
                 </Grid>
                 <Grid Margin="0 10 0 0">
-                    <CheckBox  HorizontalAlignment="Left" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsNotch}">
+                    <CheckBox  HorizontalAlignment="Left" Name="notch" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsNotch}">
                         <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="Notch (Hz)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
-                    <hc:TextBox Width="90" Margin="0 0 20 0" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsNotch}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.Notch}"/>
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}"  Width="90" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Notch_TextChanged}"  IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsNotch}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.Notch}"/>
                 </Grid>
                 <Grid Margin="0 10 0 0" >
-                    <CheckBox  HorizontalAlignment="Left" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
+                    <CheckBox Name="smooth"  HorizontalAlignment="Left" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=filtersChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
                         <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="Smooth (Point)"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     </CheckBox>
                     <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}"  Width="90" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="2" InperTextType="Int" InperTextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=filtersChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=filtersChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>

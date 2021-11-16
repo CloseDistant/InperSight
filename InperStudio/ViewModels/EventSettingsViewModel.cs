@@ -276,7 +276,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = "DIO-" + (ch.ChannelId + 1) + "-";
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
                         }
                     }
@@ -286,7 +286,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = "Start";
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
                         }
                     }
@@ -296,7 +296,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = "Stop";
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
                         }
                     }
@@ -306,7 +306,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = "Manual-" + (manualChannels.Count == 0 ? 1 : manualChannels.Last().ChannelId + 2) + "-";
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
                         }
                     }
@@ -316,7 +316,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = "ROI-" + (ch.ChannelId + 1) + "-";
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
                         }
                     }
@@ -326,7 +326,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = "AI-" + ch.ChannelId + "-";
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
                         }
                     }
@@ -675,7 +675,7 @@ namespace InperStudio.ViewModels
                                         {
                                             if (x.Condition.Hotkeys == channle.Condition.Hotkeys)
                                             {
-                                                Growl.Warning(new GrowlInfo() { Message = "快捷键重复，请修改当前快捷键配置", Token = "SuccessMsg", WaitTime = 1 });
+                                                Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
                                                 mc.IsActive = false;
                                             }
                                         }
@@ -705,7 +705,7 @@ namespace InperStudio.ViewModels
                                 }
                                 if (manual != null)
                                 {
-                                    Growl.Warning(new GrowlInfo() { Message = "快捷键重复，请修改当前快捷键配置", Token = "SuccessMsg", WaitTime = 1 });
+                                    Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
                                     mc.IsActive = false;
                                     return;
                                 }
@@ -732,7 +732,7 @@ namespace InperStudio.ViewModels
                                     EventChannel manual = manualChannels.FirstOrDefault(x => x.Hotkeys == ch.Hotkeys);
                                     if (manual != null)
                                     {
-                                        Growl.Warning(new GrowlInfo() { Message = "快捷键重复，请修改当前快捷键配置", Token = "SuccessMsg", WaitTime = 1 });
+                                        Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
                                         return;
                                     }
                                 }
