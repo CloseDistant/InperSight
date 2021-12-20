@@ -8,7 +8,6 @@ using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
-using InperStudioControlLib.Lib.DeviceAgency;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
@@ -498,7 +497,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = verify;
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                            Growl.Warning(new GrowlInfo() { Message = "Fixed character, cannot be changed", Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
                         else

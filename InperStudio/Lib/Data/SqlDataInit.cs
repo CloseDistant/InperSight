@@ -89,8 +89,8 @@ namespace InperStudio.Lib.Data
                 TablesDesc desc = new TablesDesc()
                 {
                     TableName = nameof(Input) + item.Tag,
-                    TableType = 0,
-                    Desc = "0:Input 输入电信号数据表",
+                    TableType = 101,
+                    Desc = "101:Input 输入电信号数据表",
                     CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
                 };
                 _ = sqlSugar.Insertable(desc).ExecuteCommand();
@@ -137,12 +137,12 @@ namespace InperStudio.Lib.Data
                 PropertyName = nameof(InperGlobalClass.EventSettings),
                 CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
             });
-            configs.Add(new Config()
-            {
-                JsonText = JsonConvert.SerializeObject(InperGlobalClass.ManualEvents),
-                PropertyName = nameof(InperGlobalClass.EventSettings),
-                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-            });
+            //configs.Add(new Config()
+            //{
+            //    JsonText = JsonConvert.SerializeObject(InperGlobalClass.ManualEvents),
+            //    PropertyName = nameof(InperGlobalClass.ManualEvents),
+            //    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+            //});
             _ = sqlSugar.Insertable(configs).ExecuteCommand();
         }
     }

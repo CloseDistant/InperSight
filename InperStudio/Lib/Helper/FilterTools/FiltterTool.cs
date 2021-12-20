@@ -130,8 +130,6 @@ namespace InperStudio.Lib.Helper.FilterTools
                 // float y = iirfilter.a1 * x0 + iirfilter.a2 * iirfilter.x1 + iirfilter.b0 * iirfilter.x2 + iirfilter.b1 * iirfilter.y1 + iirfilter.b2 * iirfilter.y2;
                 y = x0 * NotchFilter.b0 + NotchFilter.x1 * NotchFilter.b1 + NotchFilter.x2 * NotchFilter.b2 + NotchFilter.y1 * NotchFilter.a1 + NotchFilter.y2 * NotchFilter.a2;
 
-                Console.WriteLine("b0:"+NotchFilter.b0+"---"+ "b1:" + NotchFilter.b1 + "---" + "b2:" + NotchFilter.b2 + "---" + "a1:" + NotchFilter.a1 + "---" + "a2:" + NotchFilter.a2 + "---");
-                Console.WriteLine("x1:" + NotchFilter.x1 + "---" + "x2:" + NotchFilter.x2 + "---" + "y1:" + NotchFilter.y1 + "---" + "y2:" + NotchFilter.y2 + "---");
                 NotchFilter.x2 = NotchFilter.x1;
                 NotchFilter.x1 = x0;
                 NotchFilter.y2 = NotchFilter.y1;

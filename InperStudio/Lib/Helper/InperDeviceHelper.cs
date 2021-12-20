@@ -8,8 +8,6 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.ViewModels;
 using InperStudio.Views;
-using InperStudioControlLib.Lib.DeviceAgency;
-using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;

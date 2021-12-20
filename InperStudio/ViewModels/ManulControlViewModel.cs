@@ -9,7 +9,6 @@ using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
-using InperStudioControlLib.Lib.DeviceAgency;
 using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
@@ -410,6 +409,7 @@ namespace InperStudio.ViewModels
                                    {
                                        ChannelId = channel.ChannelId,
                                        CameraTime = time.Ticks,
+                                       Type = typeEnum.ToString(),
                                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
                                    };
                                    _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());

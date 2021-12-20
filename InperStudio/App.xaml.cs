@@ -1,4 +1,5 @@
-﻿using InperStudio.Lib.Bean;
+﻿using InperProtocolStack.Communication;
+using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data;
 using InperStudio.Lib.Helper;
 using InperStudioControlLib.Lib.Config;
@@ -11,6 +12,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -35,6 +37,7 @@ namespace InperStudio
         public static ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static SqlDataInit SqlDataInit;
         private static System.Threading.Mutex mutex;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             mutex = new System.Threading.Mutex(true, "OnlyRun_CRNS");

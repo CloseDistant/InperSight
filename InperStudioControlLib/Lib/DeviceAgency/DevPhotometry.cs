@@ -5,142 +5,142 @@ using OpenCvSharp;
 
 namespace InperStudioControlLib.Lib.DeviceAgency
 {
-    public class MarkedMat
-    {
-        public int Group { get; set; } = 0;
-        public long Timestamp { get; set; } = 0;
-        public Mat ImageMat { get; set; }
-    }
+    //public class MarkedMat
+    //{
+    //    public int Group { get; set; } = 0;
+    //    public long Timestamp { get; set; } = 0;
+    //    public Mat ImageMat { get; set; }
+    //}
 
 
-    public class DevPhotometry
-    {
-        private static readonly DevPhotometry _Instance = new DevPhotometry();
-        public static DevPhotometry Instance => _Instance;
+    //public class DevPhotometry
+    //{
+    //    private static readonly DevPhotometry _Instance = new DevPhotometry();
+    //    public static DevPhotometry Instance => _Instance;
 
 
-        private USARTOperator _USARTOpe = USARTOperator.Instance;
-        private CameraAgent _CamAgent = CameraAgent.Instance;
+    //    private USARTOperator _USARTOpe = USARTOperator.Instance;
+    //    private CameraAgent _CamAgent = CameraAgent.Instance;
 
-        private BaslerCamera _BaslerCam;
+    //    private BaslerCamera _BaslerCam;
 
-        private DevPhotometry()
-        {
-            _CamAgent.CameraStatusChanged += CameraStatusChanged;
-            _USARTOpe.PortStatusChanged += PortStatusChanged;
-            _USARTOpe.LightStatusChanged += LightStatusChanged;
+    //    private DevPhotometry()
+    //    {
+    //        _CamAgent.CameraStatusChanged += CameraStatusChanged;
+    //        _USARTOpe.PortStatusChanged += PortStatusChanged;
+    //        _USARTOpe.LightStatusChanged += LightStatusChanged;
 
-            try
-            {
-                _BaslerCam = _CamAgent.CreateCamera();
-                if (_BaslerCam == null)
-                {
-                    HandyControl.Controls.Growl.Error("Failed to create basler camera");
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                HandyControl.Controls.Growl.Error("On creat basler camera " + ex.Message);
-                return;
-            }
+    //        try
+    //        {
+    //            _BaslerCam = _CamAgent.CreateCamera();
+    //            if (_BaslerCam == null)
+    //            {
+    //                HandyControl.Controls.Growl.Error("Failed to create basler camera");
+    //                return;
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            HandyControl.Controls.Growl.Error("On creat basler camera " + ex.Message);
+    //            return;
+    //        }
 
-            _BaslerCam.DidGrabImage += ImageGrabbed;
-            _USARTOpe.GetDeviceConfig();
-        }
+    //        _BaslerCam.DidGrabImage += ImageGrabbed;
+    //        _USARTOpe.GetDeviceConfig();
+    //    }
 
-        #region events handlers
-        public event EventHandler<MarkedMat> OnImageGrabbed;
-        private void ImageGrabbed(object sender, MarkedMat mmat)
-        {
-            OnImageGrabbed?.Invoke(this, mmat);
-        }
-
-
-        public event EventHandler<CameraStatusChangedEventArgs> OnCameraStatusChanged;
-        private void CameraStatusChanged(object sender, CameraStatusChangedEventArgs e)
-        {
-            OnCameraStatusChanged?.Invoke(this, e);
-            return;
-        }
+    //    #region events handlers
+    //    public event EventHandler<MarkedMat> OnImageGrabbed;
+    //    private void ImageGrabbed(object sender, MarkedMat mmat)
+    //    {
+    //        OnImageGrabbed?.Invoke(this, mmat);
+    //    }
 
 
-        public event EventHandler<PortStatusChangedEventArgs> OnPortStatusChanged;
-        private void PortStatusChanged(object sender, PortStatusChangedEventArgs e)
-        {
-            OnPortStatusChanged?.Invoke(this, e);
-            return;
-        }
+    //    public event EventHandler<CameraStatusChangedEventArgs> OnCameraStatusChanged;
+    //    private void CameraStatusChanged(object sender, CameraStatusChangedEventArgs e)
+    //    {
+    //        OnCameraStatusChanged?.Invoke(this, e);
+    //        return;
+    //    }
 
 
-        public short Light0WaveLength => _USARTOpe.Light0WaveLength;
-        public short Light1WaveLength => _USARTOpe.Light1WaveLength;
-        public short Light2WaveLength => _USARTOpe.Light2WaveLength;
-        public short Light3WaveLength => _USARTOpe.Light3WaveLength;
-
-        public event EventHandler<LightStatusChangedEventArgs> OnLightStatusChanged;
-        private void LightStatusChanged(object sender, LightStatusChangedEventArgs e)
-        {
-            OnLightStatusChanged?.Invoke(this, e);
-            return;
-        }
-        #endregion
+    //    public event EventHandler<PortStatusChangedEventArgs> OnPortStatusChanged;
+    //    private void PortStatusChanged(object sender, PortStatusChangedEventArgs e)
+    //    {
+    //        OnPortStatusChanged?.Invoke(this, e);
+    //        return;
+    //    }
 
 
-        #region commands
-        public double SetFrameRate(double frame_rate)
-        {
-            return _USARTOpe.SetFrameRate(frame_rate);
-        }
+    //    public short Light0WaveLength => _USARTOpe.Light0WaveLength;
+    //    public short Light1WaveLength => _USARTOpe.Light1WaveLength;
+    //    public short Light2WaveLength => _USARTOpe.Light2WaveLength;
+    //    public short Light3WaveLength => _USARTOpe.Light3WaveLength;
+
+    //    public event EventHandler<LightStatusChangedEventArgs> OnLightStatusChanged;
+    //    private void LightStatusChanged(object sender, LightStatusChangedEventArgs e)
+    //    {
+    //        OnLightStatusChanged?.Invoke(this, e);
+    //        return;
+    //    }
+    //    #endregion
 
 
-        public double SetExposure(double exposure)
-        {
-            return _BaslerCam.SetExposure(exposure);
-        }
+    //    #region commands
+    //    public double SetFrameRate(double frame_rate)
+    //    {
+    //        return _USARTOpe.SetFrameRate(frame_rate);
+    //    }
 
 
-        public double SetGain(double gain)
-        {
-            return _BaslerCam.SetGain(gain);
-        }
+    //    public double SetExposure(double exposure)
+    //    {
+    //        return _BaslerCam.SetExposure(exposure);
+    //    }
 
 
-        public void SwitchLight(int light_no, bool enable)
-        {
-            _USARTOpe.SwitchLight(light_no, enable);
-        }
+    //    public double SetGain(double gain)
+    //    {
+    //        return _BaslerCam.SetGain(gain);
+    //    }
 
 
-        public void SetLightPower(int light_no, double power_percent)
-        {
-            _USARTOpe.SetLightPower(light_no, power_percent);
-        }
-        #endregion
+    //    public void SwitchLight(int light_no, bool enable)
+    //    {
+    //        _USARTOpe.SwitchLight(light_no, enable);
+    //    }
 
 
-        #region properties
-        public double CurrentExposure => _BaslerCam.GetCurrentExposure();
+    //    public void SetLightPower(int light_no, double power_percent)
+    //    {
+    //        _USARTOpe.SetLightPower(light_no, power_percent);
+    //    }
+    //    #endregion
 
-        public double CurrentFrameRate => _BaslerCam.GetCurrentFrameRate();
 
-        public double CurrentGain => _BaslerCam.GetCurrentGain();
+    //    #region properties
+    //    public double CurrentExposure => _BaslerCam.GetCurrentExposure();
 
-        public double MaximumExposure => _BaslerCam.GetMaximumExposure();
+    //    public double CurrentFrameRate => _BaslerCam.GetCurrentFrameRate();
 
-        public double MaximumFrameRate => _BaslerCam.GetMaximumFrameRate();
+    //    public double CurrentGain => _BaslerCam.GetCurrentGain();
 
-        public double MaximumGain => _BaslerCam.GetMaximumGain();
+    //    public double MaximumExposure => _BaslerCam.GetMaximumExposure();
 
-        public double MinimumExposure => _BaslerCam.GetMinimumExposure();
+    //    public double MaximumFrameRate => _BaslerCam.GetMaximumFrameRate();
 
-        public double MinimumFrameRate => _BaslerCam.GetMinimumFrameRate();
+    //    public double MaximumGain => _BaslerCam.GetMaximumGain();
 
-        public double MinimumGain => _BaslerCam.GetMinimumGain();
+    //    public double MinimumExposure => _BaslerCam.GetMinimumExposure();
 
-        public int VisionWidth => _BaslerCam.GetVisionWidth();
+    //    public double MinimumFrameRate => _BaslerCam.GetMinimumFrameRate();
 
-        public int VisionHeight => _BaslerCam.GetVisionHeight();
-        #endregion
-    }
+    //    public double MinimumGain => _BaslerCam.GetMinimumGain();
+
+    //    public int VisionWidth => _BaslerCam.GetVisionWidth();
+
+    //    public int VisionHeight => _BaslerCam.GetVisionHeight();
+    //    #endregion
+    //}
 }

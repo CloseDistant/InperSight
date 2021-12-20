@@ -13,6 +13,7 @@ namespace InperStudio.Lib.Data.Model
         [SugarColumn(IsIdentity = true, IsPrimaryKey = true)]
         public int Id { get; set; }
         public int ChannelId { get; set; }
+        public string Type { get; set; }
         public long CameraTime { get; set; }
         public DateTime CreateTime { get; set; }
     }

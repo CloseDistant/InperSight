@@ -5,7 +5,6 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
-using InperStudioControlLib.Lib.DeviceAgency;
 using Stylet;
 using System;
 using System.Collections.Generic;

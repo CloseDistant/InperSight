@@ -54,6 +54,7 @@ namespace InperStudio
                     }
                 }
                 db.Close();
+                db.Dispose();
             }
             catch (Exception ex)
             {

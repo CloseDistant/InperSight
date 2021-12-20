@@ -253,6 +253,7 @@ namespace InperStudio.ViewModels
                 {
                     ChannelId = x.ChannelId,
                     CameraTime = time.Ticks,
+                    Type = ChannelTypeEnum.Manual.ToString(),
                     CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
                 };
                 _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());

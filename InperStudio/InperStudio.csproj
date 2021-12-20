@@ -92,6 +92,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperPhotometry\bin\Debug\InperProtocolStack.dll</HintPath>
     </Reference>
+    <Reference Include="InperStudioControlLib">
+      <HintPath>..\InperStudioControlLib\bin\Debug\InperStudioControlLib.dll</HintPath>
+    </Reference>
     <Reference Include="K4os.Compression.LZ4, Version=1.1.11.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
       <HintPath>packages\K4os.Compression.LZ4.1.1.11\lib\net46\K4os.Compression.LZ4.dll</HintPath>
     </Reference>
@@ -461,12 +464,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\InperStudioControlLib\InperStudioControlLib.csproj">
-      <Project>{6168bb6b-9375-4a4d-9049-98408981bd53}</Project>
-      <Name>InperStudioControlLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Lib\Images\inper.png" />

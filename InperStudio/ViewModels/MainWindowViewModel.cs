@@ -4,8 +4,6 @@ using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
-using InperStudioControlLib.Lib.DeviceAgency;
-using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
 using InperStudioControlLib.Lib.Helper;
 using Stylet;
 using System;
