@@ -123,7 +123,14 @@ namespace InperStudio.ViewModels
                 {
                     if (grid.Name.Equals("chartItem"))
                     {
-                        this.windowManager.ShowDialog(new SignalPropertiesViewModel(SignalPropertiesTypeEnum.Camera, channel.ChannelId));
+                        if (channel.Type == ChannelTypeEnum.Camera.ToString())
+                        {
+                            this.windowManager.ShowDialog(new SignalPropertiesViewModel(SignalPropertiesTypeEnum.Camera, channel.ChannelId));
+                        }
+                        else
+                        {
+                            this.windowManager.ShowDialog(new SignalPropertiesViewModel(SignalPropertiesTypeEnum.Analog, channel.ChannelId));
+                        }
                     }
                     else
                     {

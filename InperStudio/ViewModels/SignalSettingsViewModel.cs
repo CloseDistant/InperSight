@@ -36,7 +36,7 @@ namespace InperStudio.ViewModels
         #region properties
         private readonly SignalSettingsTypeEnum @enum;
         private SignalSettingsView view;
-        
+
         //ellipse
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
@@ -75,26 +75,68 @@ namespace InperStudio.ViewModels
         {
             view = this.View as SignalSettingsView;
 
+            for (int i = 0; i < 8; i++)
+            {
+                AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 1, Name = "AI-" + (i + 1), BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
+            }
             switch (@enum)
             {
                 case SignalSettingsTypeEnum.Camera:
                     Init();
                     break;
                 case SignalSettingsTypeEnum.Analog:
-                    this.view.Title = "Analog Signal Settings";
-                    this.view.analog.Visibility = Visibility.Visible;
+                    view.Title = "Analog Signal Settings";
+                    view.analog.Visibility = Visibility.Visible;
+                    InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
+                    {
+                        if (x.Type == ChannelTypeEnum.Analog.ToString())
+                        {
+                            _ = AnalogChannels.Remove(AnalogChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId));
+                            AnalogActiveChannels.Add(new SignalCameraChannel()
+                            {
+                                ChannelId = x.ChannelId,
+                                ChannelType = x.Type,
+                                Name = x.Name,
+                                YaxisDoubleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
+                                BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color))
+                            });
+                            if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId && c.Type == x.Type) == null)
+                            {
+                                CameraChannel item = new CameraChannel()
+                                {
+                                    ChannelId = x.ChannelId,
+                                    Name = x.Name,
+                                    YVisibleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
+                                    Type = ChannelTypeEnum.Analog.ToString()
+                                };
+                                item.TimeSpanAxis = new TimeSpanAxis()
+                                {
+                                    DrawMajorBands = false,
+                                    DrawMajorGridLines = false,
+                                    DrawMinorGridLines = false,
+                                    VisibleRange = item.XVisibleRange,
+                                    Visibility = Visibility.Collapsed
+                                };
+                                item.Filters = new Lib.Bean.Channel.Filters();
+                                item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
+
+                                LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color?)ColorConverter.ConvertFromString(x.Color) };
+                                item.RenderableSeries.Add(line);
+
+                                InperDeviceHelper.Instance.CameraChannels.Add(item);
+                            }
+                        }
+                    });
+                    if (AnalogChannels.Count > 0)
+                    {
+                        view.PopButton.Background = AnalogChannels?.FirstOrDefault().BgColor;
+                        view.AnalogChannelCombox.SelectedIndex = 0;
+                    }
                     break;
                 default:
                     break;
             }
 
-            if (@enum == SignalSettingsTypeEnum.Analog)
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 1, Name = "AL-" + (i + 1) + "-PFC", BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
-                }
-            }
             view.ConfirmClickEvent += (s, e) =>
             {
                 RequestClose();
@@ -206,9 +248,11 @@ namespace InperStudio.ViewModels
                 }
                 InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
                 {
-                    Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x);
-
-                    _ = view.ellipseCanvas.Children.Add(grid);
+                    if (x.Type == ChannelTypeEnum.Camera.ToString())
+                    {
+                        Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x);
+                        _ = view.ellipseCanvas.Children.Add(grid);
+                    }
                 });
                 _ = InperDeviceHelper.Instance.device.SetGain(InperGlobalClass.CameraSignalSettings.Gain);
             }
@@ -263,11 +307,11 @@ namespace InperStudio.ViewModels
                         view.ellipseCanvas.Children.Remove(moveGrid);
                         _ = EllipseBorder.Remove(moveGrid);
 
-                        CameraChannel item = InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1);
+                        CameraChannel item = InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
                         _ = InperDeviceHelper.CameraChannels.Remove(item);
                         _ = InperDeviceHelper._SignalQs.TryRemove(int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1);
 
-                        Lib.Helper.JsonBean.Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
+                        Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Camera.ToString());
                         if (channel != null)
                         {
                             _ = InperGlobalClass.CameraSignalSettings.CameraChannels.Remove(channel);
@@ -325,7 +369,7 @@ namespace InperStudio.ViewModels
 
             view.channelName.Text = "ROI-";
 
-            if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1) == null)
+            if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString()) == null)
             {
                 CameraChannel item = new CameraChannel()
                 {
@@ -334,7 +378,8 @@ namespace InperStudio.ViewModels
                     YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop),
                     Offset = _channel.Offset,
                     OffsetWindowSize = _channel.OffsetWindowSize,
-                    Height = _channel.Height
+                    Height = _channel.Height,
+                    Type = ChannelTypeEnum.Camera.ToString()
                 };
                 item.Filters.IsSmooth = _channel.Filters.IsSmooth;
                 item.Filters.Smooth = _channel.Filters.Smooth;
@@ -378,11 +423,11 @@ namespace InperStudio.ViewModels
 
                 InperDeviceHelper.Instance.CameraChannels.Add(item);
 
-                Lib.Helper.JsonBean.Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1);
+                Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
 
                 if (channel == null)
                 {
-                    InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Lib.Helper.JsonBean.Channel()
+                    InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Channel()
                     {
                         ChannelId = index - 1,
                         Name = "ROI-" + index + "-",
@@ -391,7 +436,8 @@ namespace InperStudio.ViewModels
                         ROI = ellipse.Width,
                         YTop = ytop,
                         YBottom = ybottom,
-                    }); ;
+                        Type = ChannelTypeEnum.Camera.ToString()
+                    });
                 }
 
                 Mat m = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
@@ -790,7 +836,7 @@ namespace InperStudio.ViewModels
         }
         private void SetMat(Mat mat, Grid grid)
         {
-            double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth;
+            double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth == 0 ? this.view.ellipseCanvas.Width : this.view.ellipseCanvas.ActualWidth;
             double rect_left = (double)grid.GetValue(Canvas.LeftProperty) * scale;
             double rect_top = (double)grid.GetValue(Canvas.TopProperty) * scale;
 
@@ -804,7 +850,7 @@ namespace InperStudio.ViewModels
         }
         public void Interval_Checked(object sender, RoutedEventArgs e)
         {
-           InperDeviceHelper.Instance._Metronome.Start();
+            InperDeviceHelper.Instance._Metronome.Start();
         }
         public void Continus_Checked(object sender, RoutedEventArgs e)
         {
@@ -831,17 +877,17 @@ namespace InperStudio.ViewModels
             {
                 view.Dispatcher.BeginInvoke(new Action(() =>
                  {
-                    //InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp", System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
-                    //获取控件相对于窗口位置
-                    GeneralTransform generalTransform = this.view.image.TransformToAncestor(this.view.signal);
+                     //InperComputerInfoHelper.SaveFrameworkElementToImage(this.view.ellipseCanvas, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp", System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                     //获取控件相对于窗口位置
+                     GeneralTransform generalTransform = this.view.image.TransformToAncestor(this.view.signal);
                      System.Windows.Point point = generalTransform.Transform(new System.Windows.Point(0, 0));
 
-                    //获取窗口相对于屏幕的位置
-                    System.Windows.Point ptLeftUp = new System.Windows.Point(0, 0);
+                     //获取窗口相对于屏幕的位置
+                     System.Windows.Point ptLeftUp = new System.Windows.Point(0, 0);
                      ptLeftUp = this.view.PointToScreen(ptLeftUp);
 
-                    //计算DPI缩放
-                    var ct = PresentationSource.FromVisual(view.image)?.CompositionTarget;
+                     //计算DPI缩放
+                     var ct = PresentationSource.FromVisual(view.image)?.CompositionTarget;
                      var matrix = ct == null ? Matrix.Identity : ct.TransformToDevice;
 
                      double x = matrix.M11 == 0 ? 1 : matrix.M11;
@@ -873,11 +919,11 @@ namespace InperStudio.ViewModels
                 TextBox tb = sender as TextBox;
                 if (tb.IsFocused)
                 {
-                    if (tb.Text.Length < 5 || !tb.Text.StartsWith("AL-" + (view.AnalogChannelCombox.SelectedIndex + 1) + "-"))
+                    if (tb.Text.Length < 4 || !tb.Text.StartsWith("AI-" + (view.AnalogChannelCombox.SelectedIndex + 1)))
                     {
-                        tb.Text = "AL-" + (this.view.AnalogChannelCombox.SelectedIndex + 1) + "-";
+                        tb.Text = "AI-" + (this.view.AnalogChannelCombox.SelectedIndex + 1);
                         tb.SelectionStart = tb.Text.Length;
-                        Growl.Error(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
+                        Growl.Error(new GrowlInfo() { Message = "Fixed character, cannot be changed", Token = "SuccessMsg", WaitTime = 1 });
                         return;
                     }
                     AnalogChannels[view.AnalogChannelCombox.SelectedIndex].Name = tb.Text;
@@ -921,7 +967,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var ch = this.view.AnalogChannelCombox.SelectedItem as SignalCameraChannel;
+                SignalCameraChannel ch = this.view.AnalogChannelCombox.SelectedItem as SignalCameraChannel;
                 var ch_active = this.view.analogActiveChannel.SelectedItem as SignalCameraChannel;
                 if (moveType == "leftMove")//右移是激活 左移是取消激活
                 {
@@ -933,15 +979,61 @@ namespace InperStudio.ViewModels
                         {
                             view.AnalogChannelCombox.SelectedIndex = 0;
                         }
+                        CameraChannel cameraChannel = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
+                        if (cameraChannel != null)
+                        {
+                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(cameraChannel);
+                        }
+                        Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
+                        if (channel != null)
+                        {
+                            _ = InperGlobalClass.CameraSignalSettings.CameraChannels.Remove(channel);
+                        }
                     }
                 }
                 else
                 {
                     if (AnalogChannels.Count > 0 && ch != null)
                     {
-                        AnalogChannels.Remove(ch);
+                        _ = AnalogChannels.Remove(ch);
                         AnalogActiveChannels.Add(ch);
 
+                        CameraChannel item = new CameraChannel()
+                        {
+                            ChannelId = ch.ChannelId,
+                            Name = ch.Name,
+                            YVisibleRange = new SciChart.Data.Model.DoubleRange(-10, 10),
+                            Type = ChannelTypeEnum.Analog.ToString()
+                        };
+                        item.TimeSpanAxis = new TimeSpanAxis()
+                        {
+                            DrawMajorBands = false,
+                            DrawMajorGridLines = false,
+                            DrawMinorGridLines = false,
+                            VisibleRange = item.XVisibleRange,
+                            Visibility = Visibility.Collapsed
+                        };
+                        item.Filters = new Lib.Bean.Channel.Filters();
+                        item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
+
+                        LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = ch.BgColor.Color };
+                        item.RenderableSeries.Add(line);
+
+                        InperDeviceHelper.Instance.CameraChannels.Add(item);
+
+                        Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
+                        if (channel == null)
+                        {
+                            InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Channel()
+                            {
+                                ChannelId = item.ChannelId,
+                                Name = item.Name,
+                                YTop = 10,
+                                YBottom = 0,
+                                Type = ChannelTypeEnum.Analog.ToString(),
+                                Color = ch.BgColor.Color.ToString()
+                            });
+                        }
                         view.PopButton.Background = AnalogChannels.First().BgColor;
                         view.AnalogChannelCombox.SelectedIndex = 0;
                     }
@@ -970,7 +1062,7 @@ namespace InperStudio.ViewModels
                     }
                 });
 
-                InperDeviceHelper.CameraChannels.ToList().ForEach(x =>
+                InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(x =>
                 {
                     if (x.Name.EndsWith("-"))
                     {

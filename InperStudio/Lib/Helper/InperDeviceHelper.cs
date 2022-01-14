@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using InperDeviceManagement;
 using InperProtocolStack;
+using InperProtocolStack.Communication;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
@@ -42,8 +43,25 @@ namespace InperStudio.Lib.Helper
     }
     public class InperDeviceHelper : PropertyChangedBase
     {
-        public static InperDeviceHelper Instance { get; } = new InperDeviceHelper();
-
+        private static InperDeviceHelper inperDeviceHelper;
+        private static object _lock = new object();
+        public static InperDeviceHelper Instance
+        {
+            get
+            {
+                if (inperDeviceHelper == null)
+                {
+                    lock (_lock)
+                    {
+                        if (inperDeviceHelper == null)
+                        {
+                            inperDeviceHelper = new InperDeviceHelper();
+                        }
+                    }
+                }
+                return inperDeviceHelper;
+            }
+        }
         private readonly object _QLock = new object();
         private readonly object _DisplayQLock = new object();
         private readonly object _SaveDataLock = new object();
@@ -109,40 +127,52 @@ namespace InperStudio.Lib.Helper
         {
             this.device = device;
             device.DidGrabImage += Instance_OnImageGrabbed;
+            device.OnUsbInfoUpdated += Device_OnUsbInfoUpdated;
+            bool isComplete = false;
             device.OnDevInfoUpdated += (s, ee) =>
             {
-                device.LightSourceList.ForEach(e =>
+                if (!isComplete)
                 {
-                    try
+                    device.LightSourceList.ForEach(e =>
                     {
-                        bool exist = false;
-                        if (e.WaveLength > 0)
+                        try
                         {
-                            WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 0);
-                            if (wg != null)
+                            bool exist = false;
+                            if (e.WaveLength > 0)
                             {
-                                LightWaveLength.Add(wg);
-                                device.SwitchLight((uint)wg.GroupId, true);
-                                device.SetLightPower((uint)wg.GroupId, wg.LightPower);
+                                WaveGroup wg = InperGlobalClass.CameraSignalSettings.LightMode.FirstOrDefault(x => x.GroupId == 0);
+                                if (wg != null)
+                                {
+                                    LightWaveLength.Add(wg);
+                                    device.SwitchLight((uint)wg.GroupId, true);
+                                    device.SetLightPower((uint)wg.GroupId, wg.LightPower);
+                                }
+                                else
+                                {
+                                    LightWaveLength.Add(new WaveGroup() { GroupId = (int)e.LightID, WaveType = e.WaveLength + " nm" });
+                                }
+                                exist = true;
                             }
-                            else
+                            //WaveInitEvent?.Invoke(this, exist);
+                            if (!exist)
                             {
-                                LightWaveLength.Add(new WaveGroup() { GroupId = (int)e.LightID, WaveType = e.WaveLength + " nm" });
+                                Growl.Error("未获取到激发光");
                             }
-                            exist = true;
                         }
-                        WaveInitEvent?.Invoke(this, exist);
-                        if (!exist)
+                        catch (Exception ex)
                         {
-                            Growl.Error("未获取到激发光");
+                            Growl.Error("获取激发光失败：" + ex.ToString());
+                            App.Log.Error(ex.ToString());
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Growl.Error("获取激发光失败：" + ex.ToString());
-                        App.Log.Error(ex.ToString());
-                    }
-                });
+                        finally
+                        {
+                            if (LightWaveLength.Count > 0)
+                            {
+                                isComplete = true;
+                            }
+                        }
+                    });
+                }
             };
             device.SyncDeviceInfo();
 
@@ -174,7 +204,7 @@ namespace InperStudio.Lib.Helper
                     {
                         if (x.IsChecked)
                         {
-                            InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
+                            Instance.device.SetLightPower((uint)x.GroupId, 0);
                             Thread.Sleep(50);
                         }
                     });
@@ -227,7 +257,30 @@ namespace InperStudio.Lib.Helper
                 VisibleRange = EventChannelChart.XVisibleRange,
                 Visibility = Visibility.Collapsed
             };
+        }
+        public List<UsbAdData> UsbAdDatas = new List<UsbAdData>();
+        private readonly AutoResetEvent _adResetEvent = new AutoResetEvent(false);
+        private readonly object _adObject = new object();
+        private void Device_OnUsbInfoUpdated(List<UsbAdData> obj)
+        {
+            //System.Diagnostics.Debug.WriteLine(DateTime.Now.Second + "***" + _count++);
+            //if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
+            //{
+            //    Monitor.Enter(_adObject);
 
+            //    UsbAdDatas.AddRange(obj);
+            //    int count = CameraChannels.Count(x => x.Type == ChannelTypeEnum.Analog.ToString());
+
+            //    if (count * Math.Ceiling(30000 / InperGlobalClass.CameraSignalSettings.AiSampling) <= UsbAdDatas.Count * UsbAdDatas.First().Values.Count)
+            //    {
+            //        Monitor.Exit(_adObject);
+            //        _ = _adResetEvent.Set();
+            //    }
+            //    else
+            //    {
+            //        Monitor.Exit(_adObject);
+            //    }
+            //}
         }
 
         private void Device_OnDevNotification(object sender, DevNotificationEventArgs e)
@@ -406,11 +459,70 @@ namespace InperStudio.Lib.Helper
                 }
             }
         }
+        private readonly List<UsbAdData> usbAdDatas = new List<UsbAdData>();
+        public void UsbAdProc()
+        {
+            while (isLoop)
+            {
+                _ = _adResetEvent.WaitOne();
+                if (Monitor.TryEnter(_adObject))
+                {
+                    foreach (UsbAdData adData in UsbAdDatas)
+                    {
+                        if (usbAdDatas?.FirstOrDefault(x => x.ChannelId == adData.ChannelId) != null)
+                        {
+                            usbAdDatas.FirstOrDefault(x => x.ChannelId == adData.ChannelId).Values.AddRange(adData.Values);
+                        }
+                        else
+                        {
+                            usbAdDatas.Add(adData);
+                        }
+                    }
+                    UsbAdDatas.Clear();
+                    Monitor.Exit(_adObject);
+                    foreach (UsbAdData adData in usbAdDatas)
+                    {
+                        CameraChannel ccn = CameraChannels.FirstOrDefault(x => x.ChannelId == adData.ChannelId);
+                        if (ccn != null)
+                        {
+                            IDataSeries ds = ccn.RenderableSeries.First().DataSeries;
+                            Tuple<List<TimeSpan>, List<double>> res = AdDataTrans(((TimeSpan)ds.XMax).Ticks < 0 ? 0 : ((TimeSpan)ds.XMax).Ticks, adData);
+                            using (ds.SuspendUpdates())
+                            {
+                                (ds as XyDataSeries<TimeSpan, double>).Append(res.Item1, res.Item2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private double adFsTimeInterval = (double)1 / 30000;
+        private int _count = 0;
+        private Tuple<List<TimeSpan>, List<double>> AdDataTrans(long xMax, UsbAdData adData)
+        {
+            int interval = (int)Math.Floor(30000 / InperGlobalClass.CameraSignalSettings.AiSampling);
+
+            List<TimeSpan> timeSpans = new List<TimeSpan>();
+            List<double> values = new List<double>();
+
+            int count = (int)Math.Floor(adData.Values.Count / (double)interval);
+            for (int i = 0; i < count; i++)
+            {
+                timeSpans.Add(new TimeSpan(xMax + (long)(adFsTimeInterval * (i + 1) * interval * Math.Pow(10, 7))));
+                values.Add(adData.Values[(i + 1) * interval - 1]);
+                if (adData.ChannelId == 1)
+                {
+                    Console.WriteLine(adData.Values[(i + 1) * interval - 1] + "---" + timeSpans.Last().Seconds + "---" + DateTime.Now.Second + "---" + _count++);
+                }
+            }
+            adData.Values.RemoveRange(0, count * interval);
+            return new Tuple<List<TimeSpan>, List<double>>(timeSpans, values);
+        }
         public void FrameProc()
         {
             while (isLoop)
             {
-                InperDeviceManagement.MarkedMat[] mmats;
+                MarkedMat[] mmats;
                 _ = _AREvent.WaitOne();
 
                 if (Monitor.TryEnter(_QLock))
@@ -419,7 +531,7 @@ namespace InperStudio.Lib.Helper
                     _MatQ.Clear();
                     Monitor.Exit(_QLock);
 
-                    foreach (InperDeviceManagement.MarkedMat m in mmats)
+                    foreach (MarkedMat m in mmats)
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
                         time = ts;
@@ -435,39 +547,42 @@ namespace InperStudio.Lib.Helper
                         if (CameraChannels.Count > 0)
                         {
                             _ = Parallel.ForEach(CameraChannels, mask =>
-                              {
-                                  double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
-                                  if (r > 0)
                                   {
-                                      if (mask.Offset)
+                                      if (mask.Type == ChannelTypeEnum.Camera.ToString())
                                       {
-                                          r -= Offset(mask, m.Group, r);
-                                      }
+                                          double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
 
-                                      DeltaFCalculate(mask, m.Group, r, ts);
+                                          if (r > 0)
+                                          {
+                                              if (mask.Offset)
+                                              {
+                                                  r -= Offset(mask, m.Group, r);
+                                              }
 
-                                      if (mask.Filters.IsSmooth)
-                                      {
-                                          r = Smooth(mask, m.Group, r);
-                                      }
+                                              DeltaFCalculate(mask, m.Group, r, ts);
 
-                                      if (mask.Filters.IsHighPass)
-                                      {
-                                          r = HighPass(mask, m.Group, r);
-                                      }
+                                              if (mask.Filters.IsSmooth)
+                                              {
+                                                  r = Smooth(mask, m.Group, r);
+                                              }
 
-                                      if (mask.Filters.IsLowPass)
-                                      {
-                                          r = LowPass(mask, m.Group, r);
+                                              if (mask.Filters.IsHighPass)
+                                              {
+                                                  r = HighPass(mask, m.Group, r);
+                                              }
+
+                                              if (mask.Filters.IsLowPass)
+                                              {
+                                                  r = LowPass(mask, m.Group, r);
+                                              }
+                                              if (mask.Filters.IsNotch)
+                                              {
+                                                  r = NotchPass(mask, m.Group, r);
+                                              }
+                                              ploting_data[mask.ChannelId] = r;
+                                          }
                                       }
-                                      if (mask.Filters.IsNotch)
-                                      {
-                                          r = NotchPass(mask, m.Group, r);
-                                      }
-                                      ploting_data[mask.ChannelId] = r;
-                                  }
-                              });
+                                  });
                             if (ploting_data.Count > 0)
                             {
                                 this.AppendData(ploting_data, m.Group, ts);
@@ -581,7 +696,7 @@ namespace InperStudio.Lib.Helper
                                            if (DeltaFData[cameraChannel.ChannelId][group].Count > x.WindowSize)
                                            {
                                                _ = DeltaFData[cameraChannel.ChannelId][group].Dequeue();
-                                               double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / DeltaFData[cameraChannel.ChannelId][group].ToList().Average() * 100;
+                                               double deltaF = Math.Abs(r - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / DeltaFData[cameraChannel.ChannelId][group].ToList().Average() * 100;
                                                if (deltaF >= x.DeltaF)
                                                {
                                                    SetDeltaFEvent(x, ts, deltaF);
@@ -607,7 +722,7 @@ namespace InperStudio.Lib.Helper
                                                    if (DeltaFData[cameraChannel.ChannelId][group].Count > x.WindowSize)
                                                    {
                                                        _ = DeltaFData[cameraChannel.ChannelId][group].Dequeue();
-                                                       double deltaF = Math.Abs(DeltaFData[cameraChannel.ChannelId][group].ToList().LastOrDefault() - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / DeltaFData[cameraChannel.ChannelId][group].ToList().Average() * 100;
+                                                       double deltaF = Math.Abs(r - DeltaFData[cameraChannel.ChannelId][group].ToList().Average()) / DeltaFData[cameraChannel.ChannelId][group].ToList().Average() * 100;
                                                        if (deltaF >= x.DeltaF)
                                                        {
                                                            SetDeltaFEvent(x, ts, deltaF);
@@ -721,7 +836,7 @@ namespace InperStudio.Lib.Helper
 
                         _ = Parallel.ForEach(signalQs, kv =>
                         {
-                            CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
+                            CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key && x.Type == ChannelTypeEnum.Camera.ToString());
                             if (channel.LightModes.Count > 0)
                             {
                                 _ = Parallel.ForEach(channel.RenderableSeries, item =>
@@ -1037,11 +1152,19 @@ namespace InperStudio.Lib.Helper
 
                 CameraChannels.ToList().ForEach(x =>
                 {
-                    x.RenderableSeries.ToList().ForEach(line =>
+                    if (x.Type == ChannelTypeEnum.Camera.ToString())
                     {
-                        (line.DataSeries as XyDataSeries<TimeSpan, double>).Clear();
-                        line.DataSeries.FifoCapacity = 20 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
-                    });
+                        x.RenderableSeries.ToList().ForEach(line =>
+                        {
+                            (line.DataSeries as XyDataSeries<TimeSpan, double>).Clear();
+                            line.DataSeries.FifoCapacity = 20 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
+                        });
+                    }
+                    if (x.Type == ChannelTypeEnum.Analog.ToString())
+                    {
+                        x.RenderableSeries.First().DataSeries.Clear();
+                        x.RenderableSeries.First().DataSeries.FifoCapacity = (int?)(20 * 60 * InperGlobalClass.CameraSignalSettings.AiSampling);
+                    }
                 });
                 if (EventChannelChart.RenderableSeries.Count > 0)
                 {
@@ -1076,6 +1199,7 @@ namespace InperStudio.Lib.Helper
 
                 updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
                 frameProcTask = Task.Factory.StartNew(() => { FrameProc(); });
+                Task.Factory.StartNew(() => { UsbAdProc(); });
                 StartCollectEvent?.Invoke(true);
                 //saveDataTask = Task.Factory.StartNew(() => { SaveDateProc(); });
             }

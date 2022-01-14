@@ -12,6 +12,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public double Exposure { get; set; }
         public double Sampling { get; set; }
+        public double AiSampling { get; set; }
         public double Gain { get; set; }
         public double Brightness { get; set; }
         public RecordMode RecordMode { get; set; }
@@ -32,6 +33,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public int ChannelId { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
+        public string Color { get; set; }
         public double ROI { get; set; }
         public double DeltaF { get; set; }
         public double Tau1 { get; set; } = 0.2;

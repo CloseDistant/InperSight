@@ -138,7 +138,13 @@ namespace InperStudio.Views.Control
                     {
                         if (window.Name.Contains("MainWindow"))
                         {
-                            (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
+                            SignalSettingsViewModel _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera);
+                            (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
+                            _window.RequestClose();
+
+                             _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog);
+                            (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
+                            _window.RequestClose();
                         }
                     }
                 }

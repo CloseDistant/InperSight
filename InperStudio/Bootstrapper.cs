@@ -49,7 +49,6 @@ namespace InperStudio
                                 _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
                                 Environment.Exit(0);
                             }
-
                         }
                     }
                 }

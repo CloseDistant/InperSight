@@ -34,14 +34,14 @@
     </UserControl.Resources>
     <Grid x:Name="Root_Gird">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition  Width="2*" />
+            <ColumnDefinition  Width="2.5*" />
             <ColumnDefinition  Width="2.5*" />
             <ColumnDefinition  Width="2.5*" />
             <ColumnDefinition  Width="4*"  />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" VerticalAlignment="Center">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" >
-                <StackPanel Margin="10 0">
+                <StackPanel Margin="15 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Camera">
                         <StackPanel>
                             <Grid x:Name="fibers">
@@ -75,7 +75,7 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <StackPanel Margin="10 0" Visibility="Collapsed">
+                <StackPanel Margin="15 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Analog">
                         <StackPanel>
                             <Grid x:Name="analog">

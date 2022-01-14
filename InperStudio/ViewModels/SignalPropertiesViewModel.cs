@@ -43,11 +43,14 @@ namespace InperStudio.ViewModels
                 switch (@enum)
                 {
                     case SignalPropertiesTypeEnum.Camera:
+                        this.view.camera.Visibility = Visibility.Visible;
                         CameraInit();
                         break;
                     case SignalPropertiesTypeEnum.Analog:
                         this.view.analog.Visibility = Visibility.Visible;
+                        this.view.ai_sampling.Visibility = Visibility.Visible;
                         this.view.Title = "Analog Signal Properties";
+                        CameraInit();
                         break;
                     default:
                         break;
@@ -65,17 +68,12 @@ namespace InperStudio.ViewModels
         }
         private void CameraInit()
         {
-            this.view.camera.Visibility = Visibility.Visible;
             CameraSignalSettings.CameraChannels.ForEach(x =>
             {
                 if (x.Filters == null)
                 {
                     x.Filters = new Lib.Helper.JsonBean.Filters();
                 }
-                //if (x.Name.EndsWith("-"))
-                //{
-                //    x.Name = x.Name.Substring(0, x.Name.Length - 1);
-                //}
                 Channels.Add(x);
             });
             if (Channels.Count > 0)
@@ -153,10 +151,10 @@ namespace InperStudio.ViewModels
                                 }
                                 else
                                 {
-                                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Height = double.NaN;
+                                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).Height = double.NaN;
                                     InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                                     {
-                                        if (chn.ChannelId == item.ChannelId)
+                                        if (chn.ChannelId == item.ChannelId && chn.Type == item.Type)
                                         {
                                             chn.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
                                         }
@@ -200,10 +198,10 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
-                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Height = value;
+                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).Height = value;
                             InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                             {
-                                if (chn.ChannelId == item.ChannelId)
+                                if (chn.ChannelId == item.ChannelId && chn.Type == item.Type)
                                 {
                                     chn.Height = value;
                                 }
@@ -238,10 +236,10 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).OffsetWindowSize = value;
+                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).OffsetWindowSize = value;
                     _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
                     {
-                        if (chn.ChannelId == item.ChannelId)
+                        if (chn.ChannelId == item.ChannelId && chn.Type == item.Type)
                         {
                             chn.OffsetWindowSize = value;
                         }
@@ -285,10 +283,10 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
-                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).YTop = value;
+                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).YTop = value;
                             foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                             {
-                                if (channel.ChannelId == item.ChannelId)
+                                if (channel.ChannelId == item.ChannelId && channel.Type == item.Type)
                                 {
                                     channel.YVisibleRange.Max = value;
                                 }
@@ -319,11 +317,11 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
-                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).YBottom = value;
+                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).YBottom = value;
 
                             foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                             {
-                                if (channel.ChannelId == item.ChannelId)
+                                if (channel.ChannelId == item.ChannelId && channel.Type == item.Type)
                                 {
                                     channel.YVisibleRange.Min = value;
                                 }
@@ -371,10 +369,10 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).YTop = value;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).YTop = value;
                         foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                         {
-                            if (channel.ChannelId == item.ChannelId)
+                            if (channel.ChannelId == item.ChannelId && channel.Type == item.Type)
                             {
                                 channel.YVisibleRange.Max = value;
                             }
@@ -405,11 +403,11 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).YBottom = value;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).YBottom = value;
 
                         foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                         {
-                            if (channel.ChannelId == item.ChannelId)
+                            if (channel.ChannelId == item.ChannelId && channel.Type == item.Type)
                             {
                                 channel.YVisibleRange.Min = value;
                             }

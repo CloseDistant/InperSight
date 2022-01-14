@@ -25,7 +25,7 @@
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
-        <Grid x:Name="camera" Visibility="Visible">
+        <Grid x:Name="camera" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="220"/>
@@ -141,7 +141,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid x:Name="analog" Visibility="Hidden" Margin="30 40">
+        <Grid x:Name="analog" Visibility="Collapsed" Margin="30 40">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -150,20 +150,20 @@
             <StackPanel Grid.Column="0" >
                 <Grid Margin="0 20" >
                     <TextBlock Text="Channels Setting" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
-                    <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
+                    <hc:Divider Width="90" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 0 0" />
                 </Grid>
                 <Grid Margin="0 20" >
                     <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <ComboBox Margin="20 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding AnalogChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" MinWidth="160" x:Name="AnalogChannelCombox" SelectionChanged="{s:Action AnalogChannelCombox_SelectionChanged}"/>
+                    <ComboBox Margin="20 0 0 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding AnalogChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" MinWidth="160" x:Name="AnalogChannelCombox" SelectionChanged="{s:Action AnalogChannelCombox_SelectionChanged}"/>
                 </Grid>
                 <Grid Margin="0 20" >
                     <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <hc:TextBox Margin="20 0" Style="{DynamicResource TextBoxBaseStyle}"  HorizontalAlignment="Right"  MinWidth="160" Text="{Binding ElementName=AnalogChannelCombox,Path=SelectedValue.Name,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action AnalogName_TextChanged}" x:Name="AnalogName"></hc:TextBox>
+                    <hc:TextBox Margin="20 0 0 0" Style="{DynamicResource TextBoxBaseStyle}"  HorizontalAlignment="Right"  MinWidth="160" Text="{Binding ElementName=AnalogChannelCombox,Path=SelectedValue.Name,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action AnalogName_TextChanged}" x:Name="AnalogName"></hc:TextBox>
                 </Grid>
                 <Grid Margin="0 20" >
                     <TextBlock VerticalAlignment="Center" Text="Color"  FontSize="{DynamicResource InperLargeFontSize}"/>
 
-                    <Button x:Name="PopButton" Cursor="Hand" Margin="20 0" HorizontalAlignment="Right" MinWidth="160" Click="{s:Action PopButton_Click}" />
+                    <Button x:Name="PopButton" Cursor="Hand" Margin="20 0 0 0" HorizontalAlignment="Right" MinWidth="160" Click="{s:Action PopButton_Click}" />
                     <Popup x:Name="pop" PopupAnimation="Slide" PlacementTarget="{Binding ElementName=PopButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Effect="{DynamicResource EffectShadow4}">
                         <ListBox x:Name="AnalogColorList" SelectionChanged="{s:Action AnalogColorList_Selected}"  Background="Transparent" BorderThickness="0" Margin="0 20" HorizontalAlignment="Stretch" Width="{Binding ElementName=PopButton,Path=ActualWidth}"  Style="{StaticResource WrapPanelHorizontalListBox}" ItemsSource="{Binding AnalogColorList,UpdateSourceTrigger=PropertyChanged}" >
                             <ListBox.ItemTemplate>
@@ -175,14 +175,14 @@
                     </Popup>
                 </Grid>
             </StackPanel>
-            <Grid Grid.Column="1" Margin="20 0">
+            <Grid Grid.Column="1" Margin="30 0 20 0">
                 <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action AnalogMover}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="40" Margin="0 0 0 50" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
                 <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action AnalogMover}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="40"  Margin="0 50 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
             </Grid>
             <StackPanel Grid.Column="2" Margin="20 0 0 0">
                 <Grid Margin="0 20">
                     <TextBlock Text="Active Channels" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
-                    <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 0 0" />
+                    <hc:Divider Width="90" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 0 0" />
                 </Grid>
                 <ListBox Margin="0 20" Height="200" ScrollViewer.VerticalScrollBarVisibility="Visible" x:Name="analogActiveChannel" ItemsSource="{Binding AnalogActiveChannels}">
                     <ListBox.ItemTemplate>
@@ -193,7 +193,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Label Height="20"  Margin="2 5" Grid.Column="0" Background="{Binding BgColor}" Cursor="Hand"/>
-                                <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperLargeFontSize}" Margin="40 0 0 0" TextWrapping="NoWrap" Text="{Binding Name}" />
+                                <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperLargeFontSize}" Margin="0 0 0 0" TextWrapping="NoWrap" Text="{Binding Name}" />
                                 <Border Grid.ColumnSpan="2" Opacity=".4" Margin="0 0 0 -5" Width="{Binding ElementName= analogActiveChannel,Path= ActualWidth}" BorderBrush="{Binding ElementName= analogActiveChannel,Path=BorderBrush}" BorderThickness="0 0 0 1"/>
                             </Grid>
                         </DataTemplate>
