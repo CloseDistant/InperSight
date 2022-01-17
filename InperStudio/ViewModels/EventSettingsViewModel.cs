@@ -49,6 +49,10 @@ namespace InperStudio.ViewModels
             try
             {
                 view = View as EventSettingsView;
+                view.ConfirmClickEvent += (s, e) =>
+                {
+                    RequestClose();
+                };
                 switch (@enum)
                 {
                     case EventSettingsTypeEnum.Marker:
@@ -88,7 +92,7 @@ namespace InperStudio.ViewModels
                             Tau1 = item.Tau1,
                             Tau2 = item.Tau2,
                             Tau3 = item.Tau3,
-                            BgColor = InperColorHelper.ColorPresetList[item.ChannelId],
+                            BgColor = InperColorHelper.ColorPresetList[item.ChannelId > 100 ? item.ChannelId - 91 : item.ChannelId],
                             Type = item.Type ?? ChannelTypeEnum.Camera.ToString()
                         };
                         if (@enum == EventSettingsTypeEnum.Marker)
@@ -242,10 +246,6 @@ namespace InperStudio.ViewModels
                     view.ConditionChannelCombox.SelectedIndex = 0;
                     view.ConditionsCombox.SelectedItem = markerChannels.FirstOrDefault(x => x.IsActive == false);
                 }
-                view.ConfirmClickEvent += (s, e) =>
-                {
-                    RequestClose();
-                };
 
                 view.OutLightSources.ItemsSource = view.LightSources.ItemsSource = InperDeviceHelper.Instance.LightWaveLength.ToList().FindAll(x => x.IsChecked);
                 if (InperDeviceHelper.Instance.LightWaveLength.ToList().FindAll(x => x.IsChecked).Count > 1)
@@ -322,9 +322,9 @@ namespace InperStudio.ViewModels
                     }
                     if (ch.Type == ChannelTypeEnum.Analog.ToString())
                     {
-                        if (tb.Text.Length < 5 || !tb.Text.StartsWith("AI-" + ch.ChannelId + "-"))
+                        if (tb.Text.Length < 5 || !tb.Text.StartsWith("AI-" + (ch.ChannelId - 100) + "-"))
                         {
-                            tb.Text = "AI-" + ch.ChannelId + "-";
+                            tb.Text = "AI-" + (ch.ChannelId - 100) + "-";
                             tb.SelectionStart = tb.Text.Length;
                             //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                             //return;
@@ -429,6 +429,7 @@ namespace InperStudio.ViewModels
                         }
                     }
                     view.hotkeys.Content = item.Hotkeys;
+                    view.lightSource.Visibility = Visibility.Visible;
                     if (@enum == EventSettingsTypeEnum.Output)
                     {
                         view.MarkerName.Text += view.ConditionChannelCombox.Text;
@@ -452,7 +453,11 @@ namespace InperStudio.ViewModels
                                 Name = con.Name,
                                 Type = con.Type
                             };
-                            if (item.Condition.Type == ChannelTypeEnum.Camera.ToString() || item.Condition.Type == ChannelTypeEnum.Analog.ToString())
+                            if (item.Condition.Type == ChannelTypeEnum.Analog.ToString())
+                            {
+                                item.LightIndex = -1;
+                            }
+                            if (item.Condition.Type == ChannelTypeEnum.Camera.ToString())
                             {
                                 item.LightIndex = (view.OutLightSources.SelectedItem as WaveGroup).GroupId;
                             }
@@ -460,9 +465,14 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-                        if (item.Type == ChannelTypeEnum.Camera.ToString() || item.Type == ChannelTypeEnum.Analog.ToString())
+                        if (item.Type == ChannelTypeEnum.Camera.ToString())
                         {
-                            item.LightIndex = view.OutLightSources.SelectedItem != null ? (view.OutLightSources.SelectedItem as WaveGroup).GroupId : -9;
+                            item.LightIndex = (view.OutLightSources.SelectedItem as WaveGroup).GroupId;
+                        }
+                        if (item.Type == ChannelTypeEnum.Analog.ToString())
+                        {
+                            view.lightSource.Visibility = Visibility.Collapsed;
+                            item.LightIndex = -1;
                         }
                     }
                 }

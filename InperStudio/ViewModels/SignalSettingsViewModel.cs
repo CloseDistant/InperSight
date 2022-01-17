@@ -77,7 +77,7 @@ namespace InperStudio.ViewModels
 
             for (int i = 0; i < 8; i++)
             {
-                AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 1, Name = "AI-" + (i + 1), BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
+                AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 101, Name = "AI-" + (i + 1), BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
             }
             switch (@enum)
             {
@@ -117,7 +117,24 @@ namespace InperStudio.ViewModels
                                     VisibleRange = item.XVisibleRange,
                                     Visibility = Visibility.Collapsed
                                 };
-                                item.Filters = new Lib.Bean.Channel.Filters();
+                                item.Offset = x.Offset;
+                                item.OffsetWindowSize = x.OffsetWindowSize;
+                                
+                                item.Filters = new Lib.Bean.Channel.Filters()
+                                {
+                                    HighPass = x.Filters.HighPass,
+                                    IsHighPass = x.Filters.IsHighPass,
+                                    IsLowPass = x.Filters.IsLowPass,
+                                    IsNotch = x.Filters.IsNotch,
+                                    IsSmooth = x.Filters.IsSmooth,
+                                    LowPass = x.Filters.LowPass,
+                                    Notch = x.Filters.Notch,
+                                    Smooth = x.Filters.Smooth
+                                };
+                                item.LightModes.Add(new LightMode<TimeSpan, double>()
+                                {
+                                    LightType = -1
+                                });
                                 item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
 
                                 LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color?)ColorConverter.ConvertFromString(x.Color) };
@@ -1014,6 +1031,10 @@ namespace InperStudio.ViewModels
                             Visibility = Visibility.Collapsed
                         };
                         item.Filters = new Lib.Bean.Channel.Filters();
+                        item.LightModes.Add(new LightMode<TimeSpan, double>()
+                        {
+                            LightType = -1
+                        });
                         item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
 
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = ch.BgColor.Color };

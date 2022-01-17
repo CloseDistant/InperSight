@@ -15,6 +15,7 @@
         Title="Marker" SizeToContent="Height"  Width="540" Height="380" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
+        <convert:ChannelAnalogTypeToVisibilityConverter x:Key="ChannelAnalogTypeToVisibilityConverter" />
         <convert:VisibilityToVisibilityReConverter x:Key="VisibilityToVisibilityReConverter" />
         <convert:EventTypeConverter x:Key="EventTypeConverter" />
         <convert:EventOutputConverter x:Key="EventOutputConverter" />
@@ -90,7 +91,7 @@
                             <hc:TextBox Text="{Binding  ElementName=MarkerChannelCombox,Path=SelectedItem.Tau2,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
                             <hc:TextBox Text="{Binding  ElementName=MarkerChannelCombox,Path=SelectedItem.Tau3,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
                         </WrapPanel>-->
-                        <WrapPanel Margin="0 20 0 0" HorizontalAlignment="Right">
+                        <WrapPanel Margin="0 20 0 0" HorizontalAlignment="Right" Name="lightSource">
                             <TextBlock VerticalAlignment="Center" Text="Light"  FontSize="{DynamicResource InperNormalFontSize}"/>
                             <ComboBox HorizontalAlignment="Right" FontSize="{DynamicResource InperNormalFontSize}" Margin="20 0" Width="90" Name="LightSources" SelectedIndex="0" DisplayMemberPath="WaveType"/>
                         </WrapPanel>
@@ -111,7 +112,7 @@
                             <hc:TextBox FontFamily="雅黑" Text="{Binding  ElementName=ConditionChannelCombox,Path=SelectedItem.Tau2,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="70" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t2" />
                             <hc:TextBox FontFamily="雅黑" Text="{Binding  ElementName=ConditionChannelCombox,Path=SelectedItem.Tau3,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t3" />
                         </WrapPanel>-->
-                        <WrapPanel Margin="0 20 0 0" HorizontalAlignment="Right">
+                        <WrapPanel Margin="0 20 0 0" HorizontalAlignment="Right" Visibility="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.Type,Converter={StaticResource ChannelAnalogTypeToVisibilityConverter}}">
                             <TextBlock VerticalAlignment="Center" Text="Light"  FontSize="{DynamicResource InperNormalFontSize}"/>
                             <ComboBox HorizontalAlignment="Right" FontSize="{DynamicResource InperNormalFontSize}" Margin="20 0" Width="90" Name="OutLightSources" SelectedIndex="0" DisplayMemberPath="WaveType"/>
                         </WrapPanel>

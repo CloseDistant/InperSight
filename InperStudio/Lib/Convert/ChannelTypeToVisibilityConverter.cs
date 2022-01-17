@@ -23,4 +23,17 @@ namespace InperStudio.Lib.Convert
             throw new NotImplementedException();
         }
     }
+    public class ChannelAnalogTypeToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Visibility visibility = (string)value == ChannelTypeEnum.Analog.ToString() ? Visibility.Collapsed : Visibility.Visible;
+            return visibility;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
