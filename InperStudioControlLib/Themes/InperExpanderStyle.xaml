@@ -13,14 +13,14 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Border x:Name="BorderHeader" CornerRadius="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                <ToggleButton x:Name="tog" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Focusable="False" Padding="10,0,0,0" Foreground="{TemplateBinding Foreground}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Width="{TemplateBinding Width}" Height="{TemplateBinding MinHeight}" Style="{StaticResource ToggleButtonCustom}">
+                <ToggleButton x:Name="tog" FontSize="{TemplateBinding FontSize}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Focusable="False" Padding="10,0,0,0" Foreground="{TemplateBinding Foreground}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Width="{TemplateBinding Width}" Height="{TemplateBinding MinHeight}" Style="{StaticResource ToggleButtonCustom}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="32" />
                         </Grid.ColumnDefinitions>
                         <ContentPresenter ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        <Path Name="PathArrow" IsHitTestVisible="False" Grid.Column="1" Stretch="Uniform" Fill="{TemplateBinding Foreground}" Data="{StaticResource DownGeometry}" Margin="0,0,10,0" Width="12" Height="12" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Right" />
+                        <!--<Path Name="PathArrow" IsHitTestVisible="False" Grid.Column="1" Stretch="Uniform" Fill="{TemplateBinding Foreground}" Data="{StaticResource DownGeometry}" Margin="0,0,10,0" Width="12" Height="12" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Right" />-->
                     </Grid>
                 </ToggleButton>
             </Border>
@@ -30,9 +30,9 @@
             <Trigger Property="IsExpanded" Value="true">
                 <Setter Property="CornerRadius" TargetName="BorderHeader" Value="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource CornerRadiusSplitConverter}, ConverterParameter='1,1,0,0'}" />
                 <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible" />
-                <Setter Property="Data" TargetName="PathArrow" Value="{StaticResource UpGeometry}" />
-                <Setter Property="Background" TargetName="BorderHeader" Value="#008FCD"/>
-                <Setter Property="Foreground" TargetName="tog" Value="white"/>
+                <!--<Setter Property="Data" TargetName="PathArrow" Value="{StaticResource UpGeometry}" />-->
+                <!--<Setter Property="Background" TargetName="BorderHeader" Value="{StaticResource InperButtonSelectColor}"/>
+                <Setter Property="Foreground" TargetName="tog" Value="white"/>-->
             </Trigger>
             <Trigger Property="IsEnabled" Value="false">
                 <Setter Property="Opacity" Value=".4" />
@@ -83,7 +83,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="BorderBrush" Value="{DynamicResource InperCCCColor}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="MinHeight" Value="{StaticResource DefaultControlHeight}" />
+        <Setter Property="MinHeight" Value="18" />
         <Setter Property="MinWidth" Value="{StaticResource DefaultControlHeight}" />
         <Setter Property="hc:BorderElement.CornerRadius" Value="{StaticResource DefaultCornerRadius}" />
         <Setter Property="Template" Value="{StaticResource ExpanderDownTemplate}"/>

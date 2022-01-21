@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper;
 using InperStudio.ViewModels;
 using InperStudioControlLib.Lib.Config;
 using MySql.Data.MySqlClient;

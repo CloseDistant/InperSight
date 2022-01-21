@@ -8,10 +8,17 @@
     <SolidColorBrush x:Key="InperMainPageColor">#F9F9F9</SolidColorBrush>
     <SolidColorBrush x:Key="InperDialogContentColor">#F6F6F6</SolidColorBrush>
     <SolidColorBrush x:Key="InperTitleTextColor" >#222222</SolidColorBrush>
+    <SolidColorBrush x:Key="InperTitleTextColor2" >#999999</SolidColorBrush>
+    <SolidColorBrush x:Key="InperTextColor1" >#666666</SolidColorBrush>
     <SolidColorBrush x:Key="InperTextColor" >#333333</SolidColorBrush>
     <SolidColorBrush x:Key="InperDialogButtonColor">#D7D7D7</SolidColorBrush>
     <SolidColorBrush x:Key="InperListboxEvenColor">#FEFEFE</SolidColorBrush>
     <SolidColorBrush x:Key="InperListboxOddColor">#FBFDFF</SolidColorBrush>
     <SolidColorBrush x:Key="InperButtonBorderColor">#AAAAAA</SolidColorBrush>
+
+    <SolidColorBrush Color="#EFECF2" x:Key="InperContentTheme"/>
+    <SolidColorBrush Color="#BDBDBD" x:Key="InperBorderColor"/>
+    <SolidColorBrush Color="#ED8F26" x:Key="InperButtonSelectColor"/>
+
     <FontFamily x:Key="InperFontFamily">Arial</FontFamily>
 </ResourceDictionary>

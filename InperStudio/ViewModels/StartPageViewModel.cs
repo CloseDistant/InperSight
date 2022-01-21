@@ -5,6 +5,7 @@ using InperStudioControlLib.Lib.Config;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -25,11 +26,35 @@ namespace InperStudio.ViewModels
         protected override void OnViewLoaded()
         {
             Version = InperConfig.Instance.Version;
+
+            #region 下位机更新
+            // 查找under Bin 文件夹 是否存在文件
+            string path = Environment.CurrentDirectory + "/UnderBin";
+            if (Directory.Exists(path))
+            {
+                DirectoryInfo root = new DirectoryInfo(path);
+                FileInfo[] files = root.GetFiles();
+
+                if (files.Count() > 0)
+                {
+                    // 如果存在文件 按照日期进行排序 asc
+                    files.OrderBy(x => x.LastWriteTime).ToList().ForEach(x =>
+                    {
+
+                    });
+                }
+            }
+
+            // 和下位机进行通讯 传输Bin文件
+            // 等待下位机更新通知，如果未收到通知 循环三次发送bin文件
+            // 更新成功 继续执行，更新失败弹窗提示
+            #endregion
+
             _ = View.Dispatcher.BeginInvoke(new Action(async () =>
                 {
                     if (DeviceHeuristic.Instance.DeviceList.Count < 1)
                     {
-                        (View as StartPageView).retry.Visibility = System.Windows.Visibility.Visible;
+                        (View as StartPageView).retry.Visibility = Visibility.Visible;
                         (View as StartPageView).normal.Visibility = Visibility.Collapsed;
                     }
                     else

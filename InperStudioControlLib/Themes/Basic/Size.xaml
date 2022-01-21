@@ -5,6 +5,7 @@
     <sys:Double x:Key="InperNormalFontSize">12</sys:Double>
     <sys:Double x:Key="InperSmallFontSize">10</sys:Double>
     <sys:Double x:Key="InperLargeFontSize">14</sys:Double>
+    <sys:Double x:Key="InperLargeFontSize16">16</sys:Double>
 
     <CornerRadius x:Key="InperDialogWindowCornerRadius">10</CornerRadius>
     <CornerRadius x:Key="InperDefaultCornerRadius">4</CornerRadius>
