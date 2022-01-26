@@ -14,9 +14,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperStudioTests", "..\Inpe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperStudioControlLib", "..\InperStudioControlLib\InperStudioControlLib.csproj", "{6168BB6B-9375-4A4D-9049-98408981BD53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperPhotometry", "..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperPhotometry\InperPhotometry.csproj", "{47D96C9E-1156-4035-AE74-CB36B94B30DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperPhotometry", "..\InperPhotometry\InperPhotometry.csproj", "{47D96C9E-1156-4035-AE74-CB36B94B30DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperProtocolStack", "..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperProtocolStack\InperProtocolStack.csproj", "{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperProtocolStack", "..\InperProtocolStack\InperProtocolStack.csproj", "{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
