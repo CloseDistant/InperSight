@@ -19,6 +19,7 @@ namespace InperStudio
     {
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
+
             // Configure the IoC container in here
         }
 
