@@ -12,7 +12,7 @@ namespace InperStudio.Lib.Helper.JsonBean
     {
         public double Exposure { get; set; }
         public double Sampling { get; set; }
-        public double AiSampling { get; set; }
+        public double AiSampling { get; set; } = 100;
         public double Gain { get; set; }
         public double Brightness { get; set; }
         public RecordMode RecordMode { get; set; }

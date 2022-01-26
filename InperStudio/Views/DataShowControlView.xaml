@@ -107,7 +107,7 @@
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes"  XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
+                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"

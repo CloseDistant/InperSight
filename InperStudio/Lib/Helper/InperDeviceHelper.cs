@@ -2,6 +2,7 @@
 using InperDeviceManagement;
 using InperProtocolStack;
 using InperProtocolStack.Communication;
+using InperProtocolStack.TransmissionCtrl;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
@@ -128,7 +129,8 @@ namespace InperStudio.Lib.Helper
         {
             this.device = device;
             device.DidGrabImage += Instance_OnImageGrabbed;
-            device.OnUsbInfoUpdated += Device_OnUsbInfoUpdated;
+            //device.OnUsbInfoUpdated += Device_OnUsbInfoUpdated;
+
             bool isComplete = false;
             device.OnDevInfoUpdated += (s, ee) =>
             {
@@ -259,30 +261,6 @@ namespace InperStudio.Lib.Helper
                 Visibility = Visibility.Collapsed
             };
         }
-        public List<UsbAdData> UsbAdDatas = new List<UsbAdData>();
-        private readonly AutoResetEvent _adResetEvent = new AutoResetEvent(false);
-        private readonly object _adObject = new object();
-        private void Device_OnUsbInfoUpdated(List<UsbAdData> obj)
-        {
-            if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
-            {
-                Monitor.Enter(_adObject);
-
-                UsbAdDatas.AddRange(obj);
-                int count = CameraChannels.Count(x => x.Type == ChannelTypeEnum.Analog.ToString());
-
-                if (count * Math.Ceiling(30000 / InperGlobalClass.CameraSignalSettings.AiSampling) <= UsbAdDatas.Count * UsbAdDatas.First().Values.Count)
-                {
-                    Monitor.Exit(_adObject);
-                    _ = _adResetEvent.Set();
-                }
-                else
-                {
-                    Monitor.Exit(_adObject);
-                }
-            }
-        }
-
         private void Device_OnDevNotification(object sender, DevNotificationEventArgs e)
         {
             DevInputNotificationEventArgs dev = e as DevInputNotificationEventArgs;
@@ -315,7 +293,6 @@ namespace InperStudio.Lib.Helper
                 Monitor.Exit(_EventQLock);
             }
         }
-
         public bool InitDataStruct()
         {
             try
@@ -470,37 +447,84 @@ namespace InperStudio.Lib.Helper
 
         #region usb data 
         private readonly List<UsbAdData> usbAdDatasCache = new List<UsbAdData>();
-        public void UsbAdProc()
+        private Queue<byte[]> _ADdataCache = new Queue<byte[]>();
+        private readonly List<UsbAdData> _AdDatas = new List<UsbAdData>();
+        private bool isfirstAD = true;
+
+        public unsafe void UsbAdProc()
         {
             while (isLoop)
             {
-                _ = _adResetEvent.WaitOne();
-                if (Monitor.TryEnter(_adObject))
+                _ = device._CS._UARTA._DataAutoResetEvent.WaitOne();
+                if (Monitor.TryEnter(device._CS._UARTA._DataCacheObj))
                 {
-                    foreach (UsbAdData adData in UsbAdDatas)
+                    if (isfirstAD)
                     {
-                        if (usbAdDatasCache?.FirstOrDefault(x => x.ChannelId == adData.ChannelId) != null)
-                        {
-                            usbAdDatasCache.FirstOrDefault(x => x.ChannelId == adData.ChannelId).Values.AddRange(adData.Values);
-                        }
-                        else
-                        {
-                            usbAdDatasCache.Add(adData);
-                        }
+                        device._CS._UARTA.DataCache.Clear();
+                        isfirstAD = false;
                     }
-                    UsbAdDatas.Clear();
-                    Monitor.Exit(_adObject);
-                    foreach (UsbAdData adData in usbAdDatasCache)
+                    else
+                    {
+                        Copy(device._CS._UARTA.DataCache, ref _ADdataCache);
+                        device._CS._UARTA.DataCache.Clear();
+                    }
+                    Monitor.Exit(device._CS._UARTA._DataCacheObj);
+
+                    _ = Parallel.ForEach(_ADdataCache, data =>
+                      {
+                          fixed (byte* pb = &data[0])
+                          {
+                              UsbAdDataStru res = Marshal.PtrToStructure<UsbAdDataStru>((IntPtr)pb);
+
+                              this.UsbDataAppend(res);
+                          }
+                      });
+                    _ADdataCache.Clear();
+                }
+            }
+        }
+        private readonly object _UsbDataAppendObj = new object();
+        private readonly AutoResetEvent _UsbDataEvent = new AutoResetEvent(false);
+        private void UsbDataAppend(UsbAdDataStru res)
+        {
+            Monitor.Enter(_UsbDataAppendObj);
+            List<int> res1 = new List<int>();
+            List<int> res2 = new List<int>();
+            for (int i = 0; i < res.Values.Length; i += 2)
+            {
+                res1.Add(res.Values[i]);
+                res2.Add(res.Values[i + 1]);
+            }
+
+            _AdDatas.Add(new UsbAdData(res.Channel * 2 - 1, res.Time, res1));
+            _AdDatas.Add(new UsbAdData(res.Channel * 2, res.Time, res2));
+            Monitor.Exit(_UsbDataAppendObj);
+            _UsbDataEvent.Set();
+        }
+        private void UsbDataPlot()
+        {
+            while (true)
+            {
+                _UsbDataEvent.WaitOne();
+                if (Monitor.TryEnter(_UsbDataAppendObj))
+                {
+                    List<UsbAdData> Data = new List<UsbAdData>();
+                    Copy(_AdDatas, ref Data);
+                    _AdDatas.Clear();
+                    Monitor.Exit(_UsbDataAppendObj);
+
+                    foreach (var adData in Data)
                     {
                         CameraChannel ccn = CameraChannels.FirstOrDefault(x => x.ChannelId == adData.ChannelId + 100);
                         if (ccn != null)
                         {
-                            IDataSeries ds = ccn.RenderableSeries.First().DataSeries;
-                            Tuple<List<TimeSpan>, double[]> res = AdDataTrans(((TimeSpan)ds.XMax).Ticks < 0 ? 0 : ((TimeSpan)ds.XMax).Ticks, adData, ccn.ChannelId);
+                            XyDataSeries<TimeSpan, double> ds = ccn.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>;
+                            long ticks = ds.XValues.Count > 0 ? ds.XValues.Last().Ticks : 0;
 
+                            Tuple<TimeSpan[], double[]> res = AdDataTrans(ticks, adData, ccn.ChannelId);
                             using (ds.SuspendUpdates())
                             {
-                                (ds as XyDataSeries<TimeSpan, double>).Append(res.Item1, res.Item2);
+                                ds.Append(res.Item1, res.Item2);
                             }
                             if (InperGlobalClass.IsRecord)
                             {
@@ -512,7 +536,7 @@ namespace InperStudio.Lib.Helper
             }
         }
         private readonly object _SaveUsbDataLock = new object();
-        private void UsbDataSave(Tuple<List<TimeSpan>, double[]> data, int channelId, int s_group = -1)
+        private void UsbDataSave(Tuple<TimeSpan[], double[]> data, int channelId, int s_group = -1)
         {
             Monitor.Enter(_SaveUsbDataLock);
             int i = 0;
@@ -530,50 +554,46 @@ namespace InperStudio.Lib.Helper
             Monitor.Exit(_SaveUsbDataLock);
         }
 
-        private double adFsTimeInterval = (double)1 / 30000;
-        private Tuple<List<TimeSpan>, double[]> AdDataTrans(long xMax, UsbAdData adData, int channelId)
+        private Tuple<TimeSpan[], double[]> AdDataTrans(long xMax, UsbAdData adData, int channelId)
         {
-            int interval = (int)Math.Floor(30000 / InperGlobalClass.CameraSignalSettings.AiSampling);
+            TimeSpan[] timeSpans = new TimeSpan[adData.Values.Count];
+            double[] values = new double[adData.Values.Count];
 
-            int count = (int)Math.Floor(adData.Values.Count / (double)interval);
-
-            List<TimeSpan> timeSpans = new List<TimeSpan>();
-            double[] values = new double[count];
-
-            for (int i = 0; i < count; i++)
+            double adFsTimeInterval = (double)1 / InperGlobalClass.CameraSignalSettings.AiSampling;
+            for (int i = 0; i < adData.Values.Count; i++)
             {
-                TimeSpan ts = new TimeSpan(xMax + (long)(adFsTimeInterval * (i + 1) * interval * Math.Pow(10, 7)));
-                timeSpans.Add(ts);
-                double r = adData.Values[(i + 1) * interval - 1];
-                CameraChannel cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId);
-                if (cn != null && cn.Type == ChannelTypeEnum.Analog.ToString())
-                {
-                    if (cn.Offset)
-                    {
-                        r -= Offset(cn, -1, r);
-                    }
-                    if (cn.Filters.IsSmooth)
-                    {
-                        r = Smooth(cn, -1, r);
-                    }
-                    DeltaFCalculate(cn, -1, r, ts.Ticks);
-                    if (cn.Filters.IsHighPass)
-                    {
-                        r = HighPass(cn, -1, r);
-                    }
-                    if (cn.Filters.IsLowPass)
-                    {
-                        r = LowPass(cn, -1, r);
-                    }
-                    if (cn.Filters.IsNotch)
-                    {
-                        r = NotchPass(cn, -1, r);
-                    }
-                }
+                TimeSpan ts = new TimeSpan(xMax + (long)(adFsTimeInterval * (i + 1) * Math.Pow(10, 7)));
+                timeSpans[i] = ts;
+                double r = adData.Values[i];
+                //CameraChannel cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId);
+                //if (cn != null && cn.Type == ChannelTypeEnum.Analog.ToString())
+                //{
+                //    if (cn.Offset)
+                //    {
+                //        r -= Offset(cn, -1, r);
+                //    }
+                //    if (cn.Filters.IsSmooth)
+                //    {
+                //        r = Smooth(cn, -1, r);
+                //    }
+                //    DeltaFCalculate(cn, -1, r, ts.Ticks);
+                //    if (cn.Filters.IsHighPass)
+                //    {
+                //        r = HighPass(cn, -1, r);
+                //    }
+                //    if (cn.Filters.IsLowPass)
+                //    {
+                //        r = LowPass(cn, -1, r);
+                //    }
+                //    if (cn.Filters.IsNotch)
+                //    {
+                //        r = NotchPass(cn, -1, r);
+                //    }
+                //}
                 values[i] = r;
             }
-            adData.Values.RemoveRange(0, count * interval);
-            return new Tuple<List<TimeSpan>, double[]>(timeSpans, values);
+            adData.Values.Clear();
+            return new Tuple<TimeSpan[], double[]>(timeSpans, values);
         }
         #endregion
         public void FrameProc()
@@ -1271,13 +1291,14 @@ namespace InperStudio.Lib.Helper
                     }
                 });
 
-                isFirstRecordTiem = true; isLoop = true;
+                isFirstRecordTiem = true; isLoop = true; isfirstAD = true;
                 timer.Start();
                 _DataSaveTimer.Start();
 
                 updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
                 frameProcTask = Task.Factory.StartNew(() => { FrameProc(); });
                 Task.Factory.StartNew(() => { UsbAdProc(); });
+                Task.Factory.StartNew(() => { UsbDataPlot(); });
                 StartCollectEvent?.Invoke(true);
                 //saveDataTask = Task.Factory.StartNew(() => { SaveDateProc(); });
             }

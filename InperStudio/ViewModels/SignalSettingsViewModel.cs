@@ -92,14 +92,15 @@ namespace InperStudio.ViewModels
                         if (x.Type == ChannelTypeEnum.Analog.ToString())
                         {
                             _ = AnalogChannels.Remove(AnalogChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId));
-                            AnalogActiveChannels.Add(new SignalCameraChannel()
+                            var an = new SignalCameraChannel()
                             {
                                 ChannelId = x.ChannelId,
                                 ChannelType = x.Type,
                                 Name = x.Name,
                                 YaxisDoubleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
                                 BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color))
-                            });
+                            };
+                            AnalogActiveChannels.Add(an);
                             if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId && c.Type == x.Type) == null)
                             {
                                 CameraChannel item = new CameraChannel()
@@ -1028,7 +1029,7 @@ namespace InperStudio.ViewModels
                             DrawMajorGridLines = false,
                             DrawMinorGridLines = false,
                             VisibleRange = item.XVisibleRange,
-                            Visibility = Visibility.Collapsed
+                            Visibility = Visibility.Collapsed,
                         };
                         item.Filters = new Lib.Bean.Channel.Filters();
                         item.LightModes.Add(new LightMode<TimeSpan, double>()
