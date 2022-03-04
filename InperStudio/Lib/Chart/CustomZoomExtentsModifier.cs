@@ -39,11 +39,11 @@ namespace InperStudio.Lib.Chart
             }
 
             _lastPoint = currentPoint;
+            e.Handled = true;
         }
         public override void OnModifierMouseMove(ModifierMouseArgs e)
         {
             base.OnModifierMouseMove(e);
-
         }
 
         public override void OnModifierMouseUp(ModifierMouseArgs e)

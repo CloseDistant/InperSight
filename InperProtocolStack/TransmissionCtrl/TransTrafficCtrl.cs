@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace InperProtocolStack.TransmissionCtrl
 {
-    public struct UsbAdDataStru
+    public struct UsbAdDataStru512
     {
         [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
         public uint Channel;
@@ -21,7 +21,106 @@ namespace InperProtocolStack.TransmissionCtrl
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
         public byte[] Fill;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 512)]
-        public ushort[] Values;
+        public short[] Values;
+    }
+    public struct UsbAdDataStru256
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru128
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru64
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru32
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru16
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru8
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru4
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru2
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public short[] Values;
+    }
+    public struct UsbAdDataStru1
+    {
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Channel;
+        [MarshalAs(UnmanagedType.U4, SizeConst = 4)]
+        public uint Time;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] Fill;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
+        public short[] Values;
     }
     public class TransTrafficCtrl
     {
@@ -32,74 +131,17 @@ namespace InperProtocolStack.TransmissionCtrl
             _UARTA = uart_a;
             _RProcessor.OnMsgReceived += DevMsgReceived;
             _UARTA.OnDataReceived += new EventHandler<OnDataReceivedEventArgs>(OnDataReceived);
-            _UARTA.OnDataReceivedUsb += UARTA_OnDataReceivedUsb;
+            //_UARTA.OnDataReceivedUsb += UARTA_OnDataReceivedUsb;
 
             _ = Task.Run(() => { ReceivedDataMonitor(); });
 
             //SetupMetronome();
             _ = Task.Run(() => { TransmittingProcess(); });
 
-            _ = Task.Run(() => { AdDataProcess(); });
 
             return;
         }
-        private readonly Queue<byte[]> _AdDataCache = new Queue<byte[]>();
-        private readonly object adDataCache = new object();
-
-        private void UARTA_OnDataReceivedUsb(object sender, OnDataReceivedEventArgs e)
-        {
-            Monitor.Enter(adDataCache);
-            _AdDataCache.Enqueue(e.Data);
-            Monitor.Exit(adDataCache);
-            //OnUsbInfoUpdated?.Invoke(this, e);
-        }
-        private unsafe void AdDataProcess()
-        {
-            while (true)
-            {
-                if (Monitor.TryEnter(adDataCache))
-                {
-                    if (_AdDataCache.Count > 0)
-                    {
-                        List<byte[]> vs = _AdDataCache.ToList();
-                        _AdDataCache.Clear();
-                        Monitor.Exit(adDataCache);
-
-                        List<UsbAdData> usbAdDatas = new List<UsbAdData>();
-                        foreach (byte[] data in vs)
-                        {
-                            fixed (byte* pb = &data[0])
-                            {
-                                
-                                UsbAdDataStru res = Marshal.PtrToStructure<UsbAdDataStru>((IntPtr)pb);
-                                //Console.WriteLine(res.Channel);
-                                usbAdDatas.Add(new UsbAdData(res.Channel * 2 - 1, res.Time, res.Values.Select((v, i) =>
-                                     {
-                                         return i % 2 == 0 ? v : -1;
-                                     }).Where(x => x != -1).ToList()));
-                                usbAdDatas.Add(new UsbAdData(res.Channel * 2, res.Time, res.Values.Select((v, i) =>
-                                   {
-                                       return i % 2 == 1 ? v : -1;
-                                   }).Where(x => x != -1).ToList()));
-                            }
-                        };
-                        if (usbAdDatas.Count > 0)
-                        {
-                            OnUsbInfoUpdated?.Invoke(usbAdDatas);
-                        }
-                    }
-                    else
-                    {
-                        Monitor.Exit(adDataCache);
-                    }
-
-                }
-            }
-        }
-
         public event EventHandler<MessageReceivedEventArgs> OnInfoUpdated;
-        public event Action<List<UsbAdData>> OnUsbInfoUpdated;
-
 
         private void DevMsgReceived(object sender, MessageReceivedEventArgs e)
         {

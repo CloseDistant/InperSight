@@ -248,6 +248,7 @@ namespace InperStudio.ViewModels
                 if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
                 {
                     _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    File.Create(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, "inper.guide")).Close();
                 }
 
                 Task task = StartTriggerStrategy();
@@ -317,14 +318,17 @@ namespace InperStudio.ViewModels
                     }
                     isrecord = true;
                 }
-                InperGlobalClass.IsRecord = false;
-                InperGlobalClass.IsPreview = false;
-                InperGlobalClass.IsStop = true;
-                (View as ManulControlView).Root_Gird.IsEnabled = true;
                 if (type == 0)
                 {
                     StartAndStopShowMarker(ChannelTypeEnum.Stop);
                 }
+                InperGlobalClass.IsRecord = false;
+                InperGlobalClass.IsPreview = false;
+                InperGlobalClass.IsStop = true;
+                (View as ManulControlView).Root_Gird.IsEnabled = true;
+
+                InperDeviceHelper.Instance.StopPlot();
+
                 if (isrecord)
                 {
                     NoteSettingViewModel.NotesCache.Clear();
@@ -378,7 +382,7 @@ namespace InperStudio.ViewModels
                        if (channel.Type == typeEnum.ToString())
                        {
                            _ = InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
-                           if (InperGlobalClass.IsRecord)
+                           //if (InperGlobalClass.IsRecord)
                            {
                                Manual manual = new Manual()
                                {
@@ -402,7 +406,7 @@ namespace InperStudio.ViewModels
                                time = typeEnum == ChannelTypeEnum.Start
                                ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
                                : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                               InperDeviceHelper.Instance.SendCommand(channel);
+                               InperDeviceHelper.Instance.SendCommand(channel, type);
                                if (InperGlobalClass.IsRecord)
                                {
                                    Output output = new Output()
@@ -426,7 +430,6 @@ namespace InperStudio.ViewModels
             var obj = InperJsonHelper.GetAdditionRecordJson();
             if (InperGlobalClass.AdditionRecordConditionsStart == AdditionRecordConditionsTypeEnum.Delay)
             {
-
                 return Task.Factory.StartNew(() =>
                 {
                     InperDeviceHelper.Instance.AllLightClose();

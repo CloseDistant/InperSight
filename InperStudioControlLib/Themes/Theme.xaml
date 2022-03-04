@@ -6,5 +6,6 @@
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperIconPathGeometry.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperTextBoxStylet.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperExpanderStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/InperTagStyle.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

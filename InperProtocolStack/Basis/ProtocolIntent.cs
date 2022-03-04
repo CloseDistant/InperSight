@@ -45,5 +45,6 @@ namespace InperProtocolStack.CmdPhotometry
         public const byte INTENT_INPUT_IO = 0x30;
         public const byte INTENT_OUTPUT_IO = 0x31;
         public const byte INTENT_TRIGGER_CHANGE = 0x32;
+        public const byte INTENT_ADFRAME_RATE = 0x33;
     }
 }

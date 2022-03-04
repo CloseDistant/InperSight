@@ -54,7 +54,7 @@ namespace InperProtocolStack
             _UARTA = new UARTAgent(p_name);
             _TC = new TransTrafficCtrl(_UARTA);
             _TC.OnInfoUpdated += InfoUpdated;
-          
+
             InqID();
         }
 
@@ -65,14 +65,14 @@ namespace InperProtocolStack
 
         #region Update Device Infomation
         public event EventHandler<DevInfoUpdatedEventArgs> OnDevInfoUpdated;
-        public event EventHandler<DevInfoUpdatedEventArgs> OnUsbDevInfoUpdated;
+        //public event EventHandler<DevInfoUpdatedEventArgs> OnUsbDevInfoUpdated;
 
         private readonly int _FwRevisionLen = 4;
         private readonly int _HwRevisionLen = 4;
         private readonly int _CameraIDLen = 16;
         private void UpdateID(byte[] param)
         {
-            if(param.Length < (_FwRevisionLen + _HwRevisionLen + _CameraIDLen))
+            if (param.Length < (_FwRevisionLen + _HwRevisionLen + _CameraIDLen))
             {
                 return;
             }
@@ -101,11 +101,11 @@ namespace InperProtocolStack
         {
             int light_cfg_size = Marshal.SizeOf(typeof(LightConfig));
             UInt32 light_no = BitConverter.ToUInt32(param.Take(4).ToArray(), 0);
-            for(int li = 0; li < light_no; li++)
+            for (int li = 0; li < light_no; li++)
             {
                 byte[] cfg_bytes = param.Skip(4 + (li * light_cfg_size)).Take(light_cfg_size).ToArray();
                 LightConfig lc = Utils.BytesToStruct<LightConfig>(cfg_bytes, light_cfg_size);
-                if(lc.Enabled != 0)
+                if (lc.Enabled != 0)
                 {
                     LightDesc ld = new LightDesc(lc.ID, lc.WaveLength, lc.MaxPower);
                     LightSourceList.Add(ld);
@@ -125,7 +125,7 @@ namespace InperProtocolStack
         public event EventHandler<DevNotificationEventArgs> OnDevNotification;
         private DevInputNotificationEventArgs DeviceInputUpdated(byte[] param)
         {
-            if(param.Length < 8)
+            if (param.Length < 8)
             {
                 return null;
             }
@@ -139,10 +139,10 @@ namespace InperProtocolStack
         }
         #endregion
 
-        
+
         private void InfoUpdated(object sender, MessageReceivedEventArgs e)
         {
-            switch(e.Intent)
+            switch (e.Intent)
             {
                 case ProtocolIntent.INTENT_RETURN_ID:
                     UpdateID(e.Data);
@@ -168,7 +168,7 @@ namespace InperProtocolStack
                     break;
             }
 
-            
+
         }
 
 
@@ -247,14 +247,12 @@ namespace InperProtocolStack
             _TC.Transmit(cmd);
         }
 
-
         public void Start()
         {
             CmdStart cmd = new CmdStart();
             _TC.Transmit(cmd);
         }
-
-
+ 
         public void Stop()
         {
             CmdStop cmd = new CmdStop();

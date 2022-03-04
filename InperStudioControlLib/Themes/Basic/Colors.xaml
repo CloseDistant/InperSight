@@ -3,6 +3,7 @@
 
     <SolidColorBrush x:Key="InperFFFColor">#FFFFFF</SolidColorBrush>
     <SolidColorBrush x:Key="InperCCCColor">#CCCCCC</SolidColorBrush>
+    <SolidColorBrush x:Key="InperBDBDColor">#BDBDBD</SolidColorBrush>
     
     <SolidColorBrush x:Key="InperTitlePageColor">#F6F6F6</SolidColorBrush>
     <SolidColorBrush x:Key="InperMainPageColor">#F9F9F9</SolidColorBrush>

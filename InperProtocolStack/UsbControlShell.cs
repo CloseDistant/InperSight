@@ -21,7 +21,7 @@ namespace InperProtocolStack
             _UARTA = new UARTAgent(vid, pid);
             _TC = new TransTrafficCtrl(_UARTA);
             _TC.OnInfoUpdated += InfoUpdated;
-            _TC.OnUsbInfoUpdated += _TC_OnUsbInfoUpdated;
+            //_TC.OnUsbInfoUpdated += _TC_OnUsbInfoUpdated;
             InqID();
         }
         public uint FirmwareRevision { get; private set; } = 0;
@@ -30,7 +30,6 @@ namespace InperProtocolStack
 
         #region Update Device Infomation
         public event EventHandler<DevInfoUpdatedEventArgs> OnDevInfoUpdated;
-        public event Action<List<UsbAdData>> OnUsbInfoUpdated;
 
         private readonly int _FwRevisionLen = 4;
         private readonly int _HwRevisionLen = 4;
@@ -134,10 +133,6 @@ namespace InperProtocolStack
             }
         }
 
-        private void _TC_OnUsbInfoUpdated(List<UsbAdData> obj)
-        {
-            OnUsbInfoUpdated?.Invoke(obj);
-        }
         public void SetFrameRate(double frame_rate)
         {
             CmdSetFrameRate cmd = new CmdSetFrameRate();
@@ -156,7 +151,6 @@ namespace InperProtocolStack
 
             return;
         }
-
 
         public void SetLightPower(uint light_id, double power)
         {
@@ -195,6 +189,7 @@ namespace InperProtocolStack
             CmdMeasureMode cmd = new CmdMeasureMode();
             cmd.SetCmdParam(enable);
             _TC.Transmit(cmd);
+
         }
 
 
@@ -213,7 +208,22 @@ namespace InperProtocolStack
             _TC.Transmit(cmd);
         }
 
+        public void ADIsStartCollect(bool isStart)
+        {
+            _UARTA.IsStart = isStart;
+        }
+        public void SetAdframeRate(uint frameRate, uint[] array)
+        {
+            CmdAdframeRate cmd = new CmdAdframeRate();
+            cmd.SetCmdParam(frameRate, array);
+            _TC.Transmit(cmd);
 
+            _UARTA.SetSampling((int)frameRate);
+        }
+        public void RemoveAdSampling()
+        {
+            _UARTA.RemoveSampling();
+        }
         public void Start()
         {
             CmdStart cmd = new CmdStart();

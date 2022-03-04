@@ -39,7 +39,37 @@
             </Trigger> 
         </ControlTemplate.Triggers>
     </ControlTemplate>
-    
+
+    <ControlTemplate x:Key="ExpanderDownTemplateLeftArrow" TargetType="Expander">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border x:Name="BorderHeader" CornerRadius="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                <ToggleButton x:Name="tog" FontSize="{TemplateBinding FontSize}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Focusable="False" Padding="10,0,0,0" Foreground="{TemplateBinding Foreground}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Width="{TemplateBinding Width}" Height="{TemplateBinding MinHeight}" Style="{StaticResource ToggleButtonCustom}">
+                    <WrapPanel>
+                        <ContentPresenter ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Path Name="PathArrow" IsHitTestVisible="False" Grid.Column="1" Stretch="Uniform" Fill="{TemplateBinding Foreground}" Data="{StaticResource DownGeometry}" Margin="15,0,0,0" Width="10" Height="10" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Right" />
+                    </WrapPanel>
+                </ToggleButton>
+            </Border>
+            <ContentPresenter Name="ExpandSite" Visibility="Collapsed" Grid.Row="1" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="true">
+                <Setter Property="CornerRadius" TargetName="BorderHeader" Value="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource CornerRadiusSplitConverter}, ConverterParameter='1,1,0,0'}" />
+                <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible" />
+                <Setter Property="Data" TargetName="PathArrow" Value="{StaticResource UpGeometry}" />
+                <!--<Setter Property="Background" TargetName="BorderHeader" Value="{StaticResource InperButtonSelectColor}"/>-->
+                <!--<Setter Property="Foreground" TargetName="tog" Value="white"/>-->
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Opacity" Value=".4" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
     <ControlTemplate x:Key="ExpanderLeftArrowTemplate" TargetType="Expander">
         <Grid>
             <Grid.RowDefinitions>
@@ -104,5 +134,12 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Template" Value="{StaticResource ExpanderLeftArrowTemplate}"/>
+    </Style>
+
+    <Style x:Key="ExpanderRightArrowStyle" BasedOn="{StaticResource InperExpanderBaseStyle}" TargetType="Expander">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template" Value="{StaticResource ExpanderDownTemplateLeftArrow}"/>
     </Style>
 </ResourceDictionary>

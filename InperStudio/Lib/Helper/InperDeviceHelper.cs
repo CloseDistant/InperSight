@@ -8,8 +8,6 @@ using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper.JsonBean;
-using InperStudio.ViewModels;
-using InperStudio.Views;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
@@ -41,6 +39,10 @@ namespace InperStudio.Lib.Helper
     public class SignalData
     {
         public Dictionary<int, Queue<KeyValuePair<long, double>>> ValuePairs { get; set; } = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
+    }
+    public class SignalDataUsb
+    {
+        public Dictionary<int, Queue<Tuple<TimeSpan[], double[]>>> ValuePairs { get; set; } = new Dictionary<int, Queue<Tuple<TimeSpan[], double[]>>>();
     }
     public class InperDeviceHelper : PropertyChangedBase
     {
@@ -85,13 +87,13 @@ namespace InperStudio.Lib.Helper
         private Queue<long> EventTimeSet = new Queue<long>();
         private Dictionary<int, Queue<KeyValuePair<long, double>>> _SaveEventQs = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
         private Dictionary<int, SignalData> _SaveSignalQs = new Dictionary<int, SignalData>();
-        private Dictionary<int, SignalData> _SaveUsbSignalQs = new Dictionary<int, SignalData>();
+        private Dictionary<int, SignalDataUsb> _SaveUsbSignalQs = new Dictionary<int, SignalDataUsb>();
         #region
         public int VisionWidth = 720;
         public int VisionHeight = 540;
         public int SelectedWaveType = 1;
 
-        public event EventHandler<bool> WaveInitEvent;
+        //public event EventHandler<bool> WaveInitEvent;
         public event Action<bool> StartCollectEvent;
         public PhotometryDevice device;
         public long time;
@@ -211,7 +213,7 @@ namespace InperStudio.Lib.Helper
                             Thread.Sleep(50);
                         }
                     });
-                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                    next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000;
                 }
                 else
                 {
@@ -314,8 +316,8 @@ namespace InperStudio.Lib.Helper
                         }
                         if (!_SaveUsbSignalQs.ContainsKey(item.ChannelId) && item.Type == ChannelTypeEnum.Analog.ToString())
                         {
-                            _SaveUsbSignalQs.Add(item.ChannelId, new SignalData());
-                            _SaveUsbSignalQs[item.ChannelId].ValuePairs.Add(-1, new Queue<KeyValuePair<long, double>>());
+                            _SaveUsbSignalQs.Add(item.ChannelId, new SignalDataUsb());
+                            _SaveUsbSignalQs[item.ChannelId].ValuePairs.Add(-1, new Queue<Tuple<TimeSpan[], double[]>>());
                         }
                         _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         _ = LowFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
@@ -423,7 +425,7 @@ namespace InperStudio.Lib.Helper
                 }
 
                 Monitor.Enter(_DisplayQLock);
-                InperDeviceManagement.MarkedMat[] mmats = _DisplayMatQ.ToArray();
+                MarkedMat[] mmats = _DisplayMatQ.ToArray();
                 _DisplayMatQ.Clear();
                 Monitor.Exit(_DisplayQLock);
 
@@ -446,85 +448,271 @@ namespace InperStudio.Lib.Helper
         }
 
         #region usb data 
-        private readonly List<UsbAdData> usbAdDatasCache = new List<UsbAdData>();
-        private Queue<byte[]> _ADdataCache = new Queue<byte[]>();
         private readonly List<UsbAdData> _AdDatas = new List<UsbAdData>();
         private bool isfirstAD = true;
-
+        private bool isfirstADTime = true;
+        public long _firstADTime = 0;
+        public Dictionary<int, long> _adPreTime = new Dictionary<int, long>();
         public unsafe void UsbAdProc()
         {
-            while (isLoop)
+            try
             {
-                _ = device._CS._UARTA._DataAutoResetEvent.WaitOne();
-                if (Monitor.TryEnter(device._CS._UARTA._DataCacheObj))
+                while (isLoop)
                 {
-                    if (isfirstAD)
+                    _ = device._CS._UARTA._DataAutoResetEvent.WaitOne();
+                    if (Monitor.TryEnter(device._CS._UARTA._DataCacheObj))
                     {
-                        device._CS._UARTA.DataCache.Clear();
-                        isfirstAD = false;
+                        AdSamplingConv(InperGlobalClass.CameraSignalSettings.AiSampling);
+                        Monitor.Exit(device._CS._UARTA._DataCacheObj);
                     }
-                    else
-                    {
-                        Copy(device._CS._UARTA.DataCache, ref _ADdataCache);
-                        device._CS._UARTA.DataCache.Clear();
-                    }
-                    Monitor.Exit(device._CS._UARTA._DataCacheObj);
-
-                    _ = Parallel.ForEach(_ADdataCache, data =>
-                      {
-                          fixed (byte* pb = &data[0])
-                          {
-                              UsbAdDataStru res = Marshal.PtrToStructure<UsbAdDataStru>((IntPtr)pb);
-
-                              this.UsbDataAppend(res);
-                          }
-                      });
-                    _ADdataCache.Clear();
                 }
             }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        private void AdSamplingConv(double sampling)
+        {
+            if (sampling >= 10000)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache512 = new ConcurrentQueue<UsbAdDataStru512>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru512 data;
+                while (device._CS._UARTA._ADDataCache512.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 5000)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache256 = new ConcurrentQueue<UsbAdDataStru256>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru256 data;
+                while (device._CS._UARTA._ADDataCache256.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 1000)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache128 = new ConcurrentQueue<UsbAdDataStru128>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru128 data;
+                while (device._CS._UARTA._ADDataCache128.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 500)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache64 = new ConcurrentQueue<UsbAdDataStru64>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru64 data;
+                while (device._CS._UARTA._ADDataCache64.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 100)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache32 = new ConcurrentQueue<UsbAdDataStru32>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru32 data;
+                while (device._CS._UARTA._ADDataCache32.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 50)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache16 = new ConcurrentQueue<UsbAdDataStru16>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru16 data;
+                while (device._CS._UARTA._ADDataCache16.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 30)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache8 = new ConcurrentQueue<UsbAdDataStru8>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru8 data;
+                while (device._CS._UARTA._ADDataCache8.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            else if (sampling >= 16)
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache4 = new ConcurrentQueue<UsbAdDataStru4>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru4 data;
+                while (device._CS._UARTA._ADDataCache4.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            //else if (sampling >= 8)
+            else
+            {
+                if (isfirstAD)
+                {
+
+                    device._CS._UARTA._ADDataCache2 = new ConcurrentQueue<UsbAdDataStru2>();
+                    isfirstAD = false;
+                }
+                UsbAdDataStru2 data;
+                while (device._CS._UARTA._ADDataCache2.TryDequeue(out data))
+                {
+                    if (isfirstADTime)
+                    {
+                        _firstADTime = data.Time;
+                        isfirstADTime = false;
+                    }
+                    this.UsbDataAppend(data.Channel, data.Time, data.Values);
+                }
+            }
+            //else
+            //{
+            //    if (isfirstAD)
+            //    {
+
+            //        device._CS._UARTA._ADDataCache1 = new ConcurrentQueue<UsbAdDataStru1>();
+            //        isfirstAD = false;
+            //    }
+            //    UsbAdDataStru1 data;
+            //    while (device._CS._UARTA._ADDataCache1.TryDequeue(out data))
+            //    {
+            //        if (isfirstADTime)
+            //        {
+            //            _firstADTime = data.Time;
+            //            isfirstADTime = false;
+            //        }
+            //        this.UsbDataAppend(data.Channel, data.Time, data.Values);
+            //    }
+            //}
         }
         private readonly object _UsbDataAppendObj = new object();
         private readonly AutoResetEvent _UsbDataEvent = new AutoResetEvent(false);
-        private void UsbDataAppend(UsbAdDataStru res)
+        private void UsbDataAppend(uint channel, long time, short[] values)
         {
             Monitor.Enter(_UsbDataAppendObj);
             List<int> res1 = new List<int>();
             List<int> res2 = new List<int>();
-            for (int i = 0; i < res.Values.Length; i += 2)
+            for (int i = 0; i < values.Length; i += 2)
             {
-                res1.Add(res.Values[i]);
-                res2.Add(res.Values[i + 1]);
+                res1.Add(values[i]);
+                res2.Add(values[i + 1]);
             }
 
-            _AdDatas.Add(new UsbAdData(res.Channel * 2 - 1, res.Time, res1));
-            _AdDatas.Add(new UsbAdData(res.Channel * 2, res.Time, res2));
+            _AdDatas.Add(new UsbAdData(channel * 2 - 1, time, res1));
+            _AdDatas.Add(new UsbAdData(channel * 2, time, res2));
             Monitor.Exit(_UsbDataAppendObj);
             _UsbDataEvent.Set();
         }
+        private List<UsbAdData> _Data = new List<UsbAdData>();
         private void UsbDataPlot()
         {
-            while (true)
+            while (isLoop)
             {
-                _UsbDataEvent.WaitOne();
+                _ = _UsbDataEvent.WaitOne();
+
                 if (Monitor.TryEnter(_UsbDataAppendObj))
                 {
-                    List<UsbAdData> Data = new List<UsbAdData>();
-                    Copy(_AdDatas, ref Data);
+                    Copy(_AdDatas, ref _Data);
                     _AdDatas.Clear();
                     Monitor.Exit(_UsbDataAppendObj);
 
-                    foreach (var adData in Data)
+                    foreach (UsbAdData adData in _Data.ToArray())
                     {
-                        CameraChannel ccn = CameraChannels.FirstOrDefault(x => x.ChannelId == adData.ChannelId + 100);
+                        CameraChannel ccn = CameraChannels.FirstOrDefault(x => x.ChannelId == (adData.ChannelId + 100));
                         if (ccn != null)
                         {
                             XyDataSeries<TimeSpan, double> ds = ccn.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>;
-                            long ticks = ds.XValues.Count > 0 ? ds.XValues.Last().Ticks : 0;
 
-                            Tuple<TimeSpan[], double[]> res = AdDataTrans(ticks, adData, ccn.ChannelId);
+                            //long ticks = ((TimeSpan)ds.XMax).Ticks > 0 ? ((TimeSpan)ds.XMax).Ticks : 0;
+
+                            Tuple<TimeSpan[], double[]> res = AdDataTrans(adData, ccn.ChannelId);
                             using (ds.SuspendUpdates())
                             {
-                                ds.Append(res.Item1, res.Item2);
+                                if ((TimeSpan)ds.XMax < res.Item1.First())
+                                {
+                                    ds.Append(res.Item1, res.Item2);
+                                }
                             }
                             if (InperGlobalClass.IsRecord)
                             {
@@ -532,6 +720,7 @@ namespace InperStudio.Lib.Helper
                             }
                         }
                     }
+                    _Data.Clear();
                 }
             }
         }
@@ -539,32 +728,34 @@ namespace InperStudio.Lib.Helper
         private void UsbDataSave(Tuple<TimeSpan[], double[]> data, int channelId, int s_group = -1)
         {
             Monitor.Enter(_SaveUsbDataLock);
-            int i = 0;
-            foreach (var kv in data.Item1)
+            if (_SaveUsbSignalQs.ContainsKey(channelId))
             {
-                if (_SaveUsbSignalQs.ContainsKey(channelId))
+                if (_SaveUsbSignalQs[channelId].ValuePairs.ContainsKey(s_group))
                 {
-                    if (_SaveUsbSignalQs[channelId].ValuePairs.ContainsKey(s_group))
-                    {
-                        _SaveUsbSignalQs[channelId].ValuePairs[s_group].Enqueue(new KeyValuePair<long, double>(kv.Ticks, data.Item2[i]));
-                        i++;
-                    }
+                    _SaveUsbSignalQs[channelId].ValuePairs[s_group].Enqueue(data);
+
                 }
             }
             Monitor.Exit(_SaveUsbDataLock);
         }
 
-        private Tuple<TimeSpan[], double[]> AdDataTrans(long xMax, UsbAdData adData, int channelId)
+        private Tuple<TimeSpan[], double[]> AdDataTrans(UsbAdData adData, int channelId)
         {
             TimeSpan[] timeSpans = new TimeSpan[adData.Values.Count];
             double[] values = new double[adData.Values.Count];
 
-            double adFsTimeInterval = (double)1 / InperGlobalClass.CameraSignalSettings.AiSampling;
+            double adFsTimeInterval = 1 / InperGlobalClass.CameraSignalSettings.AiSampling;
+
             for (int i = 0; i < adData.Values.Count; i++)
             {
-                TimeSpan ts = new TimeSpan(xMax + (long)(adFsTimeInterval * (i + 1) * Math.Pow(10, 7)));
+                TimeSpan ts = new TimeSpan(_adPreTime[channelId] + (long)(adFsTimeInterval * (i + 1) * Math.Pow(10, 7)));
+
                 timeSpans[i] = ts;
                 double r = adData.Values[i];
+                //if (r == 0)
+                //{
+                //    Console.WriteLine(++count);
+                //}
                 //CameraChannel cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId);
                 //if (cn != null && cn.Type == ChannelTypeEnum.Analog.ToString())
                 //{
@@ -592,7 +783,8 @@ namespace InperStudio.Lib.Helper
                 //}
                 values[i] = r;
             }
-            adData.Values.Clear();
+            _adPreTime[channelId] = timeSpans.Last().Ticks;
+            //adData.Values.Clear();
             return new Tuple<TimeSpan[], double[]>(timeSpans, values);
         }
         #endregion
@@ -806,7 +998,7 @@ namespace InperStudio.Lib.Helper
                                                        if (deltaF >= x.DeltaF)
                                                        {
                                                            SetDeltaFEvent(x, ts, deltaF);
-                                                           SendCommand(x);
+                                                           //SendCommand(x);
                                                        }
                                                    }
                                                }
@@ -825,6 +1017,12 @@ namespace InperStudio.Lib.Helper
             {
                 if (AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor)))
                 {
+                    if (eventChannelJson.Type == ChannelTypeEnum.Output.ToString())
+                    {
+                        device.OuputIO((uint)eventChannelJson.ChannelId, 1);
+                        Thread.Sleep(50);
+                        device.OuputIO((uint)eventChannelJson.ChannelId, 0);
+                    }
                     if (InperGlobalClass.IsRecord)
                     {
                         AIROI aIROI = new AIROI()
@@ -1067,51 +1265,58 @@ namespace InperStudio.Lib.Helper
                             }
                         });
                     }
-
-                    if (Monitor.TryEnter(_SaveUsbDataLock, 10))
+                    if (isAdstart)
                     {
-                        Dictionary<int, SignalData> saveUsbSignalQS = null;
-                        Copy(_SaveUsbSignalQs, ref saveUsbSignalQS);
-                        _ = Parallel.ForEach(_SaveUsbSignalQs, kv =>
+                        if (Monitor.TryEnter(_SaveUsbDataLock, 10))
                         {
-                            foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in kv.Value.ValuePairs)
+                            Dictionary<int, SignalDataUsb> saveUsbSignalQS = null;
+                            Copy(_SaveUsbSignalQs, ref saveUsbSignalQS);
+                            _ = Parallel.ForEach(_SaveUsbSignalQs, kv =>
                             {
-                                item.Value.Clear();
-                            }
-                        });
-                        Monitor.Exit(_SaveUsbDataLock);
-                        if (saveUsbSignalQS == null)
-                        {
-                            continue;
-                        }
-                        _ = Parallel.ForEach(saveUsbSignalQS, kv =>
-                        {
-                            if (kv.Value.ValuePairs.Count > 0)
-                            {
-                                List<ChannelRecord> records = new List<ChannelRecord>();
-                                CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
-                                if (App.SqlDataInit.RecordTablePairs.ContainsKey(channel.Type + channel.ChannelId))
+                                foreach (KeyValuePair<int, Queue<Tuple<TimeSpan[], double[]>>> item in kv.Value.ValuePairs)
                                 {
-                                    _ = App.SqlDataInit.sqlSugar.UseTran(() =>
-                                    {
-
-                                        kv.Value.ValuePairs[-1].ToList().ForEach(x =>
-                                        {
-                                            ChannelRecord record = new ChannelRecord()
-                                            {
-                                                ChannelId = kv.Key,
-                                                Type = -1,
-                                                Value = x.Value,
-                                                CameraTime = x.Key,
-                                                CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
-                                            };
-                                            records.Add(record);
-                                        });
-                                        _ = App.SqlDataInit.sqlSugar.Insertable(records).AS(App.SqlDataInit.RecordTablePairs[channel.Type + channel.ChannelId]).ExecuteCommand();
-                                    });
+                                    item.Value.Clear();
                                 }
+                            });
+                            Monitor.Exit(_SaveUsbDataLock);
+                            if (saveUsbSignalQS == null)
+                            {
+                                continue;
                             }
-                        });
+                            _ = Parallel.ForEach(saveUsbSignalQS, kv =>
+                            {
+                                if (kv.Value.ValuePairs.Count > 0)
+                                {
+                                    List<ChannelRecord> records = new List<ChannelRecord>();
+                                    CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
+                                    if (App.SqlDataInit.RecordTablePairs.ContainsKey(channel.Type + channel.ChannelId))
+                                    {
+                                        _ = App.SqlDataInit.sqlSugar.UseTran(() =>
+                                        {
+
+                                            kv.Value.ValuePairs[-1].ToList().ForEach(x =>
+                                            {
+                                                int i = 0;
+                                                x.Item1.ToList().ForEach(v =>
+                                                {
+                                                    ChannelRecord record = new ChannelRecord()
+                                                    {
+                                                        ChannelId = kv.Key,
+                                                        Type = -1,
+                                                        Value = x.Item2[i],
+                                                        CameraTime = v.Ticks,
+                                                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                                    };
+                                                    records.Add(record);
+                                                    i++;
+                                                });
+                                            });
+                                            _ = App.SqlDataInit.sqlSugar.Insertable(records).AS(App.SqlDataInit.RecordTablePairs[channel.Type + channel.ChannelId]).ExecuteCommand();
+                                        });
+                                    }
+                                }
+                            });
+                        }
                     }
 
                 }
@@ -1161,7 +1366,7 @@ namespace InperStudio.Lib.Helper
                     if (obj != null)
                     {
                         TimeSpan tick = _time.Subtract((TimeSpan)(obj as VerticalLineAnnotationViewModel).X1);
-                        EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString()));
+                        EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString() || x.Type == ChannelTypeEnum.Output.ToString()));
                         if (chn != null)
                         {
                             if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
@@ -1186,11 +1391,10 @@ namespace InperStudio.Lib.Helper
                 });
                 return true;
             }
-
         }
-        public void SendCommand(EventChannelJson channelJson)
+        public void SendCommand(EventChannelJson channelJson, int type = -1)
         {
-            if (AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor)))
+            if (AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor), type))
             {
                 device.OuputIO((uint)channelJson.ChannelId, 1);
                 Thread.Sleep(50);
@@ -1198,13 +1402,18 @@ namespace InperStudio.Lib.Helper
             }
 
         }
-        public void StopCollect()
+        public void StopPlot()
         {
             try
             {
-                isFirstRecordTiem = false; isLoop = false;
-                timer.Stop();
-                _DataSaveTimer.Stop();
+                if (isAdstart)
+                {
+                    device.RemoveAdSampling();
+                }
+
+                isFirstRecordTiem = false; isLoop = false; isAdstart = false;
+
+
                 if (frameProcTask != null)
                 {
                     while (frameProcTask.IsCompleted)
@@ -1221,6 +1430,19 @@ namespace InperStudio.Lib.Helper
                         break;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void StopCollect()
+        {
+            try
+            {
+                timer.Stop();
+                _DataSaveTimer.Stop();
+
                 if (saveDataTask != null)
                 {
                     while (saveDataTask.IsCompleted)
@@ -1239,8 +1461,10 @@ namespace InperStudio.Lib.Helper
                 _SaveSignalQs.Clear();
                 _SaveUsbSignalQs.Clear();
                 _SaveEventQs.Clear();
+                device.AdIsCollect(false);
             }
         }
+        public bool isAdstart = false;
         public void StartCollect()
         {
             try
@@ -1248,6 +1472,9 @@ namespace InperStudio.Lib.Helper
                 _ = device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
                 device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
 
+                _adPreTime.Clear();
+
+                uint[] chnn = new uint[4] { 0, 0, 0, 0 };
                 CameraChannels.ToList().ForEach(x =>
                 {
                     if (x.Type == ChannelTypeEnum.Camera.ToString())
@@ -1260,8 +1487,29 @@ namespace InperStudio.Lib.Helper
                     }
                     if (x.Type == ChannelTypeEnum.Analog.ToString())
                     {
-                        x.RenderableSeries.First().DataSeries.Clear();
-                        x.RenderableSeries.First().DataSeries.FifoCapacity = (int?)(20 * 60 * InperGlobalClass.CameraSignalSettings.AiSampling);
+                        isAdstart = true;
+                        if (x.ChannelId <= 102)
+                        {
+                            chnn[0] = 1;
+                        }
+                        else if (x.ChannelId <= 104)
+                        {
+                            chnn[1] = 1;
+                        }
+                        else if (x.ChannelId <= 106)
+                        {
+                            chnn[2] = 1;
+                        }
+                        else
+                        {
+                            chnn[3] = 1;
+                        }
+                        x.RenderableSeries.ToList().ForEach(line =>
+                        {
+                            (line.DataSeries as XyDataSeries<TimeSpan, double>).Clear();
+                            line.DataSeries.FifoCapacity = 20 * 60 * (int)InperGlobalClass.CameraSignalSettings.AiSampling;
+                        });
+                        _adPreTime.Add(x.ChannelId, 0);
                     }
                 });
                 if (EventChannelChart.RenderableSeries.Count > 0)
@@ -1290,15 +1538,24 @@ namespace InperStudio.Lib.Helper
                         Instance.device.SetIOMode((uint)x.ChannelId, IOMode.IOM_OUTPUT);
                     }
                 });
+                if (isAdstart)
+                {
+                    device.SetAdframeRate((uint)InperGlobalClass.CameraSignalSettings.AiSampling, chnn);
+                }
 
-                isFirstRecordTiem = true; isLoop = true; isfirstAD = true;
+                isFirstRecordTiem = true; isLoop = true; isfirstADTime = isfirstAD = true;
+                _firstADTime = 0;
                 timer.Start();
                 _DataSaveTimer.Start();
-
                 updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
                 frameProcTask = Task.Factory.StartNew(() => { FrameProc(); });
-                Task.Factory.StartNew(() => { UsbAdProc(); });
-                Task.Factory.StartNew(() => { UsbDataPlot(); });
+                if (isAdstart)
+                {
+                    _ = Task.Factory.StartNew(() => { UsbAdProc(); });
+                    _ = Task.Factory.StartNew(() => { UsbDataPlot(); });
+                    device.AdIsCollect(true);
+                }
+
                 StartCollectEvent?.Invoke(true);
                 //saveDataTask = Task.Factory.StartNew(() => { SaveDateProc(); });
             }

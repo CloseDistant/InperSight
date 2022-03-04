@@ -16,9 +16,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
-                    <Border x:Name="bd" CornerRadius="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}}" BorderThickness="1" BorderBrush="{StaticResource InperBorderColor}">
-                        <hc:SimplePanel Name="effect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="2" Background="{StaticResource InperFFFColor}"/>
-                    </Border>
+                    <WrapPanel>
+                        <Border x:Name="bd" Width="15" Height="15" CornerRadius="{Binding Path=(hc:BorderElement.CornerRadius),RelativeSource={RelativeSource TemplatedParent}}" BorderThickness="1" BorderBrush="{StaticResource InperBorderColor}">
+                            <hc:SimplePanel Name="effect" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="2" Background="{StaticResource InperFFFColor}"/>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center" Margin="8 0 0 0" />
+                    </WrapPanel>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="true">
                             <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource InperButtonSelectColor}" ></Setter>

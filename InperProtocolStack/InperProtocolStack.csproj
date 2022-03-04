@@ -53,6 +53,7 @@
     <Compile Include="Basis\CRCCalculation.cs" />
     <Compile Include="Basis\DataFrame.cs" />
     <Compile Include="Basis\Utils.cs" />
+    <Compile Include="CmdPhotometry\CmdAdframeRate.cs" />
     <Compile Include="CmdPhotometry\CmdInqID.cs" />
     <Compile Include="CmdPhotometry\CmdInqInfo.cs" />
     <Compile Include="CmdPhotometry\CmdInqIOConfig.cs" />

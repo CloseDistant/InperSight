@@ -86,11 +86,11 @@
     </Reference>
     <Reference Include="InperPhotometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperPhotometry\bin\Debug\InperPhotometry.dll</HintPath>
+      <HintPath>..\InperPhotometry\bin\Debug\InperPhotometry.dll</HintPath>
     </Reference>
     <Reference Include="InperProtocolStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Users\刘小刀\source\repos\inperdevicemanagement\InperPhotometry\bin\Debug\InperProtocolStack.dll</HintPath>
+      <HintPath>..\InperProtocolStack\bin\Debug\InperProtocolStack.dll</HintPath>
     </Reference>
     <Reference Include="InperStudioControlLib">
       <HintPath>..\InperStudioControlLib\bin\Debug\InperStudioControlLib.dll</HintPath>

@@ -377,10 +377,7 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    EventChannel cha = view.MarkerChannelCombox.SelectedItem as EventChannel;
-
-                    EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == cha.ChannelId);
-                    if (chn != null)
+                    if (view.ConditionsCombox.SelectedItem is EventChannel chn)
                     {
                         chn.Condition.Hotkeys = bt.Content == null ? "" : bt.Content.ToString();
                     }

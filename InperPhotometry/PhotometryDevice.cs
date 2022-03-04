@@ -31,7 +31,6 @@ namespace InperDeviceManagement
             return;
         }
 
-        public event Action<List<UsbAdData>> OnUsbInfoUpdated;
         public event EventHandler<DevInfoUpdatedEventArgs> OnDevInfoUpdated;
         public event EventHandler<DevNotificationEventArgs> OnDevNotification;
 
@@ -41,7 +40,6 @@ namespace InperDeviceManagement
             _BC = bc;
             _CS.OnDevInfoUpdated += DevInfoUpdated;
             _CS.OnDevNotification += DevNotified;
-            _CS.OnUsbInfoUpdated += _CS_OnUsbInfoUpdated;
             _BC.DidGrabImage += OnImageGrabbed;
 
             // stub of device IO
@@ -58,11 +56,6 @@ namespace InperDeviceManagement
             };
 
             // SyncDeviceInfo();
-        }
-
-        private void _CS_OnUsbInfoUpdated(List<UsbAdData> obj)
-        {
-            OnUsbInfoUpdated?.Invoke(obj);
         }
 
         private void DevInfoUpdated(object sender, DevInfoUpdatedEventArgs e)
@@ -232,7 +225,18 @@ namespace InperDeviceManagement
 
         #endregion
 
-
+        public void AdIsCollect(bool isStart)
+        {
+            _CS.ADIsStartCollect(isStart);
+        }
+        public void SetAdframeRate(uint frameRate, uint[] array)
+        {
+            _CS.SetAdframeRate(frameRate, array);
+        }
+        public void RemoveAdSampling()
+        {
+            _CS.RemoveAdSampling();
+        }
         public void Start()
         {
             _BC.SwitchRunningMode(CameraRunningMode.Trigger);
