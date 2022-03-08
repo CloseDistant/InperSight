@@ -21,7 +21,7 @@
     <StackPanel Background="{DynamicResource InperDialogContentColor}">
         <WrapPanel HorizontalAlignment="Stretch" Margin="20 10 0 0" x:Name="ai_sampling" Visibility="Collapsed" >
             <TextBlock VerticalAlignment="Center">Sampling (Point)</TextBlock>
-            <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" Text="{Binding Source={StaticResource InperGlobalClass}, Path=CameraSignalSettings.AiSampling,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" Margin="15 0 0 0" HorizontalAlignment="Stretch" InperTextType="Double" InperVerify="True" InperMaxValue="30000" InperMinValue="1" Width="300" Height="32" />
+            <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsPreview,Converter={StaticResource Boolean2BooleanReConverter}}" Text="{Binding Source={StaticResource InperGlobalClass}, Path=CameraSignalSettings.AiSampling,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" Margin="15 0 0 0" HorizontalAlignment="Stretch" InperTextType="Double" InperVerify="True" InperMaxValue="30000" InperMinValue="1" Width="300" Height="32" />
         </WrapPanel>
         <Grid x:Name="camera" Visibility="Visible">
             <Grid.ColumnDefinitions>

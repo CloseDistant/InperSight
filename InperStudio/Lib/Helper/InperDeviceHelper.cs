@@ -376,7 +376,7 @@ namespace InperStudio.Lib.Helper
             }
             return true;
         }
-        private void Instance_OnImageGrabbed(object sender, InperDeviceManagement.MarkedMat e)
+        private void Instance_OnImageGrabbed(object sender, MarkedMat e)
         {
             try
             {

@@ -253,14 +253,9 @@ namespace InperStudio.ViewModels
                 InperDeviceHelper.Instance.SelectedWaveType = -1;
                 if (InperDeviceHelper.Instance.LightWaveLength.Count > 0)
                 {
-                    if (InperDeviceHelper.Instance.LightWaveLength.Count > 1)
-                    {
-                        view.waveView.SelectedItem = InperDeviceHelper.Instance.LightWaveLength[1];
-                    }
-                    else
-                    {
-                        view.waveView.SelectedItem = InperDeviceHelper.Instance.LightWaveLength[0];
-                    }
+                    view.waveView.SelectedItem = InperDeviceHelper.Instance.LightWaveLength.Count > 1
+                        ? InperDeviceHelper.Instance.LightWaveLength[1]
+                        : InperDeviceHelper.Instance.LightWaveLength[0];
 
                     view.lightMode.ItemsSource = InperDeviceHelper.Instance.LightWaveLength;
                 }
@@ -854,7 +849,7 @@ namespace InperStudio.ViewModels
         }
         private void SetMat(Mat mat, Grid grid)
         {
-            double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth == 0 ? this.view.ellipseCanvas.Width : this.view.ellipseCanvas.ActualWidth;
+            double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth;
             double rect_left = (double)grid.GetValue(Canvas.LeftProperty) * scale;
             double rect_top = (double)grid.GetValue(Canvas.TopProperty) * scale;
 

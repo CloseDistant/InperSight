@@ -120,7 +120,7 @@ namespace InperStudio.Views.Control
                     {
                         cs.Add(x.ChannelId);
                     });
-                    foreach (Lib.Bean.Channel.CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
+                    foreach (CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
                     {
                         if (!cs.Contains(item.ChannelId))
                         {
