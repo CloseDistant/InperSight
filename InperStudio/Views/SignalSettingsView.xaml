@@ -162,7 +162,6 @@
                 </Grid>
                 <Grid Margin="0 20" >
                     <TextBlock VerticalAlignment="Center" Text="Color"  FontSize="{DynamicResource InperLargeFontSize}"/>
-
                     <Button x:Name="PopButton" Cursor="Hand" Margin="20 0 0 0" HorizontalAlignment="Right" MinWidth="160" Click="{s:Action PopButton_Click}" />
                     <Popup x:Name="pop" PopupAnimation="Slide" PlacementTarget="{Binding ElementName=PopButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Effect="{DynamicResource EffectShadow4}">
                         <ListBox x:Name="AnalogColorList" SelectionChanged="{s:Action AnalogColorList_Selected}"  Background="Transparent" BorderThickness="0" Margin="0 20" HorizontalAlignment="Stretch" Width="{Binding ElementName=PopButton,Path=ActualWidth}"  Style="{StaticResource WrapPanelHorizontalListBox}" ItemsSource="{Binding AnalogColorList,UpdateSourceTrigger=PropertyChanged}" >

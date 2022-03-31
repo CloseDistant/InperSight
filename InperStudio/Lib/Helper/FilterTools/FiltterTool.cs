@@ -89,12 +89,12 @@ namespace InperStudio.Lib.Helper.FilterTools
             float w0 = 2 * pi * frequency; //陷波器中心角频率
             float Q = 1 / (4 - 2 * k);//品质因数
 
-            float m0 = (float)(Q * Math.Sqrt(ts) * Math.Sqrt(w0) + 4 * Q);
-            float m1 = (float)-(8 * Q - 2 * Q * Math.Sqrt(ts) * Math.Sqrt(w0));
+            float m0 = (float)((Q * Math.Sqrt(ts) * Math.Sqrt(w0)) + (4 * Q));
+            float m1 = (float)-((8 * Q) - (2 * Q * Math.Sqrt(ts) * Math.Sqrt(w0)));
             float m2 = m0;
-            float n0 = (float)(Q * Math.Sqrt(ts) * Math.Sqrt(w0) + 2 * ts * w0 + 4 * Q);
+            float n0 = (float)((Q * Math.Sqrt(ts) * Math.Sqrt(w0)) + (2 * ts * w0) + 4 * Q);
             float n1 = m1;
-            float n2 = (float)(Q * Math.Sqrt(ts) * Math.Sqrt(w0) - 2 * ts * w0 + 4 * Q);
+            float n2 = (float)((Q * Math.Sqrt(ts) * Math.Sqrt(w0)) - (2 * ts * w0) + 4 * Q);
 
             a1 = (-n1) / n0;
             a2 = (-n2) / n0;
