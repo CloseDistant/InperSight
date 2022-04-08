@@ -628,34 +628,36 @@ namespace InperStudio.ViewModels
 
                 foreach (CameraChannel item in InperDeviceHelper.CameraChannels)
                 {
-                    var mode = item.LightModes.FirstOrDefault(x => x.LightType == sen.GroupId);
-                    if (mode == null)
+                    if (item.Type == ChannelTypeEnum.Camera.ToString())
                     {
-                        mode = new LightMode<TimeSpan, double>()
+                        var mode = item.LightModes.FirstOrDefault(x => x.LightType == sen.GroupId);
+                        if (mode == null)
                         {
-                            LightType = sen.GroupId,
-                            WaveColor = new SolidColorBrush(InperColorHelper.WavelengthToRGB(int.Parse(sen.WaveType.Split(' ').First()))),
-                            //WaveColor = sen.GroupId == 1 ? InperColorHelper.SCBrushes[item.ChannelId % 9] : (sen.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
-                            XyDataSeries = new XyDataSeries<TimeSpan, double>(),
-                        };
-                        item.LightModes.Add(mode);
-                    }
-                    LineRenderableSeriesViewModel fast = null;
-                    foreach (LineRenderableSeriesViewModel line in item.RenderableSeries)
-                    {
-                        if (line.Tag.ToString() == sen.GroupId.ToString())
-                        {
-                            fast = line;
+                            mode = new LightMode<TimeSpan, double>()
+                            {
+                                LightType = sen.GroupId,
+                                WaveColor = new SolidColorBrush(InperColorHelper.WavelengthToRGB(int.Parse(sen.WaveType.Split(' ').First()))),
+                                //WaveColor = sen.GroupId == 1 ? InperColorHelper.SCBrushes[item.ChannelId % 9] : (sen.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
+                                XyDataSeries = new XyDataSeries<TimeSpan, double>(),
+                            };
+                            item.LightModes.Add(mode);
                         }
+                        LineRenderableSeriesViewModel fast = null;
+                        foreach (LineRenderableSeriesViewModel line in item.RenderableSeries)
+                        {
+                            if (line.Tag.ToString() == sen.GroupId.ToString())
+                            {
+                                fast = line;
+                            }
+                        }
+                        if (fast == null)
+                        {
+                            item.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = sen.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color });
+                        }
+                        Monitor.Enter(InperDeviceHelper._SignalQsLocker);
+                        InperDeviceHelper._SignalQs[item.ChannelId].ValuePairs[sen.GroupId] = new Queue<KeyValuePair<long, double>>();
+                        Monitor.Exit(InperDeviceHelper._SignalQsLocker);
                     }
-                    if (fast == null)
-                    {
-                        item.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = sen.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color });
-                    }
-                    Monitor.Enter(InperDeviceHelper._SignalQsLocker);
-                    InperDeviceHelper._SignalQs[item.ChannelId].ValuePairs[sen.GroupId] = new Queue<KeyValuePair<long, double>>();
-                    Monitor.Exit(InperDeviceHelper._SignalQsLocker);
-
                 }
                 e.Handled = true;
             }
