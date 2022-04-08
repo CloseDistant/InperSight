@@ -108,14 +108,12 @@ namespace InperStudio.ViewModels
         }
         public void InperDialogWindow_ConfirmClickEvent(object sender, ExecutedRoutedEventArgs e)
         {
-            if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-            {
-                Growl.Warning("Filename exsited", "SuccessMsg");
-            }
-            else
-            {
-                RequestClose();
-            }
+            //if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+            //{
+            //    Growl.Warning("Filename exsited", "SuccessMsg");
+            //}
+
+            RequestClose();
         }
         #endregion
     }

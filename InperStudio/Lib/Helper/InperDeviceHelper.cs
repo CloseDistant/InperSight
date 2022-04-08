@@ -82,9 +82,10 @@ namespace InperStudio.Lib.Helper
         private bool isFirstRecordTiem = true;
         private bool isLoop = true;
         private long _PlottingStartTime;
+        private long _EventStartTime;
+        private bool _eventIsFirst = true;
 
         private short[] _SwapBuffer;
-        private Queue<long> EventTimeSet = new Queue<long>();
         private Dictionary<int, Queue<KeyValuePair<long, double>>> _SaveEventQs = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
         private Dictionary<int, SignalData> _SaveSignalQs = new Dictionary<int, SignalData>();
         private Dictionary<int, SignalDataUsb> _SaveUsbSignalQs = new Dictionary<int, SignalDataUsb>();
@@ -268,28 +269,30 @@ namespace InperStudio.Lib.Helper
             DevInputNotificationEventArgs dev = e as DevInputNotificationEventArgs;
             if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
             {
-                Monitor.Enter(_EventQLock);
-                if (EventTimeSet.Count > 0)
+                if (_eventIsFirst)
                 {
-                    foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in EventChannelChart.EventQs)
+                    _EventStartTime = DateTime.Now.Ticks;
+                    _eventIsFirst = false;
+                }
+                Monitor.Enter(_EventQLock);
+                foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in EventChannelChart.EventQs)
+                {
+                    if (dev.IOID == item.Key)
+                    {
+                        long time = DateTime.Now.Ticks - _EventStartTime;
+                        item.Value.Enqueue(new KeyValuePair<long, double>(time * 100, dev.Status));
+                    }
+                }
+                if (InperGlobalClass.IsRecord)
+                {
+                    foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in _SaveEventQs)
                     {
                         if (dev.IOID == item.Key)
                         {
-                            item.Value.Enqueue(new KeyValuePair<long, double>(EventTimeSet.Last(), dev.Status));
-                            //Console.WriteLine(dev.IOID + ":" + dev.Status);
+                            long time = DateTime.Now.Ticks - _EventStartTime;
+                            item.Value.Enqueue(new KeyValuePair<long, double>(time * 100, dev.Status));
                         }
                     }
-                    if (InperGlobalClass.IsRecord)
-                    {
-                        foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in _SaveEventQs)
-                        {
-                            if (dev.IOID == item.Key)
-                            {
-                                item.Value.Enqueue(new KeyValuePair<long, double>(EventTimeSet.Last(), dev.Status));
-                            }
-                        }
-                    }
-                    EventTimeSet.Clear();
                 }
 
                 Monitor.Exit(_EventQLock);
@@ -386,6 +389,7 @@ namespace InperStudio.Lib.Helper
                     if (isFirstRecordTiem)
                     {
                         _PlottingStartTime = e.Timestamp;
+
                         isFirstRecordTiem = false;
                     }
                     Monitor.Enter(_QLock);
@@ -805,11 +809,8 @@ namespace InperStudio.Lib.Helper
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
                         time = ts;
-                        //System.Diagnostics.Debug.WriteLine(m.Group + " ====== " + ts);
                         if (Monitor.TryEnter(_EventQLock))
                         {
-                            EventTimeSet.Enqueue(ts);
-
                             Monitor.Exit(_EventQLock);
                         }
 
@@ -1253,7 +1254,7 @@ namespace InperStudio.Lib.Helper
                                                       ChannelId = kv.Key,
                                                       Type = item.Key,
                                                       Value = value.Value,
-                                                      CameraTime = value.Key,
+                                                      CameraTime = value.Key / 100,
                                                       CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
                                                   };
                                                   records.Add(record);
@@ -1512,13 +1513,13 @@ namespace InperStudio.Lib.Helper
                         _adPreTime.Add(x.ChannelId, 0);
                     }
                 });
-                if (EventChannelChart.RenderableSeries.Count > 0)
-                {
-                    EventChannelChart.RenderableSeries.ToList().ForEach(line =>
-                    {
-                        line.DataSeries.FifoCapacity = 20 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
-                    });
-                }
+                //if (EventChannelChart.RenderableSeries.Count > 0)
+                //{
+                //    EventChannelChart.RenderableSeries.ToList().ForEach(line =>
+                //    {
+                //        line.DataSeries.FifoCapacity = 20 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
+                //    });
+                //}
                 foreach (KeyValuePair<int, SignalData> item in _SignalQs)
                 {
                     foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> data in item.Value.ValuePairs)
@@ -1543,7 +1544,7 @@ namespace InperStudio.Lib.Helper
                     device.SetAdframeRate((uint)InperGlobalClass.CameraSignalSettings.AiSampling, chnn);
                 }
 
-                isFirstRecordTiem = true; isLoop = true; isfirstADTime = isfirstAD = true;
+                _eventIsFirst = true; isFirstRecordTiem = true; isLoop = true; isfirstADTime = isfirstAD = true;
                 _firstADTime = 0;
                 timer.Start();
                 _DataSaveTimer.Start();

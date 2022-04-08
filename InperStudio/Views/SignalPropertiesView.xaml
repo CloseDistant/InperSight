@@ -62,7 +62,7 @@
                     <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" Checked="{s:Action HeightAuto_Checked}" IsChecked="{Binding ElementName=heightChannel,Path=SelectedItem.Height,Converter={StaticResource DoubleToBoolReConverter}}">
                         <TextBlock Text="Fixed" Margin="5 0"   FontSize="{DynamicResource InperLargeFontSize}"/>
                     </RadioButton>
-                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperTextChanged="{s:Action FixedValue_InperTextChanged}" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding ElementName=heightChannel,Path=SelectedItem.Height,UpdateSourceTrigger=PropertyChanged}"  />
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperMinValue="10" InperMaxValue="1000" InperTextChanged="{s:Action FixedValue_InperTextChanged}" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding ElementName=heightChannel,Path=SelectedItem.Height,UpdateSourceTrigger=PropertyChanged}"  />
                 </Grid>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="20 10 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">

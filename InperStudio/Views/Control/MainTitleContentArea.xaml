@@ -53,7 +53,7 @@
             </MenuItem>
         </Menu>
         <hc:SimplePanel Grid.Column="1"  MouseDown="Border_MouseDown" Name="move1"/>
-        <Button Grid.Column="2" Cursor="Hand" x:Name="DataFolderName" Click="DataFolderName_Click">
+        <Button Grid.Column="2" Cursor="Hand" x:Name="DataFolderName" Click="DataFolderName_Click" IsEnabled="{Binding InperGlobalClass.IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}">
             <Button.Template>
                 <ControlTemplate>
                     <Grid>
@@ -64,7 +64,7 @@
         </Button>
         <hc:SimplePanel Grid.Column="3"  MouseDown="Border_MouseDown" Name="move2"/>
         <Button Grid.Column="4" Name="skin" Style="{StaticResource InperFreeButton}" Click="Skin_Click"  Margin="0 0 10 0" Width="16" Height="16" VerticalAlignment="Center">
-           <Image Source="/Lib/Images/New/skin.png" Stretch="Fill" />
+            <Image Source="/Lib/Images/New/skin.png" Stretch="Fill" />
         </Button>
         <Popup AllowsTransparency="True" Grid.Column="1" PlacementTarget="{Binding ElementName=skin}" HorizontalOffset="-80" Name="PopupConfig" VerticalOffset="15" StaysOpen="False">
             <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="4" Margin="16" Effect="{StaticResource EffectShadow3}">

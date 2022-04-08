@@ -120,7 +120,7 @@ namespace InperStudio.ViewModels
                                 };
                                 item.Offset = x.Offset;
                                 item.OffsetWindowSize = x.OffsetWindowSize;
-                                
+
                                 item.Filters = new Lib.Bean.Channel.Filters()
                                 {
                                     HighPass = x.Filters.HighPass,
@@ -849,7 +849,7 @@ namespace InperStudio.ViewModels
         }
         private void SetMat(Mat mat, Grid grid)
         {
-            double scale = InperDeviceHelper.Instance.VisionWidth / this.view.ellipseCanvas.ActualWidth;
+            double scale = InperDeviceHelper.Instance.VisionWidth / (this.view.ellipseCanvas.ActualWidth == 0 ? this.view.ellipseCanvas.Width : this.view.ellipseCanvas.ActualWidth);
             double rect_left = (double)grid.GetValue(Canvas.LeftProperty) * scale;
             double rect_top = (double)grid.GetValue(Canvas.TopProperty) * scale;
 
