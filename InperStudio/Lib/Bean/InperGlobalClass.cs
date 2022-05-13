@@ -170,7 +170,12 @@ namespace InperStudio.Lib.Bean
 
         public static void ShowReminderInfo(string message, int waitTime = 1)
         {
-            Growl.Error(new GrowlInfo() { Message = message, Token = "SuccessMsg", WaitTime = waitTime });
+            Growl.Warning(new GrowlInfo() { Message = message, Token = "SuccessMsg", WaitTime = waitTime });
+        }
+        public static void SetSampling(double sampling)
+        {
+            InperDeviceHelper.Instance.device.SetFrameRate(sampling * (CameraSignalSettings.LightMode.Count < 1 ? 1 : CameraSignalSettings.LightMode.Count));
+            CameraSignalSettings.Sampling = sampling;
         }
     }
 }

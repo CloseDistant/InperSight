@@ -60,7 +60,7 @@ namespace InperStudioControlLib.Control.TextBox
         public InperTextBox()
         {
             this.TextChanged += InperTextBox_TextChanged;
-            this.LostFocus += InperTextBox_LostFocus;
+            //this.LostFocus += InperTextBox_LostFocus;
         }
 
         private void InperTextBox_LostFocus(object sender, RoutedEventArgs e)
@@ -116,22 +116,22 @@ namespace InperStudioControlLib.Control.TextBox
                                 if (res < InperMinValue)
                                 {
                                     this.Foreground = Brushes.Red;
-                                    Growl.Warning(new GrowlInfo() { Message = "The value cannot be less than " + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
-                                    //this.Text = InperMinValue.ToString();
+                                    //Growl.Warning(new GrowlInfo() { Message = "The value cannot be less than " + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                                    this.Text = InperMinValue.ToString();
                                     return;
                                 }
                                 if (res > InperMaxValue && InperMaxValue > InperMinValue)
                                 {
                                     this.Foreground = Brushes.Red;
-                                    Growl.Warning(new GrowlInfo() { Message = "The value cannot exceed " + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
-                                    //this.Text = InperMaxValue.ToString();
+                                    //Growl.Warning(new GrowlInfo() { Message = "The value cannot exceed " + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                                    this.Text = InperMaxValue.ToString();
                                     return;
                                 }
                             }
                             else
                             {
                                 this.Foreground = Brushes.Red;
-                                Growl.Warning(new GrowlInfo() { Message = "Invalid input", Token = "SuccessMsg", WaitTime = 1 });
+                                //Growl.Warning(new GrowlInfo() { Message = "Invalid input", Token = "SuccessMsg", WaitTime = 1 });
                                 return;
                             }
                         }
@@ -143,7 +143,7 @@ namespace InperStudioControlLib.Control.TextBox
                             if (tbox.Text.Length > InperStringLength)
                             {
                                 this.Foreground = Brushes.Red;
-                                Growl.Warning(new GrowlInfo() { Message = "No more than " + InperStringLength + " characters", Token = "SuccessMsg", WaitTime = 1 });
+                                //Growl.Warning(new GrowlInfo() { Message = "No more than " + InperStringLength + " characters", Token = "SuccessMsg", WaitTime = 1 });
                                 return;
                             }
                         }

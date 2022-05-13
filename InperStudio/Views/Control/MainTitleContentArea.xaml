@@ -18,8 +18,8 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
-        <Menu Margin="0,-3,0,0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center">
-            <MenuItem Header="InperSignal" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" FontSize="13">
+        <Menu Margin="0 -5 0 0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center">
+            <MenuItem Header="Inper Signal" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" Padding="10 8" FontSize="13">
                 <MenuItem  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Header="Import Config" Foreground="#333333"  FontSize="12" FontFamily="Arial" Width="180" Name="ImportConfig" Click="ImportConfig_Click">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/import config.png" SnapsToDevicePixels="True" Width="14" Height="14" Stretch="Fill"/>
@@ -56,9 +56,10 @@
         <Button Grid.Column="2" Cursor="Hand" x:Name="DataFolderName" Click="DataFolderName_Click" IsEnabled="{Binding InperGlobalClass.IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}">
             <Button.Template>
                 <ControlTemplate>
-                    <Grid>
-                        <TextBlock x:Name="dic_name" Foreground="White"  FontSize="13" Text="{Binding InperGlobalClass.DataFolderName,UpdateSourceTrigger=PropertyChanged}" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Grid>
+                    <WrapPanel VerticalAlignment="Center">
+                        <Image Source="/Lib/Images/New/文件.png" Width="15" Height="15" Stretch="UniformToFill" VerticalAlignment="Center" Margin="0 0 5 0" />
+                        <TextBlock x:Name="dic_name" Foreground="White" FontSize="13" Text="{Binding InperGlobalClass.DataFolderName,UpdateSourceTrigger=PropertyChanged}" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </WrapPanel>
                 </ControlTemplate>
             </Button.Template>
         </Button>

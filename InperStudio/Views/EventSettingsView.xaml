@@ -12,7 +12,7 @@
         xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
         xmlns:local="clr-namespace:InperStudio.Views"
         mc:Ignorable="d" IsShowCancleButton="False" IsShowTopAllButton="False" IsShowOtherButton="False"
-        Title="Marker" SizeToContent="Height"  Width="540" Height="380" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
+        Title="Marker" x:Name="eswidnow" SizeToContent="Height"  Width="540" Height="380" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
         <convert:ChannelAnalogTypeToVisibilityConverter x:Key="ChannelAnalogTypeToVisibilityConverter" />
@@ -178,7 +178,7 @@
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="ListBoxItem">
-                                                        <Grid x:Name="test" Background="Transparent" Visibility="{Binding IsActive,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}" >
+                                                        <Grid x:Name="test" Background="Transparent" MouseEnter="{s:Action Test_MouseEnter}" Visibility="{Binding IsActive,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}" >
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*"/>
                                                                 <ColumnDefinition Width="3.5*"/>

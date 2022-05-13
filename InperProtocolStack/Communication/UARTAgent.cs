@@ -25,7 +25,7 @@ namespace InperProtocolStack.Communication
     }
     public class UsbAdData
     {
-        public UsbAdData(uint channelId, long time, List<int> values)
+        public UsbAdData(uint channelId, long time, List<double> values)
         {
             ChannelId = channelId;
             Time = time;
@@ -34,7 +34,7 @@ namespace InperProtocolStack.Communication
 
         public uint ChannelId { get; private set; }
         public long Time { get; private set; }
-        public List<int> Values { get; private set; }
+        public List<double> Values { get; private set; }
     }
 
     public class UARTAgent

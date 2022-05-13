@@ -335,15 +335,35 @@ namespace InperStudio.Lib.Helper
                                 x.OffsetValue = 0;
                                 if (item.Type == ChannelTypeEnum.Camera.ToString())
                                 {
-                                    _SaveSignalQs[item.ChannelId].ValuePairs.Add(x.LightType, new Queue<KeyValuePair<long, double>>());
+                                    if (!_SaveSignalQs[item.ChannelId].ValuePairs.ContainsKey(x.LightType))
+                                    {
+                                        _SaveSignalQs[item.ChannelId].ValuePairs.Add(x.LightType, new Queue<KeyValuePair<long, double>>());
+                                    }
                                 }
-                                FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                LowFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                HeightFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                NotchFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-
-                                OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                if (!FilterData[item.ChannelId].ContainsKey(x.LightType))
+                                {
+                                    FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                }
+                                if (!LowFilterData[item.ChannelId].ContainsKey(x.LightType))
+                                {
+                                    LowFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                }
+                                if (!HeightFilterData[item.ChannelId].ContainsKey(x.LightType))
+                                {
+                                    HeightFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                }
+                                if (!NotchFilterData[item.ChannelId].ContainsKey(x.LightType))
+                                {
+                                    NotchFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                }
+                                if (!OffsetData[item.ChannelId].ContainsKey(x.LightType))
+                                {
+                                    OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                }
+                                if (!DeltaFData[item.ChannelId].ContainsKey(x.LightType))
+                                {
+                                    DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                                }
                             });
                         }
                         //else
@@ -352,10 +372,7 @@ namespace InperStudio.Lib.Helper
                         //}
                     }
                 }
-                else
-                {
-                    return false;
-                }
+
                 if (InperGlobalClass.EventSettings.Channels.Count > 0)
                 {
                     InperGlobalClass.EventSettings.Channels.ForEach(x =>
@@ -367,7 +384,10 @@ namespace InperStudio.Lib.Helper
                             {
                                 EventChannelChart.EventQs.TryAdd(x.ChannelId, new Queue<KeyValuePair<long, double>>());
                             }
-                            _SaveEventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                            if (!_SaveEventQs.ContainsKey(x.ChannelId))
+                            {
+                                _SaveEventQs.Add(x.ChannelId, new Queue<KeyValuePair<long, double>>());
+                            }
                         }
                     });
                 }
@@ -650,37 +670,18 @@ namespace InperStudio.Lib.Helper
                     this.UsbDataAppend(data.Channel, data.Time, data.Values);
                 }
             }
-            //else
-            //{
-            //    if (isfirstAD)
-            //    {
-
-            //        device._CS._UARTA._ADDataCache1 = new ConcurrentQueue<UsbAdDataStru1>();
-            //        isfirstAD = false;
-            //    }
-            //    UsbAdDataStru1 data;
-            //    while (device._CS._UARTA._ADDataCache1.TryDequeue(out data))
-            //    {
-            //        if (isfirstADTime)
-            //        {
-            //            _firstADTime = data.Time;
-            //            isfirstADTime = false;
-            //        }
-            //        this.UsbDataAppend(data.Channel, data.Time, data.Values);
-            //    }
-            //}
         }
         private readonly object _UsbDataAppendObj = new object();
         private readonly AutoResetEvent _UsbDataEvent = new AutoResetEvent(false);
         private void UsbDataAppend(uint channel, long time, short[] values)
         {
             Monitor.Enter(_UsbDataAppendObj);
-            List<int> res1 = new List<int>();
-            List<int> res2 = new List<int>();
+            List<double> res1 = new List<double>();
+            List<double> res2 = new List<double>();
             for (int i = 0; i < values.Length; i += 2)
             {
-                res1.Add(values[i]);
-                res2.Add(values[i + 1]);
+                res1.Add(values[i] * 3.3 * 23.81 / 4096 - 5);
+                res2.Add(values[i + 1] * 3.3 * 23.81 / 4096 - 5);
             }
 
             _AdDatas.Add(new UsbAdData(channel * 2 - 1, time, res1));
@@ -760,31 +761,31 @@ namespace InperStudio.Lib.Helper
                 //{
                 //    Console.WriteLine(++count);
                 //}
-                //CameraChannel cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId);
-                //if (cn != null && cn.Type == ChannelTypeEnum.Analog.ToString())
-                //{
-                //    if (cn.Offset)
-                //    {
-                //        r -= Offset(cn, -1, r);
-                //    }
-                //    if (cn.Filters.IsSmooth)
-                //    {
-                //        r = Smooth(cn, -1, r);
-                //    }
-                //    DeltaFCalculate(cn, -1, r, ts.Ticks);
-                //    if (cn.Filters.IsHighPass)
-                //    {
-                //        r = HighPass(cn, -1, r);
-                //    }
-                //    if (cn.Filters.IsLowPass)
-                //    {
-                //        r = LowPass(cn, -1, r);
-                //    }
-                //    if (cn.Filters.IsNotch)
-                //    {
-                //        r = NotchPass(cn, -1, r);
-                //    }
-                //}
+                CameraChannel cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId);
+                if (cn != null && cn.Type == ChannelTypeEnum.Analog.ToString())
+                {
+                    if (cn.Offset)
+                    {
+                        r -= Offset(cn, -1, r);
+                    }
+                    if (cn.Filters.IsSmooth)
+                    {
+                        r = Smooth(cn, -1, r);
+                    }
+                    DeltaFCalculate(cn, -1, r, ts.Ticks);
+                    if (cn.Filters.IsHighPass)
+                    {
+                        r = HighPass(cn, -1, r);
+                    }
+                    if (cn.Filters.IsLowPass)
+                    {
+                        r = LowPass(cn, -1, r);
+                    }
+                    if (cn.Filters.IsNotch)
+                    {
+                        r = NotchPass(cn, -1, r);
+                    }
+                }
                 values[i] = r;
             }
             _adPreTime[channelId] = timeSpans.Last().Ticks;
@@ -917,7 +918,7 @@ namespace InperStudio.Lib.Helper
                     HeightFilterData[cameraChannel.ChannelId][group].Enqueue(r);
                     if (HeightFilterData[cameraChannel.ChannelId][group].Count >= 5)
                     {
-                        val = FilterTools.FiltterTool.RCHighFilter(HeightFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.HighPass, InperGlobalClass.CameraSignalSettings.Sampling / InperGlobalClass.CameraSignalSettings.CameraChannels.Count);
+                        val = FilterTools.FiltterTool.RCHighFilter(HeightFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.HighPass, InperGlobalClass.CameraSignalSettings.Sampling);// / InperGlobalClass.CameraSignalSettings.CameraChannels.Count
                         _ = HeightFilterData[cameraChannel.ChannelId][group].Dequeue();
                     }
                 }
@@ -934,7 +935,7 @@ namespace InperStudio.Lib.Helper
                     LowFilterData[cameraChannel.ChannelId][group].Enqueue(r);
                     if (LowFilterData[cameraChannel.ChannelId][group].Count >= 5)
                     {
-                        val = FilterTools.FiltterTool.RCLowPass(LowFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.LowPass, InperGlobalClass.CameraSignalSettings.Sampling / InperGlobalClass.CameraSignalSettings.CameraChannels.Count);
+                        val = FilterTools.FiltterTool.RCLowPass(LowFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.LowPass, InperGlobalClass.CameraSignalSettings.Sampling); /// InperGlobalClass.CameraSignalSettings.CameraChannels.Count
                         _ = LowFilterData[cameraChannel.ChannelId][group].Dequeue();
                     }
                 }
@@ -943,7 +944,7 @@ namespace InperStudio.Lib.Helper
         }
         private double NotchPass(CameraChannel cameraChannel, int group, double r)
         {
-            r = FilterTools.FiltterTool.NotchPass(r, InperGlobalClass.CameraSignalSettings.Sampling / InperGlobalClass.CameraSignalSettings.CameraChannels.Count, cameraChannel.Filters.Notch);
+            r = FilterTools.FiltterTool.NotchPass(r, InperGlobalClass.CameraSignalSettings.Sampling, cameraChannel.Filters.Notch); /// InperGlobalClass.CameraSignalSettings.CameraChannels.Count
             return r;
         }
         private readonly object deltaFObj = new object();
@@ -1471,8 +1472,8 @@ namespace InperStudio.Lib.Helper
             try
             {
                 _ = device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
-                device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
-
+                //device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
+                InperGlobalClass.SetSampling(InperGlobalClass.CameraSignalSettings.Sampling);
                 _adPreTime.Clear();
 
                 uint[] chnn = new uint[4] { 0, 0, 0, 0 };
@@ -1543,6 +1544,14 @@ namespace InperStudio.Lib.Helper
                 {
                     device.SetAdframeRate((uint)InperGlobalClass.CameraSignalSettings.AiSampling, chnn);
                 }
+                //确保绘制间隔
+                if (InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval)
+                {
+                    _Metronome.Stop();
+                    IsInWorkingPeriod = true;
+                    _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                    _Metronome.Start();
+                }
 
                 _eventIsFirst = true; isFirstRecordTiem = true; isLoop = true; isfirstADTime = isfirstAD = true;
                 _firstADTime = 0;
@@ -1587,16 +1596,20 @@ namespace InperStudio.Lib.Helper
         public bool AllLightOpen()
         {
             bool isExistLight = false;
-            LightWaveLength.ToList().ForEach(x =>
-             {
-                 if (x.IsChecked)
+            if (CameraChannels.Count(c => c.Type == ChannelTypeEnum.Camera.ToString()) > 0)
+            {
+                LightWaveLength.ToList().ForEach(x =>
                  {
-                     isExistLight = true;
-                     device.SwitchLight((uint)x.GroupId, true);
-                     device.SetLightPower((uint)x.GroupId, x.LightPower);
-                 }
-             });
-            return isExistLight;
+                     if (x.IsChecked)
+                     {
+                         isExistLight = true;
+                         device.SwitchLight((uint)x.GroupId, true);
+                         device.SetLightPower((uint)x.GroupId, x.LightPower);
+                     }
+                 });
+                return isExistLight;
+            }
+            return true;
         }
         public void AllLightClose()
         {

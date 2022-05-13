@@ -253,6 +253,11 @@ namespace InperStudio.ViewModels
                 {
                     if (UsedKits.Count > 0 && view.cameraActiveChannel.SelectedItem is VideoRecordBean camera_active)
                     {
+                        if (Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.Title.Equals(camera_active.CustomName)) != null)
+                        {
+                            InperGlobalClass.ShowReminderInfo("The camera is running!");
+                            return;
+                        }
                         _ = UsedKits.Remove(camera_active);
                         UnusedKits.Add(camera_active);
                         if (UnusedKits.Count <= 1)
@@ -269,6 +274,11 @@ namespace InperStudio.ViewModels
                         if (camera.CustomName.EndsWith("-"))
                         {
                             camera.CustomName = camera.CustomName.Substring(0, camera.CustomName.Length - 1);
+                        }
+                        if (UsedKits.Count(x => x.CustomName == camera.CustomName) > 0)
+                        {
+                            Growl.Warning(new GrowlInfo() { Message= "Name already exists!",Token="SuccessMsg",WaitTime=1 });
+                            return;
                         }
                         camera.AutoRecord = true;
                         _ = UnusedKits.Remove(camera);

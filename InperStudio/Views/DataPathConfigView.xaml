@@ -19,7 +19,7 @@
         <StackPanel x:Name="Path"  Visibility="Visible" Margin="30 20 0 0">
             <WrapPanel>
                 <TextBlock FontFamily="{StaticResource InperFontFamily}" Width="35" FontSize="11" Text="Name" VerticalAlignment="Center"/>
-                <TextBox Margin="20 0 0 0" Style="{StaticResource BaseStyle}"  VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="#CCCCCC" hc:BorderElement.CornerRadius="0" FontSize="11" Width="180" Height="20"  Text="{Binding Source={StaticResource InperGlobalClass},Path=DataFolderName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" hc:InfoElement.Placeholder="File name" x:Name="fileName" />
+                <TextBox  Margin="20 0 0 0" Style="{StaticResource BaseStyle}"  VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="#CCCCCC" hc:BorderElement.CornerRadius="0" FontSize="11" Width="180" Height="20"  Text="{Binding Source={StaticResource InperGlobalClass},Path=DataFolderName,UpdateSourceTrigger=PropertyChanged}"  TextChanged="{s:Action FileName_TextChanged}" hc:InfoElement.Placeholder="File name" x:Name="fileName" />
             </WrapPanel>
             <WrapPanel Margin="0 15">
                 <TextBlock FontFamily="{StaticResource InperFontFamily}" FontSize="11" Width="35" Text="Where" VerticalAlignment="Center"/>

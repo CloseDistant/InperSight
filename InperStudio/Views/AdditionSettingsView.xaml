@@ -11,7 +11,7 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib" OtherButtonText="Open all"
         mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="True"
-        Title="Video Settings" SizeToContent="Height" MinHeight="440" Height="440" Width="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        Title="Video" SizeToContent="Height" MinHeight="440" Height="440" Width="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
     </inp:InperDialogWindow.Resources>

@@ -22,19 +22,19 @@ namespace InperStudio.ViewModels
         {
             (View as NoteSettingView).ConfirmClickEvent += NoteSettingViewModel_ConfirmClickEvent;
 
-            if (App.SqlDataInit != null)
-            {
-                List<Note> notes = App.SqlDataInit.sqlSugar.Queryable<Note>().ToList();
-                if (notes.Count > 0)
-                {
-                    notes.ForEach(x =>
-                    {
-                        TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
-                        tb.Text = x.CreateTime + @"：" + x.Text;
-                        (View as NoteSettingView).TagListValue.Children.Add(tb);
-                    });
-                }
-            }
+            //if (App.SqlDataInit != null)
+            //{
+            //    List<Note> notes = App.SqlDataInit.sqlSugar.Queryable<Note>().ToList();
+            //    if (notes.Count > 0)
+            //    {
+            //        notes.ForEach(x =>
+            //        {
+            //            TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
+            //            tb.Text = x.CreateTime + @"：" + x.Text;
+            //            (View as NoteSettingView).TagListValue.Children.Add(tb);
+            //        });
+            //    }
+            //}
             if (NotesCache.Count > 0)
             {
                 NotesCache.ForEach(x =>
@@ -55,40 +55,43 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                if (e.Key == Key.Enter)
+                this.View.Dispatcher.BeginInvoke(new Action(() =>
                 {
-
-                    RichTextBox rich = sender as RichTextBox;
-
-                    ScrollViewer scroll = (rich.Parent as Grid).FindName("TagScroll") as ScrollViewer;
-
-                    StackPanel stack = scroll.FindName("TagListValue") as StackPanel;
-
-                    string text = new TextRange(rich.Document.ContentStart, rich.Document.ContentEnd).Text.Replace("\r\n", "");
-
-                    rich.Document.Blocks.Clear();
-                    if (!string.IsNullOrEmpty(text))
+                    if (e.Key == Key.Enter)
                     {
-                        TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
-                        string time = DateTime.Now.ToString("G");
 
-                        tb.Text = time + @"：" + text;
-                        _ = stack.Children.Add(tb);
-                        Note note = new Note()
+                        RichTextBox rich = sender as RichTextBox;
+
+                        ScrollViewer scroll = (rich.Parent as Grid).FindName("TagScroll") as ScrollViewer;
+
+                        StackPanel stack = scroll.FindName("TagListValue") as StackPanel;
+
+                        string text = new TextRange(rich.Document.ContentStart, rich.Document.ContentEnd).Text.Replace("\r\n", "");
+
+                        rich.Document.Blocks.Clear();
+                        if (!string.IsNullOrEmpty(text))
                         {
-                            Text = text,
-                            CreateTime = DateTime.Parse(time)
-                        };
-                        if (App.SqlDataInit != null)
-                        {
-                            _ = App.SqlDataInit.sqlSugar.Insertable(note).ExecuteCommand();
-                        }
-                        else
-                        {
-                            NotesCache.Add(note);
+                            TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
+                            string time = DateTime.Now.ToString("G");
+
+                            tb.Text = time + @"：" + text;
+                            _ = stack.Children.Add(tb);
+                            Note note = new Note()
+                            {
+                                Text = text,
+                                CreateTime = DateTime.Parse(time)
+                            };
+                            //if (App.SqlDataInit != null)
+                            //{
+                            //    _ = App.SqlDataInit.sqlSugar.Insertable(note).ExecuteCommand();
+                            //}
+                            //else
+                            //{
+                                NotesCache.Add(note);
+                            //}
                         }
                     }
-                }
+                }));
             }
             catch (Exception ex)
             {

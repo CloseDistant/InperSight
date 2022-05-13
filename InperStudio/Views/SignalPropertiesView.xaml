@@ -53,7 +53,7 @@
                     <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <ComboBox Margin="20 0" x:Name="heightChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" HorizontalAlignment="Right" SelectedItem="{Binding ActiveChannel,UpdateSourceTrigger=PropertyChanged}" MinWidth="130" />
                 </Grid>
-                <Grid Margin="0 10 90 0" HorizontalAlignment="Right">
+                <Grid Margin="0 10 91 0" HorizontalAlignment="Right">
                     <RadioButton x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left" IsChecked="{Binding ElementName=heightChannel,Path=SelectedItem.Height,Converter={StaticResource DoubleToBoolConverter}}" Checked="{s:Action HeightAuto_Checked}">
                         <TextBlock Text="Auto" Margin="5 0"   FontSize="{DynamicResource InperLargeFontSize}"/>
                     </RadioButton>
@@ -62,7 +62,7 @@
                     <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" Checked="{s:Action HeightAuto_Checked}" IsChecked="{Binding ElementName=heightChannel,Path=SelectedItem.Height,Converter={StaticResource DoubleToBoolReConverter}}">
                         <TextBlock Text="Fixed" Margin="5 0"   FontSize="{DynamicResource InperLargeFontSize}"/>
                     </RadioButton>
-                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperMinValue="10" InperMaxValue="1000" InperTextChanged="{s:Action FixedValue_InperTextChanged}" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding ElementName=heightChannel,Path=SelectedItem.Height,UpdateSourceTrigger=PropertyChanged}"  />
+                    <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="False" InperTextType="Double" InperMinValue="10" InperMaxValue="1000" InperTextChanged="{s:Action FixedValue_InperTextChanged}" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding ElementName=heightChannel,Path=SelectedItem.Height,StringFormat={}{0:F0},UpdateSourceTrigger=PropertyChanged}"  />
                 </Grid>
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="20 10 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
@@ -111,8 +111,8 @@
                     <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="2" Width="130" InperTextChanged="{s:Action WindowSize_TextChanged}" HorizontalAlignment="Right" Margin="0 0 20 0" Text="{Binding ElementName=offsetChannel,Path=SelectedItem.OffsetWindowSize,Mode=TwoWay}" />
                 </Grid>
                 <WrapPanel Margin="0 10" HorizontalAlignment="Right"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
-                    <Button Content="Cancle" Command="{s:Action CameraOffset}" Name="cancle" IsEnabled="False" CommandParameter="Cancle" />
-                    <Button Content="Offset" Command="{s:Action CameraOffset}" Name="offset" CommandParameter="Offset" Margin="20 0"/>
+                    <Button Content="Inactive" Command="{s:Action CameraOffset}" Name="cancle" IsEnabled="False" CommandParameter="Cancle" />
+                    <Button Content="Active" Command="{s:Action CameraOffset}" Name="offset" CommandParameter="Offset" Margin="20 0"/>
                 </WrapPanel>
             </StackPanel>
         </Grid>

@@ -22,7 +22,7 @@
                 <ScrollViewer x:Name="TagScroll" HorizontalAlignment="Left" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="TagListValue"/>
                 </ScrollViewer>
-                <RichTextBox MinWidth="120" Grid.Row="1" x:Name="NoteContent" PreviewKeyUp="{s:Action NoteContent_KeyDown}"   Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource InperTitlePageColor}"/>
+                <RichTextBox MinWidth="120" Grid.Row="1" x:Name="NoteContent" PreviewKeyUp="{s:Action NoteContent_KeyDown}"   Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource InperTheme}"/>
             </Grid>
         </Border>
     </Grid>

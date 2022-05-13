@@ -205,9 +205,10 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.ShowReminderInfo("No lights");
                 return;
             }
+           
             InperDeviceHelper.Instance.StartCollect();
 
-            StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
+            StartAndStopShowMarker(ChannelTypeEnum.Start, 0, false);
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
@@ -245,11 +246,11 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.ShowReminderInfo("未设置激发光");
                     return;
                 }
-                if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-                {
-                    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
-                    File.Create(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, "inper.guide")).Close();
-                }
+                //if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                //{
+                //    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                //}
+                File.Create(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, "inper.ipd")).Close();
 
                 Task task = StartTriggerStrategy();
                 if (task != null)
@@ -260,14 +261,14 @@ namespace InperStudio.ViewModels
                 //数据库优先初始化
                 App.SqlDataInit = new Lib.Data.SqlDataInit();
 
-                if (NoteSettingViewModel.NotesCache.Count > 0)
-                {
-                    NoteSettingViewModel.NotesCache.ForEach(x =>
-                    {
-                        App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
-                    });
-                    NoteSettingViewModel.NotesCache.Clear();
-                }
+                //if (NoteSettingViewModel.NotesCache.Count > 0)
+                //{
+                //    NoteSettingViewModel.NotesCache.ForEach(x =>
+                //    {
+                //        App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
+                //    });
+                //    NoteSettingViewModel.NotesCache.Clear();
+                //}
                 if (DataPathConfigViewModel.DataList.Count > 0)
                 {
                     DataPathConfigViewModel.DataList.ToList().ForEach(x =>
@@ -282,7 +283,7 @@ namespace InperStudio.ViewModels
                 {
                     if (item.IsActive && item.AutoRecord)
                     {
-                        item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item._CamIndex));
+                        item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item.CustomName));
                     }
                 }
 
@@ -320,7 +321,7 @@ namespace InperStudio.ViewModels
                 }
                 if (type == 0)
                 {
-                    StartAndStopShowMarker(ChannelTypeEnum.Stop);
+                    StartAndStopShowMarker(ChannelTypeEnum.Stop, 1, isrecord);
                 }
                 InperGlobalClass.IsRecord = false;
                 InperGlobalClass.IsPreview = false;
@@ -331,7 +332,14 @@ namespace InperStudio.ViewModels
 
                 if (isrecord)
                 {
-                    NoteSettingViewModel.NotesCache.Clear();
+                    if (NoteSettingViewModel.NotesCache.Count > 0)
+                    {
+                        NoteSettingViewModel.NotesCache.ForEach(x =>
+                        {
+                            App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
+                        });
+                        NoteSettingViewModel.NotesCache.Clear();
+                    }
                     DataPathConfigViewModel.DataList.Clear();
 
                     foreach (VideoRecordBean item in InperGlobalClass.ActiveVideos)
@@ -350,7 +358,10 @@ namespace InperStudio.ViewModels
                 InperDeviceHelper.Instance.StopCollect();
 
                 InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
-
+                if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                {
+                    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                }
                 InperDeviceHelper.Instance.device.Stop();
                 InperDeviceHelper.Instance.AllLightClose();
             }
@@ -366,7 +377,7 @@ namespace InperStudio.ViewModels
             }
 
         }
-        private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum, int type = 1)
+        private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum, int type = 1, bool isRecord = true)
         {
             await Task.Factory.StartNew(() =>
              {
@@ -377,51 +388,51 @@ namespace InperStudio.ViewModels
                          _ = Task.Delay(100);
                      }
                  }
-                 _ = Parallel.ForEach(InperGlobalClass.EventSettings.Channels, channel =>
-                   {
-                       if (channel.Type == typeEnum.ToString())
-                       {
-                           _ = InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
-                           //if (InperGlobalClass.IsRecord)
-                           {
-                               Manual manual = new Manual()
-                               {
-                                   ChannelId = channel.ChannelId,
-                                   CameraTime = 0,
-                                   Color = channel.BgColor,
-                                   Name = channel.Name,
-                                   Type = channel.Type,
-                                   CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                               };
-                               _ = App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
-                           }
-                       }
-                       if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
-                       {
-                           if (channel.Condition.Type == typeEnum.ToString())
-                           {
+                 foreach (var channel in InperGlobalClass.EventSettings.Channels)
+                 {
+                     if (channel.Type == typeEnum.ToString())
+                     {
+                         _ = InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
+                         if (isRecord)
+                         {
+                             Manual manual = new Manual()
+                             {
+                                 ChannelId = channel.ChannelId,
+                                 CameraTime = 0,
+                                 Color = channel.BgColor,
+                                 Name = channel.Name,
+                                 Type = channel.Type,
+                                 CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                             };
+                             _ = App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
+                         }
+                     }
+                     if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
+                     {
+                         if (channel.Condition.Type == typeEnum.ToString())
+                         {
 
-                               int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-                               TimeSpan time = new TimeSpan();
-                               time = typeEnum == ChannelTypeEnum.Start
-                               ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
-                               : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                               InperDeviceHelper.Instance.SendCommand(channel, type);
-                               if (InperGlobalClass.IsRecord)
-                               {
-                                   Output output = new Output()
-                                   {
-                                       ChannelId = channel.ChannelId,
-                                       CameraTime = time.Ticks,
-                                       Type = typeEnum.ToString(),
-                                       CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                                   };
-                                   _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
-                               }
+                             int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
+                             TimeSpan time = new TimeSpan();
+                             time = typeEnum == ChannelTypeEnum.Start
+                             ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
+                             : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+                             InperDeviceHelper.Instance.SendCommand(channel, type);
+                             if (isRecord)
+                             {
+                                 Output output = new Output()
+                                 {
+                                     ChannelId = channel.ChannelId,
+                                     CameraTime = time.Ticks,
+                                     Type = typeEnum.ToString(),
+                                     CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                                 };
+                                 _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                             }
 
-                           }
-                       }
-                   });
+                         }
+                     }
+                 }
              });
         }
         private Task StartTriggerStrategy()

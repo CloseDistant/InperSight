@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Screen = Stylet.Screen;
@@ -112,8 +113,24 @@ namespace InperStudio.ViewModels
             //{
             //    Growl.Warning("Filename exsited", "SuccessMsg");
             //}
-
+            if (string.IsNullOrEmpty(InperGlobalClass.DataFolderName))
+            {
+                InperGlobalClass.ShowReminderInfo("Not null!");
+                return;
+            }
             RequestClose();
+        }
+        public void FileName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            try
+            {
+                var tb = sender as System.Windows.Controls.TextBox;
+                InperGlobalClass.DataFolderName = tb.Text.Replace(" ", "");
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
         }
         #endregion
     }

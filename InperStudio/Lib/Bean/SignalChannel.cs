@@ -18,6 +18,7 @@ namespace InperStudio.Lib.Bean
         public int ChannelId { get; set; }
         public string ChannelType { get; set; }
         public string Name { get; set; }
+        public string NickName { get; set; }
         public bool Offset { get; set; }
         public SolidColorBrush BgColor { get; set; } = Brushes.Red;
         public IRange YaxisDoubleRange { get; set; }

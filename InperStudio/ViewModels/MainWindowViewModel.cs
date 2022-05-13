@@ -8,6 +8,7 @@ using InperStudioControlLib.Lib.Helper;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -68,6 +69,18 @@ namespace InperStudio.ViewModels
                     Thread.Sleep(50);
                 });
                 InperDeviceHelper.Instance.device.Stop();
+
+                string[] files = Directory.GetDirectories(Path.Combine(InperGlobalClass.DataPath));
+                if (files.Length > 0)
+                {
+                    foreach (string s in files)
+                    {
+                        if (Directory.GetFiles(s).Length == 0)
+                        {
+                            Directory.Delete(s);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -75,7 +88,7 @@ namespace InperStudio.ViewModels
             }
             finally
             {
-                //RequestClose();
+                RequestClose();
                 Environment.Exit(0);
             }
         }

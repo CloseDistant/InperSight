@@ -261,7 +261,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AdditionSettingsShow}" CommandParameter="Trigger">
                         <StackPanel>
                             <Grid x:Name="trigger">
-                                <Image Source="/Lib/Images/New/start.png" Width="20" Height="20" Stretch="Uniform" />
+                                <Image Source="/Lib/Images/New/trigger.png" Width="20" Height="20" Stretch="Uniform" />
                                 <Grid.Triggers>
                                     <EventTrigger RoutedEvent="Mouse.MouseEnter">
                                         <EventTrigger.Actions>

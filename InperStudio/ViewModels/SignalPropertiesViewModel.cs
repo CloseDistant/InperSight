@@ -141,13 +141,13 @@ namespace InperStudio.ViewModels
                                 {
                                     CameraSignalSettings.CameraChannels.ForEach(x =>
                                     {
-                                        x.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                        x.Height = Math.Ceiling((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1));
                                     });
                                     InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                                      {
-                                         chn.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                         chn.Height = Math.Ceiling((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1));
                                      });
-                                    CameraSignalSettings.AllChannelConfig.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                    CameraSignalSettings.AllChannelConfig.Height = Math.Ceiling((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1));
                                 }
                                 else
                                 {
@@ -156,12 +156,12 @@ namespace InperStudio.ViewModels
                                     {
                                         if (chn.ChannelId == item.ChannelId && chn.Type == item.Type)
                                         {
-                                            chn.Height = (((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1);
+                                            chn.Height = Math.Ceiling((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1));
                                         }
                                     });
                                 }
 
-                                this.view.fixedValue.Text = ((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1)).ToString("0.00");
+                                this.view.fixedValue.Text = Math.Ceiling((((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).View as DataShowControlView).dataScroll.ActualHeight / (Channels.Count - 1)).ToString();
                             }
                         }
                     }
@@ -184,26 +184,32 @@ namespace InperStudio.ViewModels
                     {
                         Channel item = view.heightChannel.SelectedItem as Channel;
                         double value = double.Parse(tb.Text);
+                        if (value > 999)
+                        {
+                            value = 999;
+                            tb.Text = "999";
+                            InperGlobalClass.ShowReminderInfo("The maximum is 999!");
+                        }
                         if (item.ChannelId == _ChannleId)
                         {
                             CameraSignalSettings.CameraChannels.ForEach(x =>
                             {
-                                x.Height = value;
+                                x.Height = Math.Ceiling(value);
                             });
                             InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                             {
-                                chn.Height = value;
+                                chn.Height = Math.Ceiling(value);
                             });
-                            CameraSignalSettings.AllChannelConfig.Height = value;
+                            CameraSignalSettings.AllChannelConfig.Height = Math.Ceiling(value);
                         }
                         else
                         {
-                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).Height = value;
+                            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type).Height = Math.Ceiling(value);
                             InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                             {
                                 if (chn.ChannelId == item.ChannelId && chn.Type == item.Type)
                                 {
-                                    chn.Height = value;
+                                    chn.Height = Math.Ceiling(value);
                                 }
                             });
                         }

@@ -111,7 +111,7 @@
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
                                 DrawMajorGridLines="False"
-                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Always" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </sc:SciChartSurface.YAxis>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
@@ -244,54 +244,48 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2" Margin="0 0 0 0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
+        <Border Grid.Row="2" BorderThickness="0 1 0 1" BorderBrush="{StaticResource InperBorderColor}" >
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="82"/>
+                    <ColumnDefinition Width="141"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border BorderThickness="0 0 0 1" Margin="141 0 0 0" BorderBrush="Gray" Grid.ColumnSpan="2" />
-                <ComboBox Height="24" Width="95" SelectionChanged="{s:Action TextFormat_SelectionChanged}" Margin="25 0 0 0" ItemsSource="{Binding TextLableFormatting}" MinHeight="24" Padding="3 0" Grid.ColumnSpan="2" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                <Grid Grid.Column="0">
-                    <Border Width="1"  HorizontalAlignment="Right" Margin="0 0 -60 0" Background="Gray"/>
-                </Grid>
-                <sc:SciChartSurface Name="timesAxisSci" Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1"  DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
-                    <sc:SciChartSurface.YAxis>
-                        <sc:NumericAxis DrawMajorBands="False"
-                                    DrawMajorGridLines="False"
-                                    DrawMinorGridLines="False"  AxisAlignment="Left" Visibility="Hidden"/>
-                    </sc:SciChartSurface.YAxis>
-                    <sc:SciChartSurface.ChartModifier>
-                        <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
-                            <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
-                            <chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
-                        </sc:ModifierGroup>
-                    </sc:SciChartSurface.ChartModifier>
-                </sc:SciChartSurface>
-            </Grid>
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="142"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" >
+                <UniformGrid Rows="2" Grid.Column="0" Panel.ZIndex="999" Background="{StaticResource InperDialogContentColor}">
+                    <ComboBox Height="24" Width="95" MinHeight="24" Padding="3 0"  SelectionChanged="{s:Action TextFormat_SelectionChanged}" ItemsSource="{Binding TextLableFormatting}" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Button  Style="{StaticResource InperFreeButton}" Command="{s:Action TextFormatChanged}" CommandParameter="Add" Width="20" Height="20" >
+                        <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Add">
                             <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
                         </Button>
-                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperTextType="Double" InperMinValue="1" InperVerify="True" Width="45" Height="25" MinHeight="25" Text="{Binding VisibleValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="5 0" Padding="0" HorizontalContentAlignment="Center" />
+                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperTextType="Double" InperMinValue="1" InperVerify="True" Width="45" Height="25" MinHeight="25" Margin="5 0" Padding="0" HorizontalContentAlignment="Center" Text="{Binding VisibleValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                         <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Reduce">
                             <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
                         </Button>
                     </WrapPanel>
-                    <Border Width="1" Padding="0 18"  HorizontalAlignment="Right" Background="Gray"/>
-                </Grid>
-                <sc:SciChartScrollbar Name="sciScroll" Grid.Column="1" Height="20" Background="#33000000" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsAllowDragScroll,UpdateSourceTrigger=PropertyChanged}"/>
+                </UniformGrid>
+                <UniformGrid Rows="2" Grid.Column="1" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" >
+                    <Border BorderThickness="1 0 0 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{StaticResource InperBorderColor}">
+                        <sc:SciChartSurface Name="timesAxisSci" Margin="-62 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
+                            <sc:SciChartSurface.YAxis>
+                                <sc:NumericAxis DrawMajorBands="False"
+                                    DrawMajorGridLines="False"  
+                                    DrawMinorGridLines="False"  AxisAlignment="Left" Visibility="Collapsed"/>
+                            </sc:SciChartSurface.YAxis>
+                            <sc:SciChartSurface.ChartModifier>
+                                <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
+                                    <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
+                                    <sc:RubberBandXyZoomModifier FlowDirection="LeftToRight" ExecuteOn="MouseRightButton" ReceiveHandledEvents="True"/>
+                                    <sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick" ReceiveHandledEvents="True"/>
+                                    <!--<chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />-->
+                                    <sc:RolloverModifier IsEnabled="True" ReceiveHandledEvents="True" DrawVerticalLine="True"/>
+                                </sc:ModifierGroup>
+                            </sc:SciChartSurface.ChartModifier>
+                        </sc:SciChartSurface>
+                    </Border>
+                    <Border BorderThickness="1 0 0 0" BorderBrush="{StaticResource InperBorderColor}">
+                        <sc:SciChartScrollbar Name="sciScroll" Grid.Column="1" Height="20" Background="#33000000" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsAllowDragScroll,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+                </UniformGrid>
             </Grid>
-        </Grid>
+        </Border>
     </Grid>
 </UserControl>

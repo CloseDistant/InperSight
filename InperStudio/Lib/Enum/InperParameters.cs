@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Stylet;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,18 +21,16 @@ namespace InperStudio.Lib.Enum
            "30",
            "50"
         };
-        public static List<double> FPS { get; set; } = new List<double>()
+        public static BindableCollection<double> FPS { get; set; } = new BindableCollection<double>()
         {
             6,
             12,
-            20,
+            18,
             30,
-            40,
-            50,
+            42,
             60,
-            80,
-            100,
-            200
+            90,
+            120
         };
     }
 }

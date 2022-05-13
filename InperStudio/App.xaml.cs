@@ -1,5 +1,6 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data;
+using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.Helper;
 using log4net;
 using SciChart.Charting.Visuals;

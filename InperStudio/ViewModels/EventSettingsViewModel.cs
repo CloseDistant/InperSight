@@ -58,7 +58,7 @@ namespace InperStudio.ViewModels
                     case EventSettingsTypeEnum.Marker:
                         break;
                     case EventSettingsTypeEnum.Output:
-                        view.Title = "OutPut";
+                        view.Title = "Output";
                         view.MarkerColorList.SelectedIndex = 0;
                         view.conditionGrid.Visibility = Visibility.Visible;
                         break;
@@ -179,6 +179,7 @@ namespace InperStudio.ViewModels
                                     BgColor = item.BgColor,
                                     SymbolName = item.SymbolName,
                                     RefractoryPeriod = item.RefractoryPeriod,
+                                    Hotkeys = item.Hotkeys,
                                     Name = item.Name,
                                     IsActive = item.IsActive,
                                     Type = item.Type
@@ -797,6 +798,40 @@ namespace InperStudio.ViewModels
                             MarkerChannels.Add(_item);
                             view.ConditionsCombox.SelectedItem = _item;
                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void Test_MouseEnter(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                EventChannel channel = (sender as Grid).DataContext as EventChannel;
+
+                if (channel.Condition == null)
+                {
+                    if (channel.Type == "Camera")
+                    {
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.DeltaF + " Windowsize:"+channel.WindowSize+ " RefractoryPeriod:" + channel.RefractoryPeriod };
+                    }
+                    if (channel.Type == "Manual")
+                    {
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "Shortcuts:" + channel.Hotkeys };
+                    }
+                }
+                else
+                {
+                    if (channel.Condition.Type == "Camera")
+                    {
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.Condition.DeltaF };
+                    }
+                    if (channel.Condition.Type == "Manual")
+                    {
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "Shortcuts:" + channel.Condition.Hotkeys };
                     }
                 }
             }
