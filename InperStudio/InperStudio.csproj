@@ -107,6 +107,9 @@
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Filtering, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MathNet.Filtering.0.7.0\lib\net461\MathNet.Filtering.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=4.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\MathNet.Numerics.4.15.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -227,6 +230,7 @@
     <Compile Include="Lib\Bean\HPTimer.cs" />
     <Compile Include="Lib\Bean\InperGlobalClass.cs" />
     <Compile Include="Lib\Bean\ListChartValues.cs" />
+    <Compile Include="Lib\Bean\Mcu_Version.cs" />
     <Compile Include="Lib\Bean\ScrollingViewportManager.cs" />
     <Compile Include="Lib\Bean\SignalChannel.cs" />
     <Compile Include="Lib\Bean\Tb_Version.cs" />
@@ -262,6 +266,7 @@
     <Compile Include="Lib\Enum\InperEnums.cs" />
     <Compile Include="Lib\Enum\InperParameters.cs" />
     <Compile Include="Lib\Helper\FilterTools\FiltterTool.cs" />
+    <Compile Include="Lib\Helper\FilterTools\OnLineFilterTool.cs" />
     <Compile Include="Lib\Helper\HighAccurateTimer.cs" />
     <Compile Include="Lib\Helper\InperClassExtensionHelper.cs" />
     <Compile Include="Lib\Helper\InperClassHelper.cs" />
@@ -274,6 +279,7 @@
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventPanelProperties.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventSettings.cs" />
+    <Compile Include="Lib\Helper\UnderUpgrade.cs" />
     <Compile Include="ViewModels\AdditionSettingsViewModel.cs" />
     <Compile Include="ViewModels\DataPathConfigViewModel.cs" />
     <Compile Include="ViewModels\DataShowControlViewModel.cs" />

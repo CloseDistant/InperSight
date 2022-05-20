@@ -11,7 +11,7 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib" OtherButtonText="Open all"
         mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="True"
-        Title="Video" SizeToContent="Height" MinHeight="440" Height="440" Width="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        Title="Video Setting" SizeToContent="Height" MinHeight="440" Height="440" Width="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
     </inp:InperDialogWindow.Resources>
@@ -71,7 +71,7 @@
                 </RadioButton>
                 <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" Margin="0 20 0 0" GroupName="stop" x:Name="delayStop" IsChecked="{Binding Delay.IsActive,Mode=TwoWay}">
                     <WrapPanel IsEnabled="{Binding ElementName=delayStop,Path=IsChecked}">
-                        <TextBlock Text="Delay after pressing button Start (s)" VerticalAlignment="Center" Margin="5 0 0 0"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <TextBlock Text="Delay after pressing button Stop (s)" VerticalAlignment="Center" Margin="5 0 0 0"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <hc:TextBox Width="40" HorizontalAlignment="Right" Margin="10 0 0 0" Text="{Binding Delay.Value,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>

@@ -213,8 +213,26 @@ namespace InperProtocolStack.Communication
         }
         private void Reader_DataReceived(object sender, EndpointDataEventArgs e)
         {
-            byte[] data = e.Buffer;
-            RaiseDataReceivedEvent(data);
+
+            byte[] data = null;
+            if (e.Buffer[0]==0x48 && e.Buffer[1]==0x57)
+            {
+                int length = BitConverter.ToUInt16(e.Buffer.Skip(12).Take(2).ToArray(), 0);
+
+                data = e.Buffer.Take(20 + length).ToArray();
+
+                //for (int i = 20; i < e.Buffer.Length; i++)
+                //{
+                //    if (e.Buffer[i] == 0xCA && e.Buffer[i + 1] == 0xFE)
+                //    {
+                //        data = e.Buffer.Take(i + 2).ToArray();
+                //        break;
+                //    }
+                //}
+                RaiseDataReceivedEvent(data);
+                Console.WriteLine("---" + BitConverter.ToString(data));
+            }
+
         }
         public UARTAgent(string p_name)
         {

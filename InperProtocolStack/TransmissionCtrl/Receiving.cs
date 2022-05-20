@@ -152,11 +152,11 @@ namespace InperProtocolStack.TransmissionCtrl
             var r_header = Utils.BytesToStruct<FrameHeader.StructFrameHeader>(_InterpretBuffer, _HeaderLength);
             var body_len = r_header.BodyLength;
             int frame_len = _HeaderLength + body_len + _TailLenth;
-
             if (_InterpretBuffer.Length >= frame_len)
             {
                 byte[] tail_bytes = _InterpretBuffer.Skip(_HeaderLength + body_len).Take(_TailLenth).ToArray();
                 var r_tail = Utils.BytesToStruct<FrameTail.StructFrameTail>(tail_bytes, _TailLenth);
+
                 var r_body_crc = r_tail.CRC;
 
                 ushort c_body_crc = 0;

@@ -19,7 +19,7 @@ namespace InperPhotometry
         public static readonly DeviceHeuristic Instance = new DeviceHeuristic();
         private DeviceHeuristic()
         {
-            UpdateDeviceList();
+            //UpdateDeviceList();
         }
 
 

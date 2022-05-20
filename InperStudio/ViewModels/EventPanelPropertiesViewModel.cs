@@ -38,7 +38,16 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.EventPanelProperties.HeightAuto = false;
                     InperGlobalClass.EventPanelProperties.HeightFixed = true;
                 };
-                view.fixedValue.TextChanged += (s, e) => dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = double.Parse(view.fixedValue.Text == string.Empty ? "30" : view.fixedValue.Text) >= 999 ? 999 : double.Parse(view.fixedValue.Text == string.Empty ? "30" : view.fixedValue.Text);
+                view.fixedValue.LostFocus += (s, e) =>
+                {
+                    double value = 30;
+                    if (double.TryParse(view.fixedValue.Text, out value))
+                    {
+                        value = value < 2 ? 30 : (value >= 200 ? 200 : value);
+                    }
+                    view.fixedValue.Text = value.ToString();
+                    dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = value;
+                };
                 view.ConfirmClickEvent += (s, e) => RequestClose();
 
                 if (InperGlobalClass.EventPanelProperties.HeightAuto)

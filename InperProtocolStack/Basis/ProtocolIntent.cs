@@ -46,5 +46,16 @@ namespace InperProtocolStack.CmdPhotometry
         public const byte INTENT_OUTPUT_IO = 0x31;
         public const byte INTENT_TRIGGER_CHANGE = 0x32;
         public const byte INTENT_ADFRAME_RATE = 0x33;
+
+        public const byte INTENT_FILE_HASH_VAL = 0xEF;
+        public const byte INTENT_FILE_UPLOAD = 0xE9;
+        public const byte INTENT_CMD_GET_HASH_VAL = 0xEE;
+        public const byte INTENT_CMD_INIT_MCU = 0xED;
+        public const byte INTENT_CMD_SET_FILE_LENGTH = 0xEC;
+        public const byte INTENT_FILE_LENGTH = 0xEB;
+        public const byte INTENT_CMD_APP_RUN = 0xEA;
+
+        public const byte INTENT_DEVIC_INFO = 0xE5;
+        public const byte INTENT_SMARTLIGHT_INFO = 0xE6;
     }
 }

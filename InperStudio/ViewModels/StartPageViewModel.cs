@@ -1,4 +1,6 @@
 ﻿using InperPhotometry;
+using InperProtocolStack.CmdPhotometry;
+using InperProtocolStack.UnderUpgrade;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
@@ -7,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,61 +21,67 @@ namespace InperStudio.ViewModels
     {
         public string Version { get; set; }
         IWindowManager windowManager;
+        CancellationTokenSource tokenStart = new CancellationTokenSource();
         public StartPageViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
         }
-
+        async Task TaskExecute(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(100);
+            }
+        }
         protected override void OnViewLoaded()
         {
             try
             {
-
-
                 Version = InperConfig.Instance.Version;
-
-                #region 下位机更新
-                // 查找under Bin 文件夹 是否存在文件
-                string path = Environment.CurrentDirectory + "/UnderBin";
-                if (Directory.Exists(path))
-                {
-                    DirectoryInfo root = new DirectoryInfo(path);
-                    FileInfo[] files = root.GetFiles();
-
-                    if (files.Count() > 0)
-                    {
-                        // 如果存在文件 按照日期进行排序 asc
-                        files.OrderBy(x => x.LastWriteTime).ToList().ForEach(x =>
-                        {
-
-                        });
-                    }
-                }
-
-                // 和下位机进行通讯 传输Bin文件
-                // 等待下位机更新通知，如果未收到通知 循环三次发送bin文件
-                // 更新成功 继续执行，更新失败弹窗提示
-                #endregion
+                DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
+                FileInfo[] files = root.GetFiles();
+                UnderUpgradeFunc under = new UnderUpgradeFunc();
 
                 _ = View.Dispatcher.BeginInvoke(new Action(async () =>
-                    {
-                        if (DeviceHeuristic.Instance.DeviceList.Count < 1)
-                        {
-                            (View as StartPageView).retry.Visibility = Visibility.Visible;
-                            (View as StartPageView).normal.Visibility = Visibility.Collapsed;
-                        }
-                        else
-                        {
-                            await Task.Delay(2000);
-                            InperDeviceHelper.Instance.DeviceInit(DeviceHeuristic.Instance.DeviceList.First());
+                  {
+                      #region 下位机更新
+                      if (files.Length > 0)
+                      {
+                          under.SendFile(files, tokenStart);
+                          await TaskExecute(tokenStart.Token);
+                      }
+                      else
+                      {
+                          under.UnderInitJumpUpgrade(tokenStart);
+                          await TaskExecute(tokenStart.Token);
+                      }
+                      await Task.Delay(1000);
+                      DeviceHeuristic.Instance.UpdateDeviceList();
+                      #endregion
+                      if (DeviceHeuristic.Instance.DeviceList.Count < 1)
+                      {
+                          (View as StartPageView).retry.Visibility = Visibility.Visible;
+                          (View as StartPageView).normal.Visibility = Visibility.Collapsed;
+                      }
+                      else
+                      {
+                          await Task.Delay(2000);
+                          (View as StartPageView).loading.Visibility = Visibility.Collapsed;
+                          (View as StartPageView).remainder.Text = "Initialization completed";
+                          InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
+                          InperDeviceHelper.Instance.DeviceInit();
 
-                            (View as StartPageView).loading.Visibility = Visibility.Collapsed;
-                            (View as StartPageView).remainder.Text = "Initialization completed";
-                            await Task.Delay(1000);
-                            windowManager.ShowWindow(new MainWindowViewModel(windowManager));
-                            RequestClose();
-                        }
-                    }));
+                          //uint DEVICE_INFO_PUB = 0x000000E8;
+                          //uint SMARTLIGHT_INFO = 0x000000E7;
+
+                          //InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
+
+                          await Task.Delay(1000);
+                          windowManager.ShowWindow(new MainWindowViewModel(windowManager));
+                          RequestClose();
+                      }
+                  }));
+
             }
             catch (Exception ex)
             {
@@ -83,22 +92,25 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                DeviceHeuristic.Instance.UpdateDeviceList();
-                if (DeviceHeuristic.Instance.DeviceList.Count < 1)
+                _ = View.Dispatcher.BeginInvoke(new Action(async () =>
                 {
-                    MessageBox.Show("Device not found");
-                }
-                else
-                {
-                    InperDeviceHelper.Instance.DeviceInit(DeviceHeuristic.Instance.DeviceList.First());
+                    DeviceHeuristic.Instance.UpdateDeviceList();
+                    if (DeviceHeuristic.Instance.DeviceList.Count < 1)
+                    {
+                        MessageBox.Show("Device not found");
+                    }
+                    else
+                    {
+                        InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
+                        await Task.Delay(3000);
+                        InperDeviceHelper.Instance.DeviceInit();
+                        (View as StartPageView).loading.Visibility = Visibility.Collapsed;
+                        (View as StartPageView).remainder.Text = "Initialization completed";
 
-                    (View as StartPageView).loading.Visibility = Visibility.Collapsed;
-                    (View as StartPageView).remainder.Text = "Initialization completed";
-
-                    Thread.Sleep(3000);
-                    windowManager.ShowWindow(new MainWindowViewModel(windowManager));
-                    RequestClose();
-                }
+                        windowManager.ShowWindow(new MainWindowViewModel(windowManager));
+                        RequestClose();
+                    }
+                }));
             }
             catch (Exception ex)
             {

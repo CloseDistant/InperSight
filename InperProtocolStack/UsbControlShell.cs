@@ -77,7 +77,11 @@ namespace InperProtocolStack
             }
             return;
         }
-
+        private void GetBootLoaderHashVal(byte[] param)
+        {
+            var a = BitConverter.ToString(param.Skip(4).Take(16).ToArray());
+            Console.WriteLine("aaa :" + a);
+        }
         private void UpdateIOConfig(byte[] param)
         {
             return;
@@ -122,12 +126,19 @@ namespace InperProtocolStack
                     UpdateIOConfig(e.Data);
                     OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
                     break;
-
                 case ProtocolIntent.INTENT_INPUT_IO:
                     DevInputNotificationEventArgs ea = DeviceInputUpdated(e.Data);
                     OnDevNotification?.Invoke(this, ea);
                     break;
-
+                case ProtocolIntent.INTENT_CMD_INIT_MCU:
+                    Console.WriteLine(22222);
+                    break;
+                case ProtocolIntent.INTENT_FILE_HASH_VAL:
+                    GetBootLoaderHashVal(e.Data);
+                    break;
+                case ProtocolIntent.INTENT_FILE_LENGTH:
+                    Console.WriteLine(111);
+                    break;
                 default:
                     break;
             }
@@ -236,5 +247,42 @@ namespace InperProtocolStack
             CmdStop cmd = new CmdStop();
             _TC.Transmit(cmd);
         }
+        #region 下位机升级
+        public void GetDeviceInfo(uint type)
+        {
+            CmdDeviceInfo cmd = new CmdDeviceInfo();
+            cmd.SetCmdParam(type);
+            _TC.Transmit(cmd);
+        }
+        public void AppRun()
+        {
+            CmdAppRun cmdAppRun = new CmdAppRun();
+            _TC.Transmit(cmdAppRun);
+        }
+        public void McuInit()
+        {
+            CmdInitMcu cmd = new CmdInitMcu();
+            _TC.Transmit(cmd);
+        }
+        public void GetHashVal()
+        {
+            CmdGetHashVal cmd = new CmdGetHashVal();
+
+            _TC.Transmit(cmd);
+        }
+
+        public void FileUpload(List<byte> bytes)
+        {
+            CmdSendFile cmd = new CmdSendFile();
+            cmd.SetCmdParam(bytes);
+            _TC.Transmit(cmd);
+        }
+        public void SetFileLength(UInt32 length)
+        {
+            CmdSetFileLength cmd = new CmdSetFileLength();
+            cmd.SetCmdParam(length);
+            _TC.Transmit(cmd);
+        }
+        #endregion
     }
 }

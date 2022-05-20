@@ -1,16 +1,12 @@
-﻿using OpenCvSharp;
+﻿using InperStudio.Lib.Helper.FilterTools;
+using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Axes;
-using SciChart.Charting.Visuals.RenderableSeries;
 using SciChart.Data.Model;
 using Stylet;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Bean.Channel
@@ -28,7 +24,7 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public Mat Mask { get; set; }
         public double ROI { get; set; }
-        private double height= double.NaN;
+        private double height = double.NaN;
         public double Height { get => height; set => SetAndNotify(ref height, value); }
         public int OffsetWindowSize { get; set; } = 300;
         public bool Offset { get; set; }
@@ -74,5 +70,6 @@ namespace InperStudio.Lib.Bean.Channel
         public double Notch { get; set; }
         public bool IsSmooth { get; set; } = true;
         public double Smooth { get; set; } = 5;
+        public OnLineFilterTool OnlineFilter { get; set; } = new OnLineFilterTool();
     }
 }

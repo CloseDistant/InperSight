@@ -201,13 +201,13 @@ namespace InperStudio.ViewModels
                         com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                         return;
                     }
-                    Expourse = com.Text;
+                    this.view.Exposure.Text = Expourse = com.Text;
                     _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(com.Text));
                     InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(com.Text);
                     if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count) > 1000)
                     {
                         InperGlobalClass.CameraSignalSettings.Sampling = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Exposure / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
-                        this.view.Sampling.Text = sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                        this.view.Sampling.Text = Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         InperDeviceHelper.Instance.device.SetFrameRate(double.Parse(sampling));
                     }
                 }
@@ -239,11 +239,12 @@ namespace InperStudio.ViewModels
                         com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         return;
                     }
-                    InperGlobalClass.SetSampling(double.Parse(sampling));
+                    com.Text = Sampling;
+                    InperGlobalClass.SetSampling(double.Parse(Sampling));
                     if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count) > 1000)
                     {
                         InperGlobalClass.CameraSignalSettings.Exposure = Math.Floor(1000 / (InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count)));
-                        this.view.Exposure.Text = expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
+                        this.view.Exposure.Text = Expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                         _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(expourse));
                     }
                 }
@@ -407,7 +408,7 @@ namespace InperStudio.ViewModels
                 CameraChannel item = new CameraChannel()
                 {
                     ChannelId = index - 1,
-                    Name = "ROI-" + index + "-",
+                    Name = _channel.Name == null ? "ROI-" + index + "-" : _channel.Name,
                     YVisibleRange = new SciChart.Data.Model.DoubleRange(ybottom, ytop),
                     Offset = _channel.Offset,
                     OffsetWindowSize = _channel.OffsetWindowSize,
@@ -610,7 +611,7 @@ namespace InperStudio.ViewModels
                     TextBlock tb = moveGrid.Children[0] as TextBlock;
                     double width = double.Parse((sender as TextBox).Text);
 
-                    if (width >= Math.Floor(view.image.ActualHeight))
+                    if (width >= Math.Floor(view.ellipseCanvas.Height))
                     {
                         width = Math.Floor(view.image.ActualHeight);
                         moveGrid.SetValue(Canvas.LeftProperty, 10.0);
@@ -655,7 +656,9 @@ namespace InperStudio.ViewModels
                         InperGlobalClass.CameraSignalSettings.LightMode.Add(sen);
 
                         InperGlobalClass.SetSampling(Math.Round(InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count - 1 < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count - 1) / InperGlobalClass.CameraSignalSettings.LightMode.Count, 0));
-                        Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                        this.view.Sampling.Text = Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+
+
                     }
                 }
 
@@ -740,7 +743,7 @@ namespace InperStudio.ViewModels
                         if (InperGlobalClass.CameraSignalSettings.LightMode.Remove(wg))
                         {
                             InperGlobalClass.SetSampling(Math.Round(InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count + 1) / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count), 0));
-                            Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                            this.view.Sampling.Text = Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         }
                     }
 

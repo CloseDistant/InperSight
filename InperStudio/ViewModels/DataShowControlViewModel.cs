@@ -197,11 +197,11 @@ namespace InperStudio.ViewModels
             string[] hotkeys = type == 1 ? x.Condition.Hotkeys.Split('+') : x.Hotkeys.Split('+');
             if (hotkeys.Count() == 1)
             {
-                if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])))
+                if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
                 {
                     if (type == 0)
                     {
-                        _ = InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
                     }
                     else
                     {
@@ -211,7 +211,7 @@ namespace InperStudio.ViewModels
             }
             if (hotkeys.Count() == 2)
             {
-                if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
+                if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
                 {
                     if (type == 0)
                     {
@@ -225,7 +225,7 @@ namespace InperStudio.ViewModels
             }
             if (hotkeys.Count() == 3)
             {
-                if (Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
+                if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
                 {
                     if (type == 0)
                     {

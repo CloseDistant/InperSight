@@ -107,7 +107,7 @@ namespace InperDeviceManagement
 
         public double SetExposure(double exposure)
         {
-            return _BC.SetExposure(exposure);
+            return _BC.SetExposure(exposure - 0.3 <= 0 ? 1 : exposure - 0.3);
         }
 
         public double GetMaximumExposure()
@@ -249,6 +249,36 @@ namespace InperDeviceManagement
         {
             _CS.Stop();
             _BC.SwitchRunningMode(CameraRunningMode.FreeRun);
+            return;
+        }
+        public void GetDeviceInfo(uint type)
+        {
+            _CS.GetDeviceInfo(type);
+            return;
+        }
+        public void AppRun()
+        {
+            _CS.AppRun();
+            return;
+        }
+        public void McuInit()
+        {
+            _CS.McuInit();
+            return;
+        }
+        public void GetHashVal()
+        {
+            _CS.GetHashVal();
+            return;
+        }
+        public void SetFileLength(UInt32 length)
+        {
+            _CS.SetFileLength(length);
+            return;
+        }
+        public void FileUpload(List<byte> bytes)
+        {
+            _CS.FileUpload(bytes);
             return;
         }
     }

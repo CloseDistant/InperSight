@@ -12,8 +12,8 @@ namespace InperStudio.Lib.Convert
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value==null) return value;
             string text = value.ToString();
-
             if (text.EndsWith("-"))
             {
                 text = text.Substring(0, text.Length - 1);

@@ -816,11 +816,15 @@ namespace InperStudio.ViewModels
                 {
                     if (channel.Type == "Camera")
                     {
-                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.DeltaF + " Windowsize:"+channel.WindowSize+ " RefractoryPeriod:" + channel.RefractoryPeriod };
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.DeltaF + " Windowsize:" + channel.WindowSize + " RefractoryPeriod:" + channel.RefractoryPeriod };
+                    }
+                    if (channel.Type == "Analog")
+                    {
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.DeltaF + " Windowsize:" + channel.WindowSize };
                     }
                     if (channel.Type == "Manual")
                     {
-                        (sender as Grid).ToolTip = new TextBlock() { Text = "Shortcuts:" + channel.Hotkeys };
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "hotkey:" + channel.Hotkeys };
                     }
                 }
                 else
@@ -829,9 +833,13 @@ namespace InperStudio.ViewModels
                     {
                         (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.Condition.DeltaF };
                     }
+                    if (channel.Condition.Type == "Analog")
+                    {
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.Condition.DeltaF };
+                    }
                     if (channel.Condition.Type == "Manual")
                     {
-                        (sender as Grid).ToolTip = new TextBlock() { Text = "Shortcuts:" + channel.Condition.Hotkeys };
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "hotkey:" + channel.Condition.Hotkeys };
                     }
                 }
             }

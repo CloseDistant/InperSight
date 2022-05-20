@@ -34,7 +34,7 @@
                 <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed">
                     <TextBlock Text="Fixed" Margin="5 0" />
                 </RadioButton>
-                <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Double" InperMaxValue="999" InperMinValue="30" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />
+                <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="False" InperTextType="Double" InperMaxValue="999" InperMinValue="30" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />
             </Grid>
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="20">

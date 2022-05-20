@@ -205,7 +205,7 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.ShowReminderInfo("No lights");
                 return;
             }
-           
+
             InperDeviceHelper.Instance.StartCollect();
 
             StartAndStopShowMarker(ChannelTypeEnum.Start, 0, false);
@@ -225,7 +225,6 @@ namespace InperStudio.ViewModels
                 {
                     StopRecord(1);
                 }
-
                 InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
@@ -246,10 +245,10 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.ShowReminderInfo("未设置激发光");
                     return;
                 }
-                //if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-                //{
-                //    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
-                //}
+                if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                {
+                    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                }
                 File.Create(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, "inper.ipd")).Close();
 
                 Task task = StartTriggerStrategy();
@@ -298,6 +297,25 @@ namespace InperStudio.ViewModels
                 StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
                 ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
                 InperGlobalClass.IsAllowDragScroll = true;
+
+                if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
+                {
+                    var obj = InperJsonHelper.GetAdditionRecordJson("stop");
+                    _ = Task.Factory.StartNew(() =>
+                      {
+                          TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
+                          while (true)
+                          {
+                              var currentTime = TimeSpan.Parse(DateTime.Now.ToLongTimeString()).Ticks;
+                              if (currentTime >= time.Ticks)
+                              {
+                                  break;
+                              }
+                              Task.Delay(10);
+                          }
+                          this.View.Dispatcher.Invoke(() => { StopRecord(); });
+                      });
+                }
             }
             catch (Exception ex)
             {
@@ -357,13 +375,18 @@ namespace InperStudio.ViewModels
                 }
                 InperDeviceHelper.Instance.StopCollect();
 
-                InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
-                if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                if (Directory.GetDirectories(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0 || Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0)
                 {
-                    _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                    {
+                        _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    }
                 }
+
                 InperDeviceHelper.Instance.device.Stop();
                 InperDeviceHelper.Instance.AllLightClose();
+                System.Windows.MessageBox.Show(InperDeviceHelper.Instance.imagecount.ToString() + "----点数2：" + InperDeviceHelper.Instance.imagecount2);
             }
             catch (Exception ex)
             {
@@ -392,7 +415,7 @@ namespace InperStudio.ViewModels
                  {
                      if (channel.Type == typeEnum.ToString())
                      {
-                         _ = InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
+                         InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
                          if (isRecord)
                          {
                              Manual manual = new Manual()
@@ -475,6 +498,7 @@ namespace InperStudio.ViewModels
                     InperDeviceHelper.Instance.AllLightOpen();
                 });
             }
+
             return null;
         }
         private Task StopTriggerStrategy()
@@ -497,23 +521,7 @@ namespace InperStudio.ViewModels
                     }
                 });
             }
-            if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
-            {
 
-                return Task.Factory.StartNew(() =>
-                {
-                    TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
-                    while (true)
-                    {
-                        var currentTime = TimeSpan.Parse(DateTime.Now.ToLongTimeString()).Ticks;
-                        if (currentTime >= time.Ticks)
-                        {
-                            break;
-                        }
-                        Task.Delay(10);
-                    }
-                });
-            }
             return null;
         }
         #endregion

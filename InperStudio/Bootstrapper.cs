@@ -32,6 +32,26 @@ namespace InperStudio
                     DbType = DbType.MySql,
                     IsAutoCloseConnection = true //不设成true要手动close
                 });
+                //List<Mcu_Version> list_mcu = db.Queryable<Mcu_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
+
+                //if (list_mcu.Count() > 0)
+                //{
+                //    Mcu_Version mcu = list_mcu.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Mcu_Version);
+                //    if (mcu != null)
+                //    {
+                //        Mcu_Version _Version = list_mcu.FirstOrDefault(x => x.Id > mcu.Id);
+
+                //        if (_Version != null)
+                //        {
+                //            if (!InperConfig.Instance.IsSkip)
+                //            {
+                //                string content = InperConfig.Instance.Mcu_Version + "," + Environment.CurrentDirectory + "/UnderBin/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe") + ",mcu";
+                //                _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
+                //                Environment.Exit(0);
+                //            }
+                //        }
+                //    }
+                //}
 
                 List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
 
@@ -53,6 +73,7 @@ namespace InperStudio
                         }
                     }
                 }
+              
                 db.Close();
                 db.Dispose();
             }

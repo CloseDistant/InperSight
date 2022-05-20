@@ -21,9 +21,11 @@ namespace InperStudioControlLib.Lib.Config
         private string dataCustomDirectoryPath;
         private string configPath;
         private string version;
+        private string mcu_version;
         private string conStr;
         private bool isSkip;
         private string upgradeKey;
+        private string mcuKey;
         public bool IsSkip
         {
             get => isSkip;
@@ -51,6 +53,15 @@ namespace InperStudioControlLib.Lib.Config
                 SetConfigValue("upgradeKey", upgradeKey);
             }
         }
+        public string McuKey
+        {
+            get => mcuKey;
+            set
+            {
+                mcuKey = value;
+                SetConfigValue("mcuKey", mcuKey);
+            }
+        }
         public string Version
         {
             get => version;
@@ -58,6 +69,15 @@ namespace InperStudioControlLib.Lib.Config
             {
                 version = value;
                 SetConfigValue("version", version);
+            }
+        }
+        public string Mcu_Version
+        {
+            get => mcu_version;
+            set
+            {
+                mcu_version = value;
+                SetConfigValue("version", mcu_version);
             }
         }
         public string DataPath
@@ -116,10 +136,12 @@ namespace InperStudioControlLib.Lib.Config
             dataPath = GetConfigValue("dataPath");
             dataCustomDirectoryPath = GetConfigValue("dataCustomDirectoryPath");
             configPath = GetConfigValue("configPath");
-            version =GetConfigValue("version");
-            conStr =  Helper.EnAndDecryption.Decrypt(GetConfigValue("conStr"));
+            version = GetConfigValue("version");
+            conStr = Helper.EnAndDecryption.Decrypt(GetConfigValue("conStr"));
             isSkip = bool.Parse(GetConfigValue("isSkip"));
             upgradeKey = GetConfigValue("upgradeKey");
+            mcu_version = GetConfigValue("mcu_version");
+            mcuKey = GetConfigValue("mcuKey");
         }
         #endregion
 

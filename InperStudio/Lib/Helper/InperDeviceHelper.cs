@@ -128,9 +128,12 @@ namespace InperStudio.Lib.Helper
             set => SetAndNotify(ref _WBMPPreview, value);
         }
         #endregion
-        public void DeviceInit(PhotometryDevice device)
+        public void DeviceSet(PhotometryDevice device)
         {
             this.device = device;
+        }
+        public void DeviceInit()
+        {
             device.DidGrabImage += Instance_OnImageGrabbed;
             //device.OnUsbInfoUpdated += Device_OnUsbInfoUpdated;
 
@@ -399,6 +402,8 @@ namespace InperStudio.Lib.Helper
             }
             return true;
         }
+        public int imagecount;
+        public int imagecount2;
         private void Instance_OnImageGrabbed(object sender, MarkedMat e)
         {
             try
@@ -411,6 +416,10 @@ namespace InperStudio.Lib.Helper
                         _PlottingStartTime = e.Timestamp;
 
                         isFirstRecordTiem = false;
+                    }
+                    if (InperGlobalClass.IsRecord)
+                    {
+                        imagecount2++;
                     }
                     Monitor.Enter(_QLock);
                     _MatQ.Enqueue(e);
@@ -466,6 +475,85 @@ namespace InperStudio.Lib.Helper
                             _WBMPPreview.AddDirtyRect(new Int32Rect(0, 0, VisionWidth, VisionHeight));
                             _WBMPPreview.Unlock();
                         }));
+                    }
+                }
+            }
+        }
+        public void FrameProc()
+        {
+            while (isLoop)
+            {
+                MarkedMat[] mmats;
+                _ = _AREvent.WaitOne();
+
+                if (Monitor.TryEnter(_QLock))
+                {
+                    mmats = _MatQ.ToArray();
+                    _MatQ.Clear();
+                    Monitor.Exit(_QLock);
+
+                    foreach (MarkedMat m in mmats)
+                    {
+                        if (InperGlobalClass.IsRecord)
+                        {
+                            imagecount++;
+                        }
+                        long ts = m.Timestamp - _PlottingStartTime;
+                        time = ts;
+                        if (Monitor.TryEnter(_EventQLock))
+                        {
+                            Monitor.Exit(_EventQLock);
+                        }
+
+                        ConcurrentDictionary<int, double> ploting_data = new ConcurrentDictionary<int, double>();
+                        if (CameraChannels.Count > 0)
+                        {
+                            foreach (CameraChannel mask in CameraChannels)
+                            {
+                                if (mask.Type == ChannelTypeEnum.Camera.ToString())
+                                {
+                                    double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
+
+                                    if (r > 0)
+                                    {
+                                        if (mask.Offset)
+                                        {
+                                            r -= Offset(mask, m.Group, r);
+                                        }
+
+                                        if (mask.Filters.IsSmooth)
+                                        {
+                                            r = Smooth(mask, m.Group, r);
+                                        }
+
+                                        DeltaFCalculate(mask, m.Group, r, ts);
+
+                                        if (mask.Filters.IsHighPass)
+                                        {
+                                            r = HighPass(mask, m.Group, r);
+                                        }
+
+                                        if (mask.Filters.IsLowPass)
+                                        {
+                                            r = LowPass(mask, m.Group, r);
+                                        }
+                                        if (mask.Filters.IsNotch)
+                                        {
+                                            r = NotchPass(mask, m.Group, r);
+                                        }
+                                        ploting_data[mask.ChannelId] = r;
+                                    }
+                                }
+                            }
+                            if (ploting_data.Count > 0)
+                            {
+                                this.AppendData(ploting_data, m.Group, ts);
+                                if (InperGlobalClass.IsRecord)
+                                {
+                                    this.SaveData(ploting_data, ts, m.Group);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -793,81 +881,6 @@ namespace InperStudio.Lib.Helper
             return new Tuple<TimeSpan[], double[]>(timeSpans, values);
         }
         #endregion
-        public void FrameProc()
-        {
-            while (isLoop)
-            {
-                MarkedMat[] mmats;
-                _ = _AREvent.WaitOne();
-
-                if (Monitor.TryEnter(_QLock))
-                {
-                    mmats = _MatQ.ToArray();
-                    _MatQ.Clear();
-                    Monitor.Exit(_QLock);
-
-                    foreach (MarkedMat m in mmats)
-                    {
-                        long ts = m.Timestamp - _PlottingStartTime;
-                        time = ts;
-                        if (Monitor.TryEnter(_EventQLock))
-                        {
-                            Monitor.Exit(_EventQLock);
-                        }
-
-                        ConcurrentDictionary<int, double> ploting_data = new ConcurrentDictionary<int, double>();
-                        if (CameraChannels.Count > 0)
-                        {
-                            _ = Parallel.ForEach(CameraChannels, mask =>
-                                  {
-                                      if (mask.Type == ChannelTypeEnum.Camera.ToString())
-                                      {
-                                          double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
-                                          if (r > 0)
-                                          {
-                                              if (mask.Offset)
-                                              {
-                                                  r -= Offset(mask, m.Group, r);
-                                              }
-
-                                              if (mask.Filters.IsSmooth)
-                                              {
-                                                  r = Smooth(mask, m.Group, r);
-                                              }
-
-                                              DeltaFCalculate(mask, m.Group, r, ts);
-
-                                              if (mask.Filters.IsHighPass)
-                                              {
-                                                  r = HighPass(mask, m.Group, r);
-                                              }
-
-                                              if (mask.Filters.IsLowPass)
-                                              {
-                                                  r = LowPass(mask, m.Group, r);
-                                              }
-                                              if (mask.Filters.IsNotch)
-                                              {
-                                                  r = NotchPass(mask, m.Group, r);
-                                              }
-                                              ploting_data[mask.ChannelId] = r;
-                                          }
-                                      }
-                                  });
-                            if (ploting_data.Count > 0)
-                            {
-                                this.AppendData(ploting_data, m.Group, ts);
-                                if (InperGlobalClass.IsRecord)
-                                {
-                                    this.SaveData(ploting_data, ts, m.Group);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         #region 滤波 offset smooth
         private double Offset(CameraChannel cameraChannel, int group, double r)
@@ -1017,8 +1030,9 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
-                if (AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor)))
+                //if (AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor)))
                 {
+                    AddMarkerByHotkeys(eventChannelJson.ChannelId, eventChannelJson.Name, (Color)ColorConverter.ConvertFromString(eventChannelJson.BgColor));
                     if (eventChannelJson.Type == ChannelTypeEnum.Output.ToString())
                     {
                         device.OuputIO((uint)eventChannelJson.ChannelId, 1);
@@ -1352,16 +1366,17 @@ namespace InperStudio.Lib.Helper
             }
             return new Tuple<TimeSpan[], double[]>(new TimeSpan[0], new double[0]);
         }
-        private readonly object marker = new object();
-        public bool AddMarkerByHotkeys(int channelId, string text, Color color, int type = -1)//type 0 start 1 end -1 other
+        public async void AddMarkerByHotkeys(int channelId, string text, Color color, int type = -1)//type 0 start 1 end -1 other
         {
-            //lock (marker)
+            await Task.Factory.StartNew(() =>
             {
+
                 TimeSpan _time = new TimeSpan(time / 100);
                 if (type == 0)
                 {
                     _time = new TimeSpan(0);
                 }
+                bool isAddAnnotation = true;
                 if (EventChannelChart.Annotations.Count > 0)
                 {
                     IAnnotationViewModel obj = EventChannelChart.Annotations.LastOrDefault((x) => (x as VerticalLineAnnotationViewModel).LabelValue.Equals(text));
@@ -1373,31 +1388,35 @@ namespace InperStudio.Lib.Helper
                         {
                             if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
                             {
-                                return false;
+                                isAddAnnotation = false;
                             }
                         }
                     }
                 }
-                EventChannelChart.Annotations.Add(new VerticalLineAnnotationViewModel()
+                if (isAddAnnotation)
                 {
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    FontSize = 12,
-                    ShowLabel = InperGlobalClass.EventPanelProperties.DisplayNameVisible,
-                    Stroke = color,
-                    LabelValue = text,
-                    LabelTextFormatting = "12",
-                    LabelPlacement = LabelPlacement.Left,
-                    LabelsOrientation = System.Windows.Controls.Orientation.Vertical,
-                    StrokeThickness = 1,
-                    X1 = _time
-                });
-                return true;
-            }
+                    EventChannelChart.Annotations.Add(new VerticalLineAnnotationViewModel()
+                    {
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        FontSize = 12,
+                        ShowLabel = InperGlobalClass.EventPanelProperties.DisplayNameVisible,
+                        Stroke = color,
+                        LabelValue = text,
+                        LabelTextFormatting = "12",
+                        LabelPlacement = LabelPlacement.Left,
+                        LabelsOrientation = System.Windows.Controls.Orientation.Vertical,
+                        StrokeThickness = 1,
+                        X1 = _time
+                    });
+                }
+            });
+
         }
         public void SendCommand(EventChannelJson channelJson, int type = -1)
         {
-            if (AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor), type))
+            //if (AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor), type))
             {
+                AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor), type);
                 device.OuputIO((uint)channelJson.ChannelId, 1);
                 Thread.Sleep(50);
                 device.OuputIO((uint)channelJson.ChannelId, 0);
