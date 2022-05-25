@@ -18,7 +18,7 @@
         NonClientAreaForeground="White"
         Icon="../inper_studio_icon_96.ico"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
-        Title="inper" ShowTitle="False" Height="800" Width="1282" hc:Dialog.Token="MainDialog" MinWidth="1000" MinHeight="660" x:Name="MainWindow">
+        Title="inper" ShowTitle="False" Height="800" Width="1282" hc:Dialog.Token="MainDialog" MinWidth="1000" MinHeight="660" x:Name="MainWindow" Closing="{s:Action MainWindow_Closing}">
     <Grid Background="{StaticResource InperMainPageColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="66" />

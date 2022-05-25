@@ -227,7 +227,7 @@
     <Compile Include="Lib\Bean\Channel\CameraChannel.cs" />
     <Compile Include="Lib\Bean\Channel\EventChannel.cs" />
     <Compile Include="Lib\Bean\Derivative.cs" />
-    <Compile Include="Lib\Bean\HPTimer.cs" />
+    <Compile Include="Lib\Bean\DeviceTimer.cs" />
     <Compile Include="Lib\Bean\InperGlobalClass.cs" />
     <Compile Include="Lib\Bean\ListChartValues.cs" />
     <Compile Include="Lib\Bean\Mcu_Version.cs" />
@@ -268,6 +268,7 @@
     <Compile Include="Lib\Helper\FilterTools\FiltterTool.cs" />
     <Compile Include="Lib\Helper\FilterTools\OnLineFilterTool.cs" />
     <Compile Include="Lib\Helper\HighAccurateTimer.cs" />
+    <Compile Include="Lib\Helper\HotKey\HotKeyHelper.cs" />
     <Compile Include="Lib\Helper\InperClassExtensionHelper.cs" />
     <Compile Include="Lib\Helper\InperClassHelper.cs" />
     <Compile Include="Lib\Helper\InperColorHelper.cs" />
@@ -279,7 +280,6 @@
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventPanelProperties.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventSettings.cs" />
-    <Compile Include="Lib\Helper\UnderUpgrade.cs" />
     <Compile Include="ViewModels\AdditionSettingsViewModel.cs" />
     <Compile Include="ViewModels\DataPathConfigViewModel.cs" />
     <Compile Include="ViewModels\DataShowControlViewModel.cs" />

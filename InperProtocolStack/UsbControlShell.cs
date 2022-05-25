@@ -12,6 +12,22 @@ using System.Threading.Tasks;
 
 namespace InperProtocolStack
 {
+    public class PhotometryInfo
+    {
+        public uint Model { get; set; }
+        public uint DetectorIdLength { get; set; }
+        public string DetectorId { get; set; }
+        public uint SNlength { get; set; }
+        public string SN { get; set; }
+        public uint LightNumber { get; set; }
+        public List<LightConfigInfo> LightConfigInfos { get; set; }
+    }
+    public struct LightConfigInfo
+    {
+        public int ID;
+        public float MaxPower;
+        public uint WaveLength;
+    }
     public class UsbControlShell
     {
         public readonly UARTAgent _UARTA;
@@ -21,7 +37,6 @@ namespace InperProtocolStack
             _UARTA = new UARTAgent(vid, pid);
             _TC = new TransTrafficCtrl(_UARTA);
             _TC.OnInfoUpdated += InfoUpdated;
-            //_TC.OnUsbInfoUpdated += _TC_OnUsbInfoUpdated;
             InqID();
         }
         public uint FirmwareRevision { get; private set; } = 0;
@@ -51,37 +66,58 @@ namespace InperProtocolStack
 
             return;
         }
-
-
-        private struct LightConfig
+        private void UpdatePhotoMetryInfo(byte[] param)
         {
-            public UInt32 ID;
-            public UInt32 Enabled;
-            public float MaxPower;
-            public UInt32 WaveLength;
+            PhotometryInfo info = new PhotometryInfo();
+            info.Model = BitConverter.ToUInt32(param.Take(4).ToArray(), 0);
+            info.DetectorIdLength = BitConverter.ToUInt32(param.Skip(4).Take(4).ToArray(), 0);
+            info.DetectorId = Encoding.ASCII.GetString(param.Skip(8).Take((int)info.DetectorIdLength).ToArray(), 0, (int)info.DetectorIdLength);
+            int skipLength = 8 + (int)info.DetectorIdLength;
+            info.SNlength = BitConverter.ToUInt32(param.Skip(skipLength).Take(4).ToArray(), 0);
+            skipLength += 4;
+            info.SN = Encoding.ASCII.GetString(param.Skip(skipLength).Take((int)info.SNlength).ToArray(), 0, (int)info.SNlength);
+            skipLength += (int)info.SNlength;
+            info.LightNumber = BitConverter.ToUInt32(param.Skip(skipLength).Take(4).ToArray(), 0);
+            skipLength += 4;
+            info.LightConfigInfos = new List<LightConfigInfo>();
+            for (int i = 0; i < info.LightNumber; i++)
+            {
+                LightConfigInfo lightConfigInfo = new LightConfigInfo()
+                {
+                    ID = i,
+                    WaveLength = BitConverter.ToUInt32(param.Skip(skipLength).Take(4).ToArray(), 0),
+                    MaxPower = BitConverter.ToSingle(param.Skip(skipLength + 4).Take(4).ToArray(), 0)
+                };
+                skipLength += 8;
+                info.LightConfigInfos.Add(lightConfigInfo);
+                LightDesc ld = new LightDesc((uint)lightConfigInfo.ID, lightConfigInfo.WaveLength, lightConfigInfo.MaxPower);
+                LightSourceList.Add(ld);
+            }
         }
         public List<LightDesc> LightSourceList { get; private set; } = new List<LightDesc>();
-        private void UpdateLightConfig(byte[] param)
-        {
-            int light_cfg_size = Marshal.SizeOf(typeof(LightConfig));
-            UInt32 light_no = BitConverter.ToUInt32(param.Take(4).ToArray(), 0);
-            for (int li = 0; li < light_no; li++)
-            {
-                byte[] cfg_bytes = param.Skip(4 + (li * light_cfg_size)).Take(light_cfg_size).ToArray();
-                LightConfig lc = Utils.BytesToStruct<LightConfig>(cfg_bytes, light_cfg_size);
-                if (lc.Enabled != 0)
-                {
-                    LightDesc ld = new LightDesc(lc.ID, lc.WaveLength, lc.MaxPower);
-                    LightSourceList.Add(ld);
-                }
-            }
-            return;
-        }
-        private void GetBootLoaderHashVal(byte[] param)
-        {
-            var a = BitConverter.ToString(param.Skip(4).Take(16).ToArray());
-            Console.WriteLine("aaa :" + a);
-        }
+        //private struct LightConfig
+        //{
+        //    public UInt32 ID;
+        //    public UInt32 Enabled;
+        //    public float MaxPower;
+        //    public UInt32 WaveLength;
+        //}
+        //private void UpdateLightConfig(byte[] param)
+        //{
+        //    int light_cfg_size = Marshal.SizeOf(typeof(LightConfig));
+        //    UInt32 light_no = BitConverter.ToUInt32(param.Take(4).ToArray(), 0);
+        //    for (int li = 0; li < light_no; li++)
+        //    {
+        //        byte[] cfg_bytes = param.Skip(4 + (li * light_cfg_size)).Take(light_cfg_size).ToArray();
+        //        LightConfig lc = Utils.BytesToStruct<LightConfig>(cfg_bytes, light_cfg_size);
+        //        if (lc.Enabled != 0)
+        //        {
+        //            LightDesc ld = new LightDesc(lc.ID, lc.WaveLength, lc.MaxPower);
+        //            LightSourceList.Add(ld);
+        //        }
+        //    }
+        //    return;
+        //}
         private void UpdateIOConfig(byte[] param)
         {
             return;
@@ -117,10 +153,10 @@ namespace InperProtocolStack
                     OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
                     break;
 
-                case ProtocolIntent.INTENT_RETURN_LIGHT_CONFIG:
-                    UpdateLightConfig(e.Data);
-                    OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
-                    break;
+                //case ProtocolIntent.INTENT_RETURN_LIGHT_CONFIG:
+                //    UpdateLightConfig(e.Data);
+                //    OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
+                //    break;
 
                 case ProtocolIntent.INTENT_RETURN_IO_CONFIG:
                     UpdateIOConfig(e.Data);
@@ -130,14 +166,12 @@ namespace InperProtocolStack
                     DevInputNotificationEventArgs ea = DeviceInputUpdated(e.Data);
                     OnDevNotification?.Invoke(this, ea);
                     break;
-                case ProtocolIntent.INTENT_CMD_INIT_MCU:
-                    Console.WriteLine(22222);
+                case ProtocolIntent.INTENT_PHOTOMETRY_INFO:
+                    UpdatePhotoMetryInfo(e.Data);
+                    OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
                     break;
-                case ProtocolIntent.INTENT_FILE_HASH_VAL:
-                    GetBootLoaderHashVal(e.Data);
-                    break;
-                case ProtocolIntent.INTENT_FILE_LENGTH:
-                    Console.WriteLine(111);
+                case ProtocolIntent.INTENT_DEVICE_INFO_PUB:
+                    Console.WriteLine(e.Data);
                     break;
                 default:
                     break;

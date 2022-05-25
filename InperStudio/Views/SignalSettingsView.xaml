@@ -62,7 +62,7 @@
                         <hc:TextBox Margin="10 0 0 0" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center"  TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="0" Width="140"  Height="20"  />
                         <WrapPanel VerticalAlignment="Center" Margin="10 0 0 0">
                             <TextBlock Text="ROI(px)" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
-                            <inper:InperTextBox Style="{StaticResource   BaseStyle}"  HorizontalContentAlignment="Center" InperVerify="False" InperTextType="Double" InperMaxValue="320" InperMinValue="1" Width="40" Margin="5 0 0 0" x:Name="channelRoi" Text="{Binding Diameter,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action ChannelRoi_TextChanged}"/>
+                            <inper:InperTextBox Style="{StaticResource   BaseStyle}"  HorizontalContentAlignment="Center" InperVerify="True" InperTextType="Double" InperMaxValue="150" InperMinValue="1" Width="40" Margin="5 0 0 0" x:Name="channelRoi" Text="{Binding Diameter,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action ChannelRoi_TextChanged}"/>
                         </WrapPanel>
                         <Button Margin="10 0 0 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Click="{s:Action ReduceCircle}" Width="20" Height="20" >
                             <Path Fill="#D9001B" Stretch="Uniform" Data="{StaticResource InperReduce}"/>

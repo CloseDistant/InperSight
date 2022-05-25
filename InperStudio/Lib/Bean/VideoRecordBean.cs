@@ -40,7 +40,7 @@ namespace InperStudio.Lib.Bean
             set { SetValue(() => Time, value); }
         }
         public Mat _capturedFrame = new Mat();
-       
+
         #region private
         //定义Timer类
         private VideoCaptureAPIs _videoCaptureApi = VideoCaptureAPIs.DSHOW;

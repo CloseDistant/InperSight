@@ -37,7 +37,7 @@ namespace InperStudio.ViewModels
         public BindableCollection<EventChannel> ConditionsChannels { get => conditionsChannels; set => SetAndNotify(ref conditionsChannels, value); }
         public List<string> EventColorList { get; set; } = InperColorHelper.ColorPresetList;
 
-        public BindableCollection<EventChannelJson> ManualEvents = InperGlobalClass.ManualEvents;
+        //public BindableCollection<EventChannelJson> ManualEvents = InperGlobalClass.ManualEvents;
         #endregion
         public EventSettingsViewModel(EventSettingsTypeEnum typeEnum)
         {
@@ -195,7 +195,7 @@ namespace InperStudio.ViewModels
                                     EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && (x.Type == ChannelTypeEnum.DIO.ToString() || x.Type == ChannelTypeEnum.Input.ToString()));
                                     if (chn != null)
                                     {
-                                        chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name; chn.BgColor = item.BgColor;
+                                        chn.IsActive = true; chn.Type = item.Type; chn.Name = item.Name; chn.BgColor = item.BgColor; chn.RefractoryPeriod = item.RefractoryPeriod;
                                     }
                                 }
                                 else
@@ -203,7 +203,7 @@ namespace InperStudio.ViewModels
                                     EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
                                     if (chn != null)
                                     {
-                                        chn.IsActive = item.IsActive; chn.BgColor = item.BgColor;
+                                        chn.IsActive = item.IsActive; chn.BgColor = item.BgColor; chn.RefractoryPeriod = item.RefractoryPeriod;
                                     }
                                 }
                             }
@@ -571,7 +571,7 @@ namespace InperStudio.ViewModels
                             }
                         }
                         EventChannelJson item = @enum == EventSettingsTypeEnum.Marker
-                            ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Input.ToString() || x.Type == ChannelTypeEnum.Output.ToString()))
+                            ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Input.ToString()) && x.Type != ChannelTypeEnum.Output.ToString())
                             : InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Output.ToString()) && x.Condition?.ChannelId == ch_active.Condition?.ChannelId);
                         if (item != null)
                         {
@@ -625,7 +625,7 @@ namespace InperStudio.ViewModels
                             EventChannelJson output = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Condition?.Type == ch.Condition?.Type && x.Condition?.ChannelId == ch.Condition?.ChannelId && (x.Type == ch.Type || x.Type == ChannelTypeEnum.Output.ToString()));
                             if (output != null)
                             {
-                                Growl.Warning("Condition exists!", "SuccessMsg");
+                                Growl.Warning("This condition already exists!", "SuccessMsg");
                                 ch.IsActive = false;
                                 return;
                             }
@@ -667,57 +667,82 @@ namespace InperStudio.ViewModels
                             {
                                 channle.Name = channle.Name.Substring(0, channle.Name.Length - 1);
                             }
-                            //output 热键重复排除
-                            if (channle.Condition != null && channle.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                            if (@enum == EventSettingsTypeEnum.Marker)
                             {
-                                if (string.IsNullOrEmpty(channle.Condition.Hotkeys))
+                                if (channle.Type == ChannelTypeEnum.Camera.ToString() || channle.Type == ChannelTypeEnum.Analog.ToString())
                                 {
-                                    mc.IsActive = false;
-                                    return;
-                                }
-                                InperGlobalClass.EventSettings.Channels.ForEach(x =>
-                                {
-                                    if (x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
-                                    {
-                                        if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
-                                        {
-                                            if (x.Condition.Hotkeys == channle.Condition.Hotkeys)
-                                            {
-                                                Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
-                                                mc.IsActive = false;
-                                            }
-                                        }
-                                    }
-                                });
-                                if (mc.IsActive == false)
-                                {
-                                    return;
+                                    channle.IsRefractoryPeriod = true;
                                 }
                             }
-
-                            if (ManualEvents.Count > 0 && (channle.Type == ChannelTypeEnum.Manual.ToString() || channle.Condition?.Type == ChannelTypeEnum.Manual.ToString()))
+                            else
                             {
-                                EventChannelJson manual = null;
-                                if (@enum == EventSettingsTypeEnum.Marker)
+                                //output 热键重复排除
+                                if (channle.Condition != null && channle.Condition.Type == ChannelTypeEnum.Manual.ToString())
                                 {
-                                    if (string.IsNullOrEmpty(channle.Hotkeys))
+                                    if (string.IsNullOrEmpty(channle.Condition.Hotkeys))
                                     {
                                         mc.IsActive = false;
                                         return;
                                     }
-                                    manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Hotkeys);
+                                    InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                                    {
+                                        if (x.Type == ChannelTypeEnum.Manual.ToString())
+                                        {
+                                            if (x.Hotkeys == channle.Condition.Hotkeys || x.Name == channle.Condition.Name)
+                                            {
+                                                Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
+                                                mc.IsActive = false;
+                                                return;
+                                            }
+                                        }
+                                        if (x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                                        {
+                                            if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                                            {
+                                                if (x.Condition.Hotkeys == channle.Condition.Hotkeys || x.Condition.Name == channle.Condition.Name)
+                                                {
+                                                    Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
+                                                    mc.IsActive = false;
+                                                }
+
+                                            }
+                                        }
+                                    });
+                                    if (mc.IsActive == false)
+                                    {
+                                        return;
+                                    }
                                 }
-                                else
+                                //output 不应期激活
+                                if (channle.Condition != null && (channle.Condition.Type == ChannelTypeEnum.Camera.ToString() || channle.Condition.Type == ChannelTypeEnum.Analog.ToString()))
                                 {
-                                    manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Condition.Hotkeys);
-                                }
-                                if (manual != null)
-                                {
-                                    Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
-                                    mc.IsActive = false;
-                                    return;
+                                    channle.IsRefractoryPeriod = true;
                                 }
                             }
+
+                            //if (ManualEvents.Count > 0 && (channle.Type == ChannelTypeEnum.Manual.ToString() || channle.Condition?.Type == ChannelTypeEnum.Manual.ToString()))
+                            //{
+                            //    EventChannelJson manual = null;
+                            //    if (@enum == EventSettingsTypeEnum.Marker)
+                            //    {
+                            //        if (string.IsNullOrEmpty(channle.Hotkeys))
+                            //        {
+                            //            mc.IsActive = false;
+                            //            return;
+                            //        }
+                            //        manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Hotkeys);
+                            //    }
+                            //    else
+                            //    {
+                            //        manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Condition.Hotkeys);
+                            //    }
+                            //    if (manual != null)
+                            //    {
+                            //        Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
+                            //        mc.IsActive = false;
+                            //        return;
+                            //    }
+                            //}
                             //deltaf/f
                             if (type == ChannelTypeEnum.Camera.ToString() || type == ChannelTypeEnum.Analog.ToString())
                             {
@@ -737,10 +762,10 @@ namespace InperStudio.ViewModels
                             {
                                 if (manualChannels.Count > 0)
                                 {
-                                    EventChannel manual = manualChannels.FirstOrDefault(x => x.Hotkeys == ch.Hotkeys);
+                                    EventChannel manual = manualChannels.FirstOrDefault(x => x.Hotkeys == ch.Hotkeys || x.Name == ch.Name);
                                     if (manual != null)
                                     {
-                                        Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
+                                        Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
                                         return;
                                     }
                                 }
@@ -853,40 +878,40 @@ namespace InperStudio.ViewModels
         {
             InperGlobalClass.IsExistEvent = InperGlobalClass.EventSettings.Channels.Count > 0;
 
-            ManualEvents.Clear();
-            InperGlobalClass.EventSettings.Channels.ForEach(x =>
-            {
-                //if (x.Name.EndsWith("-"))
-                //{
-                //    x.Name = x.Name.Substring(0, x.Name.Length - 1);
-                //}
-                if (x.IsActive)
-                {
-                    if (x.Type == ChannelTypeEnum.Manual.ToString())
-                    {
-                        if (!ManualEvents.Contains(x))
-                        {
-                            ManualEvents.Add(x);
-                        }
-                    }
-                    if (x.Condition?.Type == ChannelTypeEnum.Manual.ToString() && x.Type == ChannelTypeEnum.Output.ToString())
-                    {
-                        if (!ManualEvents.Contains(x))
-                        {
-                            ManualEvents.Add(new EventChannelJson()
-                            {
-                                ChannelId = x.ChannelId,
-                                BgColor = x.BgColor,
-                                Hotkeys = x.Condition.Hotkeys,
-                                HotkeysCount = x.Condition.HotkeysCount,
-                                Name = x.Name,
-                                Type = x.Type,
-                                IsActive = x.IsActive
-                            });
-                        }
-                    }
-                }
-            });
+            //ManualEvents.Clear();
+            //InperGlobalClass.EventSettings.Channels.ForEach(x =>
+            //{
+            //    //if (x.Name.EndsWith("-"))
+            //    //{
+            //    //    x.Name = x.Name.Substring(0, x.Name.Length - 1);
+            //    //}
+            //    if (x.IsActive)
+            //    {
+            //        if (x.Type == ChannelTypeEnum.Manual.ToString())
+            //        {
+            //            if (!ManualEvents.Contains(x))
+            //            {
+            //                ManualEvents.Add(x);
+            //            }
+            //        }
+            //        if (x.Condition?.Type == ChannelTypeEnum.Manual.ToString() && x.Type == ChannelTypeEnum.Output.ToString())
+            //        {
+            //            if (!ManualEvents.Contains(x))
+            //            {
+            //                ManualEvents.Add(new EventChannelJson()
+            //                {
+            //                    ChannelId = x.ChannelId,
+            //                    BgColor = x.BgColor,
+            //                    Hotkeys = x.Condition.Hotkeys,
+            //                    HotkeysCount = x.Condition.HotkeysCount,
+            //                    Name = x.Name,
+            //                    Type = x.Type,
+            //                    IsActive = x.IsActive
+            //                });
+            //            }
+            //        }
+            //    }
+            //});
             InperJsonHelper.SetEventSettings(InperGlobalClass.EventSettings);
         }
     }

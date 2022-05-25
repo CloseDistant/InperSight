@@ -41,7 +41,6 @@ namespace InperStudio.ViewModels
                 DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
                 FileInfo[] files = root.GetFiles();
                 UnderUpgradeFunc under = new UnderUpgradeFunc();
-
                 _ = View.Dispatcher.BeginInvoke(new Action(async () =>
                   {
                       #region 下位机更新
@@ -49,6 +48,10 @@ namespace InperStudio.ViewModels
                       {
                           under.SendFile(files, tokenStart);
                           await TaskExecute(tokenStart.Token);
+                          if (!under.DeviceIsRestart)
+                          {
+                              MessageBox.Show("Updating successful . Changes will take effect after restarting.");
+                          }
                       }
                       else
                       {
@@ -71,12 +74,13 @@ namespace InperStudio.ViewModels
                           InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
                           InperDeviceHelper.Instance.DeviceInit();
 
-                          //uint DEVICE_INFO_PUB = 0x000000E8;
-                          //uint SMARTLIGHT_INFO = 0x000000E7;
+                          uint SMARTLIGHT_INFO = 0x000000E7;
+                          uint DEVICE_INFO_PUB = 0x000000E8;
 
-                          //InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
-
+                          InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
                           await Task.Delay(1000);
+                          InperDeviceHelper.Instance.device.GetDeviceInfo(DEVICE_INFO_PUB);
+
                           windowManager.ShowWindow(new MainWindowViewModel(windowManager));
                           RequestClose();
                       }
@@ -102,8 +106,14 @@ namespace InperStudio.ViewModels
                     else
                     {
                         InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
-                        await Task.Delay(3000);
                         InperDeviceHelper.Instance.DeviceInit();
+                        await Task.Delay(2000);
+                        uint SMARTLIGHT_INFO = 0x000000E7;
+                        uint DEVICE_INFO_PUB = 0x000000E8;
+
+                        InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
+                        await Task.Delay(1000);
+                        InperDeviceHelper.Instance.device.GetDeviceInfo(DEVICE_INFO_PUB);
                         (View as StartPageView).loading.Visibility = Visibility.Collapsed;
                         (View as StartPageView).remainder.Text = "Initialization completed";
 
@@ -116,6 +126,10 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
+        }
+        public void SearchDevice()
+        {
+
         }
         public void Close()
         {

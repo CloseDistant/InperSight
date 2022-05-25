@@ -45,7 +45,7 @@ namespace InperStudio.Views.Control
         }
         private void SaveConfig_Click(object sender, RoutedEventArgs e)
         {
-            Growl.Success("Save success", "SuccessMsg");
+            Growl.Success("Saved successfully", "SuccessMsg");
         }
         private void SaveConfigAs_Click(object sender, RoutedEventArgs e)
         {

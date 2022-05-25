@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace InperProtocolStack.UnderUpgrade
 {
@@ -16,6 +17,7 @@ namespace InperProtocolStack.UnderUpgrade
     {
         private AutoResetEvent _RecvAREvent = new AutoResetEvent(false);
         UsbDevice MyUsbDevice;
+        public bool DeviceIsRestart = false;
         CancellationTokenSource tokenSource = new CancellationTokenSource(new TimeSpan(0, 0, 3));
         CancellationTokenSource tokenSourceHash = new CancellationTokenSource(new TimeSpan(0, 0, 3));
         CancellationTokenSource tokenSourceRun = new CancellationTokenSource(new TimeSpan(0, 0, 3));
@@ -50,6 +52,11 @@ namespace InperProtocolStack.UnderUpgrade
         }
         public async void UnderInitJumpUpgrade(CancellationTokenSource cancellation)
         {
+            if (MyUsbDevice == null)
+            {
+                cancellation.Cancel();
+                return;
+            }
             MyUsbDevice.Open();
             Write(new CmdInitMcu().GetBytes().ToArray());
             await TaskExecute(tokenSource.Token);
@@ -79,11 +86,19 @@ namespace InperProtocolStack.UnderUpgrade
 
             Write(new CmdInitMcu().GetBytes().ToArray());
             await TaskExecute(tokenSource.Token);
-
             foreach (FileInfo x in files.OrderBy(x => x.LastWriteTime).ToList())
             {
                 Write(new CmdGetHashVal().GetBytes().ToArray()); //获取下位机hsah值
                 await TaskExecute(tokenSourceHash.Token);
+                if (!DeviceIsRestart)
+                {
+                    cancellation.Cancel();
+                    if (MyUsbDevice.IsOpen)
+                    {
+                        MyUsbDevice.Close();
+                    }
+                    return;
+                }
 
                 if (x.Extension.Contains("bin"))
                 {
@@ -178,6 +193,7 @@ namespace InperProtocolStack.UnderUpgrade
                 var _hashVal = e.Buffer.Skip(20).Take(16).ToArray();
                 hashval = BitConverter.ToString(_hashVal).Replace("-", "");
                 Console.WriteLine(hashval);
+                DeviceIsRestart = true;
                 tokenSourceHash.Cancel();
             }
             if (isstart)

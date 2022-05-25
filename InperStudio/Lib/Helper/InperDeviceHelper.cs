@@ -17,8 +17,10 @@ using Stylet;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
@@ -36,10 +38,12 @@ namespace InperStudio.Lib.Helper
         public string WaveType { get; set; }
         public double LightPower { get; set; } = 0;
     }
+    [Serializable]
     public class SignalData
     {
         public Dictionary<int, Queue<KeyValuePair<long, double>>> ValuePairs { get; set; } = new Dictionary<int, Queue<KeyValuePair<long, double>>>();
     }
+    [Serializable]
     public class SignalDataUsb
     {
         public Dictionary<int, Queue<Tuple<TimeSpan[], double[]>>> ValuePairs { get; set; } = new Dictionary<int, Queue<Tuple<TimeSpan[], double[]>>>();
@@ -47,20 +51,13 @@ namespace InperStudio.Lib.Helper
     public class InperDeviceHelper : PropertyChangedBase
     {
         private static InperDeviceHelper inperDeviceHelper;
-        private static object _lock = new object();
         public static InperDeviceHelper Instance
         {
             get
             {
                 if (inperDeviceHelper == null)
                 {
-                    lock (_lock)
-                    {
-                        if (inperDeviceHelper == null)
-                        {
-                            inperDeviceHelper = new InperDeviceHelper();
-                        }
-                    }
+                    Interlocked.CompareExchange(ref inperDeviceHelper, new InperDeviceHelper(), null);
                 }
                 return inperDeviceHelper;
             }
@@ -68,17 +65,20 @@ namespace InperStudio.Lib.Helper
         private readonly object _QLock = new object();
         private readonly object _DisplayQLock = new object();
         private readonly object _SaveDataLock = new object();
+        public readonly object _SignalQsLocker = new object();
         private readonly AutoResetEvent _AREvent = new AutoResetEvent(false);
         public readonly DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         public readonly DispatcherTimer _DataSaveTimer = new DispatcherTimer(DispatcherPriority.Render);
         private readonly AutoResetEvent _DataEvent = new AutoResetEvent(false);
         private readonly AutoResetEvent _DataSaveEvent = new AutoResetEvent(false);
-        public readonly object _SignalQsLocker = new object();
         public readonly object _EventQLock = new object();
 
         private Task updateTask;
         private Task frameProcTask;
+        private CancellationTokenSource _updateTaskTokenSource;
+        private CancellationTokenSource _frameProcTaskTokenSource;
         public Task saveDataTask;
+        public CancellationTokenSource _saveDataTaskTokenSource = new CancellationTokenSource();
         private bool isFirstRecordTiem = true;
         private bool isLoop = true;
         private long _PlottingStartTime;
@@ -110,9 +110,6 @@ namespace InperStudio.Lib.Helper
         public ConcurrentDictionary<int, SignalData> _SignalQs = new ConcurrentDictionary<int, SignalData>();
         public ConcurrentDictionary<int, Mat> ROIMasks { get; set; } = new ConcurrentDictionary<int, Mat>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> FilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
-        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> LowFilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
-        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> HeightFilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
-        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> NotchFilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> OffsetData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> DeltaFData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
 
@@ -135,7 +132,6 @@ namespace InperStudio.Lib.Helper
         public void DeviceInit()
         {
             device.DidGrabImage += Instance_OnImageGrabbed;
-            //device.OnUsbInfoUpdated += Device_OnUsbInfoUpdated;
 
             bool isComplete = false;
             device.OnDevInfoUpdated += (s, ee) =>
@@ -162,7 +158,6 @@ namespace InperStudio.Lib.Helper
                                 }
                                 exist = true;
                             }
-                            //WaveInitEvent?.Invoke(this, exist);
                             if (!exist)
                             {
                                 Growl.Error("未获取到激发光");
@@ -170,7 +165,7 @@ namespace InperStudio.Lib.Helper
                         }
                         catch (Exception ex)
                         {
-                            Growl.Error("获取激发光失败：" + ex.ToString());
+                            //Growl.Error("获取激发光失败：" + ex.ToString());
                             App.Log.Error(ex.ToString());
                         }
                         finally
@@ -191,7 +186,7 @@ namespace InperStudio.Lib.Helper
             VisionHeight = device.GetVisionHeight();
             if (VisionWidth <= 0)
             {
-                Growl.Error("Failed to initialize the basler camera");
+                Growl.Error("Device initialization failed");
                 return;
             }
             WBMPPreview = new WriteableBitmap(VisionWidth, VisionHeight, 96, 96, PixelFormats.Gray16, null);
@@ -308,14 +303,10 @@ namespace InperStudio.Lib.Helper
                 if (_SignalQs.Count > 0)
                 {
                     FilterData.Clear();
-                    LowFilterData.Clear();
-                    HeightFilterData.Clear();
-                    NotchFilterData.Clear();
                     OffsetData.Clear();
                     DeltaFData.Clear();
                     foreach (var item in CameraChannels)
                     {
-                        //item.Offset = false;
                         if (!_SaveSignalQs.ContainsKey(item.ChannelId) && item.Type == ChannelTypeEnum.Camera.ToString())
                         {
                             _SaveSignalQs.Add(item.ChannelId, new SignalData());
@@ -326,13 +317,23 @@ namespace InperStudio.Lib.Helper
                             _SaveUsbSignalQs[item.ChannelId].ValuePairs.Add(-1, new Queue<Tuple<TimeSpan[], double[]>>());
                         }
                         _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
-                        _ = LowFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
-                        _ = HeightFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
-                        _ = NotchFilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                         if (item.LightModes.Count > 0)
                         {
+                            if (item.Filters.IsBandpass)
+                            {
+                                double high = item.Filters.Bandpass2 < item.Filters.Bandpass1 ? item.Filters.Bandpass1 : item.Filters.Bandpass2;
+                                double low = item.Filters.Bandpass1 > item.Filters.Bandpass2 ? item.Filters.Bandpass2 : item.Filters.Bandpass1;
+                                item.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, low, high);
+                            }
+                            if (item.Filters.IsBandstop)
+                            {
+                                double high = item.Filters.Bandstop2 < item.Filters.Bandstop1 ? item.Filters.Bandstop1 : item.Filters.Bandstop2;
+                                double low = item.Filters.Bandstop1 > item.Filters.Bandstop2 ? item.Filters.Bandstop2 : item.Filters.Bandstop1;
+                                item.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, item.Filters.Bandstop1, item.Filters.Bandstop2);
+                            }
+
                             item.LightModes.ForEach(x =>
                             {
                                 x.OffsetValue = 0;
@@ -347,18 +348,7 @@ namespace InperStudio.Lib.Helper
                                 {
                                     FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
                                 }
-                                if (!LowFilterData[item.ChannelId].ContainsKey(x.LightType))
-                                {
-                                    LowFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                }
-                                if (!HeightFilterData[item.ChannelId].ContainsKey(x.LightType))
-                                {
-                                    HeightFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                }
-                                if (!NotchFilterData[item.ChannelId].ContainsKey(x.LightType))
-                                {
-                                    NotchFilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                                }
+
                                 if (!OffsetData[item.ChannelId].ContainsKey(x.LightType))
                                 {
                                     OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
@@ -419,7 +409,7 @@ namespace InperStudio.Lib.Helper
                     }
                     if (InperGlobalClass.IsRecord)
                     {
-                        imagecount2++;
+                        Interlocked.Increment(ref imagecount2);
                     }
                     Monitor.Enter(_QLock);
                     _MatQ.Enqueue(e);
@@ -494,10 +484,6 @@ namespace InperStudio.Lib.Helper
 
                     foreach (MarkedMat m in mmats)
                     {
-                        if (InperGlobalClass.IsRecord)
-                        {
-                            imagecount++;
-                        }
                         long ts = m.Timestamp - _PlottingStartTime;
                         time = ts;
                         if (Monitor.TryEnter(_EventQLock))
@@ -528,19 +514,16 @@ namespace InperStudio.Lib.Helper
 
                                         DeltaFCalculate(mask, m.Group, r, ts);
 
-                                        if (mask.Filters.IsHighPass)
+                                        if (mask.Filters.IsBandpass)
                                         {
-                                            r = HighPass(mask, m.Group, r);
+                                            r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
+                                        }
+                                        if (mask.Filters.IsBandstop)
+                                        {
+                                            r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
                                         }
 
-                                        if (mask.Filters.IsLowPass)
-                                        {
-                                            r = LowPass(mask, m.Group, r);
-                                        }
-                                        if (mask.Filters.IsNotch)
-                                        {
-                                            r = NotchPass(mask, m.Group, r);
-                                        }
+
                                         ploting_data[mask.ChannelId] = r;
                                     }
                                 }
@@ -550,6 +533,7 @@ namespace InperStudio.Lib.Helper
                                 this.AppendData(ploting_data, m.Group, ts);
                                 if (InperGlobalClass.IsRecord)
                                 {
+                                    Interlocked.Increment(ref imagecount);
                                     this.SaveData(ploting_data, ts, m.Group);
                                 }
                             }
@@ -786,7 +770,7 @@ namespace InperStudio.Lib.Helper
 
                 if (Monitor.TryEnter(_UsbDataAppendObj))
                 {
-                    Copy(_AdDatas, ref _Data);
+                    Clone(_AdDatas, ref _Data);
                     _AdDatas.Clear();
                     Monitor.Exit(_UsbDataAppendObj);
 
@@ -845,10 +829,6 @@ namespace InperStudio.Lib.Helper
 
                 timeSpans[i] = ts;
                 double r = adData.Values[i];
-                //if (r == 0)
-                //{
-                //    Console.WriteLine(++count);
-                //}
                 CameraChannel cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId);
                 if (cn != null && cn.Type == ChannelTypeEnum.Analog.ToString())
                 {
@@ -861,17 +841,13 @@ namespace InperStudio.Lib.Helper
                         r = Smooth(cn, -1, r);
                     }
                     DeltaFCalculate(cn, -1, r, ts.Ticks);
-                    if (cn.Filters.IsHighPass)
+                    if (cn.Filters.IsBandpass)
                     {
-                        r = HighPass(cn, -1, r);
+                        r = cn.Filters.OnlineFilter.GetBandpassValue(r, 0);
                     }
-                    if (cn.Filters.IsLowPass)
+                    if (cn.Filters.IsBandstop)
                     {
-                        r = LowPass(cn, -1, r);
-                    }
-                    if (cn.Filters.IsNotch)
-                    {
-                        r = NotchPass(cn, -1, r);
+                        r = cn.Filters.OnlineFilter.GetBandstopValue(r, 0);
                     }
                 }
                 values[i] = r;
@@ -904,68 +880,34 @@ namespace InperStudio.Lib.Helper
             }
             return offsetValue.OffsetValue;
         }
+        public int _InterSmooth = 0;
         private double Smooth(CameraChannel cameraChannel, int group, double r)
         {
             double val = r;
-            if (FilterData.ContainsKey(cameraChannel.ChannelId))
+            if (Interlocked.Exchange(ref _InterSmooth, 1) == 0)
             {
-                if (FilterData[cameraChannel.ChannelId].ContainsKey(group))
+                if (FilterData.ContainsKey(cameraChannel.ChannelId))
                 {
-                    FilterData[cameraChannel.ChannelId][group].Enqueue(r);
-                    if (FilterData[cameraChannel.ChannelId][group].Count > cameraChannel.Filters.Smooth)
+                    if (FilterData[cameraChannel.ChannelId].ContainsKey(group))
                     {
-                        _ = FilterData[cameraChannel.ChannelId][group].Dequeue();
-                        val = FilterData[cameraChannel.ChannelId][group].ToList().Average();
+                        FilterData[cameraChannel.ChannelId][group].Enqueue(r);
+                        if (FilterData[cameraChannel.ChannelId][group].Count > cameraChannel.Filters.Smooth)
+                        {
+                            _ = FilterData[cameraChannel.ChannelId][group].Dequeue();
+                            val = FilterData[cameraChannel.ChannelId][group].ToList().Average();
+                        }
                     }
                 }
+                Interlocked.Exchange(ref _InterSmooth, 0);
             }
             return val;
         }
-        private double HighPass(CameraChannel cameraChannel, int group, double r)
-        {
-            double val = r;
-            if (HeightFilterData.ContainsKey(cameraChannel.ChannelId))
-            {
-                if (HeightFilterData[cameraChannel.ChannelId].ContainsKey(group))
-                {
-                    HeightFilterData[cameraChannel.ChannelId][group].Enqueue(r);
-                    if (HeightFilterData[cameraChannel.ChannelId][group].Count >= 5)
-                    {
-                        val = FilterTools.FiltterTool.RCHighFilter(HeightFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.HighPass, InperGlobalClass.CameraSignalSettings.Sampling);// / InperGlobalClass.CameraSignalSettings.CameraChannels.Count
-                        _ = HeightFilterData[cameraChannel.ChannelId][group].Dequeue();
-                    }
-                }
-            }
-            return val;
-        }
-        private double LowPass(CameraChannel cameraChannel, int group, double r)
-        {
-            double val = r;
-            if (LowFilterData.ContainsKey(cameraChannel.ChannelId))
-            {
-                if (LowFilterData[cameraChannel.ChannelId].ContainsKey(group))
-                {
-                    LowFilterData[cameraChannel.ChannelId][group].Enqueue(r);
-                    if (LowFilterData[cameraChannel.ChannelId][group].Count >= 5)
-                    {
-                        val = FilterTools.FiltterTool.RCLowPass(LowFilterData[cameraChannel.ChannelId][group].ToArray(), cameraChannel.Filters.LowPass, InperGlobalClass.CameraSignalSettings.Sampling); /// InperGlobalClass.CameraSignalSettings.CameraChannels.Count
-                        _ = LowFilterData[cameraChannel.ChannelId][group].Dequeue();
-                    }
-                }
-            }
-            return val;
-        }
-        private double NotchPass(CameraChannel cameraChannel, int group, double r)
-        {
-            r = FilterTools.FiltterTool.NotchPass(r, InperGlobalClass.CameraSignalSettings.Sampling, cameraChannel.Filters.Notch); /// InperGlobalClass.CameraSignalSettings.CameraChannels.Count
-            return r;
-        }
-        private readonly object deltaFObj = new object();
+        private int deltaFObj = 0;
         private void DeltaFCalculate(CameraChannel cameraChannel, int group, double r, long ts)
         {
-            _ = Parallel.ForEach(new ConcurrentBag<EventChannelJson>(InperGlobalClass.EventSettings.Channels), x =>
-               {
-                   lock (deltaFObj)
+            if (Interlocked.Exchange(ref deltaFObj, 1) == 0)
+            {
+                _ = Parallel.ForEach(new ConcurrentBag<EventChannelJson>(InperGlobalClass.EventSettings.Channels), x =>
                    {
                        if (x.IsActive)
                        {
@@ -1023,8 +965,9 @@ namespace InperStudio.Lib.Helper
                                }
                            }
                        }
-                   }
-               });
+                   });
+                Interlocked.Exchange(ref deltaFObj, 0);
+            }
         }
         private void SetDeltaFEvent(EventChannelJson eventChannelJson, long ts, double deltaF)
         {
@@ -1036,7 +979,7 @@ namespace InperStudio.Lib.Helper
                     if (eventChannelJson.Type == ChannelTypeEnum.Output.ToString())
                     {
                         device.OuputIO((uint)eventChannelJson.ChannelId, 1);
-                        Thread.Sleep(50);
+                        //Thread.Sleep(50);
                         device.OuputIO((uint)eventChannelJson.ChannelId, 0);
                     }
                     if (InperGlobalClass.IsRecord)
@@ -1062,7 +1005,7 @@ namespace InperStudio.Lib.Helper
         private void SaveData(ConcurrentDictionary<int, double> data, long timestamp, int s_group = -1)
         {
             Monitor.Enter(_SaveDataLock);
-            _ = Parallel.ForEach(data, kv =>
+            foreach (KeyValuePair<int, double> kv in data)
             {
                 if (_SaveSignalQs.ContainsKey(kv.Key))
                 {
@@ -1071,7 +1014,7 @@ namespace InperStudio.Lib.Helper
                         _SaveSignalQs[kv.Key].ValuePairs[s_group].Enqueue(new KeyValuePair<long, double>(timestamp, kv.Value));
                     }
                 }
-            });
+            }
             Monitor.Exit(_SaveDataLock);
         }
         private void AppendData(ConcurrentDictionary<int, double> data, int s_group, long timestamp)
@@ -1110,8 +1053,7 @@ namespace InperStudio.Lib.Helper
                         ConcurrentDictionary<int, SignalData> signalQs = null;
                         if (Monitor.TryEnter(_SignalQsLocker))
                         {
-
-                            Copy(_SignalQs, ref signalQs);
+                            Clone(_SignalQs, ref signalQs);
 
                             _ = Parallel.ForEach(_SignalQs, q =>
                             {
@@ -1156,8 +1098,7 @@ namespace InperStudio.Lib.Helper
                         if (Monitor.TryEnter(_EventQLock))
                         {
                             ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>> eventQs = null;
-                            Copy(EventChannelChart.EventQs, ref eventQs);
-
+                            Clone(EventChannelChart.EventQs, ref eventQs);
                             _ = Parallel.ForEach(EventChannelChart.EventQs, q =>
                             {
                                 q.Value.Clear();
@@ -1204,39 +1145,39 @@ namespace InperStudio.Lib.Helper
                     if (Monitor.TryEnter(_EventQLock))
                     {
                         Dictionary<int, Queue<KeyValuePair<long, double>>> saveEventQs = null;
-                        Copy(_SaveEventQs, ref saveEventQs);
-                        _ = Parallel.ForEach(_SaveEventQs, q =>
+                        Clone(_SaveEventQs, ref saveEventQs);
+                        _ = Parallel.ForEach(_SaveEventQs, kv =>
                         {
-                            q.Value.Clear();
+                            kv.Value.Clear();
                         });
                         Monitor.Exit(_EventQLock);
                         _ = Parallel.ForEach(saveEventQs, q =>
                         {
+                            List<Input> inputs = new List<Input>();
+                            q.Value.ToList().ForEach(x =>
+                            {
+                                Input input = new Input()
+                                {
+                                    CameraTime = x.Key,
+                                    ChannelId = q.Key,
+                                    Value = x.Value,
+                                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                };
+                                inputs.Add(input);
+                            });
                             _ = App.SqlDataInit.sqlSugar.UseTran(() =>
                               {
-                                  List<Input> inputs = new List<Input>();
-                                  q.Value.ToList().ForEach(x =>
-                                  {
-                                      Input input = new Input()
-                                      {
-                                          CameraTime = x.Key,
-                                          ChannelId = q.Key,
-                                          Value = x.Value,
-                                          CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
-                                      };
-                                      inputs.Add(input);
-                                  });
 
                                   _ = App.SqlDataInit.sqlSugar.Insertable(inputs).AS("Input" + q.Key).ExecuteCommand();
                               });
-                            q.Value.Clear();
+                            //q.Value.Clear();
                         });
                     }
 
                     if (Monitor.TryEnter(_SaveDataLock, 10))
                     {
                         Dictionary<int, SignalData> saveSignalQS = null;
-                        Copy(_SaveSignalQs, ref saveSignalQS);
+                        Clone(_SaveSignalQs, ref saveSignalQS);
                         _ = Parallel.ForEach(_SaveSignalQs, kv =>
                         {
                             foreach (KeyValuePair<int, Queue<KeyValuePair<long, double>>> item in kv.Value.ValuePairs)
@@ -1286,7 +1227,7 @@ namespace InperStudio.Lib.Helper
                         if (Monitor.TryEnter(_SaveUsbDataLock, 10))
                         {
                             Dictionary<int, SignalDataUsb> saveUsbSignalQS = null;
-                            Copy(_SaveUsbSignalQs, ref saveUsbSignalQS);
+                            Clone(_SaveUsbSignalQs, ref saveUsbSignalQS);
                             _ = Parallel.ForEach(_SaveUsbSignalQs, kv =>
                             {
                                 foreach (KeyValuePair<int, Queue<Tuple<TimeSpan[], double[]>>> item in kv.Value.ValuePairs)
@@ -1294,7 +1235,9 @@ namespace InperStudio.Lib.Helper
                                     item.Value.Clear();
                                 }
                             });
+                            _SaveUsbSignalQs.Clear();
                             Monitor.Exit(_SaveUsbDataLock);
+
                             if (saveUsbSignalQS == null)
                             {
                                 continue;
@@ -1307,26 +1250,25 @@ namespace InperStudio.Lib.Helper
                                     CameraChannel channel = CameraChannels.FirstOrDefault(x => x.ChannelId == kv.Key);
                                     if (App.SqlDataInit.RecordTablePairs.ContainsKey(channel.Type + channel.ChannelId))
                                     {
+                                        kv.Value.ValuePairs[-1].ToList().ForEach(x =>
+                                        {
+                                            int i = 0;
+                                            x.Item1.ToList().ForEach(v =>
+                                            {
+                                                ChannelRecord record = new ChannelRecord()
+                                                {
+                                                    ChannelId = kv.Key,
+                                                    Type = -1,
+                                                    Value = x.Item2[i],
+                                                    CameraTime = v.Ticks,
+                                                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
+                                                };
+                                                records.Add(record);
+                                                i++;
+                                            });
+                                        });
                                         _ = App.SqlDataInit.sqlSugar.UseTran(() =>
                                         {
-
-                                            kv.Value.ValuePairs[-1].ToList().ForEach(x =>
-                                            {
-                                                int i = 0;
-                                                x.Item1.ToList().ForEach(v =>
-                                                {
-                                                    ChannelRecord record = new ChannelRecord()
-                                                    {
-                                                        ChannelId = kv.Key,
-                                                        Type = -1,
-                                                        Value = x.Item2[i],
-                                                        CameraTime = v.Ticks,
-                                                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G")),
-                                                    };
-                                                    records.Add(record);
-                                                    i++;
-                                                });
-                                            });
                                             _ = App.SqlDataInit.sqlSugar.Insertable(records).AS(App.SqlDataInit.RecordTablePairs[channel.Type + channel.ChannelId]).ExecuteCommand();
                                         });
                                     }
@@ -1383,8 +1325,8 @@ namespace InperStudio.Lib.Helper
                     if (obj != null)
                     {
                         TimeSpan tick = _time.Subtract((TimeSpan)(obj as VerticalLineAnnotationViewModel).X1);
-                        EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString() || x.Type == ChannelTypeEnum.Output.ToString()));
-                        if (chn != null)
+                        EventChannelJson chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == channelId && x.Name == text && (x.Type == ChannelTypeEnum.Camera.ToString() || x.Type == ChannelTypeEnum.Analog.ToString() || x.Type == ChannelTypeEnum.Output.ToString()));
+                        if (chn != null && chn.IsRefractoryPeriod)
                         {
                             if (tick.TotalMilliseconds < chn.RefractoryPeriod * 1000)
                             {
@@ -1418,7 +1360,7 @@ namespace InperStudio.Lib.Helper
             {
                 AddMarkerByHotkeys(channelJson.ChannelId, channelJson.Name, (Color)ColorConverter.ConvertFromString(channelJson.BgColor), type);
                 device.OuputIO((uint)channelJson.ChannelId, 1);
-                Thread.Sleep(50);
+                //Thread.Sleep(50);
                 device.OuputIO((uint)channelJson.ChannelId, 0);
             }
 
@@ -1434,23 +1376,8 @@ namespace InperStudio.Lib.Helper
 
                 isFirstRecordTiem = false; isLoop = false; isAdstart = false;
 
-
-                if (frameProcTask != null)
-                {
-                    while (frameProcTask.IsCompleted)
-                    {
-                        frameProcTask.Dispose();
-                        break;
-                    }
-                }
-                if (updateTask != null)
-                {
-                    while (updateTask.IsCompleted)
-                    {
-                        updateTask.Dispose();
-                        break;
-                    }
-                }
+                _frameProcTaskTokenSource.Cancel();
+                _updateTaskTokenSource.Cancel();
             }
             catch (Exception ex)
             {
@@ -1463,15 +1390,7 @@ namespace InperStudio.Lib.Helper
             {
                 timer.Stop();
                 _DataSaveTimer.Stop();
-
-                if (saveDataTask != null)
-                {
-                    while (saveDataTask.IsCompleted)
-                    {
-                        saveDataTask.Dispose();
-                        break;
-                    }
-                }
+                _saveDataTaskTokenSource.Cancel();
             }
             catch (Exception ex)
             {
@@ -1576,8 +1495,10 @@ namespace InperStudio.Lib.Helper
                 _firstADTime = 0;
                 timer.Start();
                 _DataSaveTimer.Start();
-                updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); });
-                frameProcTask = Task.Factory.StartNew(() => { FrameProc(); });
+                _updateTaskTokenSource = new CancellationTokenSource();
+                _frameProcTaskTokenSource = new CancellationTokenSource();
+                updateTask = Task.Factory.StartNew(() => { UpdateDataProc(); }, _updateTaskTokenSource.Token);
+                frameProcTask = Task.Factory.StartNew(() => { FrameProc(); }, _frameProcTaskTokenSource.Token);
                 if (isAdstart)
                 {
                     _ = Task.Factory.StartNew(() => { UsbAdProc(); });
@@ -1611,7 +1532,16 @@ namespace InperStudio.Lib.Helper
             string jsonStr = Newtonsoft.Json.JsonConvert.SerializeObject(source);
             destination = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonStr);
         }
-
+        private void Clone<T>(T source, ref T destination)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(memoryStream, source);
+                memoryStream.Position = 0;
+                destination = (T)formatter.Deserialize(memoryStream);
+            }
+        }
         public bool AllLightOpen()
         {
             bool isExistLight = false;

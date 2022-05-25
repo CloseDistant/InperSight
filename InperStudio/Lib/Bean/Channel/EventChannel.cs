@@ -22,7 +22,8 @@ namespace InperStudio.Lib.Bean.Channel
         public string BgColor { get => bgColor; set => SetAndNotify(ref bgColor, value); }
         public string Hotkeys { get; set; }
         public double DeltaF { get; set; } = 5;
-        public int RefractoryPeriod { get; set; } = 3;
+        private double refractoryPeriod = 3;
+        public double RefractoryPeriod { get => refractoryPeriod; set => SetAndNotify(ref refractoryPeriod, value); }
         public int LightIndex { get; set; }
         public int WindowSize { get; set; } = 300;
         public double Tau1 { get; set; }

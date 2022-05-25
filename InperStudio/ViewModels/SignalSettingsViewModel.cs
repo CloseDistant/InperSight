@@ -3,6 +3,7 @@ using HandyControl.Data;
 using HandyControl.Tools;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Chart;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
@@ -19,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -59,8 +61,8 @@ namespace InperStudio.ViewModels
         public BindableCollection<double> FPS { get => fps; set => SetAndNotify(ref fps, value); }
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
-        private string sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
-        public string Sampling { get => sampling; set => SetAndNotify(ref sampling, value); }
+        private double sampling = InperGlobalClass.CameraSignalSettings.Sampling;
+        public double Sampling { get => sampling; set => SetAndNotify(ref sampling, value); }
         private string expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
         public string Expourse { get => expourse; set => SetAndNotify(ref expourse, value); }
         #endregion
@@ -201,14 +203,20 @@ namespace InperStudio.ViewModels
                         com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                         return;
                     }
+                    Regex rx = new Regex(@"^([0-9]{1,})$");
+                    if (!rx.IsMatch(com.Text))
+                    {
+                        com.Text = Math.Floor(double.Parse(com.Text)).ToString();
+                        return;
+                    }
                     this.view.Exposure.Text = Expourse = com.Text;
                     _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(com.Text));
                     InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(com.Text);
                     if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count) > 1000)
                     {
                         InperGlobalClass.CameraSignalSettings.Sampling = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Exposure / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
-                        this.view.Sampling.Text = Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
-                        InperDeviceHelper.Instance.device.SetFrameRate(double.Parse(sampling));
+                        Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
+                        InperDeviceHelper.Instance.device.SetFrameRate(Sampling);
                     }
                 }
             }
@@ -239,8 +247,13 @@ namespace InperStudio.ViewModels
                         com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         return;
                     }
-                    com.Text = Sampling;
-                    InperGlobalClass.SetSampling(double.Parse(Sampling));
+                    Regex rx = new Regex(@"^([0-9]{1,})$");
+                    if (!rx.IsMatch(com.Text))
+                    {
+                        com.Text = Math.Floor(double.Parse(com.Text)).ToString();
+                        return;
+                    }
+                    InperGlobalClass.SetSampling(Sampling);
                     if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count) > 1000)
                     {
                         InperGlobalClass.CameraSignalSettings.Exposure = Math.Floor(1000 / (InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count)));
@@ -252,8 +265,7 @@ namespace InperStudio.ViewModels
             catch (Exception ex)
             {
                 Growl.Warning(new GrowlInfo() { Message = "Error!", Token = "SuccessMsg", WaitTime = 1 });
-                Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
-                (sender as System.Windows.Controls.ComboBox).Text = Sampling;
+                Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
                 App.Log.Error(ex.ToString());
             }
         }
@@ -322,7 +334,7 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
-                    Growl.Info(new GrowlInfo() { Message = "No more than 9 channels", Token = "SuccessMsg", WaitTime = 1 });
+                    //Growl.Info(new GrowlInfo() { Message = "No more than 9 channels", Token = "SuccessMsg", WaitTime = 1 });
                 }
             }
             catch (Exception ex)
@@ -445,7 +457,7 @@ namespace InperStudio.ViewModels
                             LightType = wave.GroupId,
                             WaveColor = new SolidColorBrush(InperColorHelper.WavelengthToRGB(int.Parse(wave.WaveType.Split(' ').First()))),
                             //WaveColor = wave.GroupId == 1 ? InperColorHelper.SCBrushes[index % 9] : (wave.GroupId == 0 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF008000")) : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0000FF"))),
-                            XyDataSeries = new XyDataSeries<TimeSpan, double>()
+                            XyDataSeries = new XyDataSeries<TimeSpan, double>(),
                         };
                         item.LightModes.Add(mode);
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = wave.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
@@ -577,7 +589,7 @@ namespace InperStudio.ViewModels
                         {
                             tb.Text = verify;
                             tb.SelectionStart = tb.Text.Length;
-                            Growl.Warning(new GrowlInfo() { Message = "Fixed character, cannot be changed", Token = "SuccessMsg", WaitTime = 1 });
+                            //Growl.Warning(new GrowlInfo() { Message = "Fixed character, cannot be changed", Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
                         else
@@ -656,9 +668,7 @@ namespace InperStudio.ViewModels
                         InperGlobalClass.CameraSignalSettings.LightMode.Add(sen);
 
                         InperGlobalClass.SetSampling(Math.Round(InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count - 1 < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count - 1) / InperGlobalClass.CameraSignalSettings.LightMode.Count, 0));
-                        this.view.Sampling.Text = Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
-
-
+                        Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
                     }
                 }
 
@@ -743,7 +753,7 @@ namespace InperStudio.ViewModels
                         if (InperGlobalClass.CameraSignalSettings.LightMode.Remove(wg))
                         {
                             InperGlobalClass.SetSampling(Math.Round(InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count + 1) / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count), 0));
-                            this.view.Sampling.Text = Sampling = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                            Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
                         }
                     }
 
@@ -978,7 +988,7 @@ namespace InperStudio.ViewModels
                      int left = (int)ptLeftUp.X + (int)(point.X * x);
                      int top = (int)ptLeftUp.Y + (int)(point.Y * y);
 
-                     InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "CameraScreen.bmp"));
+                     InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmssffff") + "CameraScreen.bmp"));
                      Growl.Info(new GrowlInfo() { Message = "Saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
                  }));
             }
@@ -1006,7 +1016,7 @@ namespace InperStudio.ViewModels
                     {
                         tb.Text = "AI-" + (obj.ChannelId - 100) + "-";
                         tb.SelectionStart = tb.Text.Length;
-                        Growl.Error(new GrowlInfo() { Message = "Fixed character, cannot be changed", Token = "SuccessMsg", WaitTime = 1 });
+                        //Growl.Error(new GrowlInfo() { Message = "Fixed character, cannot be changed", Token = "SuccessMsg", WaitTime = 1 });
                         return;
                     }
                     if (tb.Text.Length > 15)

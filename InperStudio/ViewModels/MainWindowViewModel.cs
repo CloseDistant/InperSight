@@ -57,6 +57,11 @@ namespace InperStudio.ViewModels
         }
         protected override void OnClose()
         {
+            RequestClose();
+            Environment.Exit(0);
+        }
+        public void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
             try
             {
                 InperConfig.Instance.IsSkip = false;
@@ -81,15 +86,22 @@ namespace InperStudio.ViewModels
                         }
                     }
                 }
+                if (System.Windows.Application.Current.Windows.OfType<Window>().Count() > 1)
+                {
+                    foreach (var x in System.Windows.Application.Current.Windows.OfType<Window>().ToList())
+                    {
+                        if (!x.Name.StartsWith("MainWindow"))
+                        {
+                            x.Close();
+                            Thread.Sleep(3000);
+                        }
+                    }
+                }
+                base.OnClose();
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
-            }
-            finally
-            {
-                RequestClose();
-                Environment.Exit(0);
             }
         }
         #endregion
@@ -108,14 +120,5 @@ namespace InperStudio.ViewModels
         }
 
         #endregion
-
-        public void InperFile()
-        {
-
-        }
-        public int Test(int a, int b)
-        {
-            return a + b;
-        }
     }
 }

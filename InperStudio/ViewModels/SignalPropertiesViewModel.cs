@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
+using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
@@ -72,7 +73,7 @@ namespace InperStudio.ViewModels
             {
                 if (x.Filters == null)
                 {
-                    x.Filters = new Lib.Helper.JsonBean.Filters();
+                    x.Filters = new Filters();
                 }
                 Channels.Add(x);
             });
@@ -441,17 +442,13 @@ namespace InperStudio.ViewModels
                         {
                             x.Filters.IsSmooth = true;
                         }
-                        else if (chb.Name.Equals("notch"))
+                        else if (chb.Name.Equals("bandpass"))
                         {
-                            x.Filters.IsNotch = true;
+                            x.Filters.IsBandpass = true;
                         }
-                        else if (chb.Name.Equals("highpass"))
+                        else if (chb.Name.Equals("bandstop"))
                         {
-                            x.Filters.IsHighPass = true;
-                        }
-                        else if (chb.Name.Equals("lowpass"))
-                        {
-                            x.Filters.IsLowPass = true;
+                            x.Filters.IsBandstop = true;
                         }
 
                     });
@@ -463,17 +460,13 @@ namespace InperStudio.ViewModels
                             {
                                 chn.Filters.IsSmooth = true;
                             }
-                            else if (chb.Name.Equals("notch"))
+                            else if (chb.Name.Equals("bandpass"))
                             {
-                                chn.Filters.IsNotch = true;
+                                chn.Filters.IsBandpass = true;
                             }
-                            else if (chb.Name.Equals("highpass"))
+                            else if (chb.Name.Equals("bandstop"))
                             {
-                                chn.Filters.IsHighPass = true;
-                            }
-                            else if (chb.Name.Equals("lowpass"))
-                            {
-                                chn.Filters.IsLowPass = true;
+                                chn.Filters.IsBandstop = true;
                             }
                         }));
                     });
@@ -481,17 +474,13 @@ namespace InperStudio.ViewModels
                     {
                         CameraSignalSettings.AllChannelConfig.Filters.IsSmooth = true;
                     }
-                    else if (chb.Name.Equals("notch"))
+                    else if (chb.Name.Equals("bandpass"))
                     {
-                        CameraSignalSettings.AllChannelConfig.Filters.IsNotch = true;
+                        CameraSignalSettings.AllChannelConfig.Filters.IsBandpass = true;
                     }
-                    else if (chb.Name.Equals("highpass"))
+                    else if (chb.Name.Equals("bandstop"))
                     {
-                        CameraSignalSettings.AllChannelConfig.Filters.IsHighPass = true;
-                    }
-                    else if (chb.Name.Equals("lowpass"))
-                    {
-                        CameraSignalSettings.AllChannelConfig.Filters.IsLowPass = true;
+                        CameraSignalSettings.AllChannelConfig.Filters.IsBandstop = true;
                     }
 
                 }
@@ -501,17 +490,13 @@ namespace InperStudio.ViewModels
                     {
                         CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsSmooth = true;
                     }
-                    else if (chb.Name.Equals("notch"))
+                    else if (chb.Name.Equals("bandpass"))
                     {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsNotch = true;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsBandpass = true;
                     }
-                    else if (chb.Name.Equals("highpass"))
+                    else if (chb.Name.Equals("bandstop"))
                     {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsHighPass = true;
-                    }
-                    else if (chb.Name.Equals("lowpass"))
-                    {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsLowPass = true;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsBandstop = true;
                     }
 
                     _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
@@ -524,17 +509,13 @@ namespace InperStudio.ViewModels
                                 {
                                     chn.Filters.IsSmooth = true;
                                 }
-                                else if (chb.Name.Equals("notch"))
+                                else if (chb.Name.Equals("bandpass"))
                                 {
-                                    chn.Filters.IsNotch = true;
+                                    chn.Filters.IsBandpass = true;
                                 }
-                                else if (chb.Name.Equals("highpass"))
+                                else if (chb.Name.Equals("bandstop"))
                                 {
-                                    chn.Filters.IsHighPass = true;
-                                }
-                                else if (chb.Name.Equals("lowpass"))
-                                {
-                                    chn.Filters.IsLowPass = true;
+                                    chn.Filters.IsBandstop = true;
                                 }
                             }
                         }));
@@ -559,19 +540,15 @@ namespace InperStudio.ViewModels
                     {
                         if (chb.Name.Equals("smooth"))
                         {
-                            x.Filters.IsSmooth = true;
+                            x.Filters.IsSmooth = false;
                         }
-                        else if (chb.Name.Equals("notch"))
+                        else if (chb.Name.Equals("bandpass"))
                         {
-                            x.Filters.IsNotch = true;
+                            x.Filters.IsBandpass = false;
                         }
-                        else if (chb.Name.Equals("highpass"))
+                        else if (chb.Name.Equals("bandstop"))
                         {
-                            x.Filters.IsHighPass = true;
-                        }
-                        else if (chb.Name.Equals("lowpass"))
-                        {
-                            x.Filters.IsLowPass = true;
+                            x.Filters.IsBandstop = false;
                         }
                     });
                     _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
@@ -582,17 +559,13 @@ namespace InperStudio.ViewModels
                             {
                                 chn.Filters.IsSmooth = false;
                             }
-                            else if (chb.Name.Equals("notch"))
+                            else if (chb.Name.Equals("bandpass"))
                             {
-                                chn.Filters.IsNotch = false;
+                                chn.Filters.IsBandpass = false;
                             }
-                            else if (chb.Name.Equals("highpass"))
+                            else if (chb.Name.Equals("bandstop"))
                             {
-                                chn.Filters.IsHighPass = false;
-                            }
-                            else if (chb.Name.Equals("lowpass"))
-                            {
-                                chn.Filters.IsLowPass = false;
+                                chn.Filters.IsBandstop = false;
                             }
                         }));
                     });
@@ -600,17 +573,13 @@ namespace InperStudio.ViewModels
                     {
                         CameraSignalSettings.AllChannelConfig.Filters.IsSmooth = false;
                     }
-                    else if (chb.Name.Equals("notch"))
+                    else if (chb.Name.Equals("bandpass"))
                     {
-                        CameraSignalSettings.AllChannelConfig.Filters.IsNotch = false;
+                        CameraSignalSettings.AllChannelConfig.Filters.IsBandpass = false;
                     }
-                    else if (chb.Name.Equals("highpass"))
+                    else if (chb.Name.Equals("bandstop"))
                     {
-                        CameraSignalSettings.AllChannelConfig.Filters.IsHighPass = false;
-                    }
-                    else if (chb.Name.Equals("lowpass"))
-                    {
-                        CameraSignalSettings.AllChannelConfig.Filters.IsLowPass = false;
+                        CameraSignalSettings.AllChannelConfig.Filters.IsBandstop = false;
                     }
                 }
                 else
@@ -619,17 +588,13 @@ namespace InperStudio.ViewModels
                     {
                         CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsSmooth = false;
                     }
-                    else if (chb.Name.Equals("notch"))
+                    else if (chb.Name.Equals("bandpass"))
                     {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsNotch = false;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsBandpass = false;
                     }
-                    else if (chb.Name.Equals("highpass"))
+                    else if (chb.Name.Equals("bandstop"))
                     {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsHighPass = false;
-                    }
-                    else if (chb.Name.Equals("lowpass"))
-                    {
-                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsLowPass = false;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.IsBandstop = false;
                     }
                     _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
                     {
@@ -641,17 +606,13 @@ namespace InperStudio.ViewModels
                                 {
                                     chn.Filters.IsSmooth = false;
                                 }
-                                else if (chb.Name.Equals("notch"))
+                                else if (chb.Name.Equals("bandpass"))
                                 {
-                                    chn.Filters.IsNotch = false;
+                                    chn.Filters.IsBandpass = false;
                                 }
-                                else if (chb.Name.Equals("highpass"))
+                                else if (chb.Name.Equals("bandstop"))
                                 {
-                                    chn.Filters.IsHighPass = false;
-                                }
-                                else if (chb.Name.Equals("lowpass"))
-                                {
-                                    chn.Filters.IsLowPass = false;
+                                    chn.Filters.IsBandstop = false;
                                 }
                             }
                         }));
@@ -664,48 +625,65 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        public void Low_TextChanged(object sender, TextChangedEventArgs e)
+        public void Bandpass_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
             {
-                var item = this.view.filtersChannel.SelectedItem as Channel;
-
-                var textbox = sender as HandyControl.Controls.TextBox;
-                double value = double.Parse(textbox.Text);
-                if (item.ChannelId == _ChannleId)
+                if ((sender as System.Windows.Controls.TextBox).IsFocused)
                 {
-                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                    var item = this.view.filtersChannel.SelectedItem as Channel;
+                    double valueHigh = view.high.InperMaxValue;
+                    double valueLow = view.low.InperMinValue;
+
+                    if (!string.IsNullOrEmpty(view.high.Text))
                     {
-                        x.Filters.LowPass = value;
-                    });
-                    foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
-                    {
-                        channel.Filters.LowPass = value;
-                        if (InperGlobalClass.IsPreview)
-                        {
-                            channel.LightModes.ForEach(x =>
-                            {
-                                InperDeviceHelper.Instance.LowFilterData[channel.ChannelId][x.LightType].Clear();
-                            });
-                        }
+                        valueHigh = double.Parse(view.high.Text);
                     }
-                    CameraSignalSettings.AllChannelConfig.Filters.LowPass = value;
-
-                }
-                else
-                {
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.LowPass = value;
-                    foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                    if (!string.IsNullOrEmpty(view.low.Text))
                     {
-                        if (channel.ChannelId == item.ChannelId)
+                        valueLow = double.Parse(view.low.Text);
+                    }
+                    if (item.ChannelId == _ChannleId)
+                    {
+                        CameraSignalSettings.CameraChannels.ForEach(x =>
                         {
-                            channel.Filters.LowPass = value;
-                            if (InperGlobalClass.IsPreview)
+                            x.Filters.Bandpass1 = valueLow;
+                            x.Filters.Bandpass2 = valueHigh;
+                        });
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            channel.Filters.Bandpass1 = valueLow;
+                            channel.Filters.Bandpass2 = valueHigh;
+                            //if (InperGlobalClass.IsPreview)
+                            //{
+                            //    channel.LightModes.ForEach(x =>
+                            //    {
+                            //        InperDeviceHelper.Instance.LowFilterData[channel.ChannelId][x.LightType].Clear();
+                            //    });
+                            //}
+                        }
+                        CameraSignalSettings.AllChannelConfig.Filters.Bandpass1 = valueLow;
+                        CameraSignalSettings.AllChannelConfig.Filters.Bandpass2 = valueHigh;
+
+                    }
+                    else
+                    {
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.Bandpass1 = valueLow;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.Bandpass2 = valueHigh;
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            if (channel.ChannelId == item.ChannelId)
                             {
-                                channel.LightModes.ForEach(x =>
-                                {
-                                    InperDeviceHelper.Instance.LowFilterData[channel.ChannelId][x.LightType].Clear();
-                                });
+                                channel.Filters.Bandpass1 = valueLow;
+                                channel.Filters.Bandpass2 = valueHigh;
+
+                                //if (InperGlobalClass.IsPreview)
+                                //{
+                                //    channel.LightModes.ForEach(x =>
+                                //    {
+                                //        InperDeviceHelper.Instance.LowFilterData[channel.ChannelId][x.LightType].Clear();
+                                //    });
+                                //}
                             }
                         }
                     }
@@ -716,100 +694,50 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        public void High_TextChanged(object sender, TextChangedEventArgs e)
+        public void Bandstop_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
             {
-                var item = this.view.filtersChannel.SelectedItem as Channel;
-
-                var textbox = sender as HandyControl.Controls.TextBox;
-                double value = double.Parse(textbox.Text);
-                if (item.ChannelId == _ChannleId)
+                if ((sender as System.Windows.Controls.TextBox).IsFocused)
                 {
-                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                    var item = this.view.filtersChannel.SelectedItem as Channel;
+                    double valueHigh = view.stopHigh.InperMaxValue;
+                    double valueLow = view.stopLow.InperMinValue;
+
+                    if (!string.IsNullOrEmpty(view.stopHigh.Text))
                     {
-                        x.Filters.HighPass = value;
-                    });
-                    foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
-                    {
-                        channel.Filters.HighPass = value;
-                        if (InperGlobalClass.IsPreview)
-                        {
-                            channel.LightModes.ForEach(x =>
-                            {
-                                InperDeviceHelper.Instance.HeightFilterData[channel.ChannelId][x.LightType].Clear();
-                            });
-                        }
+                        valueHigh = double.Parse(view.stopHigh.Text);
                     }
-                    CameraSignalSettings.AllChannelConfig.Filters.HighPass = value;
-
-                }
-                else
-                {
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.HighPass = value;
-                    foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                    if (!string.IsNullOrEmpty(view.stopLow.Text))
                     {
-                        if (channel.ChannelId == item.ChannelId)
-                        {
-                            channel.Filters.HighPass = value;
-                            if (InperGlobalClass.IsPreview)
-                            {
-                                channel.LightModes.ForEach(x =>
-                                {
-                                    InperDeviceHelper.Instance.HeightFilterData[channel.ChannelId][x.LightType].Clear();
-                                });
-                            }
-                        }
+                        valueLow = double.Parse(view.stopLow.Text);
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-        }
-        public void Notch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            try
-            {
-                var item = this.view.filtersChannel.SelectedItem as Channel;
-
-                var textbox = sender as HandyControl.Controls.TextBox;
-                double value = double.Parse(textbox.Text);
-                if (item.ChannelId == _ChannleId)
-                {
-                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                    if (item.ChannelId == _ChannleId)
                     {
-                        x.Filters.Notch = value;
-                    });
-                    foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
-                    {
-                        channel.Filters.Notch = value;
-                        if (InperGlobalClass.IsPreview)
+                        CameraSignalSettings.CameraChannels.ForEach(x =>
                         {
-                            channel.LightModes.ForEach(x =>
-                            {
-                                InperDeviceHelper.Instance.NotchFilterData[channel.ChannelId][x.LightType].Clear();
-                            });
+                            x.Filters.Bandstop1 = valueLow;
+                            x.Filters.Bandstop2 = valueHigh;
+                        });
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                        {
+                            channel.Filters.Bandstop1 = valueLow;
+                            channel.Filters.Bandstop2 = valueHigh;
                         }
-                    }
-                    CameraSignalSettings.AllChannelConfig.Filters.Notch = value;
+                        CameraSignalSettings.AllChannelConfig.Filters.Bandstop1 = valueLow;
+                        CameraSignalSettings.AllChannelConfig.Filters.Bandstop2 = valueHigh;
 
-                }
-                else
-                {
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.Notch = value;
-                    foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
+                    }
+                    else
                     {
-                        if (channel.ChannelId == item.ChannelId)
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.Bandstop1 = valueLow;
+                        CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Filters.Bandstop2 = valueHigh;
+                        foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                         {
-                            channel.Filters.Notch = value;
-                            if (InperGlobalClass.IsPreview)
+                            if (channel.ChannelId == item.ChannelId)
                             {
-                                channel.LightModes.ForEach(x =>
-                                {
-                                    InperDeviceHelper.Instance.NotchFilterData[channel.ChannelId][x.LightType].Clear();
-                                });
+                                channel.Filters.Bandstop1 = valueLow;
+                                channel.Filters.Bandstop2 = valueHigh;
                             }
                         }
                     }

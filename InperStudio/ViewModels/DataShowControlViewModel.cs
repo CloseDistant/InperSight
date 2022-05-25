@@ -5,15 +5,18 @@ using InperStudio.Lib.Chart;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
+using InperStudio.Lib.Helper.HotKey;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using SciChart.Charting.Visuals;
 using SciChart.Data.Model;
 using Stylet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +25,12 @@ using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
+    class HotKeysListen
+    {
+        public int Timestamp { get; set; }
+        public Key Key { get; set; }
+        public bool IsPressed { get; set; } = true;
+    }
     public class DataShowControlViewModel : Screen
     {
         #region properties
@@ -34,7 +43,9 @@ namespace InperStudio.ViewModels
         public List<string> TextLableFormatting { get; set; } = new List<string>();
         public static string TextFormat = "hh:mm:ss";
         private double visibleValue = 10;
+        private ConcurrentQueue<HotKeysListen> _hotKeysListens = new ConcurrentQueue<HotKeysListen>();
 
+        private int _HotKeyQueueEvent = 0;
         public double VisibleValue
         {
             get => visibleValue;
@@ -168,33 +179,33 @@ namespace InperStudio.ViewModels
         }
         public void MarkerMonitor_KeyUp(object sender, KeyEventArgs e)
         {
-            try
+            InperGlobalClass.EventSettings.Channels.ForEach(x =>
             {
-                InperGlobalClass.EventSettings.Channels.ForEach(x =>
-                {
-                    if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
-                    {
-                        AddMarkers(x, 0);
-                    }
 
-                    if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
+                {
+                    string[] hotkeys = x.Hotkeys.Split('+');
+                    if (hotkeys.Contains(e.Key.ToString()))
                     {
-                        if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                        AddMarkers(hotkeys, x);
+                    }
+                }
+                else if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                {
+                    if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                    {
+                        string[] hotkeys = x.Condition.Hotkeys.Split('+');
+                        if (hotkeys.Contains(e.Key.ToString()))
                         {
-                            AddMarkers(x, 1);
+                            AddMarkers(hotkeys, x, 1);
                         }
                     }
+                }
 
-                });
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
+            });
         }
-        private void AddMarkers(EventChannelJson x, int type = 0)
+        private void AddMarkers(string[] hotkeys, EventChannelJson x, int type = 0)
         {
-            string[] hotkeys = type == 1 ? x.Condition.Hotkeys.Split('+') : x.Hotkeys.Split('+');
             if (hotkeys.Count() == 1)
             {
                 if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
@@ -238,32 +249,35 @@ namespace InperStudio.ViewModels
                 }
             }
             int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-            TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-            if (type == 0 && InperGlobalClass.IsRecord)
+            if (count > 0)
             {
-
-                Manual manual = new Manual()
+                TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+                if (type == 0 && InperGlobalClass.IsRecord)
                 {
-                    ChannelId = x.ChannelId,
-                    Color = x.BgColor,
-                    CameraTime = time.Ticks,
-                    Name = x.Name,
-                    Type = ChannelTypeEnum.Manual.ToString(),
-                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                };
 
-                _ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
-            }
-            if (type == 1 && InperGlobalClass.IsRecord)
-            {
-                Output output = new Output()
+                    Manual manual = new Manual()
+                    {
+                        ChannelId = x.ChannelId,
+                        Color = x.BgColor,
+                        CameraTime = time.Ticks,
+                        Name = x.Name,
+                        Type = ChannelTypeEnum.Manual.ToString(),
+                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                    };
+
+                    _ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
+                }
+                if (type == 1 && InperGlobalClass.IsRecord)
                 {
-                    ChannelId = x.ChannelId,
-                    CameraTime = time.Ticks,
-                    Type = ChannelTypeEnum.Manual.ToString(),
-                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                };
-                _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                    Output output = new Output()
+                    {
+                        ChannelId = x.ChannelId,
+                        CameraTime = time.Ticks,
+                        Type = ChannelTypeEnum.Manual.ToString(),
+                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                    };
+                    _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                }
             }
 
         }
@@ -277,7 +291,7 @@ namespace InperStudio.ViewModels
 
                 if (min >= value)
                 {
-                    Growl.Info("Reached the limit", "SuccessMsg");
+                    //Growl.Info("Reached the limit", "SuccessMsg");
                     return;
                 }
 
@@ -299,7 +313,7 @@ namespace InperStudio.ViewModels
 
                 if (maxValue > 100)
                 {
-                    Growl.Warning("Reached the limit", "SuccessMsg");
+                    //Growl.Warning("Reached the limit", "SuccessMsg");
                     return;
                 }
 

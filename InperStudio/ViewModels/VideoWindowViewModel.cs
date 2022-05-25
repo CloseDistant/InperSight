@@ -41,10 +41,10 @@ namespace InperStudio.ViewModels
                     {
                         this.view.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
-                            string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + ".bmp");
-                            bit.Save(path);
-                            Growl.Info(new GrowlInfo() { Message = "Snapshot saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
+                            //System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
+                            //string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmssffff") + ".bmp");
+                            //bit.Save(path);
+                            //Growl.Info(new GrowlInfo() { Message = "Snapshot saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
                         }));
                     }
                     catch (Exception ex)

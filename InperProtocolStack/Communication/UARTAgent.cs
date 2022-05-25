@@ -23,6 +23,8 @@ namespace InperProtocolStack.Communication
         }
         public byte[] Data => _Data;
     }
+
+    [Serializable]
     public class UsbAdData
     {
         public UsbAdData(uint channelId, long time, List<double> values)
@@ -220,15 +222,6 @@ namespace InperProtocolStack.Communication
                 int length = BitConverter.ToUInt16(e.Buffer.Skip(12).Take(2).ToArray(), 0);
 
                 data = e.Buffer.Take(20 + length).ToArray();
-
-                //for (int i = 20; i < e.Buffer.Length; i++)
-                //{
-                //    if (e.Buffer[i] == 0xCA && e.Buffer[i + 1] == 0xFE)
-                //    {
-                //        data = e.Buffer.Take(i + 2).ToArray();
-                //        break;
-                //    }
-                //}
                 RaiseDataReceivedEvent(data);
                 Console.WriteLine("---" + BitConverter.ToString(data));
             }

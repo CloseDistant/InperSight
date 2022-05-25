@@ -68,6 +68,12 @@ namespace InperStudio.Lib.Bean.Channel
         public double HighPass { get; set; }
         public bool IsNotch { get; set; }
         public double Notch { get; set; }
+        public bool IsBandpass { get; set; }
+        public double Bandpass1 { get; set; } = 0;
+        public double Bandpass2 { get; set; } = 0;
+        public bool IsBandstop { get; set; }
+        public double Bandstop1 { get; set; } = 0;
+        public double Bandstop2 { get; set; } = 0;
         public bool IsSmooth { get; set; } = true;
         public double Smooth { get; set; } = 5;
         public OnLineFilterTool OnlineFilter { get; set; } = new OnLineFilterTool();

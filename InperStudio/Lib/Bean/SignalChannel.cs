@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using InperStudio.Lib.Bean.Channel;
+using OpenCvSharp;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.RenderableSeries;
 using SciChart.Data.Model;
@@ -25,13 +26,13 @@ namespace InperStudio.Lib.Bean
         public string Hotkeys { get; set; }
         public Filters Filters { get; set; }
     }
-    public class Filters
-    {
-        public double LowPass { get; set; }
-        public double HighPass { get; set; }
-        public double Notch { get; set; }
-        public double Smooth { get; set; }
-    }
+    //public class Filters
+    //{
+    //    public double LowPass { get; set; }
+    //    public double HighPass { get; set; }
+    //    public double Notch { get; set; }
+    //    public double Smooth { get; set; }
+    //}
 
     public class SignalCameraChannel : SignalChannel
     {

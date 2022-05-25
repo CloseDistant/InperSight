@@ -48,15 +48,15 @@ namespace InperStudio.Lib.Helper.JsonBean
         public int OffsetWindowSize { get; set; } = 300;
         public Filters Filters { get; set; } = new Filters();
     }
-    public class Filters
-    {
-        public bool IsLowPass { get; set; }
-        public double LowPass { get; set; }
-        public bool IsHighPass { get; set; }
-        public double HighPass { get; set; }
-        public bool IsNotch { get; set; }
-        public double Notch { get; set; }
-        public bool IsSmooth { get; set; } = true;
-        public double Smooth { get; set; } = 5;
-    }
+    //public class Filters
+    //{
+    //    public bool IsLowPass { get; set; }
+    //    public double LowPass { get; set; }
+    //    public bool IsHighPass { get; set; }
+    //    public double HighPass { get; set; }
+    //    public bool IsNotch { get; set; }
+    //    public double Notch { get; set; }
+    //    public bool IsSmooth { get; set; } = true;
+    //    public double Smooth { get; set; } = 5;
+    //}
 }

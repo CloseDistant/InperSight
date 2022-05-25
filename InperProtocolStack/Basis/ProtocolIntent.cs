@@ -56,6 +56,7 @@ namespace InperProtocolStack.CmdPhotometry
         public const byte INTENT_CMD_APP_RUN = 0xEA;
 
         public const byte INTENT_DEVIC_INFO = 0xE5;
-        public const byte INTENT_SMARTLIGHT_INFO = 0xE6;
+        public const byte INTENT_PHOTOMETRY_INFO = 0xE7;
+        public const byte INTENT_DEVICE_INFO_PUB = 0xE8;
     }
 }

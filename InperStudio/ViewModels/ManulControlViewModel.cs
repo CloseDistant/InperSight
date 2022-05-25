@@ -192,7 +192,7 @@ namespace InperStudio.ViewModels
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
-                InperGlobalClass.ShowReminderInfo("No data channels");
+                InperGlobalClass.ShowReminderInfo("Please add at least one data channel");
                 return;
             }
             if (!InperDeviceHelper.Instance.InitDataStruct())
@@ -202,7 +202,7 @@ namespace InperStudio.ViewModels
             }
             if (!InperDeviceHelper.Instance.AllLightOpen())
             {
-                InperGlobalClass.ShowReminderInfo("No lights");
+                InperGlobalClass.ShowReminderInfo("Please select at least one light");
                 return;
             }
 
@@ -232,7 +232,7 @@ namespace InperStudio.ViewModels
 
                 if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
                 {
-                    InperGlobalClass.ShowReminderInfo("未配置数据通道");
+                    InperGlobalClass.ShowReminderInfo("Please add at least one data channel");
                     return;
                 }
                 if (!InperDeviceHelper.Instance.InitDataStruct())
@@ -242,7 +242,7 @@ namespace InperStudio.ViewModels
                 }
                 if (!InperDeviceHelper.Instance.AllLightOpen())
                 {
-                    InperGlobalClass.ShowReminderInfo("未设置激发光");
+                    InperGlobalClass.ShowReminderInfo("Please select at least one light");
                     return;
                 }
                 if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
@@ -292,7 +292,7 @@ namespace InperStudio.ViewModels
                 (this.View as ManulControlView).Root_Gird.IsEnabled = true;
 
 
-                InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); });
+                InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); }, InperDeviceHelper.Instance._saveDataTaskTokenSource.Token);
 
                 StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
                 ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();

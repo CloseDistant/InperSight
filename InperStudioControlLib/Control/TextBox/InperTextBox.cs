@@ -76,17 +76,17 @@ namespace InperStudioControlLib.Control.TextBox
                 if (rx.IsMatch(tbox.Text))
                 {
                     double res = double.Parse(tbox.Text);
-                    if (res < InperMinValue)
+                    if (res < InperMinValue) 
                     {
                         this.Foreground = Brushes.Red;
-                        Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                        //Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
                         this.Text = InperMinValue.ToString();
                         return;
                     }
                     if (res > InperMaxValue && InperMaxValue > InperMinValue)
                     {
                         this.Foreground = Brushes.Red;
-                        Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                        //Growl.Warning(new GrowlInfo() { Message = "不能大于" + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
                         this.Text = InperMaxValue.ToString();
                         return;
                     }
@@ -105,14 +105,49 @@ namespace InperStudioControlLib.Control.TextBox
             {
                 try
                 {
-                    if (this.InperTextType == InperTextType.Double || this.InperTextType == InperTextType.Int)
+                    if (this.InperTextType == InperTextType.Double)
                     {
                         if (!string.IsNullOrEmpty(tbox.Text))
                         {
                             Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
                             if (rx.IsMatch(tbox.Text))
                             {
-                                double res = double.Parse(tbox.Text);
+                                double res = Math.Round(double.Parse(tbox.Text), 2);
+                                if (tbox.Text.Split('.').Last().Length > 2)
+                                {
+                                    this.Text = res.ToString();
+                                }
+                                if (res < InperMinValue)
+                                {
+                                    this.Foreground = Brushes.Red;
+                                    //Growl.Warning(new GrowlInfo() { Message = "The value cannot be less than " + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });
+                                    this.Text = InperMinValue.ToString();
+                                    return;
+                                }
+                                if (res > InperMaxValue && InperMaxValue > InperMinValue)
+                                {
+                                    this.Foreground = Brushes.Red;
+                                    //Growl.Warning(new GrowlInfo() { Message = "The value cannot exceed " + InperMaxValue, Token = "SuccessMsg", WaitTime = 1 });
+                                    this.Text = InperMaxValue.ToString();
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                this.Foreground = Brushes.Red;
+                                //Growl.Warning(new GrowlInfo() { Message = "Invalid input", Token = "SuccessMsg", WaitTime = 1 });
+                                return;
+                            }
+                        }
+                    }
+                    if (this.InperTextType == InperTextType.Int)
+                    {
+                        if (!string.IsNullOrEmpty(tbox.Text))
+                        {
+                            Regex rx = new Regex(@"^([0-9]{1,})$");
+                            if (rx.IsMatch(tbox.Text))
+                            {
+                                int res = int.Parse(tbox.Text);
                                 if (res < InperMinValue)
                                 {
                                     this.Foreground = Brushes.Red;
@@ -155,6 +190,7 @@ namespace InperStudioControlLib.Control.TextBox
                 }
             }
             this.Foreground = Brushes.Black;
+            this.Select(this.Text.Length, 0);
             InperTextChanged?.Invoke(sender, e);
         }
     }

@@ -115,7 +115,7 @@ namespace InperStudio.ViewModels
             //}
             if (string.IsNullOrEmpty(InperGlobalClass.DataFolderName))
             {
-                InperGlobalClass.ShowReminderInfo("Not null!");
+                InperGlobalClass.ShowReminderInfo("The file name can’t be empty!");
                 return;
             }
             RequestClose();

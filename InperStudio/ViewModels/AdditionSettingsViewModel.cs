@@ -10,11 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Management;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
@@ -72,9 +73,18 @@ namespace InperStudio.ViewModels
 
                     await Task.Factory.StartNew(() =>
                        {
+                           var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')");
 
-                           InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
-                           foreach (KeyValuePair<int, string> c in CompInfo.ListCamerasData)
+                           Dictionary<int, string> cameras = new Dictionary<int, string>();
+                           int count = 0;
+                           foreach (ManagementBaseObject device in searcher.Get())
+                           {
+                               cameras.Add(count, (string)device["Caption"]);
+                               count++;
+                           }
+
+                           //InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
+                           foreach (KeyValuePair<int, string> c in cameras)
                            {
                                if (!c.Value.Contains("Basler"))
                                {
@@ -109,7 +119,7 @@ namespace InperStudio.ViewModels
                 else
                 {
                     view.trigger.Visibility = Visibility.Visible;
-                    view.Title = "Start/Stop Conditions";
+                    view.Title = "Trigger";//"Start/Stop Conditions";
                     view.IsShowOtherButton = false;
                 }
 
@@ -234,10 +244,6 @@ namespace InperStudio.ViewModels
                         main.windowManager.ShowWindow(window);
                         window.ActivateWith(main);
                     }
-                    else
-                    {
-                        Growl.Warning("Do not reactivate", "SuccessMsg");
-                    }
                 }
             }
             catch (Exception ex)
@@ -277,7 +283,7 @@ namespace InperStudio.ViewModels
                         }
                         if (UsedKits.Count(x => x.CustomName == camera.CustomName) > 0)
                         {
-                            Growl.Warning(new GrowlInfo() { Message= "Name already exists!",Token="SuccessMsg",WaitTime=1 });
+                            Growl.Warning(new GrowlInfo() { Message = "This name already exists!", Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
                         camera.AutoRecord = true;
@@ -331,8 +337,9 @@ namespace InperStudio.ViewModels
                         case "stopHours":
                             if (double.Parse(tb.Text) < DateTime.Now.Hour)
                             {
-                                Growl.Warning("Incorrect input time", "SuccessMsg");
+                                //Growl.Warning("Incorrect input time", "SuccessMsg");
                                 //tb.Text = DateTime.Now.Hour.ToString();
+                                tb.Foreground = Brushes.Red;
                             }
                             break;
                         case "startMinutes":
@@ -340,8 +347,9 @@ namespace InperStudio.ViewModels
                             {
                                 if (double.Parse(tb.Text) < DateTime.Now.Minute)
                                 {
-                                    Growl.Warning("Incorrect input time", "SuccessMsg");
+                                    //Growl.Warning("Incorrect input time", "SuccessMsg");
                                     //tb.Text = DateTime.Now.Minute.ToString();
+                                    tb.Foreground = Brushes.Red;
                                 }
                             }
                             break;
@@ -350,7 +358,8 @@ namespace InperStudio.ViewModels
                             {
                                 if (double.Parse(tb.Text) < DateTime.Now.Minute)
                                 {
-                                    Growl.Warning("Incorrect input time", "SuccessMsg");
+                                    //Growl.Warning("Incorrect input time", "SuccessMsg");
+                                    tb.Foreground = Brushes.Red;
                                     //tb.Text = DateTime.Now.Minute.ToString();
                                 }
                             }
