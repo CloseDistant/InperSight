@@ -34,7 +34,7 @@ namespace InperStudio.Lib.Bean.Channel
     }
     public class EventChannelChart : PropertyChangedBase
     {
-        public ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>> EventQs { get; set; } = new ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>>();
+        //public ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>> EventQs { get; set; } = new ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>>();
         private TimeSpanAxis timeSpanAxis;
         public TimeSpanAxis TimeSpanAxis { get => timeSpanAxis; set => SetAndNotify(ref timeSpanAxis, value); }
         private TimeSpanAxis eventtimeSpanAxis;

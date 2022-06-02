@@ -19,4 +19,15 @@ namespace InperStudio.Lib.Data.Model
         public long CameraTime { get; set; }
         public DateTime CreateTime { get; set; }
     }
+    [SugarTable("AllChannelRecord", "所有通道数据记录", IsDisabledUpdateAll = true)]
+    public class AllChannelRecord
+    {
+        [SugarColumn(IsIdentity = true, IsPrimaryKey = true)]
+        public int Id { get; set; }
+        //[SugarColumn(IsNullable =false,IndexGroupNameList =new string[] {"" })]
+        public string Value { get; set; }// channelid,value组合 == 通道，灰度值
+        public int Type { get; set; }
+        public long CameraTime { get; set; }
+        public DateTime CreateTime { get; set; }
+    }
 }

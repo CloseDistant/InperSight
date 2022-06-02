@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -186,7 +187,6 @@ namespace InperStudio.ViewModels
         private void PreviewRecord()
         {
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
-            InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
             InperDeviceHelper.Instance.device.Start();
 
@@ -226,7 +226,6 @@ namespace InperStudio.ViewModels
                     StopRecord(1);
                 }
                 InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
-                InperDeviceHelper.Instance.EventChannelChart.EventQs.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
                 InperDeviceHelper.Instance.device.Start();
 
@@ -260,14 +259,6 @@ namespace InperStudio.ViewModels
                 //数据库优先初始化
                 App.SqlDataInit = new Lib.Data.SqlDataInit();
 
-                //if (NoteSettingViewModel.NotesCache.Count > 0)
-                //{
-                //    NoteSettingViewModel.NotesCache.ForEach(x =>
-                //    {
-                //        App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
-                //    });
-                //    NoteSettingViewModel.NotesCache.Clear();
-                //}
                 if (DataPathConfigViewModel.DataList.Count > 0)
                 {
                     DataPathConfigViewModel.DataList.ToList().ForEach(x =>
@@ -290,9 +281,9 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.IsPreview = true;
                 InperGlobalClass.IsStop = false;
                 (this.View as ManulControlView).Root_Gird.IsEnabled = true;
+                dt = DateTime.Now;
 
-
-                InperDeviceHelper.Instance.saveDataTask = Task.Factory.StartNew(() => { InperDeviceHelper.Instance.SaveDateProc(); }, InperDeviceHelper.Instance._saveDataTaskTokenSource.Token);
+                InperDeviceHelper.Instance.AllDataSave();
 
                 StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
                 ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
@@ -322,11 +313,11 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+        DateTime dt;
         private async void StopRecord(int type = 0)
         {
             try
             {
-
                 bool isrecord = false;
                 if (InperGlobalClass.IsRecord)
                 {
@@ -344,7 +335,8 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.IsRecord = false;
                 InperGlobalClass.IsPreview = false;
                 InperGlobalClass.IsStop = true;
-                (View as ManulControlView).Root_Gird.IsEnabled = true;
+                var seconds = new TimeSpan(DateTime.Now.Ticks - dt.Ticks).TotalSeconds;
+                 (View as ManulControlView).Root_Gird.IsEnabled = true;
 
                 InperDeviceHelper.Instance.StopPlot();
 
@@ -368,12 +360,13 @@ namespace InperStudio.ViewModels
                         }
                     }
                     Dialog d = Dialog.Show<ProgressDialog>("MainDialog");
-                    await Task.Delay(3000);
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    await Task.Factory.StartNew(() => { InperDeviceHelper.Instance.StopCollect(tokenSource); }, tokenSource.Token);
+                    await Task.Delay(1000);
                     d.Close();
 
                     isrecord = false;
                 }
-                InperDeviceHelper.Instance.StopCollect();
 
                 if (Directory.GetDirectories(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0 || Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0)
                 {
@@ -386,7 +379,9 @@ namespace InperStudio.ViewModels
 
                 InperDeviceHelper.Instance.device.Stop();
                 InperDeviceHelper.Instance.AllLightClose();
-                System.Windows.MessageBox.Show(InperDeviceHelper.Instance.imagecount.ToString() + "----点数2：" + InperDeviceHelper.Instance.imagecount2);
+                System.Windows.MessageBox.Show("收到点数：" + InperDeviceHelper.Instance.count + "存储收到点数：" + InperDeviceHelper.Instance.count1 + "记录时长：" + seconds);
+                InperDeviceHelper.Instance.count = 0;
+                InperDeviceHelper.Instance.count1 = 0;
             }
             catch (Exception ex)
             {
@@ -415,7 +410,7 @@ namespace InperStudio.ViewModels
                  {
                      if (channel.Type == typeEnum.ToString())
                      {
-                         InperDeviceHelper.Instance.AddMarkerByHotkeys(channel.ChannelId, channel.Name, (Color)ColorConverter.ConvertFromString(channel.BgColor), type);
+                         InperDeviceHelper.Instance.AddMarkerByHotkeys(channel, type);
                          if (isRecord)
                          {
                              Manual manual = new Manual()
@@ -440,7 +435,7 @@ namespace InperStudio.ViewModels
                              time = typeEnum == ChannelTypeEnum.Start
                              ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
                              : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                             InperDeviceHelper.Instance.SendCommand(channel, type);
+                             InperDeviceHelper.Instance.AddMarkerByHotkeys(channel, type);
                              if (isRecord)
                              {
                                  Output output = new Output()

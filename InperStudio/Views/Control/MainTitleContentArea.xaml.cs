@@ -131,7 +131,6 @@ namespace InperStudio.Views.Control
                     {
                         CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
                         _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                        _ = InperDeviceHelper.Instance._SignalQs.TryRemove(x);
                     });
 
                     foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)

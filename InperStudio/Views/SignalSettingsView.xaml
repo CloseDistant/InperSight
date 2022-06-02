@@ -25,7 +25,7 @@
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
-        <Grid x:Name="camera" Visibility="Collapsed" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+        <Grid x:Name="camera" Visibility="Collapsed" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="220"/>
@@ -141,7 +141,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid x:Name="analog" Visibility="Collapsed" Margin="30 40"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+        <Grid x:Name="analog" Visibility="Collapsed" Margin="30 40"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

@@ -35,6 +35,18 @@ namespace InperStudio.ViewModels
         }
         protected override void OnViewLoaded()
         {
+            SearchDevice();
+        }
+        public void SearchAgain()
+        {
+            (View as StartPageView).loading.Visibility = Visibility.Visible;
+            (View as StartPageView).remainder.Text = "The device is being initialized...";
+            
+            SearchDevice();
+        }
+
+        private void SearchDevice()
+        {
             try
             {
                 Version = InperConfig.Instance.Version;
@@ -42,94 +54,55 @@ namespace InperStudio.ViewModels
                 FileInfo[] files = root.GetFiles();
                 UnderUpgradeFunc under = new UnderUpgradeFunc();
                 _ = View.Dispatcher.BeginInvoke(new Action(async () =>
-                  {
-                      #region 下位机更新
-                      if (files.Length > 0)
-                      {
-                          under.SendFile(files, tokenStart);
-                          await TaskExecute(tokenStart.Token);
-                          if (!under.DeviceIsRestart)
-                          {
-                              MessageBox.Show("Updating successful . Changes will take effect after restarting.");
-                          }
-                      }
-                      else
-                      {
-                          under.UnderInitJumpUpgrade(tokenStart);
-                          await TaskExecute(tokenStart.Token);
-                      }
-                      await Task.Delay(1000);
-                      DeviceHeuristic.Instance.UpdateDeviceList();
-                      #endregion
-                      if (DeviceHeuristic.Instance.DeviceList.Count < 1)
-                      {
-                          (View as StartPageView).retry.Visibility = Visibility.Visible;
-                          (View as StartPageView).normal.Visibility = Visibility.Collapsed;
-                      }
-                      else
-                      {
-                          await Task.Delay(2000);
-                          (View as StartPageView).loading.Visibility = Visibility.Collapsed;
-                          (View as StartPageView).remainder.Text = "Initialization completed";
-                          InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
-                          InperDeviceHelper.Instance.DeviceInit();
-
-                          uint SMARTLIGHT_INFO = 0x000000E7;
-                          uint DEVICE_INFO_PUB = 0x000000E8;
-
-                          InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
-                          await Task.Delay(1000);
-                          InperDeviceHelper.Instance.device.GetDeviceInfo(DEVICE_INFO_PUB);
-
-                          windowManager.ShowWindow(new MainWindowViewModel(windowManager));
-                          RequestClose();
-                      }
-                  }));
-
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-        }
-        public void SearchAgain()
-        {
-            try
-            {
-                _ = View.Dispatcher.BeginInvoke(new Action(async () =>
                 {
-                    DeviceHeuristic.Instance.UpdateDeviceList();
-                    if (DeviceHeuristic.Instance.DeviceList.Count < 1)
+                    #region 下位机更新
+                    if (files.Length > 0)
                     {
-                        MessageBox.Show("Device not found");
+                        under.SendFile(files, tokenStart);
+                        await TaskExecute(tokenStart.Token);
+                        if (!under.DeviceIsRestart)
+                        {
+                            MessageBox.Show("Updating successful . Changes will take effect after restarting.");
+                        }
                     }
                     else
                     {
+                        under.UnderInitJumpUpgrade(tokenStart);
+                        await TaskExecute(tokenStart.Token);
+                    }
+                    await Task.Delay(1000);
+                    DeviceHeuristic.Instance.UpdateDeviceList();
+                    #endregion
+                    if (DeviceHeuristic.Instance.DeviceList.Count < 1)
+                    {
+                        (View as StartPageView).retry.Visibility = Visibility.Visible;
+                        (View as StartPageView).normal.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        await Task.Delay(2000);
+                        (View as StartPageView).loading.Visibility = Visibility.Collapsed;
+                        (View as StartPageView).remainder.Text = "Initialization completed";
                         InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
                         InperDeviceHelper.Instance.DeviceInit();
-                        await Task.Delay(2000);
+
                         uint SMARTLIGHT_INFO = 0x000000E7;
                         uint DEVICE_INFO_PUB = 0x000000E8;
 
                         InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
                         await Task.Delay(1000);
                         InperDeviceHelper.Instance.device.GetDeviceInfo(DEVICE_INFO_PUB);
-                        (View as StartPageView).loading.Visibility = Visibility.Collapsed;
-                        (View as StartPageView).remainder.Text = "Initialization completed";
 
                         windowManager.ShowWindow(new MainWindowViewModel(windowManager));
                         RequestClose();
                     }
                 }));
+
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
-        }
-        public void SearchDevice()
-        {
-
         }
         public void Close()
         {

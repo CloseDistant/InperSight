@@ -83,6 +83,11 @@ namespace InperStudio.ViewModels
             if (obj)
             {
                 view.sciScroll.SelectedRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
+                EventChannelChart.TimeSpanAxis.VisibleRange= new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
+                foreach (var item in InperDeviceHelper.Instance.CameraChannels)
+                {
+                    item.TimeSpanAxis.VisibleRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
+                }
             }
         }
         protected override void OnViewLoaded()
@@ -197,7 +202,7 @@ namespace InperStudio.ViewModels
                         string[] hotkeys = x.Condition.Hotkeys.Split('+');
                         if (hotkeys.Contains(e.Key.ToString()))
                         {
-                            AddMarkers(hotkeys, x, 1);
+                            AddMarkers(hotkeys, x);
                         }
                     }
                 }
@@ -210,42 +215,42 @@ namespace InperStudio.ViewModels
             {
                 if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
                 {
-                    if (type == 0)
-                    {
-                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
-                    }
-                    else
-                    {
-                        InperDeviceHelper.Instance.SendCommand(x);
-                    }
+                    //if (type == 0)
+                    //{
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x);
+                    //}
+                    //else
+                    //{
+                    //    InperDeviceHelper.Instance.SendCommand(x);
+                    //}
                 }
             }
             if (hotkeys.Count() == 2)
             {
                 if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
                 {
-                    if (type == 0)
-                    {
-                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
-                    }
-                    else
-                    {
-                        InperDeviceHelper.Instance.SendCommand(x);
-                    }
+                    //if (type == 0)
+                    //{
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x);
+                    //}
+                    //else
+                    //{
+                    //    InperDeviceHelper.Instance.SendCommand(x);
+                    //}
                 }
             }
             if (hotkeys.Count() == 3)
             {
                 if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
                 {
-                    if (type == 0)
-                    {
-                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x.ChannelId, x.Name, (Color)ColorConverter.ConvertFromString(x.BgColor));
-                    }
-                    else
-                    {
-                        InperDeviceHelper.Instance.SendCommand(x);
-                    }
+                    //if (type == 0)
+                    //{
+                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x);
+                    //}
+                    //else
+                    //{
+                    //    InperDeviceHelper.Instance.SendCommand(x);
+                    //}
                 }
             }
             int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;

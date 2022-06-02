@@ -7,11 +7,16 @@ using OpenCvSharp.Extensions;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace InperStudio.ViewModels
 {
@@ -21,11 +26,18 @@ namespace InperStudio.ViewModels
         private VideoWindowView view;
         private VideoRecordBean kit;
         private VideoUserControl bottomControl;
+
         public VideoRecordBean BehaviorRecorderKit { get => kit; set => SetAndNotify(ref kit, value); }
         #endregion
         public VideoWindowViewModel(VideoRecordBean behaviorRecorderKit)
         {
-            BehaviorRecorderKit = behaviorRecorderKit;
+            BehaviorRecorderKit = new VideoRecordBean(behaviorRecorderKit._CamIndex, behaviorRecorderKit.Name)
+            {
+                AutoRecord = behaviorRecorderKit.AutoRecord,
+                CustomName = behaviorRecorderKit.CustomName,
+                IsActive = behaviorRecorderKit.IsActive,
+                WriteFps = behaviorRecorderKit.WriteFps
+            };
             BehaviorRecorderKit.StartCapture();
         }
         protected override void OnViewLoaded()
@@ -41,10 +53,23 @@ namespace InperStudio.ViewModels
                     {
                         this.view.Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            //System.Drawing.Bitmap bit = BehaviorRecorderKit._capturedFrame.Clone().ToBitmap();
-                            //string path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmssffff") + ".bmp");
-                            //bit.Save(path);
-                            //Growl.Info(new GrowlInfo() { Message = "Snapshot saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
+                            DrawingVisual drawingVisual = new DrawingVisual();
+                            using (DrawingContext context = drawingVisual.RenderOpen())
+                            {
+                                VisualBrush brush = new VisualBrush(view.image) { Stretch = Stretch.None };
+                                context.DrawRectangle(brush, null, new Rect(0, 0, view.image.ActualWidth, view.image.ActualHeight));
+                                context.Close();
+                            }
+                            RenderTargetBitmap targetBitmap = new RenderTargetBitmap((int)view.image.ActualWidth, (int)view.image.ActualHeight, 96d, 96d, PixelFormats.Default);
+                            targetBitmap.Render(drawingVisual);
+                            PngBitmapEncoder saveEncoder = new PngBitmapEncoder();
+                            saveEncoder.Frames.Add(BitmapFrame.Create(targetBitmap));
+                            string tempFile = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmssffff") + ".bmp");
+                            System.IO.FileStream fs = System.IO.File.Open(tempFile, System.IO.FileMode.OpenOrCreate);
+                            saveEncoder.Save(fs);
+                            fs.Close();
+
+                            Growl.Info(new GrowlInfo() { Message = "Snapshot saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
                         }));
                     }
                     catch (Exception ex)
@@ -75,9 +100,7 @@ namespace InperStudio.ViewModels
         {
             BehaviorRecorderKit.StopPreview();
             BehaviorRecorderKit.StopRecording();
-            BehaviorRecorderKit.Dispose();
             BehaviorRecorderKit.IsActive = false;
-            GC.Collect(0);
         }
     }
 }

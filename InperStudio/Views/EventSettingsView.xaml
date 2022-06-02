@@ -58,7 +58,7 @@
             </Style.Setters>
         </Style>
     </inp:InperDialogWindow.Resources>
-    <Grid Background="{DynamicResource InperDialogContentColor}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+    <Grid Background="{DynamicResource InperDialogContentColor}" >
         <Grid x:Name="Marker" Margin="20 0" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.8*"/>
@@ -158,7 +158,7 @@
                     </Popup>
                 </Grid>
             </StackPanel>
-            <Grid Grid.Column="1" >
+            <Grid Grid.Column="1" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                 <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action MarkerMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="36" Height="24" Margin="0 0 0 130" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
                 <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action MarkerMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="36" Height="24"   Margin="0 -30 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
             </Grid>

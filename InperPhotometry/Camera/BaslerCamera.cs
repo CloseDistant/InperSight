@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InperDeviceManagement
@@ -116,87 +117,90 @@ namespace InperDeviceManagement
             try
             {
                 _Camera.Open(30000, TimeoutHandling.Return);
-                // DeviceVendorName, DeviceModelName, and DeviceFirmwareVersion are string parameters.
-                System.Diagnostics.Debug.WriteLine("Camera Device Information");
-                System.Diagnostics.Debug.WriteLine("=================================");
-                System.Diagnostics.Debug.WriteLine("Vendor           : " + _Camera.Parameters[PLCamera.DeviceVendorName].GetValue());
-
-                string cam_model = _Camera.Parameters[PLCamera.DeviceModelName].GetValue();
-                string ID = _Camera.Parameters[PLCamera.DeviceSerialNumber].GetValue();
-
-                System.Diagnostics.Debug.WriteLine("Model            : " + cam_model);
-                System.Diagnostics.Debug.WriteLine("Serial number    : " + ID);
-                System.Diagnostics.Debug.WriteLine("Firmware version : " + _Camera.Parameters[PLCamera.DeviceFirmwareVersion].GetValue());
-                System.Diagnostics.Debug.WriteLine("=================================");
-                System.Diagnostics.Debug.WriteLine("");
-
-                System.Diagnostics.Debug.WriteLine("Camera Device Settings");
-                System.Diagnostics.Debug.WriteLine("=================================");
-
-                double max_gain = _Camera.Parameters[PLCamera.Gain].GetMaximum();
-                double gain = _Camera.Parameters[PLCamera.Gain].GetValue();
-                double min_gain = _Camera.Parameters[PLCamera.Gain].GetMinimum();
-
-                System.Diagnostics.Debug.WriteLine("Gain             : {0}", gain);
-                System.Diagnostics.Debug.WriteLine("Max Gain         : {0}", max_gain);
-                System.Diagnostics.Debug.WriteLine("Min Gain         : {0}", min_gain);
-
-                double max_exposure = _Camera.Parameters[PLCamera.ExposureTime].GetMaximum() / 1000;
-                double exposure = _Camera.Parameters[PLCamera.ExposureTime].GetValue() / 1000;
-                double min_exposure = _Camera.Parameters[PLCamera.ExposureTime].GetMinimum() / 1000;
-
-                System.Diagnostics.Debug.WriteLine("Exposure         : {0}", exposure);
-                System.Diagnostics.Debug.WriteLine("Max Exposure     : {0}", max_exposure);
-                System.Diagnostics.Debug.WriteLine("Min Exposure     : {0}", min_exposure);
-
-
-                _Camera.Parameters[PLCamera.AcquisitionFrameRateEnable].SetValue(true);
-                _Camera.Parameters[PLCamera.AcquisitionFrameRate].TrySetValue(500);
-
-                double max_frame_rate = _Camera.Parameters[PLCamera.AcquisitionFrameRate].GetMaximum();
-                double min_frame_rate = _Camera.Parameters[PLCamera.AcquisitionFrameRate].GetMinimum();
-                double frame_rate = _Camera.Parameters[PLCamera.AcquisitionFrameRate].GetValue();
-
-                System.Diagnostics.Debug.WriteLine("Frame Rate       : {0}", frame_rate);
-                System.Diagnostics.Debug.WriteLine("Max Frame Rate   : {0}", max_frame_rate);
-                System.Diagnostics.Debug.WriteLine("Min Frame Rate   : {0}", min_frame_rate);
-
-
-                long max_width = _Camera.Parameters[PLCamera.Width].GetMaximum();
-                long max_height = _Camera.Parameters[PLCamera.Height].GetMaximum();
-                max_width = max_width >= 720 ? 720 : 640;
-                max_height = max_height >= 540 ? 540 : 480;
-                _Camera.Parameters[PLCamera.Width].TrySetValue(max_width);
-                _Camera.Parameters[PLCamera.Height].TrySetValue(max_height);
-
-                _Camera.Parameters[PLCamera.OffsetX].TrySetValue(0);
-                _Camera.Parameters[PLCamera.OffsetY].TrySetValue(0);
-
-                System.Diagnostics.Debug.WriteLine("OffsetX          : {0}", _Camera.Parameters[PLCamera.OffsetX].GetValue());
-                System.Diagnostics.Debug.WriteLine("OffsetY          : {0}", _Camera.Parameters[PLCamera.OffsetY].GetValue());
-
-                int VisionWidth = (int)_Camera.Parameters[PLCamera.Width].GetValue();
-                int VisionHeight = (int)_Camera.Parameters[PLCamera.Height].GetValue();
-                System.Diagnostics.Debug.WriteLine("Width            : {0}", VisionWidth);
-                System.Diagnostics.Debug.WriteLine("Height           : {0}", VisionHeight);
-
-
-                // Set an enum parameter.
-                string oldPixelFormat = _Camera.Parameters[PLCamera.PixelFormat].GetValue(); // Remember the current pixel format.
-                System.Diagnostics.Debug.WriteLine("Old PixelFormat  : " + _Camera.Parameters[PLCamera.PixelFormat].GetValue());
-
-
-                // Set pixel format to Mono12 if available.
-                if (_Camera.Parameters[PLCamera.PixelFormat].TrySetValue(PLCamera.PixelFormat.Mono12))
+                if (_Camera.IsOpen)
                 {
-                    System.Diagnostics.Debug.WriteLine("New PixelFormat  : " + _Camera.Parameters[PLCamera.PixelFormat].GetValue());
-                }
-                System.Diagnostics.Debug.WriteLine("=================================");
-                // Some camera models may have auto functions enabled. To set the gain value to a specific value,
-                // the Gain Auto function must be disabled first (if gain auto is available).
-                _Camera.Parameters[PLCamera.GainAuto].TrySetValue(PLCamera.GainAuto.Off); // Set GainAuto to Off if it is writable.
+                    // DeviceVendorName, DeviceModelName, and DeviceFirmwareVersion are string parameters.
+                    System.Diagnostics.Debug.WriteLine("Camera Device Information");
+                    System.Diagnostics.Debug.WriteLine("=================================");
+                    System.Diagnostics.Debug.WriteLine("Vendor           : " + _Camera.Parameters[PLCamera.DeviceVendorName].GetValue());
 
-                EnableCameraFreeRunMode();
+                    string cam_model = _Camera.Parameters[PLCamera.DeviceModelName].GetValue();
+                    string ID = _Camera.Parameters[PLCamera.DeviceSerialNumber].GetValue();
+
+                    System.Diagnostics.Debug.WriteLine("Model            : " + cam_model);
+                    System.Diagnostics.Debug.WriteLine("Serial number    : " + ID);
+                    System.Diagnostics.Debug.WriteLine("Firmware version : " + _Camera.Parameters[PLCamera.DeviceFirmwareVersion].GetValue());
+                    System.Diagnostics.Debug.WriteLine("=================================");
+                    System.Diagnostics.Debug.WriteLine("");
+
+                    System.Diagnostics.Debug.WriteLine("Camera Device Settings");
+                    System.Diagnostics.Debug.WriteLine("=================================");
+
+                    double max_gain = _Camera.Parameters[PLCamera.Gain].GetMaximum();
+                    double gain = _Camera.Parameters[PLCamera.Gain].GetValue();
+                    double min_gain = _Camera.Parameters[PLCamera.Gain].GetMinimum();
+
+                    System.Diagnostics.Debug.WriteLine("Gain             : {0}", gain);
+                    System.Diagnostics.Debug.WriteLine("Max Gain         : {0}", max_gain);
+                    System.Diagnostics.Debug.WriteLine("Min Gain         : {0}", min_gain);
+
+                    double max_exposure = _Camera.Parameters[PLCamera.ExposureTime].GetMaximum() / 1000;
+                    double exposure = _Camera.Parameters[PLCamera.ExposureTime].GetValue() / 1000;
+                    double min_exposure = _Camera.Parameters[PLCamera.ExposureTime].GetMinimum() / 1000;
+
+                    System.Diagnostics.Debug.WriteLine("Exposure         : {0}", exposure);
+                    System.Diagnostics.Debug.WriteLine("Max Exposure     : {0}", max_exposure);
+                    System.Diagnostics.Debug.WriteLine("Min Exposure     : {0}", min_exposure);
+
+
+                    _Camera.Parameters[PLCamera.AcquisitionFrameRateEnable].SetValue(true);
+                    _Camera.Parameters[PLCamera.AcquisitionFrameRate].TrySetValue(500);
+
+                    double max_frame_rate = _Camera.Parameters[PLCamera.AcquisitionFrameRate].GetMaximum();
+                    double min_frame_rate = _Camera.Parameters[PLCamera.AcquisitionFrameRate].GetMinimum();
+                    double frame_rate = _Camera.Parameters[PLCamera.AcquisitionFrameRate].GetValue();
+
+                    System.Diagnostics.Debug.WriteLine("Frame Rate       : {0}", frame_rate);
+                    System.Diagnostics.Debug.WriteLine("Max Frame Rate   : {0}", max_frame_rate);
+                    System.Diagnostics.Debug.WriteLine("Min Frame Rate   : {0}", min_frame_rate);
+
+
+                    long max_width = _Camera.Parameters[PLCamera.Width].GetMaximum();
+                    long max_height = _Camera.Parameters[PLCamera.Height].GetMaximum();
+                    max_width = max_width >= 720 ? 720 : 640;
+                    max_height = max_height >= 540 ? 540 : 480;
+                    _Camera.Parameters[PLCamera.Width].TrySetValue(max_width);
+                    _Camera.Parameters[PLCamera.Height].TrySetValue(max_height);
+
+                    _Camera.Parameters[PLCamera.OffsetX].TrySetValue(0);
+                    _Camera.Parameters[PLCamera.OffsetY].TrySetValue(0);
+
+                    System.Diagnostics.Debug.WriteLine("OffsetX          : {0}", _Camera.Parameters[PLCamera.OffsetX].GetValue());
+                    System.Diagnostics.Debug.WriteLine("OffsetY          : {0}", _Camera.Parameters[PLCamera.OffsetY].GetValue());
+
+                    int VisionWidth = (int)_Camera.Parameters[PLCamera.Width].GetValue();
+                    int VisionHeight = (int)_Camera.Parameters[PLCamera.Height].GetValue();
+                    System.Diagnostics.Debug.WriteLine("Width            : {0}", VisionWidth);
+                    System.Diagnostics.Debug.WriteLine("Height           : {0}", VisionHeight);
+
+
+                    // Set an enum parameter.
+                    string oldPixelFormat = _Camera.Parameters[PLCamera.PixelFormat].GetValue(); // Remember the current pixel format.
+                    System.Diagnostics.Debug.WriteLine("Old PixelFormat  : " + _Camera.Parameters[PLCamera.PixelFormat].GetValue());
+
+
+                    // Set pixel format to Mono12 if available.
+                    if (_Camera.Parameters[PLCamera.PixelFormat].TrySetValue(PLCamera.PixelFormat.Mono12))
+                    {
+                        System.Diagnostics.Debug.WriteLine("New PixelFormat  : " + _Camera.Parameters[PLCamera.PixelFormat].GetValue());
+                    }
+                    System.Diagnostics.Debug.WriteLine("=================================");
+                    // Some camera models may have auto functions enabled. To set the gain value to a specific value,
+                    // the Gain Auto function must be disabled first (if gain auto is available).
+                    _Camera.Parameters[PLCamera.GainAuto].TrySetValue(PLCamera.GainAuto.Off); // Set GainAuto to Off if it is writable.
+
+                    EnableCameraFreeRunMode();
+                }
             }
             catch (Exception e)
             {
@@ -217,8 +221,6 @@ namespace InperDeviceManagement
 
             return;
         }
-
-
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             IGrabResult grabResult = e.GrabResult;

@@ -143,8 +143,8 @@
     <Reference Include="SciChart.Drawing, Version=6.3.0.13476, Culture=neutral, PublicKeyToken=b55dd9efe817e823, processorArchitecture=MSIL">
       <HintPath>packages\SciChart.6.3.0.13476\lib\net452\SciChart.Drawing.dll</HintPath>
     </Reference>
-    <Reference Include="SqlSugar, Version=5.0.3.8, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\SqlSugar.5.0.3.8\lib\SqlSugar.dll</HintPath>
+    <Reference Include="SqlSugar, Version=5.0.8.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\SqlSugar.5.0.8.6\lib\SqlSugar.dll</HintPath>
     </Reference>
     <Reference Include="Stylet, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Stylet.1.3.6\lib\net45\Stylet.dll</HintPath>
@@ -234,6 +234,7 @@
     <Compile Include="Lib\Bean\ScrollingViewportManager.cs" />
     <Compile Include="Lib\Bean\SignalChannel.cs" />
     <Compile Include="Lib\Bean\Tb_Version.cs" />
+    <Compile Include="Lib\Bean\VideoFrame.cs" />
     <Compile Include="Lib\Bean\VideoRecordBean.cs" />
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
@@ -252,6 +253,7 @@
     <Compile Include="Lib\Convert\VideoIntToTIme.cs" />
     <Compile Include="Lib\Convert\VisibilityToVisibilityReConverter.cs" />
     <Compile Include="Lib\Data\Model\AIROI.cs" />
+    <Compile Include="Lib\Data\Model\AnalogRecord.cs" />
     <Compile Include="Lib\Data\Model\ChannelRecord.cs" />
     <Compile Include="Lib\Data\Model\ColumnDesc.cs" />
     <Compile Include="Lib\Data\Model\Config.cs" />

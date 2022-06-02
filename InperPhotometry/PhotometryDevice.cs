@@ -237,6 +237,14 @@ namespace InperDeviceManagement
         {
             _CS.RemoveAdSampling();
         }
+        public void SetCameraFramrate(double frameRate)
+        {
+            _BC.SetFrameRate(frameRate);
+        }
+        public void SetCameraExposure(double exposure)
+        {
+            _BC.SetExposure(exposure);
+        }
         public void Start()
         {
             _BC.SwitchRunningMode(CameraRunningMode.Trigger);

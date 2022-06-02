@@ -22,19 +22,6 @@ namespace InperStudio.ViewModels
         {
             (View as NoteSettingView).ConfirmClickEvent += NoteSettingViewModel_ConfirmClickEvent;
 
-            //if (App.SqlDataInit != null)
-            //{
-            //    List<Note> notes = App.SqlDataInit.sqlSugar.Queryable<Note>().ToList();
-            //    if (notes.Count > 0)
-            //    {
-            //        notes.ForEach(x =>
-            //        {
-            //            TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
-            //            tb.Text = x.CreateTime + @"：" + x.Text;
-            //            (View as NoteSettingView).TagListValue.Children.Add(tb);
-            //        });
-            //    }
-            //}
             if (NotesCache.Count > 0)
             {
                 NotesCache.ForEach(x =>
@@ -48,7 +35,14 @@ namespace InperStudio.ViewModels
 
         private void NoteSettingViewModel_ConfirmClickEvent(object arg1, ExecutedRoutedEventArgs arg2)
         {
-            this.RequestClose();
+            var rich = (View as NoteSettingView).NoteContent;
+            if (!new TextRange(rich.Document.ContentStart, rich.Document.ContentEnd).IsEmpty)
+            {
+                if (MessageBox.Show("有未保存内容，是否推出？", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    this.RequestClose();
+                }
+            }
         }
 
         public void NoteContent_KeyDown(object sender, KeyEventArgs e)
@@ -87,7 +81,7 @@ namespace InperStudio.ViewModels
                             //}
                             //else
                             //{
-                                NotesCache.Add(note);
+                            NotesCache.Add(note);
                             //}
                         }
                     }

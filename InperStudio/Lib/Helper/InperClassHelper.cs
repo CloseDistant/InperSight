@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -56,6 +58,16 @@ namespace InperStudio.Lib.Helper
         public static object GetAdditionRecordConditionsType()
         {
             return default;
+        }
+        public static void Clone<T>(T source, ref T destination)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(memoryStream, source);
+                memoryStream.Position = 0;
+                destination = (T)formatter.Deserialize(memoryStream);
+            }
         }
     }
 }

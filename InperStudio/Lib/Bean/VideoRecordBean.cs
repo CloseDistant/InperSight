@@ -15,55 +15,51 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using InperStudio.Lib.Helper;
+using System.Collections.Concurrent;
+using Stylet;
 
 namespace InperStudio.Lib.Bean
 {
-    public class VideoRecordBean : BindableObject
+    public class VideoRecordBean : PropertyChangedBase
     {
         public int _CamIndex;
         public bool IsActive { get; set; }
         public string Name { get; set; }
         public string CustomName { get; set; }
+        private WriteableBitmap _writeableBitmap;
         public WriteableBitmap WriteableBitmap
         {
-            get { return GetValue(() => WriteableBitmap); }
-            private set { SetValue(() => WriteableBitmap, value); }
+            get => _writeableBitmap;
+            private set => SetAndNotify(ref _writeableBitmap, value);
         }
+        private bool _autoRecord;
         public bool AutoRecord
         {
-            get { return GetValue(() => AutoRecord); }
-            set { SetValue(() => AutoRecord, value); }
+            get => _autoRecord;
+            set => SetAndNotify(ref _autoRecord, value);
         }
+        private long _time;
         public long Time
         {
-            get { return GetValue(() => Time); }
-            set { SetValue(() => Time, value); }
+            get => _time;
+            set => SetAndNotify(ref _time, value);
         }
-        public Mat _capturedFrame = new Mat();
-
+        private int? _writeFps = null;
+        public int? WriteFps
+        {
+            get => _writeFps;
+            set => SetAndNotify(ref _writeFps, value);
+        }
         #region private
-        //定义Timer类
-        private VideoCaptureAPIs _videoCaptureApi = VideoCaptureAPIs.DSHOW;
-        private readonly ManualResetEventSlim _writerReset = new ManualResetEventSlim(false);
-        private readonly ManualResetEventSlim _readEvent = new ManualResetEventSlim(false);
-        private readonly AutoResetEvent _writeCheckEvent = new AutoResetEvent(true);
         private VideoCapture _videoCapture;
         private VideoWriter _videoWriter;
-        private Task _readThread;
-        private Task _writerThread;
         private CancellationTokenSource readTokenSource;
-        private CancellationTokenSource writeTokenSource;
-        private CancellationToken readToken;
-        private CancellationToken writeToken;
-        private double FPS = 30;
-        private int _VideoFrameWidth = 640;
-        private int _VideoFrameHeight = 480;
-        private PerformanceTimer timer = new PerformanceTimer();
-        private HighAccurateTimer accurateTimer = new HighAccurateTimer();
-        private long AllWriteCount = 0;
-        private double timeChange = 0;
-        private readonly object countCheckObject = new object();
-        private bool IsVideoCaptureValid => _videoCapture != null && _videoCapture.IsOpened();
+        private bool _isRecord = false;
+        private double _actuallFrameCount = 0;
+        private int _writeFrameCount = 0;
+        private ConcurrentQueue<VideoFrame> _WriteMats = new ConcurrentQueue<VideoFrame>();
+        private DateTime dt_start;
+        private List<VideoFrame> _calFrames = new List<VideoFrame>();
         #endregion
 
         #region methods
@@ -71,297 +67,167 @@ namespace InperStudio.Lib.Bean
         {
             _CamIndex = devIndex;
             Name = name;
+            _videoCapture = new VideoCapture();
+            if (_videoCapture.Open(_CamIndex, VideoCaptureAPIs.DSHOW))
+            {
+                _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640d);
+                _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480d);
+                _videoCapture.Set(VideoCaptureProperties.FourCC, FourCC.MJPG);
+            }
         }
         public void StartCapture()
         {
-            Recorder();
             readTokenSource = new CancellationTokenSource();
-            readToken = readTokenSource.Token;
 
-            _readEvent.Reset();
-            _readThread = new Task(CaptureFrameLoop, readToken);
-            _readThread.Start();
+            Task.Run(() =>
+            {
+                if (!_videoCapture.IsOpened())
+                {
+                    Console.WriteLine("摄像头打开失败");
+                    return;
+                }
+                int _redLock = 0;
+
+                while (!readTokenSource.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        if (Interlocked.Exchange(ref _redLock, 1) == 0)
+                        {
+                            Mat Camera = new Mat();
+                            _ = _videoCapture.Read(Camera);
+                            if (Camera.Empty())//读取视频文件时,判定帧是否为空,如果帧为空,则下方的图片处理会报异常
+                            {
+                                break;
+                            }
+                            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                WriteableBitmap = Camera.ToWriteableBitmap();
+                            }));
+                            if (_isRecord)
+                            {
+                                if (_writeFps == null)
+                                {
+                                    VideoFrame videoFrame = new VideoFrame(DateTime.Now, Camera);
+                                    _calFrames.Add(videoFrame);
+                                    _WriteMats.Enqueue(videoFrame);
+                                    TimeSpan acqTime = videoFrame.Time - _calFrames.First().Time;
+                                    if (acqTime >= TimeSpan.FromSeconds(1) && _calFrames.Count > 30)
+                                    {
+                                        double calFps = (_calFrames.Count - 4) / (videoFrame.Time - _calFrames[3].Time).TotalSeconds;
+                                        WriteFps = (int)Math.Ceiling(calFps * 1.01d);
+                                        _videoWriter = new VideoWriter(_path, FourCC.MJPG, _writeFps.Value, new OpenCvSharp.Size(_videoCapture.FrameWidth, _videoCapture.FrameHeight));
+                                        Interlocked.Exchange(ref _lock, 0);
+                                    }
+                                }
+                                else
+                                {
+                                    _WriteMats.Enqueue(new VideoFrame(DateTime.Now, Camera));
+                                    _ = Task.Run(() => WriteFrame());
+                                }
+                            }
+                            Interlocked.Exchange(ref _redLock, 0);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Log.Error(ex.ToString());
+                    }
+                    Thread.Sleep(1);
+                }
+
+
+
+            });
         }
-        private void Recorder()
-        {
-            _videoCapture = VideoCapture.FromCamera(_CamIndex, _videoCaptureApi);
-            _ = _videoCapture.Open(_CamIndex, _videoCaptureApi);
 
-            _ = _videoCapture.Set(VideoCaptureProperties.Fps, FPS);
-            _ = _videoCapture.Set(VideoCaptureProperties.FrameWidth, _VideoFrameWidth);//设定摄像头图片的大小
-            _ = _videoCapture.Set(VideoCaptureProperties.FrameHeight, _VideoFrameHeight);
+        private int _lock = 1;
+        private string _path;
+
+        private void WriteFrame()
+        {
+            if (Interlocked.Exchange(ref _lock, 1) == 0)
+            {
+                while (_WriteMats.TryDequeue(out VideoFrame mat))
+                {
+                    if (_writeFrameCount == 0)
+                    {
+                        dt_start = mat.Time;
+                        _videoWriter.Write(mat.FrameMat);
+                        _writeFrameCount++;
+                    }
+                    else
+                    {
+                        _actuallFrameCount = Math.Round((mat.Time - dt_start).TotalSeconds * _writeFps.Value) + 1;
+                        while (_writeFrameCount < _actuallFrameCount)
+                        {
+                            if (!_videoWriter.IsDisposed)
+                            {
+                                _videoWriter.Write(mat.FrameMat);
+                                _writeFrameCount++;
+                            }
+                        }
+                    }
+                }
+                Interlocked.Exchange(ref _lock, 0);
+                if (!_WriteMats.IsEmpty)
+                {
+                    _ = Task.Run(() => WriteFrame());
+                }
+            }
         }
         public void StartRecording(string path = null)
         {
-            if (string.IsNullOrEmpty(path))
-            {
-                path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("yyyyMMddHHmmss"));
-            }
-            path += ".avi";
-            if (_writerThread != null)
-            {
-                return;
-            }
-
-            if (!IsVideoCaptureValid)
-            {
-                Growl.Warning("Player device not found", "SuccessMsg");
-                return;
-            }
-            writeTokenSource = new CancellationTokenSource();
-            writeToken = writeTokenSource.Token;
-
-            _videoWriter = new VideoWriter(path, FourCC.DIVX, FPS - 5, new OpenCvSharp.Size(_videoCapture.FrameWidth, _videoCapture.FrameHeight));
-
-            timeChange = 0;
-
-            accurateTimer = new HighAccurateTimer();
-            accurateTimer.Interval = 1 * 1000;
-            accurateTimer.Elapsed += AccurateTimer_Elapsed;
-
-            _writerReset.Reset();
-            _writerThread = new Task(AddCameraFrameToRecordingThread, writeToken);
-            _writerThread.Start();
-            //isStartWrite = true;
-        }
-
-        private void AccurateTimer_Elapsed(object sender, TimerEventArgs e)
-        {
-            try
-            {
-                _ = _writeCheckEvent.WaitOne();
-                TimeSpan ts = TimeSpan.FromTicks(InperDeviceHelper.Instance.time / 100);
-                long actualFps = (long)(ts.TotalMilliseconds / 40);
-                if (actualFps == AllWriteCount)
-                {
-                    timeChange = 0;
-                    return;
-                }
-                if (actualFps > AllWriteCount)
-                {
-                    timeChange = ts.TotalMilliseconds / actualFps - ts.TotalMilliseconds / AllWriteCount - 2;//
-                }
-                else
-                {
-                    timeChange = ts.TotalMilliseconds / actualFps - ts.TotalMilliseconds / AllWriteCount + 1;//
-                }
-                if (double.IsInfinity(timeChange))
-                {
-                    timeChange = 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                App.Log.Error(ex.ToString());
-            }
-            finally
-            {
-            }
-        }
-
-        private void CaptureFrameLoop()
-        {
-
-            while (!_readEvent.Wait(0))
-            {
-                try
-                {
-                    if (readToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                    if (_videoCapture.IsDisposed)
-                    {
-                        return;
-                    }
-                    _capturedFrame = _videoCapture.RetrieveMat();
-                    if (_videoCapture.IsOpened())
-                    {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            WriteableBitmap = _capturedFrame.Clone().ToWriteableBitmap();
-                        }));
-
-                        //Cv2.ImShow("test", _capturedFrame);
-                        //Cv2.WaitKey(1);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    App.Log.Error(ex.ToString());
-                }
-            }
-        }
-        private void AddCameraFrameToRecordingThread()
-        {
-            accurateTimer.Enabled = true;
-
-            double delay = 1000 / (FPS - 5);
-            double iWaitKeyTime = 0;
-            double _waitS = 0;
-            uint checkCount = 0;
-            while (!_writerReset.Wait(0))
-            {
-                try
-                {
-                    timer.Start();
-                    if (Monitor.TryEnter(countCheckObject))
-                    {
-                        if (writeToken.IsCancellationRequested)
-                        {
-                            Monitor.Exit(countCheckObject);
-                            return;
-                        }
-                        if (!_videoCapture.IsDisposed)
-                        {
-                            _videoWriter.Write(_capturedFrame);
-                        }
-                        AllWriteCount++;
-                        checkCount++;
-                        if (checkCount >= 100)
-                        {
-                            _ = _writeCheckEvent.Set();
-                            checkCount = 0;
-                        }
-                        timer.Stop();
-
-                        double duration = timer.Duration;
-
-                        timer.Start();
-                        if (double.IsNaN(timeChange))
-                        {
-                            timeChange = 0;
-                        }
-                        iWaitKeyTime = iWaitKeyTime < 0 ? 0 : iWaitKeyTime;
-                        double waitTime = delay - duration - iWaitKeyTime + timeChange;
-
-                        int _wait = (int)Math.Floor(waitTime);
-                        _waitS += waitTime % 1;
-                        if (_waitS > 1)
-                        {
-                            _wait += 1;
-                            _waitS -= 1;
-                        }
-                        _wait = _wait < 0 ? 40 : _wait;
-                        _ = Cv2.WaitKey(_wait);
-                        timer.Stop();
-                        iWaitKeyTime = timer.Duration * 1000 - _wait + 1;
-                        //
-                        Monitor.Exit(countCheckObject);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    App.Log.Error(ex.ToString());
-                }
-                finally
-                {
-                    timer.Stop();
-                }
-            }
+            readTokenSource.Cancel();
+            _ = readTokenSource.Token.Register(() =>
+              {
+                  if (string.IsNullOrEmpty(path))
+                  {
+                      path = Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("yyyyMMddHHmmss"));
+                  }
+                  _path = path += ".avi";
+                  _writeFps = null;
+                  _calFrames.Clear();
+                  _WriteMats = new ConcurrentQueue<VideoFrame>();
+                  _isRecord = true;
+                  _ = Interlocked.Exchange(ref _lock, 1);
+                  StartCapture();
+              });
         }
         public void StopRecording()
         {
-            accurateTimer.Enabled = false;
-            accurateTimer.Elapsed -= AccurateTimer_Elapsed;
-            accurateTimer.Destroy();
-            AllWriteCount = 0;
-            if (_writerThread != null)
+            _isRecord = false;
+
+            readTokenSource.Cancel();
+            readTokenSource.Token.Register(async () =>
             {
-                _writerReset.Set();
-                writeTokenSource.Cancel();
-                _writerThread = null;
-                _writerReset.Reset();
-            }
-            Time = 0;
-            _videoWriter?.Release();
-            _videoWriter?.Dispose();
-            _videoWriter = null;
+                bool isEnd = false;
+                while (!isEnd)
+                {
+                    if (_WriteMats.IsEmpty)
+                    {
+                        isEnd = true;
+                    }
+                    await Task.Delay(10);
+                }
+                _writeFrameCount = 0;
+                _actuallFrameCount = 0;
+
+                _videoWriter.Release();
+                _videoWriter.Dispose();
+
+                StartCapture();
+            });
+
         }
         public void StopPreview()
         {
-            if (_videoCapture.IsDisposed)
+            if (readTokenSource != null)
             {
-                return;
+                readTokenSource.Cancel();
             }
+        }
 
-            if (_videoCapture != null && _videoCapture.IsOpened())
-            {
-                //Cv2.DestroyWindow("test");
-                _videoCapture.Release();
-                _videoCapture.Dispose();
-                if (_readThread != null)
-                {
-                    _readEvent.Set();
-                    readTokenSource.Cancel();
-                    _readThread = null;
-                    _readEvent.Reset();
-                }
-            }
-        }
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            Dispose(true);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                StopRecording();
-                if (_videoCapture != null && !_videoCapture.IsDisposed)
-                {
-                    if (_videoCapture != null && _videoCapture.IsOpened())
-                    {
-                        _videoCapture?.Release();
-                        _videoCapture?.Dispose();
-                    }
-                }
-            }
-        }
         #endregion
-    }
-    class PerformanceTimer
-    {
-        [DllImport("Kernel32.dll")]
-        private static extern bool QueryPerformanceCounter(
-          out long lpPerformanceCount);
-
-        [DllImport("Kernel32.dll")]
-        private static extern bool QueryPerformanceFrequency(
-          out long lpFrequency);
-
-        private long startTime, stopTime;
-        private long freq;
-
-        public PerformanceTimer()
-        {
-            startTime = 0;
-            stopTime = 0;
-
-            if (QueryPerformanceFrequency(out freq) == false)
-            {
-                throw new Exception("Timer not supported.");
-            }
-        }
-
-        public void Start()
-        {
-            Thread.Sleep(0);
-            QueryPerformanceCounter(out startTime);
-        }
-
-        public void Stop()
-        {
-            QueryPerformanceCounter(out stopTime);
-        }
-
-        public double Duration
-        {
-            get
-            {
-                return (double)(stopTime - startTime) / (double)freq;
-            }
-        }
     }
 }

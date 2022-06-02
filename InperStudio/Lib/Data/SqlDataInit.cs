@@ -67,20 +67,48 @@ namespace InperStudio.Lib.Data
         private void RecordInit()
         {
             RecordTablePairs.Clear();
+            bool _isFirst = true;
             foreach (var item in InperDeviceHelper.Instance.CameraChannels)
             {
-                sqlSugar.MappingTables.Add(nameof(ChannelRecord), nameof(ChannelRecord) + item.Type + item.ChannelId);
-                sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(ChannelRecord));
-                RecordTablePairs.Add(item.Type + item.ChannelId, nameof(ChannelRecord) + item.Type + item.ChannelId);
-
-                TablesDesc desc = new TablesDesc()
+                if (item.Type.Equals(ChannelTypeEnum.Camera.ToString()))
                 {
-                    TableName = nameof(ChannelRecord) + item.Type + item.ChannelId,
-                    TableType = item.Type == SignalSettingsTypeEnum.Camera.ToString() ? 0 : 1,
-                    Desc = "0:Camera 通道数据表,1:Analog 通道数据表",
-                    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                };
-                _ = sqlSugar.Insertable(desc).ExecuteCommand();
+
+                    if (_isFirst)
+                    {
+                        item.RenderableSeries.ToList().ForEach(x =>
+                        {
+                            int id = int.Parse((x as LineRenderableSeriesViewModel).Tag.ToString());
+
+                            sqlSugar.MappingTables.Add(nameof(AllChannelRecord), nameof(AllChannelRecord) + id);
+                            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(AllChannelRecord));
+                            TablesDesc desc = new TablesDesc()
+                            {
+                                TableName = nameof(AllChannelRecord) + id,
+                                TableType = item.Type == SignalSettingsTypeEnum.Camera.ToString() ? 0 : 1,
+                                Desc = "0:Camera 通道数据表",//"0:Camera 通道数据表,1:Analog 通道数据表",
+                                CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                            };
+                            _ = sqlSugar.Insertable(desc).ExecuteCommand();
+                        });
+
+                        _isFirst = false;
+                    }
+                }
+                else if (item.Type.Equals(ChannelTypeEnum.Analog.ToString()))
+                {
+                    sqlSugar.MappingTables.Add(nameof(AnalogRecord), nameof(AnalogRecord) + item.Type + item.ChannelId);
+                    sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(AnalogRecord));
+                    RecordTablePairs.Add(item.Type + item.ChannelId, nameof(AnalogRecord) + item.Type + item.ChannelId);
+
+                    TablesDesc desc = new TablesDesc()
+                    {
+                        TableName = nameof(AnalogRecord) + item.Type + item.ChannelId,
+                        TableType = item.Type == SignalSettingsTypeEnum.Camera.ToString() ? 0 : 1,
+                        Desc = "1:Analog 通道数据表",//"0:Camera 通道数据表,1:Analog 通道数据表",
+                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
+                    };
+                    _ = sqlSugar.Insertable(desc).ExecuteCommand();
+                }
             }
             foreach (LineRenderableSeriesViewModel item in InperDeviceHelper.Instance.EventChannelChart.RenderableSeries)
             {

@@ -114,7 +114,10 @@ namespace InperStudio.ViewModels
                                });
                            }
                        });
-                    view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
+                    if (unusedKits.Count > 0)
+                    {
+                        view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
+                    }
                 }
                 else
                 {
@@ -154,9 +157,9 @@ namespace InperStudio.ViewModels
                     {
                         Parallel.ForEach(UsedKits, item =>
                         {
-                            if (!item.IsActive)
+                            if (item.IsActive)
                             {
-                                item.IsActive = true;
+                                //item.IsActive = true;
                                 view.Dispatcher.BeginInvoke(new Action(() =>
                                 {
                                     var window = new VideoWindowViewModel(item);
@@ -184,10 +187,6 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                if (UnusedKits?.Count > 0)
-                {
-                    UnusedKits.ToList().ForEach(x => x.Dispose());
-                }
                 if (@enum == AdditionSettingsTypeEnum.Trigger)
                 {
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStart);
@@ -237,9 +236,9 @@ namespace InperStudio.ViewModels
                             main = window.DataContext as MainWindowViewModel;
                         }
                     }
-                    if (!item.IsActive)
+                    if (item.IsActive)
                     {
-                        item.IsActive = true;
+                        //item.IsActive = true;
                         var window = new VideoWindowViewModel(item);
                         main.windowManager.ShowWindow(window);
                         window.ActivateWith(main);
@@ -264,6 +263,7 @@ namespace InperStudio.ViewModels
                             InperGlobalClass.ShowReminderInfo("The camera is running!");
                             return;
                         }
+                        camera_active.IsActive = false;
                         _ = UsedKits.Remove(camera_active);
                         UnusedKits.Add(camera_active);
                         if (UnusedKits.Count <= 1)
@@ -286,7 +286,7 @@ namespace InperStudio.ViewModels
                             Growl.Warning(new GrowlInfo() { Message = "This name already exists!", Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
-                        camera.AutoRecord = true;
+                        camera.AutoRecord = true; camera.IsActive = true;
                         _ = UnusedKits.Remove(camera);
                         UsedKits.Add(camera);
                         //camera.StopPreview();

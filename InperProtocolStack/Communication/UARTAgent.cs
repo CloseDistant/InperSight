@@ -136,94 +136,39 @@ namespace InperProtocolStack.Communication
             readerAD.DataReceived -= ReaderAD_DataReceived;
             readerAD.DataReceivedEnabled = false;
         }
-        public ConcurrentQueue<UsbAdDataStru512> _ADDataCache512 = new ConcurrentQueue<UsbAdDataStru512>();
-        public ConcurrentQueue<UsbAdDataStru256> _ADDataCache256 = new ConcurrentQueue<UsbAdDataStru256>();
-        public ConcurrentQueue<UsbAdDataStru128> _ADDataCache128 = new ConcurrentQueue<UsbAdDataStru128>();
-        public ConcurrentQueue<UsbAdDataStru64> _ADDataCache64 = new ConcurrentQueue<UsbAdDataStru64>();
-        public ConcurrentQueue<UsbAdDataStru32> _ADDataCache32 = new ConcurrentQueue<UsbAdDataStru32>();
-        public ConcurrentQueue<UsbAdDataStru16> _ADDataCache16 = new ConcurrentQueue<UsbAdDataStru16>();
-        public ConcurrentQueue<UsbAdDataStru8> _ADDataCache8 = new ConcurrentQueue<UsbAdDataStru8>();
-        public ConcurrentQueue<UsbAdDataStru4> _ADDataCache4 = new ConcurrentQueue<UsbAdDataStru4>();
-        public ConcurrentQueue<UsbAdDataStru2> _ADDataCache2 = new ConcurrentQueue<UsbAdDataStru2>();
-        public ConcurrentQueue<UsbAdDataStru1> _ADDataCache1 = new ConcurrentQueue<UsbAdDataStru1>();
-        public readonly object _DataCacheObj = new object();
-        public readonly AutoResetEvent _DataAutoResetEvent = new AutoResetEvent(false);
+
+        public ConcurrentQueue<IntPtr> ADPtrQueues = new ConcurrentQueue<IntPtr>();
         private unsafe void ReaderAD_DataReceived(object sender, EndpointDataEventArgs e)
         {
             if (IsStart)
             {
-                lock (_DataCacheObj)
+                //lock (_DataCacheObj)
+                //{
+                if (e.Count != 0)
                 {
-                    if (e.Count != 0)
+                    fixed (byte* pb = &e.Buffer[0])
                     {
-                        fixed (byte* pb = &e.Buffer[0])
-                        {
-                            //UsbAdDataStru res = Marshal.PtrToStructure<UsbAdDataStru>((IntPtr)pb);
-                            //_ADDataCache.Enqueue(res);
-                            UsbStrSet((IntPtr)pb);
-                        }
+                        ADPtrQueues.Enqueue((IntPtr)pb);
+                        //UsbAdDataStru res = Marshal.PtrToStructure<UsbAdDataStru>((IntPtr)pb);
+                        //_ADDataCache.Enqueue(res);
+                        //UsbStrSet((IntPtr)pb);
                     }
                 }
-                _ = _DataAutoResetEvent.Set();
-            }
-        }
-        private void UsbStrSet(IntPtr intPtr)
-        {
-            switch (adLength)
-            {
-                case 1088:
-                    UsbAdDataStru512 res1 = Marshal.PtrToStructure<UsbAdDataStru512>(intPtr);
-                    _ADDataCache512.Enqueue(res1);
-                    break;
-                case 576:
-                    UsbAdDataStru256 res2 = Marshal.PtrToStructure<UsbAdDataStru256>(intPtr);
-                    _ADDataCache256.Enqueue(res2);
-                    break;
-                case 320:
-                    UsbAdDataStru128 res3 = Marshal.PtrToStructure<UsbAdDataStru128>(intPtr);
-                    _ADDataCache128.Enqueue(res3);
-                    break;
-                case 192:
-                    UsbAdDataStru64 res4 = Marshal.PtrToStructure<UsbAdDataStru64>(intPtr);
-                    _ADDataCache64.Enqueue(res4);
-                    break;
-                case 128:
-                    UsbAdDataStru32 res5 = Marshal.PtrToStructure<UsbAdDataStru32>(intPtr);
-                    _ADDataCache32.Enqueue(res5);
-                    break;
-                case 96:
-                    UsbAdDataStru16 res6 = Marshal.PtrToStructure<UsbAdDataStru16>(intPtr);
-                    _ADDataCache16.Enqueue(res6);
-                    break;
-                case 80:
-                    UsbAdDataStru8 res7 = Marshal.PtrToStructure<UsbAdDataStru8>(intPtr);
-                    _ADDataCache8.Enqueue(res7);
-                    break;
-                case 72:
-                    UsbAdDataStru4 res8 = Marshal.PtrToStructure<UsbAdDataStru4>(intPtr);
-                    _ADDataCache4.Enqueue(res8);
-                    break;
-                case 68:
-                    UsbAdDataStru2 res9 = Marshal.PtrToStructure<UsbAdDataStru2>(intPtr);
-                    _ADDataCache2.Enqueue(res9);
-                    break;
-                case 66:
-                    UsbAdDataStru1 res10 = Marshal.PtrToStructure<UsbAdDataStru1>(intPtr);
-                    _ADDataCache1.Enqueue(res10);
-                    break;
+                //}
+                //_ = _DataAutoResetEvent.Set();
             }
         }
         private void Reader_DataReceived(object sender, EndpointDataEventArgs e)
         {
 
             byte[] data = null;
-            if (e.Buffer[0]==0x48 && e.Buffer[1]==0x57)
+            if (e.Buffer[0] == 0x48 && e.Buffer[1] == 0x57)
             {
                 int length = BitConverter.ToUInt16(e.Buffer.Skip(12).Take(2).ToArray(), 0);
 
                 data = e.Buffer.Take(20 + length).ToArray();
                 RaiseDataReceivedEvent(data);
-                Console.WriteLine("---" + BitConverter.ToString(data));
+                //Console.WriteLine("---" + BitConverter.ToString(data));
             }
 
         }

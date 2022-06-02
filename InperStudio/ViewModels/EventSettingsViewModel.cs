@@ -578,15 +578,12 @@ namespace InperStudio.ViewModels
                             _ = InperGlobalClass.EventSettings.Channels.Remove(item);
                             if (item.Type == ChannelTypeEnum.Input.ToString())
                             {
-
-                                Monitor.Enter(InperDeviceHelper.Instance._EventQLock);
                                 IRenderableSeriesViewModel render = InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.FirstOrDefault(x => ((LineRenderableSeriesViewModel)x).Tag.ToString() == ch_active.ChannelId.ToString());
                                 if (render != null)
                                 {
                                     _ = InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Remove(render);
-                                    _ = InperDeviceHelper.Instance.EventChannelChart.EventQs.TryRemove(ch_active.ChannelId);
+                                    //_ = InperDeviceHelper.Instance.EventChannelChart.EventQs.TryRemove(ch_active.ChannelId);
                                 }
-                                Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
                             }
                             if (item.Type == ChannelTypeEnum.Manual.ToString())
                             {
@@ -797,10 +794,8 @@ namespace InperStudio.ViewModels
 
                         if ((ch.Type == ChannelTypeEnum.Input.ToString() || ch.Type == ChannelTypeEnum.DIO.ToString()) && @enum == EventSettingsTypeEnum.Marker)
                         {
-                            Monitor.Enter(InperDeviceHelper.Instance._EventQLock);
                             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = ch.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color)ColorConverter.ConvertFromString(ch.BgColor) });
-                            InperDeviceHelper.Instance.EventChannelChart.EventQs.TryAdd(ch.ChannelId, new Queue<KeyValuePair<long, double>>());
-                            Monitor.Exit(InperDeviceHelper.Instance._EventQLock);
+                            //InperDeviceHelper.Instance.EventChannelChart.EventQs.TryAdd(ch.ChannelId, new Queue<KeyValuePair<long, double>>());
                         }
                         view.PopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(MarkerChannels.FirstOrDefault(x => x.IsActive == false)?.BgColor ?? "#000000"));
 

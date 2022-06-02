@@ -22,6 +22,7 @@ namespace InperStudio.Lib.Bean.Channel
 
     public class CameraChannel : ChannelBase
     {
+        public int CameraPlotCount = 0;
         public Mat Mask { get; set; }
         public double ROI { get; set; }
         private double height = double.NaN;
