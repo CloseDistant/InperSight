@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using MathNet.Filtering;
-using MathNet.Filtering.FIR;
+﻿using MathNet.Filtering;
+using System;
 
 namespace InperStudio.Lib.Helper.FilterTools
 {
@@ -58,20 +52,27 @@ namespace InperStudio.Lib.Helper.FilterTools
         public double GetBandpassValue(double r, int group)
         {
             double val = r;
-            switch (group)
+            try
             {
-                case 0:
-                    val = _Bandpass0.ProcessSample(r);
-                    break;
-                case 1:
-                    val = _Bandpass1.ProcessSample(r);
-                    break;
-                case 2:
-                    val = _Bandpass2.ProcessSample(r);
-                    break;
-                case 3:
-                    val = _Bandpass3.ProcessSample(r);
-                    break;
+                switch (group)
+                {
+                    case 0:
+                        val = _Bandpass0.ProcessSample(r);
+                        break;
+                    case 1:
+                        val = _Bandpass1.ProcessSample(r);
+                        break;
+                    case 2:
+                        val = _Bandpass2.ProcessSample(r);
+                        break;
+                    case 3:
+                        val = _Bandpass3.ProcessSample(r);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
             return val;
         }

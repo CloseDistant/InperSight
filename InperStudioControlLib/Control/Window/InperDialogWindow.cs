@@ -2,10 +2,6 @@
 using HandyControl.Tools;
 using InperStudioControlLib.Command;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -54,9 +50,13 @@ namespace InperStudioControlLib.Control.Window
                 WindowState = WindowState.Maximized;
             }
         }
-        private void CloseButton_Event(object sender, ExecutedRoutedEventArgs e) => Close();
-        private void ConfirmButton_Event(object sender, ExecutedRoutedEventArgs e) => ConfirmClickEvent?.Invoke(sender, e);
-        private void OtherButton_Event(object sender, ExecutedRoutedEventArgs e) => OtherClickEvent?.Invoke(e);
+        private void CloseButton_Event(object sender, ExecutedRoutedEventArgs e) { Close(); e.Handled = true; }
+        private void ConfirmButton_Event(object sender, ExecutedRoutedEventArgs e) { ConfirmClickEvent?.Invoke(sender, e); e.Handled = true; }
+        private void OtherButton_Event(object sender, ExecutedRoutedEventArgs e)
+        {
+            OtherClickEvent?.Invoke(e);
+            e.Handled = true;
+        }
 
         #region DependencyProperty
         public static readonly DependencyProperty IsShowMiniButtonProperty = DependencyProperty.Register(
@@ -87,6 +87,13 @@ namespace InperStudioControlLib.Control.Window
         {
             get => (bool)GetValue(IsShowBottomAllButtonProperty);
             set => SetValue(IsShowBottomAllButtonProperty, value);
+        }
+        public static readonly DependencyProperty IsShowBottomProperty = DependencyProperty.Register(
+            "IsShowBottom", typeof(bool), typeof(InperDialogWindow), new PropertyMetadata(true));
+        public bool IsShowBottom
+        {
+            get => (bool)GetValue(IsShowBottomProperty);
+            set => SetValue(IsShowBottomProperty, value);
         }
 
         public static readonly DependencyProperty IsShowOtherButtonProperty = DependencyProperty.Register(

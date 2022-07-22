@@ -16,6 +16,7 @@
              mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataShowControlViewModel}" KeyUp="{s:Action MarkerMonitor_KeyUp}">
     <UserControl.Resources>
         <Style x:Key="LeftAxisLabelStyle" TargetType="sc:DefaultTickLabel">
+            <Setter Property="Margin" Value="0"/>
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
@@ -109,7 +110,7 @@
                 <Grid Grid.Column="2">
                     <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
                         <sc:SciChartSurface.YAxis>
-                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0"
+                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
                                 DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Once" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                         </sc:SciChartSurface.YAxis>
@@ -247,7 +248,7 @@
         <Border Grid.Row="2" BorderThickness="0 1 0 1" BorderBrush="{StaticResource InperBorderColor}" >
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="141"/>
+                    <ColumnDefinition Width="139"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <UniformGrid Rows="2" Grid.Column="0" Panel.ZIndex="999" Background="{StaticResource InperDialogContentColor}">
@@ -264,9 +265,9 @@
                 </UniformGrid>
                 <UniformGrid Rows="2" Grid.Column="1" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" >
                     <Border BorderThickness="1 0 0 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{StaticResource InperBorderColor}">
-                        <sc:SciChartSurface Name="timesAxisSci" Margin="-62 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
+                        <sc:SciChartSurface Name="timesAxisSci" Margin="-60 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
                             <sc:SciChartSurface.YAxis>
-                                <sc:NumericAxis DrawMajorBands="False"
+                                <sc:NumericAxis DrawMajorBands="False"  
                                     DrawMajorGridLines="False"  
                                     DrawMinorGridLines="False"  AxisAlignment="Left" Visibility="Collapsed"/>
                             </sc:SciChartSurface.YAxis>

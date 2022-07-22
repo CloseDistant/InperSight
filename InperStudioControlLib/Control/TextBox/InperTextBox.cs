@@ -1,12 +1,6 @@
-﻿using HandyControl.Controls;
-using HandyControl.Data;
-using InperStudioControlLib.Control.InperAdorner;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -76,7 +70,7 @@ namespace InperStudioControlLib.Control.TextBox
                 if (rx.IsMatch(tbox.Text))
                 {
                     double res = double.Parse(tbox.Text);
-                    if (res < InperMinValue) 
+                    if (res < InperMinValue)
                     {
                         this.Foreground = Brushes.Red;
                         //Growl.Warning(new GrowlInfo() { Message = "不能小于" + InperMinValue, Token = "SuccessMsg", WaitTime = 1 });

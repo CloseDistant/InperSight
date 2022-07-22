@@ -3,18 +3,10 @@ using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Views;
 using InperStudio.Views.Control;
-using OpenCvSharp.Extensions;
 using Stylet;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -31,13 +23,7 @@ namespace InperStudio.ViewModels
         #endregion
         public VideoWindowViewModel(VideoRecordBean behaviorRecorderKit)
         {
-            BehaviorRecorderKit = new VideoRecordBean(behaviorRecorderKit._CamIndex, behaviorRecorderKit.Name)
-            {
-                AutoRecord = behaviorRecorderKit.AutoRecord,
-                CustomName = behaviorRecorderKit.CustomName,
-                IsActive = behaviorRecorderKit.IsActive,
-                WriteFps = behaviorRecorderKit.WriteFps
-            };
+            BehaviorRecorderKit = behaviorRecorderKit;
             BehaviorRecorderKit.StartCapture();
         }
         protected override void OnViewLoaded()
@@ -99,8 +85,15 @@ namespace InperStudio.ViewModels
         protected override void OnClose()
         {
             BehaviorRecorderKit.StopPreview();
-            BehaviorRecorderKit.StopRecording();
+            BehaviorRecorderKit.StopRecording(1);
             BehaviorRecorderKit.IsActive = false;
+            foreach(var item in InperGlobalClass.ActiveVideos)
+            {
+                if (item.Name.Equals(BehaviorRecorderKit.Name))
+                {
+                    item.IsActive = false;
+                }
+            }
         }
     }
 }

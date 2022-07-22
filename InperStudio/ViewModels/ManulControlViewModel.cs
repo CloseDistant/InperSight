@@ -1,28 +1,17 @@
 ﻿using HandyControl.Controls;
-using HandyControl.Data;
-using InperPhotometry;
 using InperStudio.Lib.Bean;
-using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudio.Views.Control;
-using InperStudioControlLib.Lib.Config;
-using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Forms;
-using System.Windows.Media;
-using Tag = InperStudio.Lib.Data.Model.Tag;
 
 namespace InperStudio.ViewModels
 {
@@ -32,6 +21,7 @@ namespace InperStudio.ViewModels
         private readonly IWindowManager windowManager;
         public MainWindowViewModel MainWindowViewModel { get; private set; }
 
+        private Sprite sprite = null;
         #endregion
         public ManulControlViewModel(IWindowManager windowManager)
         {
@@ -208,7 +198,7 @@ namespace InperStudio.ViewModels
 
             InperDeviceHelper.Instance.StartCollect();
 
-            StartAndStopShowMarker(ChannelTypeEnum.Start, 0, false);
+            StartAndStopShowMarker(ChannelTypeEnum.Start);
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
@@ -281,11 +271,8 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.IsPreview = true;
                 InperGlobalClass.IsStop = false;
                 (this.View as ManulControlView).Root_Gird.IsEnabled = true;
-                dt = DateTime.Now;
 
-                InperDeviceHelper.Instance.AllDataSave();
-
-                StartAndStopShowMarker(ChannelTypeEnum.Start, 0);
+                StartAndStopShowMarker(ChannelTypeEnum.Start);
                 ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
                 InperGlobalClass.IsAllowDragScroll = true;
 
@@ -307,13 +294,15 @@ namespace InperStudio.ViewModels
                           this.View.Dispatcher.Invoke(() => { StopRecord(); });
                       });
                 }
+
+                sprite = Sprite.Show(new HeartbeatContrrol());
+
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
         }
-        DateTime dt;
         private async void StopRecord(int type = 0)
         {
             try
@@ -327,16 +316,22 @@ namespace InperStudio.ViewModels
                         await task;
                     }
                     isrecord = true;
+                    if (sprite != null)
+                    {
+                        sprite.Close();
+                        sprite = null;
+                    }
                 }
                 if (type == 0)
                 {
-                    StartAndStopShowMarker(ChannelTypeEnum.Stop, 1, isrecord);
+                    StartAndStopShowMarker(ChannelTypeEnum.Stop);
                 }
+                InperDeviceHelper.Instance.device.Stop();
                 InperGlobalClass.IsRecord = false;
                 InperGlobalClass.IsPreview = false;
                 InperGlobalClass.IsStop = true;
-                var seconds = new TimeSpan(DateTime.Now.Ticks - dt.Ticks).TotalSeconds;
-                 (View as ManulControlView).Root_Gird.IsEnabled = true;
+
+                (View as ManulControlView).Root_Gird.IsEnabled = true;
 
                 InperDeviceHelper.Instance.StopPlot();
 
@@ -377,11 +372,8 @@ namespace InperStudio.ViewModels
                     }
                 }
 
-                InperDeviceHelper.Instance.device.Stop();
                 InperDeviceHelper.Instance.AllLightClose();
-                System.Windows.MessageBox.Show("收到点数：" + InperDeviceHelper.Instance.count + "存储收到点数：" + InperDeviceHelper.Instance.count1 + "记录时长：" + seconds);
-                InperDeviceHelper.Instance.count = 0;
-                InperDeviceHelper.Instance.count1 = 0;
+                //System.Windows.MessageBox.Show("收到点数：" + InperDeviceHelper.Instance.count + "存储收到点数：" + InperDeviceHelper.Instance.count1 + "记录时长：" + seconds);
             }
             catch (Exception ex)
             {
@@ -395,61 +387,54 @@ namespace InperStudio.ViewModels
             }
 
         }
-        private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum, int type = 1, bool isRecord = true)
+        private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum)
         {
+
             await Task.Factory.StartNew(() =>
              {
-                 if (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.Count > 0)
+                 try
                  {
-                     while (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.FirstOrDefault().DataSeries.XValues.Count <= 0)
+                     TimeSpan time = new TimeSpan();
+                     time = typeEnum == ChannelTypeEnum.Start
+                         ? new TimeSpan(0)
+                         : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count - 1];
+                     foreach (var channel in InperGlobalClass.EventSettings.Channels)
                      {
-                         _ = Task.Delay(100);
-                     }
-                 }
-                 foreach (var channel in InperGlobalClass.EventSettings.Channels)
-                 {
-                     if (channel.Type == typeEnum.ToString())
-                     {
-                         InperDeviceHelper.Instance.AddMarkerByHotkeys(channel, type);
-                         if (isRecord)
+                         if (channel.Type == typeEnum.ToString())
                          {
-                             Manual manual = new Manual()
+                             InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
                              {
+                                 CameraTime = time.Ticks,
                                  ChannelId = channel.ChannelId,
-                                 CameraTime = 0,
                                  Color = channel.BgColor,
+                                 IsIgnore = true,
                                  Name = channel.Name,
                                  Type = channel.Type,
-                                 CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                             };
-                             _ = App.SqlDataInit.sqlSugar.Insertable(manual).ExecuteCommand();
+                                 CreateTime = DateTime.Now
+                             });
                          }
-                     }
-                     if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
-                     {
-                         if (channel.Condition.Type == typeEnum.ToString())
+                         if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
                          {
-
-                             int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-                             TimeSpan time = new TimeSpan();
-                             time = typeEnum == ChannelTypeEnum.Start
-                             ? (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[0]
-                             : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                             InperDeviceHelper.Instance.AddMarkerByHotkeys(channel, type);
-                             if (isRecord)
+                             if (channel.Condition.Type == typeEnum.ToString())
                              {
-                                 Output output = new Output()
+                                 InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
                                  {
-                                     ChannelId = channel.ChannelId,
                                      CameraTime = time.Ticks,
-                                     Type = typeEnum.ToString(),
-                                     CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                                 };
-                                 _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                                     ChannelId = channel.ChannelId,
+                                     Color = channel.BgColor,
+                                     IsIgnore = false,
+                                     ConditionId = channel.Condition.ChannelId,
+                                     Name = channel.Name,
+                                     Type = channel.Condition.Type,
+                                     CreateTime = DateTime.Now
+                                 });
                              }
-
                          }
                      }
+                 }
+                 catch (Exception ex)
+                 {
+                     App.Log.Error(ex.ToString());
                  }
              });
         }
@@ -493,7 +478,20 @@ namespace InperStudio.ViewModels
                     InperDeviceHelper.Instance.AllLightOpen();
                 });
             }
+            if (InperGlobalClass.AdditionRecordConditionsStart == AdditionRecordConditionsTypeEnum.Trigger)
+            {
+                return Task.Factory.StartNew(() =>
+                {
+                    InperDeviceHelper.Instance.AllLightClose();
 
+                    if (obj.Trigger.Mode.Equals("Edge"))
+                    {
+
+                    }
+
+                    InperDeviceHelper.Instance.AllLightOpen();
+                });
+            }
             return null;
         }
         private Task StopTriggerStrategy()

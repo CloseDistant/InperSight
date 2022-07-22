@@ -1,19 +1,11 @@
-﻿using HandyControl.Controls;
-using InperStudio.Lib.Bean;
-using InperStudio.Lib.Data.Model;
+﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
-using InperStudioControlLib.Lib.Config;
-using Stylet;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Screen = Stylet.Screen;
@@ -109,14 +101,18 @@ namespace InperStudio.ViewModels
         }
         public void InperDialogWindow_ConfirmClickEvent(object sender, ExecutedRoutedEventArgs e)
         {
-            //if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-            //{
-            //    Growl.Warning("Filename exsited", "SuccessMsg");
-            //}
             if (string.IsNullOrEmpty(InperGlobalClass.DataFolderName))
             {
                 InperGlobalClass.ShowReminderInfo("The file name can’t be empty!");
                 return;
+            }
+            if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+            {
+                if (Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Count() > 0)
+                {
+                    InperGlobalClass.ShowReminderInfo("文件夹已存在");
+                    return;
+                }
             }
             RequestClose();
         }

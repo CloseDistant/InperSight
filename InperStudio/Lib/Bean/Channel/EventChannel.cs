@@ -1,15 +1,9 @@
 ﻿using InperStudio.Lib.Helper.JsonBean;
 using SciChart.Charting.Model.ChartSeries;
-using SciChart.Charting.Visuals.Annotations;
 using SciChart.Charting.Visuals.Axes;
 using SciChart.Data.Model;
 using Stylet;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Bean.Channel

@@ -13,10 +13,13 @@
     },
     "Trigger": {
       "isActive": false,
-      "source": "trig2",
-      "priTrigger": 100,
-      "threshodMin": 3.99,
-      "threshodMax": 5.99
+      "source": "Trig1",
+      "mode": "Edge",
+      "priTrigger": 1000,
+      "RefractoryPeriod": 5,
+      "Duration": 60,
+      "threshodMin": 2,
+      "threshodMax": 6
     }
   },
   "stop": {
@@ -33,10 +36,13 @@
     },
     "Trigger": {
       "isActive": false,
-      "source": "trig2",
-      "priTrigger": 100,
-      "threshodMin": 3.99,
-      "threshodMax": 5.99
+      "source": "Trig2",
+      "mode": "Edge",
+      "priTrigger": 1000,
+      "RefractoryPeriod": 5,
+      "Duration": 60,
+      "threshodMin": 2,
+      "threshodMax": 6
     }
   },
   "eventPanelProperties": {

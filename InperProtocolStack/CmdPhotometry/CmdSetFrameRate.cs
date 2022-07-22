@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InperProtocolStack.CmdPhotometry
 {
@@ -13,7 +10,7 @@ namespace InperProtocolStack.CmdPhotometry
             _CmdDataFrame.Header.Intent = ProtocolIntent.INTENT_SET_FRAME_RATE;
         }
 
-        
+
         public void SetCmdParam(float frame_rate)
         {
             _CmdDataFrame.FrameBody = BitConverter.GetBytes(frame_rate).ToList();

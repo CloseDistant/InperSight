@@ -29,6 +29,7 @@ namespace InperStudio.Lib.Bean.Channel
         public double Height { get => height; set => SetAndNotify(ref height, value); }
         public int OffsetWindowSize { get; set; } = 300;
         public bool Offset { get; set; }
+        public bool IsDeltaFCalculate { get; set; }
         public Filters Filters { get; set; } = new Filters();
         private TimeSpanAxis timeSpanAxis;
         public TimeSpanAxis TimeSpanAxis { get => timeSpanAxis; set => SetAndNotify(ref timeSpanAxis, value); }

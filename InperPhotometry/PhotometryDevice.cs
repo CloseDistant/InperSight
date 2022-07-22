@@ -1,10 +1,6 @@
 ﻿using InperProtocolStack;
-using InperProtocolStack.Communication;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InperDeviceManagement
 {
@@ -19,7 +15,7 @@ namespace InperDeviceManagement
         private BaslerCamera _BC;
 
         public List<LightDesc> LightSourceList => _CS.LightSourceList;
-
+        public PhotometryInfo PhotometryInfo => _CS.PhotometryInfo;
 
         public Dictionary<string, uint> DeviceIOIDs { get; private set; } = new Dictionary<string, uint>();
 
@@ -232,6 +228,10 @@ namespace InperDeviceManagement
         public void SetAdframeRate(uint frameRate, uint[] array)
         {
             _CS.SetAdframeRate(frameRate, array);
+        }
+        public void SetRunAdframeRate(uint frameRate, uint[] array)
+        {
+            _CS.RunAdframeRate(frameRate, array);
         }
         public void RemoveAdSampling()
         {

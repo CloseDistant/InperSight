@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Resources;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace InperStudioControlLib.Lib.Config
@@ -26,6 +21,26 @@ namespace InperStudioControlLib.Lib.Config
         private bool isSkip;
         private string upgradeKey;
         private string mcuKey;
+        private string releaseData;
+        private string versionDesc;
+        public string ReleaseData
+        {
+            get => releaseData;
+            set
+            {
+                releaseData = value;
+                SetConfigValue("releaseData", releaseData.ToString());
+            }
+        }
+        public string VersionDesc
+        {
+            get => versionDesc;
+            set
+            {
+                versionDesc = value;
+                SetConfigValue("versionDesc", versionDesc.ToString());
+            }
+        }
         public bool IsSkip
         {
             get => isSkip;
@@ -142,20 +157,30 @@ namespace InperStudioControlLib.Lib.Config
             upgradeKey = GetConfigValue("upgradeKey");
             mcu_version = GetConfigValue("mcu_version");
             mcuKey = GetConfigValue("mcuKey");
+            releaseData = GetConfigValue("releaseData");
+            versionDesc = GetConfigValue("versionDesc");
         }
         #endregion
 
         #region xml
         public static string GetConfigValue(string sKey, string sDefault = null)
         {
-            string xmlPath = string.IsNullOrEmpty(path) ? Environment.CurrentDirectory + @"/Config/InperStudio.exe.config" : path;
-            XDocument xdoc = XDocument.Load(xmlPath);
-            XElement xe = xdoc.Element("configuration").Element("appSettings").Elements("add").FirstOrDefault(x => x.Attribute("key").Value == sKey);
-            if (xe != null)
+            try
             {
-                return xe.Attribute("value").Value;
+                string xmlPath = string.IsNullOrEmpty(path) ? Environment.CurrentDirectory + @"/Config/InperStudio.exe.config" : path;
+                XDocument xdoc = XDocument.Load(xmlPath);
+                XElement xe = xdoc.Element("configuration").Element("appSettings").Elements("add").FirstOrDefault(x => x.Attribute("key").Value == sKey);
+                if (xe != null)
+                {
+                    return xe.Attribute("value").Value;
+                }
+                return sDefault;
             }
-            return sDefault;
+            catch (Exception ex)
+            {
+
+            }
+            return default;
         }
         public static void SetConfigValue(string sKey, string sValue)
         {
@@ -165,12 +190,19 @@ namespace InperStudioControlLib.Lib.Config
         }
         public static void SetConfigValue(string sKey, string sValue, string sectionName)
         {
-            string xmlPath = string.IsNullOrEmpty(path) ? Environment.CurrentDirectory + @"/Config/InperStudio.exe.config" : path;
-            XDocument xdoc = XDocument.Load(xmlPath);
-            XElement xElement = xdoc.Element("configuration").Element(sectionName).Elements("add").FirstOrDefault(x => x.Attribute("key").Value == sKey);
-            xElement.SetAttributeValue("value", sValue);
-            xdoc.Save(xmlPath);
-            ConfigurationManager.RefreshSection(sectionName);
+            try
+            {
+                string xmlPath = string.IsNullOrEmpty(path) ? Environment.CurrentDirectory + @"/Config/InperStudio.exe.config" : path;
+                XDocument xdoc = XDocument.Load(xmlPath);
+                XElement xElement = xdoc.Element("configuration").Element(sectionName).Elements("add").FirstOrDefault(x => x.Attribute("key").Value == sKey);
+                xElement.SetAttributeValue("value", sValue);
+                xdoc.Save(xmlPath);
+                ConfigurationManager.RefreshSection(sectionName);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
         #endregion
     }

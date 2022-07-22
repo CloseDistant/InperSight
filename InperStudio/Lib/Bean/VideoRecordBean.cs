@@ -1,22 +1,15 @@
-﻿using HandyControl.Controls;
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
+using Stylet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using InperStudio.Lib.Helper;
-using System.Collections.Concurrent;
-using Stylet;
 
 namespace InperStudio.Lib.Bean
 {
@@ -50,6 +43,7 @@ namespace InperStudio.Lib.Bean
             get => _writeFps;
             set => SetAndNotify(ref _writeFps, value);
         }
+        public bool IsCanOpen = true;
         #region private
         private VideoCapture _videoCapture;
         private VideoWriter _videoWriter;
@@ -67,18 +61,29 @@ namespace InperStudio.Lib.Bean
         {
             _CamIndex = devIndex;
             Name = name;
-            _videoCapture = new VideoCapture();
-            if (_videoCapture.Open(_CamIndex, VideoCaptureAPIs.DSHOW))
-            {
-                _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640d);
-                _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480d);
-                _videoCapture.Set(VideoCaptureProperties.FourCC, FourCC.MJPG);
-            }
+            Init();
         }
+        private void Init()
+        {
+            _videoCapture = new VideoCapture();
+            if (!_videoCapture.Open(_CamIndex, VideoCaptureAPIs.DSHOW))
+            {
+                IsCanOpen = false;
+                return;
+            }
+            _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640d);
+            _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480d);
+            _videoCapture.Set(VideoCaptureProperties.FourCC, FourCC.MJPG);
+        }
+        private int _redLock = 0;
         public void StartCapture()
         {
             readTokenSource = new CancellationTokenSource();
-
+            Interlocked.Exchange(ref _redLock, 0);
+            if (_videoCapture.IsDisposed)
+            {
+                Init();
+            }
             Task.Run(() =>
             {
                 if (!_videoCapture.IsOpened())
@@ -86,19 +91,18 @@ namespace InperStudio.Lib.Bean
                     Console.WriteLine("摄像头打开失败");
                     return;
                 }
-                int _redLock = 0;
-
+                Mat Camera = new Mat();
                 while (!readTokenSource.Token.IsCancellationRequested)
                 {
                     try
                     {
                         if (Interlocked.Exchange(ref _redLock, 1) == 0)
                         {
-                            Mat Camera = new Mat();
                             _ = _videoCapture.Read(Camera);
                             if (Camera.Empty())//读取视频文件时,判定帧是否为空,如果帧为空,则下方的图片处理会报异常
                             {
-                                break;
+                                Interlocked.Exchange(ref _redLock, 0);
+                                continue;
                             }
                             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                             {
@@ -132,12 +136,10 @@ namespace InperStudio.Lib.Bean
                     catch (Exception ex)
                     {
                         App.Log.Error(ex.ToString());
+                        Interlocked.Exchange(ref _redLock, 0);
                     }
                     Thread.Sleep(1);
                 }
-
-
-
             });
         }
 
@@ -194,40 +196,55 @@ namespace InperStudio.Lib.Bean
                   StartCapture();
               });
         }
-        public void StopRecording()
+        public void StopRecording(int type = 0)
         {
             _isRecord = false;
-
-            readTokenSource.Cancel();
-            readTokenSource.Token.Register(async () =>
+            if (readTokenSource != null)
             {
-                bool isEnd = false;
-                while (!isEnd)
+                readTokenSource.Cancel();
+                readTokenSource.Token.Register(async () =>
                 {
-                    if (_WriteMats.IsEmpty)
+                    bool isEnd = false;
+                    while (!isEnd)
                     {
-                        isEnd = true;
+                        if (_WriteMats.IsEmpty)
+                        {
+                            isEnd = true;
+                        }
+                        await Task.Delay(10);
                     }
-                    await Task.Delay(10);
-                }
-                _writeFrameCount = 0;
-                _actuallFrameCount = 0;
+                    _writeFrameCount = 0;
+                    _actuallFrameCount = 0;
 
-                _videoWriter.Release();
-                _videoWriter.Dispose();
-
-                StartCapture();
-            });
-
+                    if (_videoWriter != null && !_videoWriter.IsDisposed)
+                    {
+                        _videoWriter.Release();
+                        _videoWriter.Dispose();
+                    }
+                    if (type == 0)
+                    {
+                        StartCapture();
+                    }
+                });
+            }
         }
         public void StopPreview()
         {
             if (readTokenSource != null)
             {
                 readTokenSource.Cancel();
+                _ = readTokenSource.Token.Register(() =>
+                  {
+                      Interlocked.Exchange(ref _redLock, 1);
+                      _videoCapture.Dispose();
+                      if (_videoWriter != null && !_videoWriter.IsDisposed)
+                      {
+                          _videoWriter.Release();
+                          _videoWriter.Dispose();
+                      }
+                  });
             }
         }
-
         #endregion
     }
 }

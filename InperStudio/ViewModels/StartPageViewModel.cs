@@ -1,16 +1,12 @@
 ﻿using InperPhotometry;
-using InperProtocolStack.CmdPhotometry;
 using InperProtocolStack.UnderUpgrade;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
 using Stylet;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -37,11 +33,11 @@ namespace InperStudio.ViewModels
         {
             SearchDevice();
         }
-        public void SearchAgain()
+        public async void SearchAgain()
         {
             (View as StartPageView).loading.Visibility = Visibility.Visible;
             (View as StartPageView).remainder.Text = "The device is being initialized...";
-            
+            await Task.Delay(1000);
             SearchDevice();
         }
 
@@ -53,6 +49,12 @@ namespace InperStudio.ViewModels
                 DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
                 FileInfo[] files = root.GetFiles();
                 UnderUpgradeFunc under = new UnderUpgradeFunc();
+                if (!under.DeviceIsExist)
+                {
+                    (View as StartPageView).retry.Visibility = Visibility.Visible;
+                    (View as StartPageView).normal.Visibility = Visibility.Collapsed;
+                    return;
+                }
                 _ = View.Dispatcher.BeginInvoke(new Action(async () =>
                 {
                     #region 下位机更新
@@ -63,7 +65,7 @@ namespace InperStudio.ViewModels
                         if (!under.DeviceIsRestart)
                         {
                             MessageBox.Show("Updating successful . Changes will take effect after restarting.");
-                        }
+                        }      
                     }
                     else
                     {

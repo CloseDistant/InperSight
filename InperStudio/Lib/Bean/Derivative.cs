@@ -1,9 +1,5 @@
-﻿using System;
-using MathNet.Numerics.Statistics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MathNet.Numerics.Statistics;
+using System;
 
 namespace InperStudio.Lib.Bean
 {

@@ -5,11 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace InperProtocolStack.UnderUpgrade
 {
@@ -18,6 +15,7 @@ namespace InperProtocolStack.UnderUpgrade
         private AutoResetEvent _RecvAREvent = new AutoResetEvent(false);
         UsbDevice MyUsbDevice;
         public bool DeviceIsRestart = false;
+        public bool DeviceIsExist = false;
         CancellationTokenSource tokenSource = new CancellationTokenSource(new TimeSpan(0, 0, 3));
         CancellationTokenSource tokenSourceHash = new CancellationTokenSource(new TimeSpan(0, 0, 3));
         CancellationTokenSource tokenSourceRun = new CancellationTokenSource(new TimeSpan(0, 0, 3));
@@ -45,6 +43,7 @@ namespace InperProtocolStack.UnderUpgrade
                     _ = wholeUsbDevice.SetConfiguration(1);
                     _ = wholeUsbDevice.ClaimInterface(0);
                 }
+                DeviceIsExist = true;
                 UsbEndpointReader reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01, 128);
                 reader.DataReceived += Reader_DataReceived;
                 reader.DataReceivedEnabled = true;

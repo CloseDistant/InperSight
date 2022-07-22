@@ -6,15 +6,15 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
+using InperStudioControlLib.Control.TextBox;
 using Stylet;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace InperStudio.ViewModels
 {
@@ -879,6 +879,20 @@ namespace InperStudio.ViewModels
                     view.cancle.IsEnabled = true;
                     view.offset.IsEnabled = false;
                 }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+
+        public void InperTextBox_InperTextChanged(object arg1, TextChangedEventArgs arg2)
+        {
+            try
+            {
+                InperTextBox textBox = arg1 as InperTextBox;
+                InperDeviceHelper.Instance.device.SetRunAdframeRate(uint.Parse(textBox.Text), InperDeviceHelper.Instance.AiChannelsConfig);
+                InperDeviceHelper.Instance.adFsTimeInterval = 1d / uint.Parse(textBox.Text);
             }
             catch (Exception ex)
             {

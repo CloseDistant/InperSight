@@ -16,6 +16,9 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -28,11 +31,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -58,6 +58,15 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>InperSignal.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aliyun.OSS, Version=2.13.0.0, Culture=neutral, PublicKeyToken=0ad4175f0dac0b9b, processorArchitecture=MSIL">
@@ -250,18 +259,20 @@
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
     <Compile Include="Lib\Convert\RoiAIVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\TestModeConvert.cs" />
+    <Compile Include="Lib\Convert\TriggeString2VisibilityConverter.cs" />
     <Compile Include="Lib\Convert\VideoIntToTIme.cs" />
     <Compile Include="Lib\Convert\VisibilityToVisibilityReConverter.cs" />
-    <Compile Include="Lib\Data\Model\AIROI.cs" />
     <Compile Include="Lib\Data\Model\AnalogRecord.cs" />
+    <Compile Include="Lib\Data\Model\BaseMarker.cs" />
+    <Compile Include="Lib\Data\Model\ChannelConfig.cs" />
     <Compile Include="Lib\Data\Model\ChannelRecord.cs" />
     <Compile Include="Lib\Data\Model\ColumnDesc.cs" />
     <Compile Include="Lib\Data\Model\Config.cs" />
     <Compile Include="Lib\Data\Model\Environment.cs" />
     <Compile Include="Lib\Data\Model\Input.cs" />
-    <Compile Include="Lib\Data\Model\Manual.cs" />
+    <Compile Include="Lib\Data\Model\Marker.cs" />
     <Compile Include="Lib\Data\Model\Note.cs" />
-    <Compile Include="Lib\Data\Model\Output.cs" />
+    <Compile Include="Lib\Data\Model\OutputMarker.cs" />
     <Compile Include="Lib\Data\Model\TablesDesc.cs" />
     <Compile Include="Lib\Data\Model\Tag.cs" />
     <Compile Include="Lib\Data\SqlDataInit.cs" />
@@ -282,6 +293,7 @@
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventPanelProperties.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventSettings.cs" />
+    <Compile Include="ViewModels\AboutInperSignalViewModel.cs" />
     <Compile Include="ViewModels\AdditionSettingsViewModel.cs" />
     <Compile Include="ViewModels\DataPathConfigViewModel.cs" />
     <Compile Include="ViewModels\DataShowControlViewModel.cs" />
@@ -296,8 +308,14 @@
     <Compile Include="ViewModels\SignalSettingsViewModel.cs" />
     <Compile Include="ViewModels\StartPageViewModel.cs" />
     <Compile Include="ViewModels\VideoWindowViewModel.cs" />
+    <Compile Include="Views\AboutInperSignalView.xaml.cs">
+      <DependentUpon>AboutInperSignalView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AdditionSettingsView.xaml.cs">
       <DependentUpon>AdditionSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Control\HeartbeatContrrol.xaml.cs">
+      <DependentUpon>HeartbeatContrrol.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
@@ -373,6 +391,7 @@
     <None Include="ProductConfig.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -385,7 +404,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\AboutInperSignalView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AdditionSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Control\HeartbeatContrrol.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

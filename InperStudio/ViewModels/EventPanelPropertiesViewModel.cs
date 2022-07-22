@@ -3,12 +3,6 @@ using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using Stylet;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
@@ -43,7 +37,7 @@ namespace InperStudio.ViewModels
                     double value = 30;
                     if (double.TryParse(view.fixedValue.Text, out value))
                     {
-                        value = value < 2 ? 30 : (value >= 200 ? 200 : value);
+                        value = value < 2 ? 30 : (value >= 999 ? 999 : value);
                     }
                     view.fixedValue.Text = value.ToString();
                     dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = value;

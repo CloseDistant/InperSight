@@ -1,4 +1,5 @@
 ﻿using HandyControl.Controls;
+using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
@@ -9,18 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace InperStudio.Views.Control
 {
@@ -45,7 +39,7 @@ namespace InperStudio.Views.Control
         }
         private void SaveConfig_Click(object sender, RoutedEventArgs e)
         {
-            Growl.Success("Saved successfully", "SuccessMsg");
+            Growl.Success(new GrowlInfo() { Message = "Saved successfully", Token = "SuccessMsg", WaitTime = 1 });
         }
         private void SaveConfigAs_Click(object sender, RoutedEventArgs e)
         {
@@ -70,6 +64,9 @@ namespace InperStudio.Views.Control
                     InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
                     InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                     InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
+
+                    InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
+                    InperGlobalClass.SetSampling(InperGlobalClass.CameraSignalSettings.Sampling);
 
                     InperGlobalClass.ManualEvents.Clear();
                     foreach (Lib.Helper.JsonBean.EventChannelJson item in InperGlobalClass.EventSettings.Channels)
@@ -141,7 +138,7 @@ namespace InperStudio.Views.Control
                             (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
                             _window.RequestClose();
 
-                             _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog);
+                            _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog);
                             (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
                             _window.RequestClose();
                         }
@@ -211,5 +208,16 @@ namespace InperStudio.Views.Control
         }
 
         private void Skin_Click(object sender, RoutedEventArgs e) => PopupConfig.IsOpen = true;
+
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+            {
+                if (window.Name.Contains("MainWindow"))
+                {
+                    (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new AboutInperSignalViewModel());
+                }
+            }
+        }
     }
 }

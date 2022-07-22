@@ -1,14 +1,8 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Helper.JsonBean;
-using InperStudio.Views;
 using Stylet;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -21,7 +15,7 @@ namespace InperStudio.ViewModels
     {
         #region properties
         private IWindowManager windowManager;
-      
+
         public BindableCollection<EventChannelJson> ManulEvents { get; set; }
         #endregion
 
@@ -62,7 +56,7 @@ namespace InperStudio.ViewModels
 
                         tb.Text = time + @"：" + text;
                         _ = stack.Children.Add(tb);
-                        
+
                         _ = App.SqlDataInit.sqlSugar.Insertable<Note>(new Note()
                         {
                             Text = text,

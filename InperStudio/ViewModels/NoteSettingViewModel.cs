@@ -1,13 +1,13 @@
-﻿using Stylet;
+﻿using InperStudio.Lib.Data.Model;
+using InperStudio.Views;
+using Stylet;
 using System;
-using InperStudio.Lib.Data.Model;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Collections.Generic;
-using InperStudio.Views;
 
 namespace InperStudio.ViewModels
 {
@@ -36,13 +36,20 @@ namespace InperStudio.ViewModels
         private void NoteSettingViewModel_ConfirmClickEvent(object arg1, ExecutedRoutedEventArgs arg2)
         {
             var rich = (View as NoteSettingView).NoteContent;
-            if (!new TextRange(rich.Document.ContentStart, rich.Document.ContentEnd).IsEmpty)
+            string text = new TextRange(rich.Document.ContentStart, rich.Document.ContentEnd).Text.Replace("\r\n", "");
+            if (!string.IsNullOrEmpty(text))
             {
-                if (MessageBox.Show("有未保存内容，是否推出？", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (MessageBox.Show("有未保存内容，是否退出？", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     this.RequestClose();
                 }
+                else
+                {
+                    return;
+                }
             }
+
+            this.RequestClose();
         }
 
         public void NoteContent_KeyDown(object sender, KeyEventArgs e)

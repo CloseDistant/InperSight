@@ -1,8 +1,8 @@
-﻿using System;
-using SciChart.Charting.ViewportManagers;
+﻿using SciChart.Charting.ViewportManagers;
 using SciChart.Charting.Visuals;
 using SciChart.Charting.Visuals.Axes;
 using SciChart.Data.Model;
+using System;
 
 namespace InperStudio.Lib.Bean
 {

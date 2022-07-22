@@ -31,7 +31,8 @@ namespace InperStudio.ViewModels
         private ObservableCollection<VideoRecordBean> unusedKits;
         //private ObservableCollection<BehaviorRecorderKit> usedKits;
         public ObservableCollection<VideoRecordBean> UnusedKits { get => unusedKits; set => SetAndNotify(ref unusedKits, value); }
-        public ObservableCollection<VideoRecordBean> UsedKits { get; set; } = InperGlobalClass.ActiveVideos;
+        private ObservableCollection<VideoRecordBean> usedKits;
+        public ObservableCollection<VideoRecordBean> UsedKits { get => usedKits; set => SetAndNotify(ref usedKits, value); }
         #endregion
 
         #region trigger
@@ -39,6 +40,8 @@ namespace InperStudio.ViewModels
         private AdditionRecordConditions additionRecordStop;
         public AdditionRecordConditions AdditionRecordStart { get => additionRecordStart; set => SetAndNotify(ref additionRecordStart, value); }
         public AdditionRecordConditions AdditionRecordStop { get => additionRecordStop; set => SetAndNotify(ref additionRecordStop, value); }
+        public List<string> Source { get; set; } = new List<string>() { "Trig1", "Trig2" };
+        public List<string> Mode { get; set; } = new List<string>() { "Edge", "Real time" };
         #endregion
 
         #endregion
@@ -59,7 +62,7 @@ namespace InperStudio.ViewModels
                     break;
             }
         }
-        protected async override void OnViewLoaded()
+        protected override void OnViewLoaded()
         {
             base.OnViewLoaded();
             try
@@ -68,73 +71,85 @@ namespace InperStudio.ViewModels
 
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
+                    UsedKits = InperGlobalClass.ActiveVideos;
                     view.video.Visibility = Visibility.Visible;
                     UnusedKits = new ObservableCollection<VideoRecordBean>();
 
-                    await Task.Factory.StartNew(() =>
-                       {
-                           var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')");
-
-                           Dictionary<int, string> cameras = new Dictionary<int, string>();
-                           int count = 0;
-                           foreach (ManagementBaseObject device in searcher.Get())
-                           {
-                               cameras.Add(count, (string)device["Caption"]);
-                               count++;
-                           }
-
-                           //InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
-                           foreach (KeyValuePair<int, string> c in cameras)
-                           {
-                               if (!c.Value.Contains("Basler"))
-                               {
-                                   var item = new VideoRecordBean(c.Key, c.Value);
-                                   view.Dispatcher.Invoke(() =>
-                                   {
-                                       VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == c.Key || x.Name == c.Value);
-                                       if (it == null)
-                                       {
-                                           UnusedKits.Add(item);
-                                       }
-                                   });
-                               }
-                           }
-                           if (UsedKits.Count > 0)
-                           {
-                               UsedKits.ToList().ForEach(x =>
-                               {
-                                   VideoRecordBean item = unusedKits.FirstOrDefault(y => y._CamIndex == x._CamIndex);
-                                   if (item != null)
-                                   {
-                                       view.Dispatcher.Invoke(() =>
-                                       {
-                                           unusedKits.Remove(item);
-                                       });
-                                   }
-                               });
-                           }
-                       });
-                    if (unusedKits.Count > 0)
+                    view.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
-                    }
+                        //ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')");
+
+                        //Dictionary<int, string> cameras = new Dictionary<int, string>();
+                        //int count = 0;
+                        //foreach (ManagementBaseObject device in searcher.Get())
+                        //{
+                        //    cameras.Add(count, (string)device["Caption"]);
+                        //    count++;
+                        //}
+                        InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
+                        if (UsedKits.Count == CompInfo.ListCamerasData.Count)
+                        {
+                            return;
+                        }
+                        foreach (KeyValuePair<int, string> c in CompInfo.ListCamerasData)
+                        {
+                            if (!c.Value.Contains("Basler"))
+                            {
+                                VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == c.Key || x.Name == c.Value);
+                                if (it == null)
+                                {
+                                    var item = new VideoRecordBean(c.Key, c.Value);
+                                    if (item.IsCanOpen)
+                                    {
+                                        view.Dispatcher.Invoke(() =>
+                                        {
+                                            UnusedKits.Add(item);
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    it.IsActive = true;
+                                }
+                            }
+                        }
+
+
+                        if (unusedKits.Count > 0)
+                        {
+                            view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
+                        }
+                    }));
                 }
                 else
                 {
                     view.trigger.Visibility = Visibility.Visible;
                     view.Title = "Trigger";//"Start/Stop Conditions";
                     view.IsShowOtherButton = false;
+                    view.source_comb.ItemsSource = Source;
+                    view.mode_comb.ItemsSource = Mode;
+                    view.stop_source_comb.ItemsSource = Source;
+                    view.source_comb.SelectionChanged += Source_comb_SelectionChanged;
                 }
-
+                view.ConfirmClickEvent += View_ConfirmClickEvent;
+                view.OtherClickEvent += View_OtherClickEvent;
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
-            finally
+        }
+
+        private void Source_comb_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comb = (sender as System.Windows.Controls.ComboBox).SelectedValue;
+            if (comb.Equals("Trig1"))
             {
-                view.ConfirmClickEvent += View_ConfirmClickEvent;
-                view.OtherClickEvent += View_OtherClickEvent;
+                view.stop_source_comb.SelectedValue = "Trig2";
+            }
+            else
+            {
+                view.stop_source_comb.SelectedValue = "Trig1";
             }
         }
 
@@ -144,7 +159,6 @@ namespace InperStudio.ViewModels
             {
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
-
                     MainWindowViewModel main = null;
                     foreach (System.Windows.Window window in Application.Current.Windows)
                     {
@@ -155,19 +169,24 @@ namespace InperStudio.ViewModels
                     }
                     if (UsedKits.Count != 0)
                     {
-                        Parallel.ForEach(UsedKits, item =>
+                        foreach (var item in UsedKits)
                         {
+                            if (Application.Current.Windows.OfType<System.Windows.Window>().Count() > 1)
+                            {
+                                var window = Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.Title.Equals(item.CustomName));
+                                if (window != null)
+                                {
+                                    continue;
+                                }
+                            }
+
                             if (item.IsActive)
                             {
-                                //item.IsActive = true;
-                                view.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    var window = new VideoWindowViewModel(item);
-                                    main.windowManager.ShowWindow(window);
-                                    window.ActivateWith(main);
-                                }));
+                                var window = new VideoWindowViewModel(item);
+                                main.windowManager.ShowWindow(window);
+                                window.ActivateWith(main);
                             }
-                        });
+                        }
                     }
                 }
             }
@@ -180,7 +199,15 @@ namespace InperStudio.ViewModels
 
         private void View_ConfirmClickEvent(object arg1, System.Windows.Input.ExecutedRoutedEventArgs arg2)
         {
+            if (unusedKits != null)
+            {
+                unusedKits.ToList().ForEach(x =>
+                {
+                    x.StopPreview();
+                });
+            }
             this.RequestClose();
+
         }
 
         protected override void OnClose()
@@ -192,12 +219,18 @@ namespace InperStudio.ViewModels
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStart);
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStop, "stop");
                 }
+                else
+                {
+                    if (UnusedKits.Count > 0)
+                    {
+                        UnusedKits.ToList().ForEach(x => x.StopPreview());
+                    }
+                }
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
-            GC.Collect();
         }
 
         #region methods Video
@@ -228,6 +261,14 @@ namespace InperStudio.ViewModels
                 if (e.ClickCount >= 2)
                 {
                     VideoRecordBean item = (sender as Grid).DataContext as VideoRecordBean;
+                    if (Application.Current.Windows.OfType<System.Windows.Window>().Count() > 1)
+                    {
+                        var window = Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.Title.Equals(item.CustomName));
+                        if (window != null)
+                        {
+                            return;
+                        }
+                    }
                     MainWindowViewModel main = null;
                     foreach (System.Windows.Window window in Application.Current.Windows)
                     {
@@ -238,7 +279,6 @@ namespace InperStudio.ViewModels
                     }
                     if (item.IsActive)
                     {
-                        //item.IsActive = true;
                         var window = new VideoWindowViewModel(item);
                         main.windowManager.ShowWindow(window);
                         window.ActivateWith(main);
@@ -264,6 +304,7 @@ namespace InperStudio.ViewModels
                             return;
                         }
                         camera_active.IsActive = false;
+                        //camera_active.StartCapture();
                         _ = UsedKits.Remove(camera_active);
                         UnusedKits.Add(camera_active);
                         if (UnusedKits.Count <= 1)
@@ -289,7 +330,7 @@ namespace InperStudio.ViewModels
                         camera.AutoRecord = true; camera.IsActive = true;
                         _ = UnusedKits.Remove(camera);
                         UsedKits.Add(camera);
-                        //camera.StopPreview();
+                        camera.StopPreview();
                         //view.PopButton.Background = MarkerChannels.First().BgColor;
                         view.CameraCombox.SelectedIndex = 0;
                         view.CameraName.Text = "Video-";

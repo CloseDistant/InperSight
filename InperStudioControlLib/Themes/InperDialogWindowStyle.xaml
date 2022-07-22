@@ -36,7 +36,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="32"/>
                                             <RowDefinition Height="*"/>
-                                            <RowDefinition Height="32"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid Grid.Row="0"  Background="{StaticResource InperTitlePageColor}">
                                             <Grid.ColumnDefinitions>
@@ -56,18 +56,18 @@
                                         <AdornerDecorator Grid.Row="1">
                                             <Grid  Background="{DynamicResource InperMainPageColor}">
                                                 <ContentPresenter/>
-                                                <Border VerticalAlignment="Bottom" BorderBrush="Black" Opacity=".1" BorderThickness="0 0 0 1" Margin="-4 0"/>
+                                                <Border VerticalAlignment="Bottom" BorderBrush="Black" Opacity=".1" BorderThickness="0 0 0 1" Margin="-4 0" Visibility="{TemplateBinding IsShowBottom,Converter={StaticResource boolToVisibilityPositive}}"/>
                                             </Grid>
                                         </AdornerDecorator>
-                                        <Grid Grid.Row="2" Background="{StaticResource InperTitlePageColor}">
+                                        <Grid Grid.Row="2" Background="{StaticResource InperTitlePageColor}" Visibility="{TemplateBinding IsShowBottom,Converter={StaticResource boolToVisibilityPositive}}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Visibility="{TemplateBinding IsShowBottomAllButton,Converter={StaticResource boolToVisibilityPositive}}" x:Name="CustomButtonPanel" Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 10 0" UseLayoutRounding="True">
-                                                <Button  Style="{DynamicResource InperBottomButtonStyle}"  Visibility="{TemplateBinding IsShowCancleButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"  Command="{x:Static Member=cmd:CustomCommands.CancleCommand}" ContentStringFormat="Cancel"/>
-                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" Visibility="{TemplateBinding IsShowOtherButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"   Command="{x:Static Member=cmd:CustomCommands.OtherCommand}" ContentStringFormat="{TemplateBinding OtherButtonText}" />
-                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" ContentStringFormat="OK" Visibility="{TemplateBinding IsShowOkButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"  Command="{x:Static Member=cmd:CustomCommands.ConfirmCommand}" />
+                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" IsHitTestVisible="True"  Visibility="{TemplateBinding IsShowCancleButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"  Command="{x:Static Member=cmd:CustomCommands.CancleCommand}" ContentStringFormat="Cancel"/>
+                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" IsHitTestVisible="True"  Visibility="{TemplateBinding IsShowOtherButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24"   Command="{x:Static Member=cmd:CustomCommands.OtherCommand}" ContentStringFormat="{TemplateBinding OtherButtonText}" />
+                                                <Button  Style="{DynamicResource InperBottomButtonStyle}" IsHitTestVisible="True"  ContentStringFormat="OK" Visibility="{TemplateBinding IsShowOkButton,Converter={StaticResource boolToVisibilityPositive}}" Margin="8 5 8 0" Width="64" Height="24" Command="{x:Static Member=cmd:CustomCommands.ConfirmCommand}" />
                                             </StackPanel>
                                             <ContentPresenter Margin="0 5" WindowChrome.IsHitTestVisibleInChrome="True" Grid.Column="0" x:Name="ContentPresenterMain" Content="{TemplateBinding InperCustomDialogBottm}"/>
                                         </Grid>

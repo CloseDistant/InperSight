@@ -9,11 +9,13 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib" OtherButtonText="Open all"
         mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="True"
-        Title="Video Setting" SizeToContent="Height" MinHeight="440" Height="440" Width="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        Title="Video Setting" SizeToContent="Height" MinHeight="440" Height="440" Width="660" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
+        <conv:TriggeString2VisibilityConverter x:Key="TriggeString2VisibilityConverter"/>
     </inp:InperDialogWindow.Resources>
     <Grid  Background="{DynamicResource InperDialogContentColor}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
         <Grid x:Name="trigger" Visibility="Collapsed"  Margin="20 10" >
@@ -45,21 +47,49 @@
                         <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" Width="40" InperTextType="Double" InperVerify="True" InperMaxValue="59" InperMinValue="0" InperTextChanged="{s:Action AtTime_TextChanged}" Name="startSeconds" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <WrapPanel Margin="0 20 0 0"  Visibility="Collapsed">
-                    <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" VerticalAlignment="Top" x:Name="triggerRad" Margin="0 5 0 0 " IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}"  GroupName="start">
-                        <WrapPanel IsEnabled="{Binding ElementName=triggerRad,Path=IsChecked}">
+                <Grid Margin="0 20 0 0">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" VerticalAlignment="Top" x:Name="triggerRad" Margin="0 5 0 0 " IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}"  GroupName="start">
                             <TextBlock Text="Trigger" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                            <TextBlock Text="Source" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0"/>
-                            <ComboBox HorizontalAlignment="Right" Width="80" Style="{StaticResource ComboBoxExtend}" SelectedValue="{Binding Trigger.Source,Mode=TwoWay}" />
-                            <TextBlock Text="Pritrigger (ms)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
-                            <TextBox HorizontalAlignment="Right" Width="80" Text="{Binding Trigger.PriTrigger,Mode=TwoWay}"/>
-                            <TextBlock Text="Threshod (V)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
-                            <TextBox HorizontalAlignment="Right" Width="40" Text="{Binding Trigger.ThreshodMin,Mode=TwoWay}" />
-                            <TextBlock Text="-" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
-                            <TextBox HorizontalAlignment="Right" Width="40" Text="{Binding Trigger.ThreshodMax,Mode=TwoWay}" />
-                        </WrapPanel>
-                    </RadioButton>
-                </WrapPanel>
+                        </RadioButton>
+                        <UniformGrid IsEnabled="{Binding ElementName=triggerRad,Path=IsChecked}" Columns="2" Grid.Column="2">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="Source" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0 0 0"/>
+                                    <ComboBox Name="source_comb" HorizontalAlignment="Left" Margin="100 0 0 0" Width="120" Style="{StaticResource ComboBoxExtend}" SelectedValue="{Binding Trigger.Source,Mode=TwoWay}"/>
+                                </Grid>
+                                <Grid Margin="0 10">
+                                    <TextBlock Text="Pritrigger (ms)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
+                                    <TextBox HorizontalAlignment="Left" Margin="140 0 0 0" Width="80" Text="{Binding Trigger.PriTrigger,Mode=TwoWay}"/>
+                                </Grid>
+                                <Grid Visibility="{Binding ElementName=mode_comb,Path=SelectedValue,Converter={StaticResource TriggeString2VisibilityConverter}}">
+                                    <TextBlock Text="Refractory Period (s)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
+                                    <TextBox HorizontalAlignment="Left" Margin="140 0 0 0" Width="80" Text="{Binding Trigger.RefractoryPeriod,Mode=TwoWay}"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="Mode" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0 0 0"/>
+                                    <ComboBox x:Name="mode_comb" HorizontalAlignment="Left" Margin="100 0 0 0" Width="120" Style="{StaticResource ComboBoxExtend}" SelectedValue="{Binding Trigger.Mode,Mode=TwoWay}"/>
+                                </Grid>
+                                <WrapPanel Margin="0 10">
+                                    <TextBlock Text="Threshod (V)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0 12 0"/>
+                                    <TextBox Width="50" Text="{Binding Trigger.ThreshodMin,Mode=TwoWay}" />
+                                    <TextBlock Text="-" Foreground="#333" VerticalAlignment="Center"  Margin="5 0"/>
+                                    <TextBox Width="50" Text="{Binding Trigger.ThreshodMax,Mode=TwoWay}" />
+                                </WrapPanel>
+                                <Grid Visibility="{Binding ElementName=mode_comb,Path=SelectedValue,Converter={StaticResource TriggeString2VisibilityConverter}}">
+                                    <TextBlock Text="Duration (s)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
+                                    <TextBox HorizontalAlignment="Left" Margin="140 0 0 0" Width="80" Text="{Binding Trigger.PriTrigger,Mode=TwoWay}"/>
+                                </Grid>
+                            </StackPanel>
+                        </UniformGrid>
+                    </Grid>
+                </Grid>
             </StackPanel>
             <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" DataContext="{Binding AdditionRecordStop,UpdateSourceTrigger=PropertyChanged}">
                 <Grid Margin="0 20 0 0" >
@@ -85,12 +115,12 @@
                         <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" Width="40" InperTextType="Double" InperVerify="True" InperMaxValue="59" InperMinValue="0" InperTextChanged="{s:Action AtTime_TextChanged}" Name="stopSeconds" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <WrapPanel Margin="0 20 0 0"  Visibility="Collapsed">
+                <WrapPanel Margin="0 10 0 0"  Visibility="Visible">
                     <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 5 0 0 " GroupName="stop" IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
                         <WrapPanel  IsEnabled="{Binding ElementName=triggerRadStop,Path=IsChecked}">
                             <TextBlock Text="Trigger" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
                             <TextBlock Text="Source" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0"/>
-                            <ComboBox HorizontalAlignment="Right" Width="80" Style="{StaticResource ComboBoxExtend}" SelectedValue="{Binding Trigger.Source,Mode=TwoWay}" />
+                            <ComboBox x:Name="stop_source_comb" IsEnabled="False" HorizontalAlignment="Right" Width="80" Style="{StaticResource ComboBoxExtend}" SelectedValue="{Binding Trigger.Source,Mode=TwoWay}" />
                             <TextBlock Text="Pritrigger (ms)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0"/>
                             <TextBox HorizontalAlignment="Right" Width="80" Text="{Binding Trigger.PriTrigger,Mode=TwoWay}" />
                             <TextBlock Text="Threshod (V)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="10 0"/>

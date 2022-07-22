@@ -110,6 +110,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attach\VisibilityElement.cs" />
     <Compile Include="Command\CustomCommands.cs" />
     <Compile Include="Control\Border\InperTagBorder.cs" />
     <Compile Include="Control\InperAdorner\InperAdornerLayer.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Lib\DeviceAgency\ControlDept\USARTOperator.cs" />
     <Compile Include="Lib\DeviceAgency\DevPhotometry.cs" />
     <Compile Include="Lib\Helper\EnAndDecryption.cs" />
+    <Compile Include="Lib\Helper\InperRegexHelper.cs" />
     <Compile Include="Lib\Helper\SystemSleepHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -182,6 +184,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\InperComboboxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\InperDialogWindowStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -206,10 +212,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\Theme.xaml">
+    <Resource Include="Themes\Theme.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </Resource>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

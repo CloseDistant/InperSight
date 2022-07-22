@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Management;
-using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
@@ -267,7 +265,7 @@ namespace InperStudio.Lib.Helper
             File.Delete(Environment.CurrentDirectory + "/" + filename);
         }
 
-        public static void SaveScreenToImageByPoint(int left, int top, int width, int height,string path)
+        public static void SaveScreenToImageByPoint(int left, int top, int width, int height, string path)
         {
             Image image = new Bitmap(width, height);
             Graphics gc = Graphics.FromImage(image);
@@ -275,6 +273,6 @@ namespace InperStudio.Lib.Helper
 
             image.Save(path, System.Drawing.Imaging.ImageFormat.Bmp);
         }
-        
+
     }
 }

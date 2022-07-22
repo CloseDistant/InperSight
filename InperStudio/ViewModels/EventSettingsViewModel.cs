@@ -12,8 +12,6 @@ using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -572,7 +570,8 @@ namespace InperStudio.ViewModels
                         }
                         EventChannelJson item = @enum == EventSettingsTypeEnum.Marker
                             ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Input.ToString()) && x.Type != ChannelTypeEnum.Output.ToString())
-                            : InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Output.ToString()) && x.Condition?.ChannelId == ch_active.Condition?.ChannelId);
+                            : InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Output.ToString()) && x.Condition?.ChannelId == ch_active.Condition?.ChannelId && x.Condition?.Type == ch_active.Condition?.Type);
+                        Console.WriteLine(item.Type);
                         if (item != null)
                         {
                             _ = InperGlobalClass.EventSettings.Channels.Remove(item);
@@ -641,17 +640,16 @@ namespace InperStudio.ViewModels
                             {
                                 id = manualChannels.Count == 0 ? 0 : manualChannels.Last().ChannelId + 1;
                             }
-
+                            ch.RefractoryPeriod = double.Parse(view.refp.Text);
                             EventChannelJson channle = new EventChannelJson()
                             {
                                 ChannelId = id,
                                 IsActive = ch.IsActive,
                                 SymbolName = ch.SymbolName,
                                 Name = view.MarkerName.Text,
-                                RefractoryPeriod = ch.RefractoryPeriod,
+                                RefractoryPeriod = double.Parse(view.refp.Text),
                                 BgColor = ch.BgColor,
                                 DeltaF = ch.DeltaF,
-                                LightIndex = ch.LightIndex,
                                 WindowSize = ch.WindowSize,
                                 Tau1 = ch.Tau1,
                                 Tau2 = ch.Tau2,
@@ -660,12 +658,17 @@ namespace InperStudio.ViewModels
                                 Condition = ch.Condition,
                                 Type = type
                             };
+
                             if (channle.Name.EndsWith("-"))
                             {
                                 channle.Name = channle.Name.Substring(0, channle.Name.Length - 1);
                             }
                             if (@enum == EventSettingsTypeEnum.Marker)
                             {
+                                if (view.LightSources.SelectedItem != null)
+                                {
+                                    channle.LightIndex = (view.LightSources.SelectedItem as WaveGroup).GroupId;
+                                }
                                 if (channle.Type == ChannelTypeEnum.Camera.ToString() || channle.Type == ChannelTypeEnum.Analog.ToString())
                                 {
                                     channle.IsRefractoryPeriod = true;
@@ -673,6 +676,10 @@ namespace InperStudio.ViewModels
                             }
                             else
                             {
+                                if (view.OutLightSources.SelectedItem != null)
+                                {
+                                    channle.LightIndex = (view.OutLightSources.SelectedItem as WaveGroup).GroupId;
+                                }
                                 //output 热键重复排除
                                 if (channle.Condition != null && channle.Condition.Type == ChannelTypeEnum.Manual.ToString())
                                 {
@@ -696,7 +703,7 @@ namespace InperStudio.ViewModels
                                         {
                                             if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
                                             {
-                                                if (x.Condition.Hotkeys == channle.Condition.Hotkeys || x.Condition.Name == channle.Condition.Name)
+                                                if (x.Condition.Hotkeys == channle.Condition.Hotkeys || x.Name == channle.Name)
                                                 {
                                                     Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
                                                     mc.IsActive = false;
@@ -716,31 +723,6 @@ namespace InperStudio.ViewModels
                                     channle.IsRefractoryPeriod = true;
                                 }
                             }
-
-                            //if (ManualEvents.Count > 0 && (channle.Type == ChannelTypeEnum.Manual.ToString() || channle.Condition?.Type == ChannelTypeEnum.Manual.ToString()))
-                            //{
-                            //    EventChannelJson manual = null;
-                            //    if (@enum == EventSettingsTypeEnum.Marker)
-                            //    {
-                            //        if (string.IsNullOrEmpty(channle.Hotkeys))
-                            //        {
-                            //            mc.IsActive = false;
-                            //            return;
-                            //        }
-                            //        manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Hotkeys);
-                            //    }
-                            //    else
-                            //    {
-                            //        manual = ManualEvents.FirstOrDefault(x => x.Hotkeys == channle.Condition.Hotkeys);
-                            //    }
-                            //    if (manual != null)
-                            //    {
-                            //        Growl.Warning(new GrowlInfo() { Message = "Hotkeys have been occupied.", Token = "SuccessMsg", WaitTime = 1 });
-                            //        mc.IsActive = false;
-                            //        return;
-                            //    }
-                            //}
-                            //deltaf/f
                             if (type == ChannelTypeEnum.Camera.ToString() || type == ChannelTypeEnum.Analog.ToString())
                             {
                                 _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
@@ -851,11 +833,11 @@ namespace InperStudio.ViewModels
                 {
                     if (channel.Condition.Type == "Camera")
                     {
-                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.Condition.DeltaF };
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.DeltaF + " Windowsize:" + channel.WindowSize + " RefractoryPeriod:" + channel.RefractoryPeriod };
                     }
                     if (channel.Condition.Type == "Analog")
                     {
-                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.Condition.DeltaF };
+                        (sender as Grid).ToolTip = new TextBlock() { Text = "δF/F:" + channel.DeltaF + " Windowsize:" + channel.WindowSize };
                     }
                     if (channel.Condition.Type == "Manual")
                     {

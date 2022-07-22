@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace InperStudio.Lib.Helper.JsonBean
 {
@@ -27,7 +23,10 @@ namespace InperStudio.Lib.Helper.JsonBean
     public class Trigger : AdditionBase
     {
         public string Source { get; set; }
+        public string Mode { get; set; }
         public int PriTrigger { get; set; }
+        public int RefractoryPeriod { get; set; }
+        public int Duration { get; set; }
         public double ThreshodMin { get; set; }
         public double ThreshodMax { get; set; }
     }

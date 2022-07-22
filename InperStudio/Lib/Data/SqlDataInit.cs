@@ -9,11 +9,8 @@ using SciChart.Charting.Model.ChartSeries;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InperStudio.Lib.Data
 {
@@ -56,22 +53,37 @@ namespace InperStudio.Lib.Data
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Note));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Environment));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Tag));
-            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Output));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.TablesDesc));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.ColumnDesc));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Config));
-            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.AIROI));
-            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Manual));
+            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Marker));
+            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.OutputMarker));
+            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.ChannelConfig));
             RecordInit();
         }
         private void RecordInit()
         {
             RecordTablePairs.Clear();
             bool _isFirst = true;
+
             foreach (var item in InperDeviceHelper.Instance.CameraChannels)
             {
                 if (item.Type.Equals(ChannelTypeEnum.Camera.ToString()))
                 {
+                    item.LightModes.ForEach(x =>
+                    {
+                        ChannelConfig channelConfig = new ChannelConfig()
+                        {
+                            ChannelName = item.Name,
+                            ChannelId = item.ChannelId,
+                            LightId = x.LightType,
+                            Type = ChannelTypeEnum.Camera.ToString(),
+                            CreateTime = DateTime.Now,
+                            Color = x.WaveColor.ToString(),
+                            LightName = InperGlobalClass.CameraSignalSettings.LightMode.First(l => l.GroupId == x.LightType).WaveType
+                        };
+                        sqlSugar.Insertable(channelConfig).ExecuteCommand();
+                    });
 
                     if (_isFirst)
                     {
@@ -81,6 +93,7 @@ namespace InperStudio.Lib.Data
 
                             sqlSugar.MappingTables.Add(nameof(AllChannelRecord), nameof(AllChannelRecord) + id);
                             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(AllChannelRecord));
+
                             TablesDesc desc = new TablesDesc()
                             {
                                 TableName = nameof(AllChannelRecord) + id,
@@ -90,19 +103,30 @@ namespace InperStudio.Lib.Data
                             };
                             _ = sqlSugar.Insertable(desc).ExecuteCommand();
                         });
-
                         _isFirst = false;
                     }
                 }
                 else if (item.Type.Equals(ChannelTypeEnum.Analog.ToString()))
                 {
-                    sqlSugar.MappingTables.Add(nameof(AnalogRecord), nameof(AnalogRecord) + item.Type + item.ChannelId);
+                    ChannelConfig channelConfig = new ChannelConfig()
+                    {
+                        ChannelName = item.Name,
+                        ChannelId = item.ChannelId,
+                        LightId = -1,
+                        LightName = "",
+                        Type = ChannelTypeEnum.Analog.ToString(),
+                        CreateTime = DateTime.Now,
+                        Color = InperGlobalClass.CameraSignalSettings.CameraChannels.First(ai => ai.Type == ChannelTypeEnum.Analog.ToString() && ai.ChannelId == item.ChannelId).Color
+                    };
+                    sqlSugar.Insertable(channelConfig).ExecuteCommand();
+
+                    sqlSugar.MappingTables.Add(nameof(AnalogRecord), nameof(AnalogRecord) + item.ChannelId);
                     sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(AnalogRecord));
-                    RecordTablePairs.Add(item.Type + item.ChannelId, nameof(AnalogRecord) + item.Type + item.ChannelId);
+                    RecordTablePairs.Add(item.Type + item.ChannelId, nameof(AnalogRecord) + item.ChannelId);
 
                     TablesDesc desc = new TablesDesc()
                     {
-                        TableName = nameof(AnalogRecord) + item.Type + item.ChannelId,
+                        TableName = nameof(AnalogRecord) + item.ChannelId,
                         TableType = item.Type == SignalSettingsTypeEnum.Camera.ToString() ? 0 : 1,
                         Desc = "1:Analog 通道数据表",//"0:Camera 通道数据表,1:Analog 通道数据表",
                         CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
@@ -165,12 +189,7 @@ namespace InperStudio.Lib.Data
                 PropertyName = nameof(InperGlobalClass.EventSettings),
                 CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
             });
-            //configs.Add(new Config()
-            //{
-            //    JsonText = JsonConvert.SerializeObject(InperGlobalClass.ManualEvents),
-            //    PropertyName = nameof(InperGlobalClass.ManualEvents),
-            //    CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-            //});
+
             _ = sqlSugar.Insertable(configs).ExecuteCommand();
         }
     }

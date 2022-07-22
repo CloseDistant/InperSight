@@ -1,16 +1,8 @@
-﻿using SciChart.Charting.ViewportManagers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Stylet;
-using System.Threading.Tasks;
-using SciChart.Charting.ChartModifiers;
-using SciChart.Charting.Model.DataSeries;
-using SciChart.Charting.Visuals.Axes;
+﻿using SciChart.Charting.Model.DataSeries;
+using SciChart.Charting.ViewportManagers;
 using SciChart.Data.Model;
-using SciChart.Charting.Visuals.TradeChart;
-using System.Windows.Input;
+using Stylet;
+using System;
 
 namespace InperStudio.Lib.Bean
 {

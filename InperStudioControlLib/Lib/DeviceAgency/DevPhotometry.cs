@@ -1,9 +1,4 @@
-﻿using System;
-using InperStudioControlLib.Lib.DeviceAgency.CameraDept;
-using InperStudioControlLib.Lib.DeviceAgency.ControlDept;
-using OpenCvSharp;
-
-namespace InperStudioControlLib.Lib.DeviceAgency
+﻿namespace InperStudioControlLib.Lib.DeviceAgency
 {
     //public class MarkedMat
     //{

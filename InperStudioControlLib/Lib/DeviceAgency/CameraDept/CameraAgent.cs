@@ -1,7 +1,4 @@
-﻿using System;
-using LibUsbDotNet.DeviceNotify;
-
-namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
+﻿namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
 {
     //public class CameraStatusChangedEventArgs : EventArgs
     //{

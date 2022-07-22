@@ -6,7 +6,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/InperStudioControlLib;component/Themes/Basic/Basic.xaml"/>
     </ResourceDictionary.MergedDictionaries>
- 
+
     <Style x:Key="InperBaseListboxStyle" TargetType="{x:Type ListBoxItem}">
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -70,6 +70,28 @@
                     <Grid x:Name="bg">
                         <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                     </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="InperMainListboxStyleTransparent" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border BorderThickness="1" x:Name="bg" CornerRadius="6" Effect="{StaticResource EffectShadow2}">
+                        <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush" Value="#ED8F26" TargetName="bg"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

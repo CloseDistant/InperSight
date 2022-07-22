@@ -1,9 +1,7 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
-using HandyControl.Tools;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
-using InperStudio.Lib.Chart;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
@@ -13,16 +11,12 @@ using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Axes;
-using SciChart.Charting.Visuals.RenderableSeries;
-using SciChart.Data.Model;
 using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -269,6 +263,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+
         private void Init()
         {
             try
@@ -668,7 +663,7 @@ namespace InperStudio.ViewModels
                     }
                 }
 
-                foreach (CameraChannel item in InperDeviceHelper.CameraChannels)
+                foreach (CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
                 {
                     if (item.Type == ChannelTypeEnum.Camera.ToString())
                     {
@@ -683,6 +678,16 @@ namespace InperStudio.ViewModels
                                 XyDataSeries = new XyDataSeries<TimeSpan, double>(),
                             };
                             item.LightModes.Add(mode);
+                            if (InperGlobalClass.IsPreview)
+                            {
+                                InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, true);
+                                InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
+                                CameraChannel loopChn = InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
+                                LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = mode.LightType, DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
+                                line.DataSeries.FifoCapacity = 10 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
+                                loopChn.RenderableSeries.Add(line);
+                            }
+
                         }
                         LineRenderableSeriesViewModel fast = null;
                         foreach (LineRenderableSeriesViewModel line in item.RenderableSeries)
@@ -761,6 +766,17 @@ namespace InperStudio.ViewModels
                         if (mode != null)
                         {
                             _ = item.LightModes.Remove(mode);
+                            if (InperGlobalClass.IsPreview)
+                            {
+                                InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
+                                InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, 0);
+                                CameraChannel loopChn = InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
+
+                                if (loopChn.RenderableSeries.FirstOrDefault(x => (x as LineRenderableSeriesViewModel).Tag.ToString() == mode.LightType.ToString()) is LineRenderableSeriesViewModel line)
+                                {
+                                    loopChn.RenderableSeries.Remove(line);
+                                }
+                            }
                         }
                         LineRenderableSeriesViewModel fast = null;
                         foreach (LineRenderableSeriesViewModel line in item.RenderableSeries)
@@ -799,8 +815,8 @@ namespace InperStudio.ViewModels
                         this.view.waveView.IsEnabled = true;
                         InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                         {
-                        //if (x.IsChecked)
-                        {
+                            //if (x.IsChecked)
+                            {
                                 InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                                 InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
                                 Thread.Sleep(50);

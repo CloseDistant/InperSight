@@ -1,11 +1,9 @@
-﻿using HandyControl.Controls;
-using InperStudio.Lib.Bean;
+﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Chart;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
-using InperStudio.Lib.Helper.HotKey;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using SciChart.Charting.Visuals;
@@ -15,13 +13,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
@@ -83,7 +77,7 @@ namespace InperStudio.ViewModels
             if (obj)
             {
                 view.sciScroll.SelectedRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
-                EventChannelChart.TimeSpanAxis.VisibleRange= new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
+                EventChannelChart.TimeSpanAxis.VisibleRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
                 foreach (var item in InperDeviceHelper.Instance.CameraChannels)
                 {
                     item.TimeSpanAxis.VisibleRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)VisibleValue));
@@ -202,7 +196,7 @@ namespace InperStudio.ViewModels
                         string[] hotkeys = x.Condition.Hotkeys.Split('+');
                         if (hotkeys.Contains(e.Key.ToString()))
                         {
-                            AddMarkers(hotkeys, x);
+                            AddMarkers(hotkeys, x, 1);
                         }
                     }
                 }
@@ -211,80 +205,65 @@ namespace InperStudio.ViewModels
         }
         private void AddMarkers(string[] hotkeys, EventChannelJson x, int type = 0)
         {
-            if (hotkeys.Count() == 1)
-            {
-                if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
-                {
-                    //if (type == 0)
-                    //{
-                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x);
-                    //}
-                    //else
-                    //{
-                    //    InperDeviceHelper.Instance.SendCommand(x);
-                    //}
-                }
-            }
-            if (hotkeys.Count() == 2)
-            {
-                if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
-                {
-                    //if (type == 0)
-                    //{
-                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x);
-                    //}
-                    //else
-                    //{
-                    //    InperDeviceHelper.Instance.SendCommand(x);
-                    //}
-                }
-            }
-            if (hotkeys.Count() == 3)
-            {
-                if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
-                {
-                    //if (type == 0)
-                    //{
-                        InperDeviceHelper.Instance.AddMarkerByHotkeys(x);
-                    //}
-                    //else
-                    //{
-                    //    InperDeviceHelper.Instance.SendCommand(x);
-                    //}
-                }
-            }
             int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
             if (count > 0)
             {
                 TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                if (type == 0 && InperGlobalClass.IsRecord)
+                if (hotkeys.Count() == 1)
                 {
-
-                    Manual manual = new Manual()
+                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
                     {
-                        ChannelId = x.ChannelId,
-                        Color = x.BgColor,
-                        CameraTime = time.Ticks,
-                        Name = x.Name,
-                        Type = ChannelTypeEnum.Manual.ToString(),
-                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                    };
-
-                    _ = (App.SqlDataInit?.sqlSugar.Insertable(manual).ExecuteCommand());
+                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                        {
+                            CameraTime = time.Ticks,
+                            ChannelId = x.ChannelId,
+                            Color = x.BgColor,
+                            IsIgnore = type == 0 ? true : false,
+                            Type = ChannelTypeEnum.Manual.ToString(),
+                            CreateTime = DateTime.Now,
+                            Name = x.Name,
+                            ConditionId = -1
+                        });
+                        return;
+                    }
                 }
-                if (type == 1 && InperGlobalClass.IsRecord)
+                if (hotkeys.Count() == 2)
                 {
-                    Output output = new Output()
+                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
                     {
-                        ChannelId = x.ChannelId,
-                        CameraTime = time.Ticks,
-                        Type = ChannelTypeEnum.Manual.ToString(),
-                        CreateTime = DateTime.Parse(DateTime.Now.ToString("G"))
-                    };
-                    _ = (App.SqlDataInit?.sqlSugar.Insertable(output).ExecuteCommand());
+                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                        {
+                            CameraTime = time.Ticks,
+                            ChannelId = x.ChannelId,
+                            Color = x.BgColor,
+                            IsIgnore = type == 0 ? true : false,
+                            Type = ChannelTypeEnum.Manual.ToString(),
+                            CreateTime = DateTime.Now,
+                            Name = x.Name,
+                            ConditionId = -1
+                        });
+                        return;
+                    }
+                }
+                if (hotkeys.Count() == 3)
+                {
+                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
+                    {
+                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                        {
+                            CameraTime = time.Ticks,
+                            ChannelId = x.ChannelId,
+                            Color = x.BgColor,
+                            IsIgnore = type == 0 ? true : false,
+                            Type = ChannelTypeEnum.Manual.ToString(),
+                            CreateTime = DateTime.Now,
+                            Name = x.Name,
+                            ConditionId = -1
+                        });
+                        return;
+                    }
                 }
             }
-
         }
         public void YaxisAdd(object sender)
         {

@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace InperStudio
 {
@@ -68,7 +67,6 @@ namespace InperStudio
             {
                 File.Copy(Environment.CurrentDirectory + @"\UserConfig.json", jsonPath, true);
             }
-
             RegisterEvents();
             #endregion
             InperGlobalClass.DataPath = InperGlobalClass.DataPath == string.Empty ? Environment.CurrentDirectory + @"\Data\" : InperGlobalClass.DataPath;
@@ -77,27 +75,32 @@ namespace InperStudio
             {
                 _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
             }
-
             SystemSleepHelper.PreventSleep(true);
 
             base.OnStartup(e);
         }
         public static void RaiseOtherProcess()
         {
-            Process proc = Process.GetCurrentProcess();
-            foreach (Process otherProc in
-                Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
+            try
             {
-                if (proc.Id != otherProc.Id)
+                Process proc = Process.GetCurrentProcess();
+                foreach (Process otherProc in Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName))
                 {
-                    IntPtr hWnd = otherProc.MainWindowHandle;
-                    if (IsIconic(hWnd))
+                    if (proc.Id != otherProc.Id)
                     {
-                        ShowWindowAsync(hWnd, 9);
+                        IntPtr hWnd = otherProc.MainWindowHandle;
+                        if (IsIconic(hWnd))
+                        {
+                            ShowWindowAsync(hWnd, 9);
+                        }
+                        SetForegroundWindow(hWnd);
+                        break;
                     }
-                    SetForegroundWindow(hWnd);
-                    break;
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
             }
         }
 

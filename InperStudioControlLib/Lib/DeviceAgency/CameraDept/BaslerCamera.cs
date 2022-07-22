@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-//using Basler.Pylon;
-using OpenCvSharp;
+﻿//using Basler.Pylon;
 
 namespace InperStudioControlLib.Lib.DeviceAgency.CameraDept
 {

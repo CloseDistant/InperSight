@@ -1,14 +1,12 @@
-﻿using System;
+﻿using InperProtocolStack.Basis;
+using InperProtocolStack.CmdPhotometry;
+using InperProtocolStack.Communication;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using InperProtocolStack.Communication;
-using InperProtocolStack.Basis;
-using InperProtocolStack.CmdPhotometry;
-using System.Windows.Forms;
 
 namespace InperProtocolStack.TransmissionCtrl
 {
@@ -132,7 +130,7 @@ namespace InperProtocolStack.TransmissionCtrl
             _RProcessor.OnMsgReceived += DevMsgReceived;
             _UARTA.OnDataReceived += new EventHandler<OnDataReceivedEventArgs>(OnDataReceived);
             //_UARTA.OnDataReceivedUsb += UARTA_OnDataReceivedUsb;
-
+            _UARTA.OnInputReceived += _UARTA_OnInputReceived;
             _ = Task.Run(() => { ReceivedDataMonitor(); });
 
             //SetupMetronome();
@@ -141,6 +139,12 @@ namespace InperProtocolStack.TransmissionCtrl
 
             return;
         }
+        public event EventHandler<byte[]> OnInputUpdated;
+        private void _UARTA_OnInputReceived(object sender, byte[] e)
+        {
+            OnInputUpdated?.Invoke(sender, e);
+        }
+
         public event EventHandler<MessageReceivedEventArgs> OnInfoUpdated;
 
         private void DevMsgReceived(object sender, MessageReceivedEventArgs e)
@@ -189,23 +193,31 @@ namespace InperProtocolStack.TransmissionCtrl
 
         private uint _SendingSequence = 0;
         private object _CmdCacheLock = new object();
-        private Queue<Command> _CommandCache = new Queue<Command>();
+        private ConcurrentQueue<Command> _CommandCache = new ConcurrentQueue<Command>();
         private AutoResetEvent _AREvent = new AutoResetEvent(false);
+        bool isFirst = true;
         public void Transmit(Command cmd)
         {
             cmd.Sequence = _SendingSequence;
             _SendingSequence++;
 
-            lock (_CmdCacheLock)
-            {
-                _CommandCache.Enqueue(cmd);
-            }
+            //lock (_CmdCacheLock)
+            //{
+            _CommandCache.Enqueue(cmd);
+            //}
 
-            _AREvent.Set();
+            if (isFirst)
+            {
+                TransmittingProcess();
+                isFirst = false;
+            }
 
             return;
         }
-
+        public void OutputSend(List<byte> b)
+        {
+            _ = _UARTA.SendDataUsb(b, 2);
+        }
 
         private bool CommandIsRedundant(Command cmd1, Command cmd2)
         {
@@ -224,52 +236,28 @@ namespace InperProtocolStack.TransmissionCtrl
         }
 
 
-
+        int _pLock = 0;
         private void TransmittingProcess()
         {
-            while (true)
+            if (Interlocked.Exchange(ref _pLock, 1) == 0)
             {
-                _AREvent.WaitOne();
-
-
-                Queue<Command> cq = new Queue<Command>();
-                lock (_CmdCacheLock)
+                if (_CommandCache.TryDequeue(out Command cmd))
                 {
-                    cq = new Queue<Command>(_CommandCache);
-                    _CommandCache.Clear();
+                    _ = _UARTA.SendDataUsb(cmd.GetBytes(), 1);
                 }
 
-                if (cq.Count == 0)
+                if (_CommandCache.Count == 0)
                 {
-                    continue;
+                    isFirst = true;
                 }
-
-                Command cmd_ready = cq.Dequeue();
-                while (cq.Count != 0)
-                {
-                    Command cmd_top = cq.Dequeue();
-                    if (CommandIsRedundant(cmd_ready, cmd_top))
-                    {
-                        cmd_ready = cmd_top;
-                        continue;
-                    }
-
-                    _ = _UARTA.SendDataUsb(cmd_ready.GetBytes());
-                    //_UARTA.SendData(cmd_ready.GetBytes());
-                    cmd_ready = cmd_top;
-                    Thread.Sleep(20);
-                }
-
-                _ = _UARTA.SendDataUsb(cmd_ready.GetBytes());
-                //_UARTA.SendData(cmd_ready.GetBytes());
-                Thread.Sleep(20);
+                Interlocked.Exchange(ref _pLock, 0);
             }
         }
 
 
         private void Confirm(uint sequence)
         {
-            //System.Diagnostics.Debug.WriteLine("Command {0} confirmed.", sequence);
+            TransmittingProcess();
             return;
         }
 

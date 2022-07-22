@@ -1,14 +1,10 @@
-﻿using InperProtocolStack.Basis;
-using InperProtocolStack.CmdPhotometry;
+﻿using InperProtocolStack.CmdPhotometry;
 using InperProtocolStack.Communication;
 using InperProtocolStack.TransmissionCtrl;
-using LibUsbDotNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace InperProtocolStack
 {
@@ -37,8 +33,22 @@ namespace InperProtocolStack
             _UARTA = new UARTAgent(vid, pid);
             _TC = new TransTrafficCtrl(_UARTA);
             _TC.OnInfoUpdated += InfoUpdated;
+            _TC.OnInputUpdated += _TC_OnInputUpdated;
             InqID();
         }
+
+        private void _TC_OnInputUpdated(object sender, byte[] e)
+        {
+            List<DevInputNotificationEventArgs> items = DeviceInputUpdated(e);
+            if (items.Count > 0)
+            {
+                items.ForEach(x =>
+                {
+                    OnDevNotification?.Invoke(this, x);
+                });
+            }
+        }
+
         public uint FirmwareRevision { get; private set; } = 0;
         public uint HardwareRevision { get; private set; } = 0;
         public string BundleCameraID = "";
@@ -93,53 +103,49 @@ namespace InperProtocolStack
                 LightDesc ld = new LightDesc((uint)lightConfigInfo.ID, lightConfigInfo.WaveLength, lightConfigInfo.MaxPower);
                 LightSourceList.Add(ld);
             }
+            PhotometryInfo = info;
         }
         public List<LightDesc> LightSourceList { get; private set; } = new List<LightDesc>();
-        //private struct LightConfig
-        //{
-        //    public UInt32 ID;
-        //    public UInt32 Enabled;
-        //    public float MaxPower;
-        //    public UInt32 WaveLength;
-        //}
-        //private void UpdateLightConfig(byte[] param)
-        //{
-        //    int light_cfg_size = Marshal.SizeOf(typeof(LightConfig));
-        //    UInt32 light_no = BitConverter.ToUInt32(param.Take(4).ToArray(), 0);
-        //    for (int li = 0; li < light_no; li++)
-        //    {
-        //        byte[] cfg_bytes = param.Skip(4 + (li * light_cfg_size)).Take(light_cfg_size).ToArray();
-        //        LightConfig lc = Utils.BytesToStruct<LightConfig>(cfg_bytes, light_cfg_size);
-        //        if (lc.Enabled != 0)
-        //        {
-        //            LightDesc ld = new LightDesc(lc.ID, lc.WaveLength, lc.MaxPower);
-        //            LightSourceList.Add(ld);
-        //        }
-        //    }
-        //    return;
-        //}
+        public PhotometryInfo PhotometryInfo { get; private set; } = new PhotometryInfo();
         private void UpdateIOConfig(byte[] param)
         {
             return;
         }
         #endregion
 
-
         #region Device Notification
         public event EventHandler<DevNotificationEventArgs> OnDevNotification;
-        private DevInputNotificationEventArgs DeviceInputUpdated(byte[] param)
+        private List<DevInputNotificationEventArgs> DeviceInputUpdated(byte[] param)
         {
-            if (param.Length < 8)
+            try
+            {
+                if (param.Length < 8)
+                {
+                    return null;
+                }
+                List<DevInputNotificationEventArgs> devs = new List<DevInputNotificationEventArgs>();
+                var length = BitConverter.ToUInt64(param.Skip(8).Take(8).ToArray(), 0);
+
+                byte[] buffer = param.Skip(16).Take((int)length * 16).ToArray();
+                var tamp = BitConverter.ToUInt64(buffer, 0);
+
+                for (int i = 0; i < (int)length; i++)
+                {
+                    UInt64 io_timestamp = BitConverter.ToUInt64(param.Skip(16 * (i + 1)).Take(8).ToArray(), 0);
+                    UInt32 io_id = BitConverter.ToUInt32(param.Skip(16 * (i + 1) + 8).Take(4).ToArray(), 0);
+
+                    UInt32 io_stat = BitConverter.ToUInt32(param.Skip(16 * (i + 1) + 12).Take(4).ToArray(), 0);
+
+                    DevInputNotificationEventArgs e = new DevInputNotificationEventArgs { IOID = io_id, Status = io_stat, Timestamp = io_timestamp * 10 };
+                    devs.Add(e);
+                }
+
+                return devs;
+            }
+            catch (Exception ex)
             {
                 return null;
             }
-
-            UInt32 io_id = BitConverter.ToUInt32(param.Take(4).ToArray(), 0);
-            byte[] stat_b = param.Skip(4).Take(4).ToArray();
-            UInt32 io_stat = BitConverter.ToUInt32(stat_b, 0);
-
-            DevInputNotificationEventArgs e = new DevInputNotificationEventArgs { IOID = io_id, Status = io_stat };
-            return e;
         }
         #endregion
 
@@ -163,8 +169,8 @@ namespace InperProtocolStack
                     OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
                     break;
                 case ProtocolIntent.INTENT_INPUT_IO:
-                    DevInputNotificationEventArgs ea = DeviceInputUpdated(e.Data);
-                    OnDevNotification?.Invoke(this, ea);
+                    //DevInputNotificationEventArgs ea = DeviceInputUpdated(e.Data);
+                    //OnDevNotification?.Invoke(this, ea);
                     break;
                 case ProtocolIntent.INTENT_PHOTOMETRY_INFO:
                     UpdatePhotoMetryInfo(e.Data);
@@ -248,14 +254,24 @@ namespace InperProtocolStack
 
         public void OuputIO(uint io_id, uint stat)
         {
-            CmdOutputIO cmd = new CmdOutputIO();
-            cmd.SetCmdParam(io_id, stat);
-            _TC.Transmit(cmd);
+            //CmdOutputIO cmd = new CmdOutputIO();
+            //cmd.SetCmdParam(io_id, stat);
+            //_TC.Transmit(cmd);
+            List<byte> b = new List<byte>();
+            b.AddRange(BitConverter.GetBytes(io_id));
+            b.AddRange(BitConverter.GetBytes(stat));
+            _TC.OutputSend(b);
         }
 
         public void ADIsStartCollect(bool isStart)
         {
             _UARTA.IsStart = isStart;
+        }
+        public void RunAdframeRate(uint frameRate, uint[] array)
+        {
+            CmdAdframeRate cmd = new CmdAdframeRate();
+            cmd.SetCmdParam(frameRate, array);
+            _TC.Transmit(cmd);
         }
         public void SetAdframeRate(uint frameRate, uint[] array)
         {

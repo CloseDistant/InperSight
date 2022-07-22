@@ -1,5 +1,4 @@
 ﻿using InperStudio.Lib.Bean;
-using InperStudio.Lib.Helper;
 using InperStudio.ViewModels;
 using InperStudioControlLib.Lib.Config;
 using MySql.Data.MySqlClient;
@@ -11,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows;
 
 namespace InperStudio
 {
@@ -32,30 +30,10 @@ namespace InperStudio
                     DbType = DbType.MySql,
                     IsAutoCloseConnection = true //不设成true要手动close
                 });
-                //List<Mcu_Version> list_mcu = db.Queryable<Mcu_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
-
-                //if (list_mcu.Count() > 0)
-                //{
-                //    Mcu_Version mcu = list_mcu.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Mcu_Version);
-                //    if (mcu != null)
-                //    {
-                //        Mcu_Version _Version = list_mcu.FirstOrDefault(x => x.Id > mcu.Id);
-
-                //        if (_Version != null)
-                //        {
-                //            if (!InperConfig.Instance.IsSkip)
-                //            {
-                //                string content = InperConfig.Instance.Mcu_Version + "," + Environment.CurrentDirectory + "/UnderBin/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe") + ",mcu";
-                //                _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
-                //                Environment.Exit(0);
-                //            }
-                //        }
-                //    }
-                //}
 
                 List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
 
-                if (list.Count() > 0)
+                if (list != null && list.Count() > 0)
                 {
                     Tb_Version ver = list.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Version);
                     if (ver != null)
@@ -67,13 +45,32 @@ namespace InperStudio
                             if (!InperConfig.Instance.IsSkip)
                             {
                                 string content = InperConfig.Instance.Version + "," + Environment.CurrentDirectory + "/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe");
-                                _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
-                                Environment.Exit(0);
+                                if (content.Split(',').Length == 3)
+                                {
+                                    _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
+                                    Environment.Exit(0);
+                                }
                             }
                         }
                     }
+                    InperConfig.Instance.ReleaseData = list.Last().UploadTime.ToString("yyyy-MM-dd");
+                    if (!string.IsNullOrEmpty(list.Last().Desc))
+                    {
+                        InperConfig.Instance.VersionDesc = string.Empty;
+                        if (list.Last().Desc.Contains('@'))
+                        {
+                            list.Last().Desc.Split('@').ToList().ForEach(desc =>
+                            {
+                                InperConfig.Instance.VersionDesc += desc + Environment.NewLine;
+                            });
+                        }
+                        else
+                        {
+                            InperConfig.Instance.VersionDesc = list.Last().Desc;
+                        }
+                    }
                 }
-              
+                InperConfig.Instance.IsSkip = false;
                 db.Close();
                 db.Dispose();
             }

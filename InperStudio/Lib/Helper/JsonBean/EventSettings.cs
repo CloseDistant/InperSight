@@ -1,5 +1,4 @@
-﻿using InperStudio.Lib.Bean.Channel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Helper.JsonBean

@@ -1,11 +1,6 @@
 ﻿using Basler.Pylon;
 using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace InperDeviceManagement
 {
@@ -97,6 +92,7 @@ namespace InperDeviceManagement
 
             _Camera.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.FrameStart);
             _Camera.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.Off);
+            //_Camera.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.On);
 
             _Camera.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.Continuous);
             _Camera.Parameters[PLCamera.AcquisitionStart].Execute();
@@ -119,6 +115,7 @@ namespace InperDeviceManagement
                 _Camera.Open(30000, TimeoutHandling.Return);
                 if (_Camera.IsOpen)
                 {
+
                     // DeviceVendorName, DeviceModelName, and DeviceFirmwareVersion are string parameters.
                     System.Diagnostics.Debug.WriteLine("Camera Device Information");
                     System.Diagnostics.Debug.WriteLine("=================================");

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace InperStudio.Lib.Helper
 {

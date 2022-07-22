@@ -3,15 +3,10 @@ using HandyControl.Data;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
-using InperStudio.ViewModels;
 using Stylet;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InperStudio.Lib.Bean
 {
@@ -165,7 +160,6 @@ namespace InperStudio.Lib.Bean
             }
         }
         #endregion
-
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
 
         public static void ShowReminderInfo(string message, int waitTime = 1)

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace InperProtocolStack
 {
@@ -42,6 +41,7 @@ namespace InperProtocolStack
     {
         public UInt32 IOID;
         public UInt32 Status;
+        public UInt64 Timestamp;
     }
 
 
@@ -54,7 +54,6 @@ namespace InperProtocolStack
             _UARTA = new UARTAgent(p_name);
             _TC = new TransTrafficCtrl(_UARTA);
             _TC.OnInfoUpdated += InfoUpdated;
-
             InqID();
         }
 
@@ -252,7 +251,7 @@ namespace InperProtocolStack
             CmdStart cmd = new CmdStart();
             _TC.Transmit(cmd);
         }
- 
+
         public void Stop()
         {
             CmdStop cmd = new CmdStop();

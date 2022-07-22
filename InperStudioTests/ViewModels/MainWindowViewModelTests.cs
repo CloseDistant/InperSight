@@ -1,10 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using InperStudio.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InperStudio.ViewModels.Tests
 {
@@ -15,7 +9,7 @@ namespace InperStudio.ViewModels.Tests
         public void TestTest()
         {
             PrivateObject po = new PrivateObject(new MainWindowViewModel(null));
-            Assert.AreEqual(po.Invoke("Test", 1, 1),2);
+            Assert.AreEqual(po.Invoke("Test", 1, 1), 2);
         }
     }
 }

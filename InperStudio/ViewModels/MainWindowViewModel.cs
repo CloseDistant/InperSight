@@ -1,5 +1,4 @@
 ﻿using InperStudio.Lib.Bean;
-using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudio.Views.Control;
@@ -7,18 +6,13 @@ using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.Helper;
 using Stylet;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace InperStudio.ViewModels
 {
@@ -58,7 +52,21 @@ namespace InperStudio.ViewModels
         protected override void OnClose()
         {
             RequestClose();
-            Environment.Exit(0);
+            string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            string[] exeArray = exeName.Split('\\');
+            KillProcess(exeArray.Last().Split('.').First());
+        }
+        private void KillProcess(string processName)
+        {
+            Process[] myproc = Process.GetProcesses();
+            foreach (Process item in myproc)
+            {
+                if (item.ProcessName == processName)
+                {
+                    item.Kill();
+                }
+            }
+
         }
         public void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

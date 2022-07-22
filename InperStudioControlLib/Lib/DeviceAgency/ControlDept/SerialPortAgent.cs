@@ -1,14 +1,4 @@
-﻿using LibUsbDotNet.DeviceNotify;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace InperStudioControlLib.Lib.DeviceAgency.ControlDept
+﻿namespace InperStudioControlLib.Lib.DeviceAgency.ControlDept
 {
     //public class OnDataReceivedEventArgs : EventArgs
     //{

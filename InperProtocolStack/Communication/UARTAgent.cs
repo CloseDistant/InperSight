@@ -1,16 +1,12 @@
-﻿using InperProtocolStack.TransmissionCtrl;
+﻿using InperProtocolStack.CmdPhotometry;
 using LibUsbDotNet;
 using LibUsbDotNet.Main;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace InperProtocolStack.Communication
 {
@@ -27,22 +23,21 @@ namespace InperProtocolStack.Communication
     [Serializable]
     public class UsbAdData
     {
-        public UsbAdData(uint channelId, long time, List<double> values)
-        {
-            ChannelId = channelId;
-            Time = time;
-            Values = values;
-        }
+        public uint ChannelId1 { get; set; }
+        public uint ChannelId2 { get; set; }
+        public long Time { get; set; }
+        public List<double> Values1 { get; set; }
+        public List<double> Values2 { get; set; }
+        public List<TimeSpan> Times1 { get; set; }
+        public List<TimeSpan> Times2 { get; set; }
 
-        public uint ChannelId { get; private set; }
-        public long Time { get; private set; }
-        public List<double> Values { get; private set; }
     }
 
     public class UARTAgent
     {
 
         public event EventHandler<OnDataReceivedEventArgs> OnDataReceived;
+        public event EventHandler<byte[]> OnInputReceived;
         //public event EventHandler<OnDataReceivedEventArgs> OnDataReceivedUsb;
         public bool IsStart = false;
         public void RaiseDataReceivedEvent(byte[] data)
@@ -54,6 +49,7 @@ namespace InperProtocolStack.Communication
         private SerialPort _ComPort;
         private readonly UsbDevice MyUsbDevice;
         private UsbEndpointReader readerAD;
+        private UsbEndpointReader readerInput;
         private int adLength = 0;
         public UARTAgent(int vid, int pid)
         {
@@ -73,14 +69,22 @@ namespace InperProtocolStack.Communication
                 // Claim interface #0.
                 _ = wholeUsbDevice.ClaimInterface(0);
             }
-            UsbEndpointReader reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01, 128);
-
-            // open write endpoint 1.
-            //UsbEndpointWriter writer = MyUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
-
+            UsbEndpointReader reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01, 1024);//128
             reader.DataReceived += Reader_DataReceived;
             reader.DataReceivedEnabled = true;
+
+            //readerInput = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep03, 8);
+            //readerInput.DataReceived += ReaderInput_DataReceived;
+            //readerInput.DataReceivedEnabled = true;
         }
+        //private void ReaderInput_DataReceived(object sender, EndpointDataEventArgs e)
+        //{
+        //    //Console.WriteLine(BitConverter.ToUInt64(e.Buffer, 0) + "--" + e.Count);
+        //    if (e.Count > 0)
+        //    {
+        //        OnInputReceived?.Invoke(sender, e.Buffer);
+        //    }
+        //}
         public void SetSampling(int sampling)
         {
 
@@ -126,7 +130,7 @@ namespace InperProtocolStack.Communication
             //    adLength = 2 + 64;
             //}
 
-            readerAD = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep02, adLength);
+            readerAD = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep02, 1088);
             readerAD.DataReceived += ReaderAD_DataReceived;
             readerAD.DataReceivedEnabled = true;
 
@@ -135,27 +139,19 @@ namespace InperProtocolStack.Communication
         {
             readerAD.DataReceived -= ReaderAD_DataReceived;
             readerAD.DataReceivedEnabled = false;
+            readerAD.Dispose();
         }
 
-        public ConcurrentQueue<IntPtr> ADPtrQueues = new ConcurrentQueue<IntPtr>();
-        private unsafe void ReaderAD_DataReceived(object sender, EndpointDataEventArgs e)
+        public ConcurrentQueue<byte[]> ADPtrQueues = new ConcurrentQueue<byte[]>();
+        private void ReaderAD_DataReceived(object sender, EndpointDataEventArgs e)
         {
             if (IsStart)
             {
-                //lock (_DataCacheObj)
-                //{
+                Console.WriteLine(e.Buffer[0]);
                 if (e.Count != 0)
                 {
-                    fixed (byte* pb = &e.Buffer[0])
-                    {
-                        ADPtrQueues.Enqueue((IntPtr)pb);
-                        //UsbAdDataStru res = Marshal.PtrToStructure<UsbAdDataStru>((IntPtr)pb);
-                        //_ADDataCache.Enqueue(res);
-                        //UsbStrSet((IntPtr)pb);
-                    }
+                    ADPtrQueues.Enqueue((byte[])e.Buffer.Clone());
                 }
-                //}
-                //_ = _DataAutoResetEvent.Set();
             }
         }
         private void Reader_DataReceived(object sender, EndpointDataEventArgs e)
@@ -169,6 +165,13 @@ namespace InperProtocolStack.Communication
                 data = e.Buffer.Take(20 + length).ToArray();
                 RaiseDataReceivedEvent(data);
                 //Console.WriteLine("---" + BitConverter.ToString(data));
+            }
+            else
+            {
+                if (BitConverter.ToUInt64(e.Buffer, 0) == 0xaa55aa5512345678)
+                {
+                    OnInputReceived?.Invoke(sender, e.Buffer);
+                }
             }
 
         }
@@ -213,7 +216,7 @@ namespace InperProtocolStack.Communication
             RaiseDataReceivedEvent(data);
         }
 
-        private bool SendDataUsb(UsbDevice myUsbDevice, List<byte> data)
+        private bool SendDataUsb(UsbDevice myUsbDevice, List<byte> data, int epPoint)
         {
             if (myUsbDevice == null)
             {
@@ -229,8 +232,14 @@ namespace InperProtocolStack.Communication
                     {
                         cmd += x.ToString("X2") + " ";
                     });
-                    Console.WriteLine(cmd);
-                    _ = myUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01).Write(data_barray, 10, out int bytesWritten);
+                    if (epPoint == 1)
+                    {
+                        _ = myUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01).Write(data_barray, 10, out int bytesWritten);
+                    }
+                    else
+                    {
+                        _ = myUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep03).Write(data_barray, 10, out int bytesWritten);
+                    }
                     return true;
                 }
                 catch (Exception ex)
@@ -240,9 +249,9 @@ namespace InperProtocolStack.Communication
             }
             return false;
         }
-        public bool SendDataUsb(List<byte> data)
+        public bool SendDataUsb(List<byte> data, int epPoint)
         {
-            return SendDataUsb(MyUsbDevice, data);
+            return SendDataUsb(MyUsbDevice, data, epPoint);
         }
         private bool SendData(SerialPort com, List<byte> data)
         {
