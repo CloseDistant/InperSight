@@ -129,11 +129,9 @@ namespace InperProtocolStack.Communication
             //{
             //    adLength = 2 + 64;
             //}
-
-            readerAD = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep02, 1088);
+            readerAD = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep02, adLength);
             readerAD.DataReceived += ReaderAD_DataReceived;
             readerAD.DataReceivedEnabled = true;
-
         }
         public void RemoveSampling()
         {
@@ -147,9 +145,9 @@ namespace InperProtocolStack.Communication
         {
             if (IsStart)
             {
-                Console.WriteLine(e.Buffer[0]);
                 if (e.Count != 0)
                 {
+                    Console.WriteLine(e.Buffer[0]);
                     ADPtrQueues.Enqueue((byte[])e.Buffer.Clone());
                 }
             }
@@ -215,7 +213,6 @@ namespace InperProtocolStack.Communication
             byte[] data = ReadData(sender);
             RaiseDataReceivedEvent(data);
         }
-
         private bool SendDataUsb(UsbDevice myUsbDevice, List<byte> data, int epPoint)
         {
             if (myUsbDevice == null)
@@ -227,11 +224,6 @@ namespace InperProtocolStack.Communication
                 byte[] data_barray = data.ToArray();
                 try
                 {
-                    string cmd = "";
-                    data_barray.ToList().ForEach(x =>
-                    {
-                        cmd += x.ToString("X2") + " ";
-                    });
                     if (epPoint == 1)
                     {
                         _ = myUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01).Write(data_barray, 10, out int bytesWritten);

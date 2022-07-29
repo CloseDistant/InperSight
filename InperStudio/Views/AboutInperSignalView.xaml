@@ -37,7 +37,7 @@
                 <TextBlock Text="Software Information" FontSize="16" Margin="28 32 0 0" />
                 <Border Background="#E2E2E2" Height="1" Width="267" Margin="28 15 0 0" HorizontalAlignment="Left"/>
                 <UniformGrid Rows="2" Columns="2" Margin="28 15 0 0">
-                    <TextBlock Text="Release Data:"/>
+                    <TextBlock Text="Release Date:"/>
                     <TextBlock x:Name="releaseData" Text="2022-07-09"/>
                     <TextBlock Text="Version:" Margin="0 8 0 0"/>
                     <TextBlock x:Name="version" Text="V1.0.3" Margin="0 8 0 0"/>

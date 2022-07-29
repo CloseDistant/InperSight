@@ -269,15 +269,9 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
-                if (InperGlobalClass.CameraSignalSettings.Sampling > 60)
-                {
-                    _cameraSkipCountArray = new int[InperGlobalClass.CameraSignalSettings.LightMode.Count];
-                    for (int i = 0; i < _cameraSkipCountArray.Length; i++)
-                    {
-                        _cameraSkipCountArray[i] = 0;
-                    }
-                    _cameraSkipCount = (int)Math.Floor(InperGlobalClass.CameraSignalSettings.Sampling / 30) - 1;
-                }
+                _cameraSkipCountArray = new int[6] { 0, 0, 0, 0, 0, 0 };
+
+                _cameraSkipCount = (int)Math.Floor(InperGlobalClass.CameraSignalSettings.Sampling / 30) - 1 < 0 ? 0 : (int)Math.Floor(InperGlobalClass.CameraSignalSettings.Sampling / 30) - 1;
                 if (InperGlobalClass.CameraSignalSettings.AiSampling >= 100)
                 {
                 }
@@ -474,6 +468,7 @@ namespace InperStudio.Lib.Helper
                     {
                         _cameraSkipCountArray[m.Group]++;
                     }
+
                     AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
                     if (InperGlobalClass.IsRecord)
                     {
@@ -604,7 +599,7 @@ namespace InperStudio.Lib.Helper
                 count++;
                 if (ccn1 != null)
                 {
-                    double v1 = (values[i] * 2.95 * 24.3520 / 4096) - 5;
+                    double v1 = (values[i] * 2.95 * 24.3520 / 4096) - 5.1;
                     TimeSpan ts1 = new TimeSpan(_adPreTime[(int)(channel * 2 - 1) + 100] + (long)(adFsTimeInterval * count * Math.Pow(10, 7)));
                     v1 = Math.Round(GetAiFilterValue(ccn1, v1, ts1.Ticks), 5);
                     usbAdData.Values1.Add(v1);
@@ -612,7 +607,7 @@ namespace InperStudio.Lib.Helper
                 }
                 if (ccn2 != null)
                 {
-                    double v2 = (values[i + 1] * 2.95 * 24.3520 / 4096) - 5;
+                    double v2 = (values[i + 1] * 2.95 * 24.3520 / 4096) - 5.1;
                     TimeSpan ts2 = new TimeSpan(_adPreTime[(int)(channel * 2) + 100] + (long)(adFsTimeInterval * count * Math.Pow(10, 7)));
                     v2 = Math.Round(GetAiFilterValue(ccn2, v2, ts2.Ticks), 5);
                     usbAdData.Values2.Add(v2);
@@ -1298,7 +1293,7 @@ namespace InperStudio.Lib.Helper
                         }
                     }
                 });
- 
+                AiChannelsConfig = new uint[4] { 0, 0, 0, 0 };
                 CameraChannels.ToList().ForEach(x =>
                 {
                     if (x.Type == ChannelTypeEnum.Camera.ToString())
@@ -1313,7 +1308,6 @@ namespace InperStudio.Lib.Helper
                     }
                     if (x.Type == ChannelTypeEnum.Analog.ToString())
                     {
-                        AiChannelsConfig = new uint[4] { 0, 0, 0, 0 };
                         isAdstart = true;
                         if (x.ChannelId <= 102)
                         {

@@ -267,12 +267,6 @@ namespace InperProtocolStack
         {
             _UARTA.IsStart = isStart;
         }
-        public void RunAdframeRate(uint frameRate, uint[] array)
-        {
-            CmdAdframeRate cmd = new CmdAdframeRate();
-            cmd.SetCmdParam(frameRate, array);
-            _TC.Transmit(cmd);
-        }
         public void SetAdframeRate(uint frameRate, uint[] array)
         {
             CmdAdframeRate cmd = new CmdAdframeRate();

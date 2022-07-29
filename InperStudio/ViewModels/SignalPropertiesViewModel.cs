@@ -891,7 +891,8 @@ namespace InperStudio.ViewModels
             try
             {
                 InperTextBox textBox = arg1 as InperTextBox;
-                InperDeviceHelper.Instance.device.SetRunAdframeRate(uint.Parse(textBox.Text), InperDeviceHelper.Instance.AiChannelsConfig);
+                InperDeviceHelper.Instance.device.RemoveAdSampling();
+                InperDeviceHelper.Instance.device.SetAdframeRate(uint.Parse(textBox.Text), InperDeviceHelper.Instance.AiChannelsConfig);
                 InperDeviceHelper.Instance.adFsTimeInterval = 1d / uint.Parse(textBox.Text);
             }
             catch (Exception ex)

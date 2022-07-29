@@ -206,7 +206,7 @@ namespace InperProtocolStack.TransmissionCtrl
             _CommandCache.Enqueue(cmd);
             //}
 
-            if (isFirst)
+            if (isFirst || _SendingSequence > sequence + 1)
             {
                 TransmittingProcess();
                 isFirst = false;
@@ -243,6 +243,7 @@ namespace InperProtocolStack.TransmissionCtrl
             {
                 if (_CommandCache.TryDequeue(out Command cmd))
                 {
+                    Console.WriteLine(BitConverter.ToString(cmd.GetBytes().ToArray()));
                     _ = _UARTA.SendDataUsb(cmd.GetBytes(), 1);
                 }
 
@@ -254,10 +255,13 @@ namespace InperProtocolStack.TransmissionCtrl
             }
         }
 
-
+        private int sequence = 0;
         private void Confirm(uint sequence)
         {
-            TransmittingProcess();
+            this.sequence = (int)sequence;
+            Console.WriteLine("收到回复" + sequence);
+            Task.Run(() => { TransmittingProcess(); });
+
             return;
         }
 

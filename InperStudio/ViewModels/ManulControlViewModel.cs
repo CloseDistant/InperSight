@@ -174,7 +174,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-        private void PreviewRecord()
+        private async void PreviewRecord()
         {
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
@@ -198,7 +198,7 @@ namespace InperStudio.ViewModels
 
             InperDeviceHelper.Instance.StartCollect();
 
-            StartAndStopShowMarker(ChannelTypeEnum.Start);
+            await StartAndStopShowMarker(ChannelTypeEnum.Start);
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
@@ -272,7 +272,7 @@ namespace InperStudio.ViewModels
                 InperGlobalClass.IsStop = false;
                 (this.View as ManulControlView).Root_Gird.IsEnabled = true;
 
-                StartAndStopShowMarker(ChannelTypeEnum.Start);
+                await StartAndStopShowMarker(ChannelTypeEnum.Start);
                 ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
                 InperGlobalClass.IsAllowDragScroll = true;
 
@@ -324,7 +324,7 @@ namespace InperStudio.ViewModels
                 }
                 if (type == 0)
                 {
-                    StartAndStopShowMarker(ChannelTypeEnum.Stop);
+                    await StartAndStopShowMarker(ChannelTypeEnum.Stop);
                 }
                 InperDeviceHelper.Instance.device.Stop();
                 InperGlobalClass.IsRecord = false;
@@ -387,54 +387,50 @@ namespace InperStudio.ViewModels
             }
 
         }
-        private async void StartAndStopShowMarker(ChannelTypeEnum typeEnum)
+        private Task StartAndStopShowMarker(ChannelTypeEnum typeEnum)
         {
 
-            await Task.Factory.StartNew(() =>
+            return Task.Factory.StartNew(() =>
              {
-                 try
+                 TimeSpan time = new TimeSpan(0);
+                 if (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count > 0)
                  {
-                     TimeSpan time = new TimeSpan();
                      time = typeEnum == ChannelTypeEnum.Start
                          ? new TimeSpan(0)
                          : (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count - 1];
-                     foreach (var channel in InperGlobalClass.EventSettings.Channels)
+                 }
+                 foreach (var channel in InperGlobalClass.EventSettings.Channels)
+                 {
+                     if (channel.Type == typeEnum.ToString())
                      {
-                         if (channel.Type == typeEnum.ToString())
+                         InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                         {
+                             CameraTime = time.Ticks,
+                             ChannelId = channel.ChannelId,
+                             Color = channel.BgColor,
+                             IsIgnore = true,
+                             Name = channel.Name,
+                             Type = channel.Type,
+                             CreateTime = DateTime.Now
+                         });
+                     }
+                     if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
+                     {
+                         if (channel.Condition.Type == typeEnum.ToString())
                          {
                              InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
                              {
                                  CameraTime = time.Ticks,
                                  ChannelId = channel.ChannelId,
                                  Color = channel.BgColor,
-                                 IsIgnore = true,
+                                 IsIgnore = false,
+                                 ConditionId = channel.Condition.ChannelId,
                                  Name = channel.Name,
-                                 Type = channel.Type,
+                                 Type = channel.Condition.Type,
                                  CreateTime = DateTime.Now
                              });
                          }
-                         if (channel.Type == ChannelTypeEnum.Output.ToString() && channel.Condition != null)
-                         {
-                             if (channel.Condition.Type == typeEnum.ToString())
-                             {
-                                 InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
-                                 {
-                                     CameraTime = time.Ticks,
-                                     ChannelId = channel.ChannelId,
-                                     Color = channel.BgColor,
-                                     IsIgnore = false,
-                                     ConditionId = channel.Condition.ChannelId,
-                                     Name = channel.Name,
-                                     Type = channel.Condition.Type,
-                                     CreateTime = DateTime.Now
-                                 });
-                             }
-                         }
                      }
-                 }
-                 catch (Exception ex)
-                 {
-                     App.Log.Error(ex.ToString());
                  }
              });
         }

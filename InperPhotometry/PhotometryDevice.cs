@@ -229,10 +229,6 @@ namespace InperDeviceManagement
         {
             _CS.SetAdframeRate(frameRate, array);
         }
-        public void SetRunAdframeRate(uint frameRate, uint[] array)
-        {
-            _CS.RunAdframeRate(frameRate, array);
-        }
         public void RemoveAdSampling()
         {
             _CS.RemoveAdSampling();
