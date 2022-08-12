@@ -87,6 +87,7 @@ namespace InperProtocolStack.UnderUpgrade
             await TaskExecute(tokenSource.Token);
             foreach (FileInfo x in files.OrderBy(x => x.LastWriteTime).ToList())
             {
+                Console.WriteLine("进入到文件");
                 Write(new CmdGetHashVal().GetBytes().ToArray()); //获取下位机hsah值
                 await TaskExecute(tokenSourceHash.Token);
                 if (!DeviceIsRestart)

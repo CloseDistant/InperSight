@@ -270,6 +270,7 @@
     <Compile Include="Lib\Data\Model\Config.cs" />
     <Compile Include="Lib\Data\Model\Environment.cs" />
     <Compile Include="Lib\Data\Model\Input.cs" />
+    <Compile Include="Lib\Data\Model\IntervalScale.cs" />
     <Compile Include="Lib\Data\Model\Marker.cs" />
     <Compile Include="Lib\Data\Model\Note.cs" />
     <Compile Include="Lib\Data\Model\OutputMarker.cs" />

@@ -134,7 +134,7 @@ namespace InperProtocolStack.TransmissionCtrl
             _ = Task.Run(() => { ReceivedDataMonitor(); });
 
             //SetupMetronome();
-            _ = Task.Run(() => { TransmittingProcess(); });
+            //_ = Task.Run(() => { TransmittingProcess(); });
 
 
             return;
@@ -149,7 +149,7 @@ namespace InperProtocolStack.TransmissionCtrl
 
         private void DevMsgReceived(object sender, MessageReceivedEventArgs e)
         {
-            Confirm(e.Header.AckNumber);
+            Confirm(e.Header.Sequence, e.Header.Intent);
             OnInfoUpdated?.Invoke(this, e);
 
             return;
@@ -192,76 +192,63 @@ namespace InperProtocolStack.TransmissionCtrl
 
 
         private uint _SendingSequence = 0;
-        private object _CmdCacheLock = new object();
         private ConcurrentQueue<Command> _CommandCache = new ConcurrentQueue<Command>();
         private AutoResetEvent _AREvent = new AutoResetEvent(false);
-        bool isFirst = true;
+        private CancellationTokenSource tokenSource = new CancellationTokenSource();
+
         public void Transmit(Command cmd)
         {
             cmd.Sequence = _SendingSequence;
             _SendingSequence++;
-
-            //lock (_CmdCacheLock)
-            //{
             _CommandCache.Enqueue(cmd);
-            //}
 
-            if (isFirst || _SendingSequence > sequence + 1)
-            {
-                TransmittingProcess();
-                isFirst = false;
-            }
-
+            Task.Run(() => { TransmittingProcess(); });
             return;
         }
         public void OutputSend(List<byte> b)
         {
             _ = _UARTA.SendDataUsb(b, 2);
         }
-
-        private bool CommandIsRedundant(Command cmd1, Command cmd2)
+        async Task TaskExecute(CancellationToken token, List<byte> vs)
         {
-            List<byte> intent_ss = new List<byte>
+            int count = 0;
+            while (!token.IsCancellationRequested)
             {
-                ProtocolIntent.INTENT_START,
-                ProtocolIntent.INTENT_STOP
-            };
-
-            if (cmd1.Intent == cmd2.Intent || (intent_ss.Contains(cmd1.Intent) && intent_ss.Contains(cmd2.Intent)))
-            {
-                return true;
+                await Task.Delay(100);
+                count++;
+                if (count >= 10)
+                {
+                    _ = _UARTA.SendDataUsb(vs, 1);
+                    count = 0;
+                }
             }
-
-            return false;
         }
-
-
         int _pLock = 0;
-        private void TransmittingProcess()
+        private async void TransmittingProcess()
         {
             if (Interlocked.Exchange(ref _pLock, 1) == 0)
             {
                 if (_CommandCache.TryDequeue(out Command cmd))
                 {
-                    Console.WriteLine(BitConverter.ToString(cmd.GetBytes().ToArray()));
+                    tokenSource = new CancellationTokenSource();
                     _ = _UARTA.SendDataUsb(cmd.GetBytes(), 1);
-                }
-
-                if (_CommandCache.Count == 0)
-                {
-                    isFirst = true;
+                    await TaskExecute(tokenSource.Token, cmd.GetBytes());
                 }
                 Interlocked.Exchange(ref _pLock, 0);
+                if (_CommandCache.Count > 0)
+                {
+                    Task.Run(() => { TransmittingProcess(); });
+                }
             }
         }
 
-        private int sequence = 0;
-        private void Confirm(uint sequence)
+ 
+        private void Confirm(uint sequence, uint intent)
         {
-            this.sequence = (int)sequence;
-            Console.WriteLine("收到回复" + sequence);
-            Task.Run(() => { TransmittingProcess(); });
-
+            if (intent==255)
+            {
+                tokenSource.Cancel();
+            }
             return;
         }
 

@@ -47,7 +47,7 @@
                         <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" Width="40" InperTextType="Double" InperVerify="True" InperMaxValue="59" InperMinValue="0" InperTextChanged="{s:Action AtTime_TextChanged}" Name="startSeconds" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <Grid Margin="0 20 0 0">
+                <Grid Margin="0 20 0 0" Visibility="Collapsed">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="80"/>
@@ -63,7 +63,7 @@
                                     <ComboBox Name="source_comb" HorizontalAlignment="Left" Margin="100 0 0 0" Width="120" Style="{StaticResource ComboBoxExtend}" SelectedValue="{Binding Trigger.Source,Mode=TwoWay}"/>
                                 </Grid>
                                 <Grid Margin="0 10">
-                                    <TextBlock Text="Pritrigger (ms)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
+                                    <TextBlock Text="Pretrigger (ms)" Foreground="#333" HorizontalAlignment="Left"  VerticalAlignment="Center"  Margin="10 0"/>
                                     <TextBox HorizontalAlignment="Left" Margin="140 0 0 0" Width="80" Text="{Binding Trigger.PriTrigger,Mode=TwoWay}"/>
                                 </Grid>
                                 <Grid Visibility="{Binding ElementName=mode_comb,Path=SelectedValue,Converter={StaticResource TriggeString2VisibilityConverter}}">
@@ -115,7 +115,7 @@
                         <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" Width="40" InperTextType="Double" InperVerify="True" InperMaxValue="59" InperMinValue="0" InperTextChanged="{s:Action AtTime_TextChanged}" Name="stopSeconds" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <WrapPanel Margin="0 10 0 0"  Visibility="Visible">
+                <WrapPanel Margin="0 10 0 0"  Visibility="Collapsed">
                     <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 5 0 0 " GroupName="stop" IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
                         <WrapPanel  IsEnabled="{Binding ElementName=triggerRadStop,Path=IsChecked}">
                             <TextBlock Text="Trigger" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
@@ -144,7 +144,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" >
                     <Grid Margin="0 0 0 0" >
-                        <TextBlock Text="Video Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
+                        <TextBlock Text="Video Setting" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
                         <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
                     </Grid>
                     <Grid Margin="0 20 0 0" >

@@ -7,6 +7,7 @@ using SciChart.Charting.Visuals;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -33,6 +34,13 @@ namespace InperStudio
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            if (System.Diagnostics.Process.GetProcessesByName("UpgradeClient").ToList().Count > 0)
+            {
+                //MessageBox.Show("正在运行中");
+                Environment.Exit(0);
+                return;
+            }
+
             mutex = new System.Threading.Mutex(true, "OnlyRun_CRNS");
             if (!mutex.WaitOne(0, false))
             {

@@ -72,19 +72,8 @@ namespace InperProtocolStack.Communication
             UsbEndpointReader reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01, 1024);//128
             reader.DataReceived += Reader_DataReceived;
             reader.DataReceivedEnabled = true;
-
-            //readerInput = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep03, 8);
-            //readerInput.DataReceived += ReaderInput_DataReceived;
-            //readerInput.DataReceivedEnabled = true;
         }
-        //private void ReaderInput_DataReceived(object sender, EndpointDataEventArgs e)
-        //{
-        //    //Console.WriteLine(BitConverter.ToUInt64(e.Buffer, 0) + "--" + e.Count);
-        //    if (e.Count > 0)
-        //    {
-        //        OnInputReceived?.Invoke(sender, e.Buffer);
-        //    }
-        //}
+
         public void SetSampling(int sampling)
         {
 
@@ -135,9 +124,12 @@ namespace InperProtocolStack.Communication
         }
         public void RemoveSampling()
         {
-            readerAD.DataReceived -= ReaderAD_DataReceived;
-            readerAD.DataReceivedEnabled = false;
-            readerAD.Dispose();
+            if (readerAD != null)
+            {
+                readerAD.DataReceived -= ReaderAD_DataReceived;
+                readerAD.DataReceivedEnabled = false;
+                readerAD.Dispose();
+            }
         }
 
         public ConcurrentQueue<byte[]> ADPtrQueues = new ConcurrentQueue<byte[]>();
@@ -147,7 +139,6 @@ namespace InperProtocolStack.Communication
             {
                 if (e.Count != 0)
                 {
-                    Console.WriteLine(e.Buffer[0]);
                     ADPtrQueues.Enqueue((byte[])e.Buffer.Clone());
                 }
             }
@@ -162,7 +153,6 @@ namespace InperProtocolStack.Communication
 
                 data = e.Buffer.Take(20 + length).ToArray();
                 RaiseDataReceivedEvent(data);
-                //Console.WriteLine("---" + BitConverter.ToString(data));
             }
             else
             {

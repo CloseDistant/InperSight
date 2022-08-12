@@ -37,7 +37,7 @@ namespace InperStudio.ViewModels
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
         private bool isDown = false;
-        private int diameter = 55;
+        private int diameter = 45;
         private Grid moveGrid = null;
         public Grid MoveGrid { get => moveGrid; set => SetAndNotify(ref moveGrid, value); }
         public int Diameter { get => diameter; set => SetAndNotify(ref diameter, value); }
@@ -350,7 +350,7 @@ namespace InperStudio.ViewModels
 
                         CameraChannel item = InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
                         _ = InperDeviceHelper.CameraChannels.Remove(item);
-
+                        InperDeviceHelper.Instance._LoopCannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance._LoopCannels.Where(x => x.ChannelId != item.ChannelId));
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Camera.ToString());
                         if (channel != null)
                         {
@@ -452,14 +452,14 @@ namespace InperStudio.ViewModels
                             XyDataSeries = new XyDataSeries<TimeSpan, double>(),
                         };
                         item.LightModes.Add(mode);
-                        LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = wave.GroupId.ToString(), DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
+                        LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = wave.GroupId, DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color };
 
                         item.RenderableSeries.Add(line);
                     }
                 }
 
                 InperDeviceHelper.Instance.CameraChannels.Add(item);
-
+                InperDeviceHelper.Instance._LoopCannels.Add(item);
                 Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
 
                 if (channel == null)
@@ -1092,6 +1092,9 @@ namespace InperStudio.ViewModels
                         if (cameraChannel != null)
                         {
                             _ = InperDeviceHelper.Instance.CameraChannels.Remove(cameraChannel);
+                            InperDeviceHelper.Instance.aiChannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance.aiChannels.Where(x => x.ChannelId != cameraChannel.ChannelId));
+                            InperDeviceHelper.Instance.AiSettingFunc(cameraChannel.ChannelId, 0);
+                            InperDeviceHelper.Instance._adPreTime.Remove(cameraChannel.ChannelId);
                         }
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
                         if (channel != null)
@@ -1138,7 +1141,9 @@ namespace InperStudio.ViewModels
                         item.RenderableSeries.Add(line);
 
                         InperDeviceHelper.Instance.CameraChannels.Add(item);
-
+                        InperDeviceHelper.Instance.aiChannels.Add(item);
+                        InperDeviceHelper.Instance._adPreTime.Add(item.ChannelId, InperDeviceHelper.Instance._adPreTime.Count == 0 ? 0 : InperDeviceHelper.Instance._adPreTime.First().Value);
+                        InperDeviceHelper.Instance.AiSettingFunc(item.ChannelId, 1);
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
                         if (channel == null)
                         {
@@ -1155,6 +1160,10 @@ namespace InperStudio.ViewModels
                         view.PopButton.Background = AnalogChannels.First().BgColor;
                         view.AnalogChannelCombox.SelectedIndex = 0;
                     }
+                }
+                if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
+                {
+                    InperDeviceHelper.Instance.AiConfigSend();
                 }
             }
             catch (Exception ex)

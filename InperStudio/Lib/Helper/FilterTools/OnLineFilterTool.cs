@@ -78,23 +78,30 @@ namespace InperStudio.Lib.Helper.FilterTools
         }
         public double GetBandstopValue(double r, int group)
         {
-            double val = r;
-            switch (group)
+            try
             {
-                case 0:
-                    val = _Bandstop0.ProcessSample(r);
-                    break;
-                case 1:
-                    val = _Bandstop1.ProcessSample(r);
-                    break;
-                case 2:
-                    val = _Bandstop2.ProcessSample(r);
-                    break;
-                case 3:
-                    val = _Bandstop3.ProcessSample(r);
-                    break;
+                double val = r;
+                switch (group)
+                {
+                    case 0:
+                        val = _Bandstop0.ProcessSample(r);
+                        break;
+                    case 1:
+                        val = _Bandstop1.ProcessSample(r);
+                        break;
+                    case 2:
+                        val = _Bandstop2.ProcessSample(r);
+                        break;
+                    case 3:
+                        val = _Bandstop3.ProcessSample(r);
+                        break;
+                }
+                return val;
             }
-            return val;
+            catch (Exception ex)
+            {
+                return r;
+            }
         }
     }
 }

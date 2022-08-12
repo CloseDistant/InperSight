@@ -885,15 +885,14 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-
         public void InperTextBox_InperTextChanged(object arg1, TextChangedEventArgs arg2)
         {
             try
             {
                 InperTextBox textBox = arg1 as InperTextBox;
-                InperDeviceHelper.Instance.device.RemoveAdSampling();
-                InperDeviceHelper.Instance.device.SetAdframeRate(uint.Parse(textBox.Text), InperDeviceHelper.Instance.AiChannelsConfig);
-                InperDeviceHelper.Instance.adFsTimeInterval = 1d / uint.Parse(textBox.Text);
+                var adFrame = uint.Parse(textBox.Text);
+                InperDeviceHelper.Instance.AiConfigSend();
+                InperDeviceHelper.Instance.adFsTimeInterval = 1d / adFrame;
             }
             catch (Exception ex)
             {
@@ -902,6 +901,7 @@ namespace InperStudio.ViewModels
         }
         protected override void OnClose()
         {
+
             InperJsonHelper.SetCameraSignalSettings(CameraSignalSettings);
         }
     }

@@ -183,12 +183,15 @@ namespace InperStudio.Lib.Helper
                 double next_Interval;
                 if (IsInWorkingPeriod)
                 {
+                    if (InperGlobalClass.IsRecord)
+                    {
+                        Task.Factory.StartNew(() => { SetIntervalData(DateTime.Now.Ticks, 0); });
+                    }
                     LightWaveLength.ToList().ForEach(x =>
                     {
                         if (x.IsChecked)
                         {
                             Instance.device.SetLightPower((uint)x.GroupId, 0);
-                            Thread.Sleep(50);
                         }
                     });
                     next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Interval * 1000;
@@ -199,12 +202,14 @@ namespace InperStudio.Lib.Helper
                     {
                         if (x.IsChecked)
                         {
-                            //DevPhotometry.Instance.SwitchLight(x.GroupId, true);
                             device.SetLightPower((uint)x.GroupId, x.LightPower);
-                            Thread.Sleep(50);
                         }
                     });
                     next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
+                    if (InperGlobalClass.IsRecord)
+                    {
+                        Task.Factory.StartNew(() => { SetIntervalData(DateTime.Now.Ticks, 1); });
+                    }
                 }
                 _Metronome.Interval = next_Interval;
                 IsInWorkingPeriod = !IsInWorkingPeriod;
@@ -235,6 +240,22 @@ namespace InperStudio.Lib.Helper
                 Visibility = Visibility.Collapsed
             };
         }
+
+        #region 间隔模式标记存储
+        private int _IntervalScaleLock = 0;
+        private void SetIntervalData(long times, int type)
+        {
+            if (Interlocked.Exchange(ref _IntervalScaleLock, 1) == 0)
+            {
+                _ = App.SqlDataInit.sqlSugar.UseTran(() =>
+                {
+                    _ = App.SqlDataInit.sqlSugar.Storageable<IntervalScale>(new IntervalScale() { CreateTime = times, Type = type }).ToStorage().BulkCopy();
+                });
+                Interlocked.Exchange(ref _IntervalScaleLock, 0);
+            }
+        }
+        #endregion
+
         private long synTime = 0;
         private void Device_OnDevNotification(object sender, DevNotificationEventArgs e)
         {
@@ -351,7 +372,7 @@ namespace InperStudio.Lib.Helper
 
                         isFirstRecordTiem = false;
                     }
-                    if (e.Group > -1)
+                    if (e.Group > -1 && _LoopCannels.Count > 0)
                     {
                         _MatQ.Enqueue(e);
                         _ = Task.Run(() => { FrameProc(); });
@@ -423,7 +444,7 @@ namespace InperStudio.Lib.Helper
                     time = ts;
                     ConcurrentBag<string> values = new ConcurrentBag<string>();
                     ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
-                    Parallel.ForEach(_LoopCannels, mask =>
+                    foreach (var mask in _LoopCannels)
                     {
 
                         double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
@@ -457,7 +478,7 @@ namespace InperStudio.Lib.Helper
                         values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
                         _poltValues.TryAdd(mask.ChannelId, r);
 
-                    });
+                    }
                     if (_cameraSkipCountArray[m.Group] >= _cameraSkipCount)
                     {
                         _CameraDataPlot.Enqueue(new PlotData(m.Group, _poltValues, ts));
@@ -636,7 +657,7 @@ namespace InperStudio.Lib.Helper
             Task.Run(() => { UsbDataPlot(); });
         }
         private int _UsbPlotLocked = 0;
-        private List<CameraChannel> aiChannels = new List<CameraChannel>();
+        public ConcurrentBag<CameraChannel> aiChannels = new ConcurrentBag<CameraChannel>();
         private void UsbDataPlot()
         {
             if (Interlocked.Exchange(ref _UsbPlotLocked, 1) == 0)
@@ -661,17 +682,24 @@ namespace InperStudio.Lib.Helper
         }
         private void AiDataPlot(int id, List<double> values, List<TimeSpan> timeSpans)
         {
-            CameraChannel ccn = aiChannels.FirstOrDefault(x => x.ChannelId == (id + 100));
-            if (ccn != null)
+            try
             {
-                XyDataSeries<TimeSpan, double> ds = ccn.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>;
-                using (ds.SuspendUpdates())
+                CameraChannel ccn = aiChannels.FirstOrDefault(x => x.ChannelId == (id + 100));
+                if (ccn != null)
                 {
-                    if ((TimeSpan)ds.XMax < timeSpans.First())
+                    XyDataSeries<TimeSpan, double> ds = ccn.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>;
+                    using (ds.SuspendUpdates())
                     {
-                        ds.Append(timeSpans, values);
+                        if ((TimeSpan)ds.XMax < timeSpans.First())
+                        {
+                            ds.Append(timeSpans, values);
+                        }
                     }
+
                 }
+            }
+            catch (Exception ex)
+            {
 
             }
         }
@@ -753,7 +781,7 @@ namespace InperStudio.Lib.Helper
             return val;
         }
         private int deltaFObj = 0;
-        private List<EventChannelJson> DeltaFCalculateList = new List<EventChannelJson>();
+        public List<EventChannelJson> DeltaFCalculateList = new List<EventChannelJson>();
         private void DeltaFCalculate(int cid, int group, double r, long ts)
         {
             try
@@ -929,9 +957,9 @@ namespace InperStudio.Lib.Helper
                 while (SaveAnalogDatas.TryDequeue(out AnalogRecord data))
                 {
                     _SaveAnalogCache.Add(data);
-                    if (_SaveInputCache.Count > 1000)
+                    if (_SaveAnalogCache.Count > InperGlobalClass.CameraSignalSettings.AiSampling * 5)
                     {
-                        AnalogRecord[] analogs = new AnalogRecord[SaveAnalogDatas.Count];
+                        AnalogRecord[] analogs = new AnalogRecord[_SaveAnalogCache.Count];
                         _SaveAnalogCache.CopyTo(analogs);
                         _SaveAnalogCache.Clear();
                         AnalogDataCloneToSave(analogs);
@@ -1013,17 +1041,24 @@ namespace InperStudio.Lib.Helper
                     {
                         _ = Parallel.ForEach(EventChannelChart.RenderableSeries, item =>
                         {
-                            int id = int.Parse((item as LineRenderableSeriesViewModel).Tag.ToString());
-                            if (input.ChannelId == id)
+                            try
                             {
-                                TimeSpan time = new TimeSpan(input.CameraTime);
-                                using (item.DataSeries.SuspendUpdates())
+                                int id = int.Parse((item as LineRenderableSeriesViewModel).Tag.ToString());
+                                if (input.ChannelId == id)
                                 {
-                                    if (((TimeSpan)item.DataSeries.XMax) < time)
+                                    TimeSpan time = new TimeSpan(input.CameraTime);
+                                    using (item.DataSeries.SuspendUpdates())
                                     {
-                                        (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(time, input.Value);
+                                        if (((TimeSpan)item.DataSeries.XMax) < time)
+                                        {
+                                            (item.DataSeries as XyDataSeries<TimeSpan, double>).Append(time, input.Value);
+                                        }
                                     }
                                 }
+                            }
+                            catch (Exception ex)
+                            {
+
                             }
                         });
                     }
@@ -1263,7 +1298,7 @@ namespace InperStudio.Lib.Helper
 
                 _adPreTime.Clear();
                 adFsTimeInterval = 1 / InperGlobalClass.CameraSignalSettings.AiSampling;
-                aiChannels = Instance.CameraChannels.ToList().FindAll(x => x.Type == ChannelTypeEnum.Analog.ToString());
+                aiChannels = new ConcurrentBag<CameraChannel>(Instance.CameraChannels.ToList().FindAll(x => x.Type == ChannelTypeEnum.Analog.ToString()));
                 _LoopCannels = new ConcurrentBag<CameraChannel>();
                 Instance.CameraChannels.ToList().ForEach(x => { if (x.Type == ChannelTypeEnum.Camera.ToString()) { _LoopCannels.Add(x); } });
                 DeltaFCalculateList = new List<EventChannelJson>();
@@ -1309,22 +1344,7 @@ namespace InperStudio.Lib.Helper
                     if (x.Type == ChannelTypeEnum.Analog.ToString())
                     {
                         isAdstart = true;
-                        if (x.ChannelId <= 102)
-                        {
-                            AiChannelsConfig[0] = 1;
-                        }
-                        else if (x.ChannelId <= 104)
-                        {
-                            AiChannelsConfig[1] = 1;
-                        }
-                        else if (x.ChannelId <= 106)
-                        {
-                            AiChannelsConfig[2] = 1;
-                        }
-                        else
-                        {
-                            AiChannelsConfig[3] = 1;
-                        }
+                        AiSettingFunc(x.ChannelId, 1);
                         x.RenderableSeries.ToList().ForEach(line =>
                         {
                             (line.DataSeries as XyDataSeries<TimeSpan, double>).Clear();
@@ -1349,7 +1369,7 @@ namespace InperStudio.Lib.Helper
                 });
                 if (isAdstart)
                 {
-                    device.SetAdframeRate((uint)InperGlobalClass.CameraSignalSettings.AiSampling, AiChannelsConfig);
+                    AiConfigSend();
                 }
                 //确保绘制间隔
                 if (InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval)
@@ -1377,6 +1397,56 @@ namespace InperStudio.Lib.Helper
             {
                 App.Log.Error(ex.ToString());
             }
+        }
+        public void AiSettingFunc(int channelId, uint statu)//statu=1 是配置  =0 是取消配置
+        {
+            if (channelId <= 102)
+            {
+                AiStatuCheck(102, channelId, statu);
+            }
+            else if (channelId <= 104)
+            {
+                AiStatuCheck(104, channelId, statu);
+            }
+            else if (channelId <= 106)
+            {
+                AiStatuCheck(106, channelId, statu);
+            }
+            else
+            {
+                AiStatuCheck(108, channelId, statu);
+            }
+        }
+        private void AiStatuCheck(int level, int channelId, uint statu)
+        {
+            if (statu == 0)
+            {
+                if (channelId != level)
+                {
+                    var cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId + 1);
+                    if (cn == null)
+                    {
+                        AiChannelsConfig[0] = statu;
+                    }
+                }
+                else
+                {
+                    var cn = CameraChannels.FirstOrDefault(x => x.ChannelId == channelId - 1);
+                    if (cn == null)
+                    {
+                        AiChannelsConfig[0] = statu;
+                    }
+                }
+            }
+            else
+            {
+                AiChannelsConfig[(level - 100) / 2 - 1] = statu;
+            }
+        }
+        public void AiConfigSend()
+        {
+            device.RemoveAdSampling();
+            device.SetAdframeRate((uint)InperGlobalClass.CameraSignalSettings.AiSampling, AiChannelsConfig);
         }
         public void TimeSpanAxis_VisibleRangeChanged(object sender, SciChart.Charting.Visuals.Events.VisibleRangeChangedEventArgs e)
         {

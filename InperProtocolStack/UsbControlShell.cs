@@ -40,10 +40,11 @@ namespace InperProtocolStack
         private void _TC_OnInputUpdated(object sender, byte[] e)
         {
             List<DevInputNotificationEventArgs> items = DeviceInputUpdated(e);
-            if (items.Count > 0)
+            if (items != null && items.Count > 0)
             {
                 items.ForEach(x =>
                 {
+                    Console.WriteLine(x.IOID + "---" + x.Status);
                     OnDevNotification?.Invoke(this, x);
                 });
             }
@@ -177,7 +178,6 @@ namespace InperProtocolStack
                     OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());
                     break;
                 case ProtocolIntent.INTENT_DEVICE_INFO_PUB:
-                    Console.WriteLine(e.Data);
                     break;
                 default:
                     break;
@@ -208,7 +208,6 @@ namespace InperProtocolStack
             CmdSetLightPower cmd = new CmdSetLightPower();
             cmd.SetCmdParam(light_id, (float)power);
             _TC.Transmit(cmd);
-
             return;
         }
 

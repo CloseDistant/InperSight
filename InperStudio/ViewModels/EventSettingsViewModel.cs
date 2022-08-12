@@ -571,10 +571,10 @@ namespace InperStudio.ViewModels
                         EventChannelJson item = @enum == EventSettingsTypeEnum.Marker
                             ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Input.ToString()) && x.Type != ChannelTypeEnum.Output.ToString())
                             : InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Output.ToString()) && x.Condition?.ChannelId == ch_active.Condition?.ChannelId && x.Condition?.Type == ch_active.Condition?.Type);
-                        Console.WriteLine(item.Type);
                         if (item != null)
                         {
                             _ = InperGlobalClass.EventSettings.Channels.Remove(item);
+                            var r = InperDeviceHelper.Instance.DeltaFCalculateList.Remove(item);
                             if (item.Type == ChannelTypeEnum.Input.ToString())
                             {
                                 IRenderableSeriesViewModel render = InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.FirstOrDefault(x => ((LineRenderableSeriesViewModel)x).Tag.ToString() == ch_active.ChannelId.ToString());
@@ -673,6 +673,10 @@ namespace InperStudio.ViewModels
                                 {
                                     channle.IsRefractoryPeriod = true;
                                 }
+                                if (InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(l => l.ChannelId == channle.ChannelId && l.Type == channle.Type) is CameraChannel channel)
+                                {
+                                    channel.IsDeltaFCalculate = true;
+                                }
                             }
                             else
                             {
@@ -722,6 +726,10 @@ namespace InperStudio.ViewModels
                                 {
                                     channle.IsRefractoryPeriod = true;
                                 }
+                                if (InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(l => l.ChannelId == channle.Condition.ChannelId && l.Type == channle.Condition.Type) is CameraChannel channel)
+                                {
+                                    channel.IsDeltaFCalculate = true;
+                                }
                             }
                             if (type == ChannelTypeEnum.Camera.ToString() || type == ChannelTypeEnum.Analog.ToString())
                             {
@@ -768,6 +776,9 @@ namespace InperStudio.ViewModels
                             }
 
                             InperGlobalClass.EventSettings.Channels.Add(channle);
+                            InperDeviceHelper.Instance.DeltaFCalculateList.Add(channle);
+                            
+                           
                         }
                         else
                         {
@@ -783,7 +794,7 @@ namespace InperStudio.ViewModels
 
                         if (@enum == EventSettingsTypeEnum.Marker)
                         {
-                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
+                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);                           
                         }
                         else
                         {

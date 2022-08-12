@@ -48,6 +48,17 @@ namespace InperStudio.ViewModels
                 Version = InperConfig.Instance.Version;
                 DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
                 FileInfo[] files = root.GetFiles();
+                if (files.Count() > 1)
+                {
+                   var _files = files.OrderByDescending(x => x.LastWriteTime).Take(1).ToArray();
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        if (files[i].Name != _files[0].Name)
+                        {
+                            File.Delete(files[i].FullName);
+                        }
+                    }
+                }
                 UnderUpgradeFunc under = new UnderUpgradeFunc();
                 if (!under.DeviceIsExist)
                 {
@@ -64,8 +75,8 @@ namespace InperStudio.ViewModels
                         await TaskExecute(tokenStart.Token);
                         if (!under.DeviceIsRestart)
                         {
-                            MessageBox.Show("Updating successful . Changes will take effect after restarting.");
-                        }      
+                            MessageBox.Show("Updating successful . Changes will take effect after restarting photometry devices.");
+                        }
                     }
                     else
                     {
