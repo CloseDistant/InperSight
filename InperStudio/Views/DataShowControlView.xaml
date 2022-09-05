@@ -73,6 +73,7 @@
         </Style>
         <convert:BoolToDoubleHeightConvert x:Key="BoolToDoubleHeightConvert"/>
         <convert:ChannelNameSplitConverter x:Key="ChannelNameSplitConverter" />
+        <convert:BoolToStringConverter x:Key="BoolToStringConverter"/>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <chart:CustomTimeSpanLableProvider x:Key="TimeSpanProvider" />
         <DataTemplate x:Key="ListDataTemplate">
@@ -109,18 +110,18 @@
                 </Grid>
                 <Grid Grid.Column="2">
                     <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
-                        <sc:SciChartSurface.YAxis>
-                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" Grid.Row="0" Grid.Column="0" Width="60" 
+                        <sc:SciChartSurface.YAxes>
+                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="0" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
-                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Always" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        </sc:SciChartSurface.YAxis>
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        </sc:SciChartSurface.YAxes>
                         <sc:SciChartSurface.ChartModifier>
                             <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
                                 <sc:YAxisDragModifier/>
-                                <!--<sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection" ZoomExtentsY="False"  ReceiveHandledEvents="True" />-->
-                                <chart:CustomZoomExtentsModifier ExecuteOn="MouseLeftButton"  ReceiveHandledEvents="True" />
-                                <chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
-                                <!--<sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick" ReceiveHandledEvents="True"/>-->
+                                <!--<chart:CustomZoomExtentsModifier ExecuteOn="MouseLeftButton"  ReceiveHandledEvents="True" />-->
+                                <!--<chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />-->
+                                <sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick" ReceiveHandledEvents="True"/>
+                                <!--<sc:ZoomPanModifier ExecuteOn="MouseMove" ReceiveHandledEvents="True"/>-->
                             </sc:ModifierGroup>
                         </sc:SciChartSurface.ChartModifier>
                     </sc:SciChartSurface>

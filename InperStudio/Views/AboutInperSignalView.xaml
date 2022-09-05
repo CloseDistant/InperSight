@@ -42,7 +42,7 @@
                     <TextBlock Text="Version:" Margin="0 8 0 0"/>
                     <TextBlock x:Name="version" Text="V1.0.3" Margin="0 8 0 0"/>
                 </UniformGrid>
-                <TextBlock x:Name="content" Margin="28 15 0 0"/>
+                <TextBlock x:Name="content" Margin="28 15 0 0" TextWrapping="WrapWithOverflow"/>
             </StackPanel>
             <StackPanel Grid.Row="1">
                 <TextBlock Text="Device Specification" FontSize="16" Margin="28 15 0 0"/>

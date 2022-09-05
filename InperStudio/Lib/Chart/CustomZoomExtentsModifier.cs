@@ -3,6 +3,7 @@ using SciChart.Charting.ChartModifiers;
 using SciChart.Core.Utility.Mouse;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace InperStudio.Lib.Chart
 {
@@ -16,6 +17,10 @@ namespace InperStudio.Lib.Chart
 
             e.Handled = true;
             _lastPoint = e.MousePoint;
+        }
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonDown(e);
         }
         public override void OnModifierDoubleClick(ModifierMouseArgs e)
         {

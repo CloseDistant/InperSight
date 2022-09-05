@@ -7,6 +7,7 @@ using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
+using SciChart.Charting.Visuals.Axes;
 using Stylet;
 using System;
 using System.Linq;
@@ -50,7 +51,6 @@ namespace InperStudio.ViewModels
                     case SignalPropertiesTypeEnum.Analog:
                         this.view.analog.Visibility = Visibility.Visible;
                         this.view.ai_sampling.Visibility = Visibility.Visible;
-                        this.view.Title = "Analog Signal Properties";
                         CameraInit();
                         break;
                     default:
@@ -97,6 +97,129 @@ namespace InperStudio.ViewModels
                 view.offset.IsEnabled = !channel.Offset;
                 view.cancle.IsEnabled = channel.Offset;
             };
+        }
+        //public void AutoRange_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        string select = (sender as System.Windows.Controls.ComboBox).SelectedValue.ToString();
+        //        Channel item = view.rangeChannel.SelectedItem as Channel;
+        //        if (item.ChannelId == _ChannleId)
+        //        {
+        //            CameraSignalSettings.CameraChannels.ForEach(x =>
+        //            {
+        //                x.AutoRange = select;
+        //            });
+        //            _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+        //            {
+        //                chn.AutoRange = select;
+        //            });
+        //            CameraSignalSettings.AllChannelConfig.AutoRange = select;
+        //        }
+        //        else
+        //        {
+        //            CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).AutoRange = select;
+        //            InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+        //            {
+        //                if (chn.ChannelId == item.ChannelId)
+        //                {
+        //                    chn.AutoRange = select;
+        //                }
+        //            });
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        App.Log.Error(ex.ToString());
+        //    }
+        //}
+        public void RangeChannel_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var svalue = (sender as System.Windows.Controls.ComboBox).SelectedValue as Channel;
+
+                if (svalue.AutoRange)
+                {
+                    this.view.autoRange.IsChecked = true;
+                    this.view.fixedRange.IsChecked = false;
+                }
+                else
+                {
+                    this.view.autoRange.IsChecked = false;
+                    this.view.fixedRange.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void AutoRange_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var rb = sender as RadioButton;
+                Channel item = view.rangeChannel.SelectedItem as Channel;
+                bool isFixed = false;
+                if (rb.Name.Equals("autoRange"))
+                {
+                    isFixed = true;
+                }
+                if (rb.Name.Equals("fixedRange"))
+                {
+                    isFixed = false;
+                }
+                if (item.ChannelId == _ChannleId)
+                {
+                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                    {
+                        x.AutoRange = isFixed;
+                    });
+                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                    {
+                        chn.AutoRange = isFixed;
+                    });
+                    CameraSignalSettings.AllChannelConfig.AutoRange = isFixed;
+                }
+                else
+                {
+                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).AutoRange = isFixed;
+                    InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
+                    {
+                        if (chn.ChannelId == item.ChannelId)
+                        {
+                            chn.AutoRange = isFixed;
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void HeightChannel_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var svalue = (sender as System.Windows.Controls.ComboBox).SelectedValue as Channel;
+
+                if (svalue.Height.ToString() == "NaN")
+                {
+                    this.view.heightAuto.IsChecked = true;
+                    this.view.heightFixed.IsChecked = false;
+                }
+                else
+                {
+                    this.view.heightAuto.IsChecked = false;
+                    this.view.heightFixed.IsChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
         }
         public void HeightAuto_Checked(object sender, RoutedEventArgs e)
         {
@@ -178,7 +301,7 @@ namespace InperStudio.ViewModels
             try
             {
                 var tb = arg1 as InperStudioControlLib.Control.TextBox.InperTextBox;
-                if (tb.IsFocused)
+                //if (tb.IsFocused)
                 {
                     Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
                     if (rx.IsMatch(tb.Text))

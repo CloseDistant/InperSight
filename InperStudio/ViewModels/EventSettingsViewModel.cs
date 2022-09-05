@@ -157,6 +157,31 @@ namespace InperStudio.ViewModels
                         BgColor = InperColorHelper.ColorPresetList[0],
                         Type = ChannelTypeEnum.Manual.ToString()
                     });
+                    if (InperDeviceHelper.Instance.device.PhotometryInfo.IsOutput)
+                    {
+                        InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
+                        {
+                            ConditionsChannels.Add(new EventChannel()
+                            {
+                                IsActive = false,
+                                ChannelId = x.GroupId,
+                                SymbolName = x.WaveType.Split(' ').First(),
+                                Name = x.WaveType.Split(' ').First(),
+                                BgColor = InperColorHelper.ColorPresetList[0],
+                                Type = ChannelTypeEnum.Light.ToString()
+                            });
+                        });
+
+                        ConditionsChannels.Add(new EventChannel()
+                        {
+                            IsActive = false,
+                            ChannelId = InperDeviceHelper.Instance.device.PhotometryInfo.OutputId,
+                            SymbolName = "After-excitation",
+                            Name = "After-excitation",
+                            BgColor = InperColorHelper.ColorPresetList[0],
+                            Type = ChannelTypeEnum.AfterExcitation.ToString()
+                        });
+                    }
                 }
                 //配置文件匹配  并设置当前可用通道
                 foreach (EventChannelJson item in InperGlobalClass.EventSettings.Channels)
@@ -777,8 +802,8 @@ namespace InperStudio.ViewModels
 
                             InperGlobalClass.EventSettings.Channels.Add(channle);
                             InperDeviceHelper.Instance.DeltaFCalculateList.Add(channle);
-                            
-                           
+
+
                         }
                         else
                         {
@@ -794,7 +819,7 @@ namespace InperStudio.ViewModels
 
                         if (@enum == EventSettingsTypeEnum.Marker)
                         {
-                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);                           
+                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
                         }
                         else
                         {

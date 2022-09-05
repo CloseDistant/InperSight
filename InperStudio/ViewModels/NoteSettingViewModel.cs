@@ -39,14 +39,21 @@ namespace InperStudio.ViewModels
             string text = new TextRange(rich.Document.ContentStart, rich.Document.ContentEnd).Text.Replace("\r\n", "");
             if (!string.IsNullOrEmpty(text))
             {
-                if (MessageBox.Show("有未保存内容，是否退出？", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                ScrollViewer scroll = (rich.Parent as Grid).FindName("TagScroll") as ScrollViewer;
+
+                StackPanel stack = scroll.FindName("TagListValue") as StackPanel;
+                TextBlock tb = new TextBlock() { MaxWidth = 300, FontSize = 12, FontFamily = new FontFamily("Arial"), Foreground = new SolidColorBrush(Color.FromRgb(132, 132, 132)), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 3) };
+                string time = DateTime.Now.ToString("G");
+
+                tb.Text = time + @"：" + text;
+                _ = stack.Children.Add(tb);
+                Note note = new Note()
                 {
-                    this.RequestClose();
-                }
-                else
-                {
-                    return;
-                }
+                    Text = text,
+                    CreateTime = DateTime.Parse(time)
+                };
+         
+                NotesCache.Add(note);
             }
 
             this.RequestClose();

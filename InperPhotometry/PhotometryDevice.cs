@@ -165,6 +165,10 @@ namespace InperDeviceManagement
             _CS.SetLightPower(light_id, power_in_percent / 100);
         }
 
+        public void SetBindDio(List<byte> lights)
+        {
+            _CS.SetBindDio(lights);
+        }
 
         public void SaveID(uint software_id, uint hardware_id, string camera_id)
         {

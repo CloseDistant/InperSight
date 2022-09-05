@@ -16,6 +16,8 @@ namespace InperProtocolStack
         public uint SNlength { get; set; }
         public string SN { get; set; }
         public uint LightNumber { get; set; }
+        public bool IsOutput { get; set; }
+        public byte OutputId { get; set; }
         public List<LightConfigInfo> LightConfigInfos { get; set; }
     }
     public struct LightConfigInfo
@@ -44,7 +46,6 @@ namespace InperProtocolStack
             {
                 items.ForEach(x =>
                 {
-                    Console.WriteLine(x.IOID + "---" + x.Status);
                     OnDevNotification?.Invoke(this, x);
                 });
             }
@@ -104,6 +105,9 @@ namespace InperProtocolStack
                 LightDesc ld = new LightDesc((uint)lightConfigInfo.ID, lightConfigInfo.WaveLength, lightConfigInfo.MaxPower);
                 LightSourceList.Add(ld);
             }
+            info.IsOutput = param.Skip(skipLength).Take(1).First() == 1 ? true : false;
+            skipLength += 1;
+            info.OutputId = param.Skip(skipLength).Take(1).First();
             PhotometryInfo = info;
         }
         public List<LightDesc> LightSourceList { get; private set; } = new List<LightDesc>();
@@ -116,6 +120,7 @@ namespace InperProtocolStack
 
         #region Device Notification
         public event EventHandler<DevNotificationEventArgs> OnDevNotification;
+
         private List<DevInputNotificationEventArgs> DeviceInputUpdated(byte[] param)
         {
             try
@@ -132,12 +137,12 @@ namespace InperProtocolStack
 
                 for (int i = 0; i < (int)length; i++)
                 {
-                    UInt64 io_timestamp = BitConverter.ToUInt64(param.Skip(16 * (i + 1)).Take(8).ToArray(), 0);
-                    UInt32 io_id = BitConverter.ToUInt32(param.Skip(16 * (i + 1) + 8).Take(4).ToArray(), 0);
+                    ulong io_timestamp = BitConverter.ToUInt64(param.Skip(16 * (i + 1)).Take(8).ToArray(), 0);
+                    uint io_id = BitConverter.ToUInt32(param.Skip(16 * (i + 1) + 8).Take(4).ToArray(), 0);
 
-                    UInt32 io_stat = BitConverter.ToUInt32(param.Skip(16 * (i + 1) + 12).Take(4).ToArray(), 0);
+                    uint io_stat = BitConverter.ToUInt32(param.Skip(16 * (i + 1) + 12).Take(4).ToArray(), 0);
 
-                    DevInputNotificationEventArgs e = new DevInputNotificationEventArgs { IOID = io_id, Status = io_stat, Timestamp = io_timestamp * 10 };
+                    DevInputNotificationEventArgs e = new DevInputNotificationEventArgs { IOID = io_id, Index = io_id, Status = io_stat, Timestamp = io_timestamp * 10 };
                     devs.Add(e);
                 }
 
@@ -211,6 +216,13 @@ namespace InperProtocolStack
             return;
         }
 
+        public void SetBindDio(List<byte> lightIds)
+        {
+            CmdSetBindDio cmd = new CmdSetBindDio();
+            cmd.SetCmdParam(lightIds);
+            _TC.Transmit(cmd);
+            return;
+        }
 
         public void SaveID(uint software_id, uint hardware_id, string camera_id)
         {

@@ -40,6 +40,7 @@ namespace InperProtocolStack
     public class DevInputNotificationEventArgs : DevNotificationEventArgs
     {
         public UInt32 IOID;
+        public UInt32 Index;
         public UInt32 Status;
         public UInt64 Timestamp;
     }

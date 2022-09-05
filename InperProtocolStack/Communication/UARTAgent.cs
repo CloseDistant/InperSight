@@ -69,7 +69,7 @@ namespace InperProtocolStack.Communication
                 // Claim interface #0.
                 _ = wholeUsbDevice.ClaimInterface(0);
             }
-            UsbEndpointReader reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01, 1024);//128
+            UsbEndpointReader reader = MyUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01, 65535);//128
             reader.DataReceived += Reader_DataReceived;
             reader.DataReceivedEnabled = true;
         }
@@ -161,7 +161,6 @@ namespace InperProtocolStack.Communication
                     OnInputReceived?.Invoke(sender, e.Buffer);
                 }
             }
-
         }
         public UARTAgent(string p_name)
         {

@@ -68,6 +68,7 @@
     <Compile Include="CmdPhotometry\CmdOutputIO.cs" />
     <Compile Include="CmdPhotometry\CmdSaveID.cs" />
     <Compile Include="CmdPhotometry\CmdSendFile.cs" />
+    <Compile Include="CmdPhotometry\CmdSetBindDio.cs" />
     <Compile Include="CmdPhotometry\CmdSetFileLength.cs" />
     <Compile Include="CmdPhotometry\CmdSetFrameRate.cs" />
     <Compile Include="CmdPhotometry\CmdSetIOStatus.cs" />

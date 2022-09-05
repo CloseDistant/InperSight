@@ -4,12 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:InperStudio.Views.Control"
+             xmlns:global="clr-namespace:InperStudio.Lib.Bean"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              mc:Ignorable="d"  >
+    <UserControl.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass"/>
+    </UserControl.Resources>
     <hc:TransitioningContentControl>
         <Grid>
             <hc:WaveProgressBar Name="wavePB" Value="90" WaveFill="LightSeaGreen" Text="123" ShowText="False"/>
-            <TextBlock x:Name="fileSize" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontSize="14" FontWeight="Bold"/>
+            <TextBlock x:Name="fileSize" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontSize="14" Margin="0 0 0 10" FontWeight="Bold"/>
+            <TextBlock x:Name="time"  Text="{Binding Source={StaticResource InperGlobalClass},Path= RunTime,StringFormat='HH:mm:ss:ff',UpdateSourceTrigger=PropertyChanged}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Heavy" FontSize="12" Margin="0 40 0 0"/>
         </Grid>
     </hc:TransitioningContentControl>
 </UserControl>

@@ -197,7 +197,6 @@ namespace InperStudio.ViewModels
             }
 
             InperDeviceHelper.Instance.StartCollect();
-
             await StartAndStopShowMarker(ChannelTypeEnum.Start);
 
             InperGlobalClass.IsPreview = true;
@@ -217,6 +216,11 @@ namespace InperStudio.ViewModels
                 }
                 InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
+                if (!InperDeviceHelper.Instance.AllLightOpen())
+                {
+                    InperGlobalClass.ShowReminderInfo("Please select at least one light");
+                    return;
+                }
                 InperDeviceHelper.Instance.device.Start();
 
                 if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
@@ -227,11 +231,6 @@ namespace InperStudio.ViewModels
                 if (!InperDeviceHelper.Instance.InitDataStruct())
                 {
                     InperGlobalClass.ShowReminderInfo("数据初始化失败");
-                    return;
-                }
-                if (!InperDeviceHelper.Instance.AllLightOpen())
-                {
-                    InperGlobalClass.ShowReminderInfo("Please select at least one light");
                     return;
                 }
                 if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))

@@ -4,6 +4,7 @@ using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
+using InperStudio.Lib.Helper.ImageRecognition;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
@@ -17,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -71,7 +73,6 @@ namespace InperStudio.ViewModels
         protected override void OnViewLoaded()
         {
             view = this.View as SignalSettingsView;
-
             for (int i = 0; i < 8; i++)
             {
                 AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 101, NickName = "AI-" + (i + 1), Name = "AI-" + (i + 1) + "-", BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
@@ -82,7 +83,7 @@ namespace InperStudio.ViewModels
                     Init();
                     break;
                 case SignalSettingsTypeEnum.Analog:
-                    view.Title = "Analog Signal Settings";
+                    view.Title = "Analog Signal";
                     view.analog.Visibility = Visibility.Visible;
                     InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
                     {
@@ -151,7 +152,6 @@ namespace InperStudio.ViewModels
                 default:
                     break;
             }
-
             view.ConfirmClickEvent += (s, e) =>
             {
                 RequestClose();
@@ -210,7 +210,7 @@ namespace InperStudio.ViewModels
                     {
                         InperGlobalClass.CameraSignalSettings.Sampling = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Exposure / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
                         Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
-                        InperDeviceHelper.Instance.device.SetFrameRate(Sampling);
+                        InperDeviceHelper.Instance.device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
                     }
                 }
             }
@@ -252,7 +252,7 @@ namespace InperStudio.ViewModels
                     {
                         InperGlobalClass.CameraSignalSettings.Exposure = Math.Floor(1000 / (InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count)));
                         this.view.Exposure.Text = Expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
-                        _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(expourse));
+                        _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(Expourse));
                     }
                 }
             }
@@ -268,13 +268,6 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                if (InperGlobalClass.IsStop)
-                {
-                    view.lightTestMode.IsChecked = true;
-                    Thread.Sleep(50);
-                    view.lightTestMode.IsChecked = false;
-                }
-
                 view.camera.Visibility = Visibility.Visible;
                 view.channelRoi.IsEnabled = false;
                 view.waveView.IsEnabled = false;
@@ -295,7 +288,56 @@ namespace InperStudio.ViewModels
                         _ = view.ellipseCanvas.Children.Add(grid);
                     }
                 });
+                #region 自动识别光纤端面
+
+                if (!InperGlobalClass.IsImportConfig && InperGlobalClass.CameraSignalSettings.CameraChannels.Count == 0)
+                {
+                    _ = InperDeviceHelper.Instance.device.SetGain(20);
+
+                    _ = InperDeviceHelper.Instance.device.SetExposure(1);
+
+                    int _loopCount = 0;
+                    while (true)
+                    {
+                        if (!InperDeviceHelper.Instance._ImageShowMat.Empty())
+                        {
+                            Mat mat = InperDeviceHelper.Instance._ImageShowMat.Clone();
+
+                            CircleSegment[] centers = AutoFocusHelper.GetCirclesCenterPoint(mat);
+                            double scaleX = view.ellipseCanvas.Width / mat.Width;
+                            double scaleY = view.ellipseCanvas.Height / mat.Height;
+                            int radius = 0;
+                            if (centers.Length < 5 && centers.Length != 0)
+                            {
+                                for (int i = 0; i < centers.Length; i++)
+                                {
+                                    if (radius <= 0)
+                                    {
+                                        radius = (int)Math.Floor(centers[i].Radius * 0.85);
+                                    }
+                                    else
+                                    {
+                                        radius = radius < (int)Math.Floor(centers[i].Radius * 0.85) ? radius : (int)Math.Floor(centers[i].Radius * 0.85);
+                                    }
+                                    Grid grid = DrawCircle(i + 1, radius, 10, 0, new Channel() { Offset = false, Top = centers[i].Center.Y * scaleY - radius / 2, Left = centers[i].Center.X * scaleY - radius / 2 });
+                                    this.view.ellipseCanvas.Children.Add(grid);
+                                }
+                                break;
+                            }
+                        }
+                        _loopCount++;
+                        if (_loopCount > 10)
+                        {
+                            InperGlobalClass.ShowReminderInfo("未找到光纤端面，请手动添加");
+                            break;
+                        }
+                        Thread.Sleep(10);
+                    }
+                }
+
+                #endregion
                 _ = InperDeviceHelper.Instance.device.SetGain(InperGlobalClass.CameraSignalSettings.Gain);
+                _ = InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
             }
             catch (Exception ex)
             {
@@ -644,7 +686,7 @@ namespace InperStudio.ViewModels
             try
             {
                 WaveGroup sen = (sender as CheckBox).DataContext as WaveGroup;
-
+                sen.IsChecked = true;
                 if (sen.IsChecked)
                 {
                     //InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, true);
@@ -740,7 +782,7 @@ namespace InperStudio.ViewModels
             try
             {
                 WaveGroup sen = (sender as CheckBox).DataContext as WaveGroup;
-
+                sen.IsChecked = false;
                 if (!sen.IsChecked)
                 {
                     //InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
@@ -1203,7 +1245,10 @@ namespace InperStudio.ViewModels
             {
                 App.Log.Error(ex.ToString());
             }
-            GC.Collect(0);
+            //finally
+            //{
+            //    this.RequestClose();
+            //}
         }
     }
 }

@@ -20,6 +20,7 @@ namespace InperStudio
             // Configure the IoC container in here
         }
 
+        //After-excitation
         protected override void Configure()
         {
             try

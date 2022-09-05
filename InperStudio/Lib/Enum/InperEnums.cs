@@ -54,7 +54,9 @@
         Input,
         Start,
         Stop,
-        Manual
+        Manual,
+        AfterExcitation,
+        Light
     }
     public enum TimerError
     {

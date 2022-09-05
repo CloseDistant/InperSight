@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
@@ -66,7 +67,6 @@ namespace InperStudio.Lib.Helper
             }
         }
         private readonly object _DisplayQLock = new object();
-        private Task updateTask;
         private Task frameProcTask;
         private CancellationTokenSource _updateTaskTokenSource;
         private CancellationTokenSource _frameProcTaskTokenSource;
@@ -185,7 +185,7 @@ namespace InperStudio.Lib.Helper
                 {
                     if (InperGlobalClass.IsRecord)
                     {
-                        Task.Factory.StartNew(() => { SetIntervalData(DateTime.Now.Ticks, 0); });
+                        Task.Factory.StartNew(() => { SetIntervalData(time / 100, 0); });
                     }
                     LightWaveLength.ToList().ForEach(x =>
                     {
@@ -208,7 +208,7 @@ namespace InperStudio.Lib.Helper
                     next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                     if (InperGlobalClass.IsRecord)
                     {
-                        Task.Factory.StartNew(() => { SetIntervalData(DateTime.Now.Ticks, 1); });
+                        Task.Factory.StartNew(() => { SetIntervalData(time / 100, 1); });
                     }
                 }
                 _Metronome.Interval = next_Interval;
@@ -249,7 +249,7 @@ namespace InperStudio.Lib.Helper
             {
                 _ = App.SqlDataInit.sqlSugar.UseTran(() =>
                 {
-                    _ = App.SqlDataInit.sqlSugar.Storageable<IntervalScale>(new IntervalScale() { CreateTime = times, Type = type }).ToStorage().BulkCopy();
+                    _ = App.SqlDataInit.sqlSugar.Storageable(new IntervalScale() { CreateTime = times, Type = type }).ToStorage().BulkCopy();
                 });
                 Interlocked.Exchange(ref _IntervalScaleLock, 0);
             }
@@ -271,7 +271,7 @@ namespace InperStudio.Lib.Helper
                         synTime = time / 100;
                         _eventIsFirst = false;
                     }
-                    Input input = new Input() { ChannelId = (int)dev.IOID, CameraTime = synTime + (long)dev.Timestamp - _EventStartTime, Value = dev.Status, CreateTime = DateTime.Now };
+                    Input input = new Input() { ChannelId = (int)dev.IOID, Index = (int)dev.Index, CameraTime = synTime + (long)dev.Timestamp - _EventStartTime, Value = dev.Status, CreateTime = DateTime.Now };
                     _InputDataPlot.Enqueue(input);
                     Task.Run(() => { InputDataUpdateProc(); });
                     if (InperGlobalClass.IsRecord)
@@ -359,7 +359,6 @@ namespace InperStudio.Lib.Helper
             }
             return true;
         }
-        int count = 0;
         private void Instance_OnImageGrabbed(object sender, MarkedMat e)
         {
             try
@@ -397,6 +396,7 @@ namespace InperStudio.Lib.Helper
                 App.Log.Error(ex.ToString());
             }
         }
+        public Mat _ImageShowMat = new Mat();
         public void DisplayProc()
         {
             _SwapBuffer = new short[VisionWidth * VisionHeight];
@@ -414,12 +414,12 @@ namespace InperStudio.Lib.Helper
                 _DisplayMatQ.Clear();
                 Monitor.Exit(_DisplayQLock);
 
+                _ImageShowMat = mmats.Last().ImageMat;
                 if (mmats.Count() > 0 && (mmats.Last().Group == SelectedWaveType || InperGlobalClass.IsPreview || InperGlobalClass.IsRecord))
                 {
-                    Mat image_mat = mmats.Last().ImageMat;
                     unsafe
                     {
-                        Marshal.Copy(image_mat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
+                        Marshal.Copy(_ImageShowMat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
                         System.Windows.Application.Current?.Dispatcher.Invoke(new Action(() =>
                         {
                             _WBMPPreview.Lock();
@@ -493,7 +493,7 @@ namespace InperStudio.Lib.Helper
                     AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
                     if (InperGlobalClass.IsRecord)
                     {
-                        count++;
+                        InperGlobalClass.RunTime = new DateTime(ts / 100, DateTimeKind.Unspecified);
                         SaveDatas.Enqueue(allChannelRecord); //mask.ChannelId, m.Group, r, ts, mask.Type
                         Task.Run(() => { SaveImageData(); });
                     }
@@ -820,7 +820,7 @@ namespace InperStudio.Lib.Helper
                         }
                         else
                         {
-                            if (cameraChannel.ChannelId == cid && cameraChannel.LightIndex == group)
+                            if (cameraChannel.ChannelId == cid && cameraChannel.LightIndex == group && cameraChannel.Type != ChannelTypeEnum.Manual.ToString())
                             {
                                 DeltaFData[cid][group].Enqueue(r);
                                 if (DeltaFData[cid][group].Count > cameraChannel.WindowSize)
@@ -1176,7 +1176,6 @@ namespace InperStudio.Lib.Helper
                 {
                     device.RemoveAdSampling();
                 }
-
                 isFirstRecordTiem = false; isLoop = false; isAdstart = false;
                 time = 0;
                 _frameProcTaskTokenSource.Cancel();
@@ -1353,20 +1352,39 @@ namespace InperStudio.Lib.Helper
                         _adPreTime.Add(x.ChannelId, 0);
                     }
                 });
-
                 InperGlobalClass.EventSettings.Channels.ForEach(x =>
                 {
                     if (x.Type == ChannelTypeEnum.Input.ToString())
                     {
                         Instance.device.SetIOMode((uint)x.ChannelId, IOMode.IOM_INPUT);
-                        Thread.Sleep(50);
+                        //Thread.Sleep(50);
                     }
                     if (x.Type == ChannelTypeEnum.Output.ToString())
                     {
                         Instance.device.SetIOMode((uint)x.ChannelId, IOMode.IOM_OUTPUT);
-                        Thread.Sleep(50);
+                        //Thread.Sleep(50);
+                        //binding dio 输出
+                        if (x.Condition != null)
+                        {
+                            if (x.Condition.Type == ChannelTypeEnum.Light.ToString() || x.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
+                            {
+                                if (x.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
+                                {
+                                    device.SwitchLight((uint)x.Condition.ChannelId, true);
+                                }
+                                List<byte> bindDios = new List<byte>();
+
+                                bindDios.Add((byte)x.Condition.ChannelId);
+                                string ob = "00000000";
+                                ob = ob.Insert(7 - x.ChannelId, "1").Remove(8, 1);
+                                bindDios.Add(System.Convert.ToByte(ob, 2));
+
+                                device.SetBindDio(bindDios);
+                            }
+                        }
                     }
                 });
+
                 if (isAdstart)
                 {
                     AiConfigSend();

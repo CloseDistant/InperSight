@@ -31,6 +31,7 @@
         public const byte INTENT_RETURN_INFO = 0x13;
         public const byte INTENT_INQ_RUN_STATUS = 0x14;
         public const byte INTENT_RETURN_RUN_STATUS = 0x15;
+        public const byte INTENT_SET_BIND_DIO = 0x16;
         public const byte INTENT_SET_FRAME_RATE = 0x20;
         public const byte INTENT_SWITCH_LIGHT_MODE = 0x21;
         public const byte INTENT_SET_LIGHT_PWR = 0x22;
@@ -52,5 +53,6 @@
         public const byte INTENT_DEVIC_INFO = 0xE5;
         public const byte INTENT_PHOTOMETRY_INFO = 0xE7;
         public const byte INTENT_DEVICE_INFO_PUB = 0xE8;
+
     }
 }

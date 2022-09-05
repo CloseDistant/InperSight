@@ -101,7 +101,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\InperProtocolStack\bin\Debug\InperProtocolStack.dll</HintPath>
     </Reference>
-    <Reference Include="InperStudioControlLib">
+    <Reference Include="InperStudioControlLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\InperStudioControlLib\bin\Debug\InperStudioControlLib.dll</HintPath>
     </Reference>
     <Reference Include="K4os.Compression.LZ4, Version=1.1.11.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
@@ -248,6 +249,7 @@
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
+    <Compile Include="Lib\Convert\BoolToStringConverter.cs" />
     <Compile Include="Lib\Convert\ChannelNameSplitConverter.cs" />
     <Compile Include="Lib\Convert\ChannelTypeToVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\DoubleToBoolConverter.cs" />
@@ -283,6 +285,7 @@
     <Compile Include="Lib\Helper\FilterTools\OnLineFilterTool.cs" />
     <Compile Include="Lib\Helper\HighAccurateTimer.cs" />
     <Compile Include="Lib\Helper\HotKey\HotKeyHelper.cs" />
+    <Compile Include="Lib\Helper\ImageRecognition\AutoFocusHelper.cs" />
     <Compile Include="Lib\Helper\InperClassExtensionHelper.cs" />
     <Compile Include="Lib\Helper\InperClassHelper.cs" />
     <Compile Include="Lib\Helper\InperColorHelper.cs" />

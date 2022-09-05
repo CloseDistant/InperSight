@@ -7,6 +7,7 @@ using Stylet;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text;
 
 namespace InperStudio.Lib.Bean
 {
@@ -20,6 +21,7 @@ namespace InperStudio.Lib.Bean
         private static bool isAllowDragScroll = false;
         private static string dataPath = string.Empty;
         private static string dataFolderName = string.Empty;
+        private static DateTime runTime;
 
         private static EventPanelProperties eventPanelProperties = InperJsonHelper.GetEventPanelProperties();
         private static CameraSignalSettings cameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
@@ -33,6 +35,16 @@ namespace InperStudio.Lib.Bean
         #endregion
 
         #region properties
+        public static bool IsImportConfig { get; set; } = false;
+        public static DateTime RunTime
+        {
+            get => runTime;
+            set
+            {
+                runTime = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(RunTime)));
+            }
+        }
         public static bool IsAllowDragScroll
         {
             get => isAllowDragScroll;

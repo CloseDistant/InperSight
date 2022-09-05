@@ -67,7 +67,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" >
                 <Grid Margin="0 20 0 0" >
-                    <TextBlock Text="Channels Setting" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource  InperNormalFontSize}" />
+                    <TextBlock Text="Channels Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource  InperNormalFontSize}" />
                     <hc:Divider Width="142" VerticalAlignment="Center" HorizontalAlignment="Right"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" Opacity=".4" />
                 </Grid>
                 <Grid Margin="0 20 0 0" x:Name="conditionGrid"  Visibility="Collapsed">
@@ -97,7 +97,7 @@
                         </WrapPanel>
                         <WrapPanel HorizontalAlignment="Right" Margin="0 20 20 0">
                             <TextBlock VerticalAlignment="Center" Text="WindowSize(point)"  FontSize="{DynamicResource InperNormalFontSize}"/>
-                            <inper:InperTextBox InperVerify="True" FontSize="{DynamicResource InperNormalFontSize}" InperMinValue="2" InperMaxValue="99999" InperTextType="Int" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectionBoxItem.WindowSize,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InperTextBoxBaseStyle}" Width="90" HorizontalAlignment="Right" Margin="10 0 0 0"/>
+                            <inper:InperTextBox InperVerify="True" FontSize="{DynamicResource InperNormalFontSize}" InperMinValue="1" InperMaxValue="99999" InperTextType="Int" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectionBoxItem.WindowSize,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InperTextBoxBaseStyle}" Width="90" HorizontalAlignment="Right" Margin="10 0 0 0"/>
                         </WrapPanel>
                     </StackPanel>
                 </Grid>

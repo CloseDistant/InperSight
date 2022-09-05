@@ -12,7 +12,7 @@
         xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib" OtherButtonText="Open all"
         mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="True"
-        Title="Video Setting" SizeToContent="Height" MinHeight="440" Height="440" Width="660" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        Title="Video" SizeToContent="Height" MinHeight="440" Height="440" Width="660" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <conv:TriggeString2VisibilityConverter x:Key="TriggeString2VisibilityConverter"/>
@@ -144,7 +144,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" >
                     <Grid Margin="0 0 0 0" >
-                        <TextBlock Text="Video Setting" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
+                        <TextBlock Text="Video Settings" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperNormalFontSize}" />
                         <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right" Opacity=".4"  LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
                     </Grid>
                     <Grid Margin="0 20 0 0" >

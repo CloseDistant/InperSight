@@ -86,7 +86,13 @@ namespace InperStudio.ViewModels
                         //    cameras.Add(count, (string)device["Caption"]);
                         //    count++;
                         //}
+
+                        //CameraInfoesReader cameraInfoesReader = new CameraInfoesReader();
+                        //var cameras = cameraInfoesReader.GetCameraInfos();
+
                         InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
+
+
                         if (UsedKits.Count == CompInfo.ListCamerasData.Count)
                         {
                             return;
@@ -165,6 +171,7 @@ namespace InperStudio.ViewModels
                         if (window.Name.Contains("MainWindow"))
                         {
                             main = window.DataContext as MainWindowViewModel;
+                            break;
                         }
                     }
                     if (UsedKits.Count != 0)
@@ -174,7 +181,7 @@ namespace InperStudio.ViewModels
                             if (Application.Current.Windows.OfType<System.Windows.Window>().Count() > 1)
                             {
                                 var window = Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.Title.Equals(item.CustomName));
-                                if (window != null)
+                                if (window != null && window.GetType().Name != "AdditionSettingsView")
                                 {
                                     continue;
                                 }

@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean.Channel;
+using SciChart.Charting.Visuals.Axes;
 using System.Collections.Generic;
 
 namespace InperStudio.Lib.Helper.JsonBean
@@ -41,6 +42,7 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double YBottom { get; set; } = 0;
         public bool Offset { get; set; }
         public int OffsetWindowSize { get; set; } = 300;
+        public bool AutoRange { get; set; } = true;
         public Filters Filters { get; set; } = new Filters();
     }
     //public class Filters

@@ -55,6 +55,7 @@ namespace InperStudio.ViewModels
             string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             string[] exeArray = exeName.Split('\\');
             KillProcess(exeArray.Last().Split('.').First());
+            Environment.Exit(0);
         }
         private void KillProcess(string processName)
         {
@@ -72,6 +73,14 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                if (!InperGlobalClass.IsImportConfig)
+                {
+                    if (MessageBox.Show("Config files unsaved,quit anyway?", "Config", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                }
                 InperConfig.Instance.IsSkip = false;
                 SystemSleepHelper.ResotreSleep();
 

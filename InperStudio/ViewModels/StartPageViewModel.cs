@@ -50,7 +50,7 @@ namespace InperStudio.ViewModels
                 FileInfo[] files = root.GetFiles();
                 if (files.Count() > 1)
                 {
-                   var _files = files.OrderByDescending(x => x.LastWriteTime).Take(1).ToArray();
+                    var _files = files.OrderByDescending(x => x.LastWriteTime).Take(1).ToArray();
                     for (int i = 0; i < files.Length; i++)
                     {
                         if (files[i].Name != _files[0].Name)
@@ -71,7 +71,7 @@ namespace InperStudio.ViewModels
                     #region 下位机更新
                     if (files.Length > 0)
                     {
-                        under.SendFile(files, tokenStart);
+                        under.SendFile(root.GetFiles(), tokenStart);
                         await TaskExecute(tokenStart.Token);
                         if (!under.DeviceIsRestart)
                         {
@@ -120,6 +120,7 @@ namespace InperStudio.ViewModels
         public void Close()
         {
             this.RequestClose();
+            Environment.Exit(0);
         }
     }
 }

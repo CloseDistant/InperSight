@@ -30,6 +30,8 @@ namespace InperStudio.Lib.Bean.Channel
         public int OffsetWindowSize { get; set; } = 300;
         public bool Offset { get; set; }
         public bool IsDeltaFCalculate { get; set; }
+        private bool autoRange = true;
+        public bool AutoRange { get => autoRange; set => SetAndNotify(ref autoRange, value); }
         public Filters Filters { get; set; } = new Filters();
         private TimeSpanAxis timeSpanAxis;
         public TimeSpanAxis TimeSpanAxis { get => timeSpanAxis; set => SetAndNotify(ref timeSpanAxis, value); }

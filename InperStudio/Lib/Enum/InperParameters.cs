@@ -22,7 +22,7 @@ namespace InperStudio.Lib.Enum
             12,
             18,
             30,
-            42,
+            50,
             60,
             90,
             120

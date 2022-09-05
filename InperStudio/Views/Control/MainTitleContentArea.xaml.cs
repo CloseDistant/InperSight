@@ -144,6 +144,8 @@ namespace InperStudio.Views.Control
                         }
                     }
                 }
+
+                InperGlobalClass.IsImportConfig = true;
             }
             catch (Exception ex)
             {
