@@ -21,7 +21,7 @@ namespace InperStudio.ViewModels
         private readonly IWindowManager windowManager;
         public MainWindowViewModel MainWindowViewModel { get; private set; }
 
-        private Sprite sprite = null;
+        public static Sprite sprite = null;
         #endregion
         public ManulControlViewModel(IWindowManager windowManager)
         {
@@ -79,13 +79,13 @@ namespace InperStudio.ViewModels
                 switch (type)
                 {
                     case "Camera":
-                        if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") == null)
+                        if (InperClassHelper.GetWindowByNameChar("Camera Signal") == null)
                         {
                             windowManager.ShowWindow(new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera));
                         }
                         else
                         {
-                            InperClassHelper.GetWindowByNameChar("Camera Signal Settings").Activate();
+                            InperClassHelper.GetWindowByNameChar("Camera Signal").Activate();
                         }
                         break;
                     case "Analog":
@@ -203,6 +203,7 @@ namespace InperStudio.ViewModels
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsStop = false;
 
+
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
             InperGlobalClass.IsAllowDragScroll = true;
         }
@@ -210,6 +211,17 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
+                {
+                    var obj = InperJsonHelper.GetAdditionRecordJson("stop");
+                    TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
+                    TimeSpan nowTime = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                    if (time <= nowTime)
+                    {
+                        InperGlobalClass.ShowReminderInfo("Trigger-AtTime模式参数设置错误");
+                        return;
+                    }
+                }
                 if (InperGlobalClass.IsPreview)
                 {
                     StopRecord(1);
@@ -278,7 +290,7 @@ namespace InperStudio.ViewModels
                 if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
                 {
                     var obj = InperJsonHelper.GetAdditionRecordJson("stop");
-                    _ = Task.Factory.StartNew(() =>
+                    _ = Task.Factory.StartNew(async () =>
                       {
                           TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
                           while (true)
@@ -288,7 +300,7 @@ namespace InperStudio.ViewModels
                               {
                                   break;
                               }
-                              Task.Delay(10);
+                              await Task.Delay(10);
                           }
                           this.View.Dispatcher.Invoke(() => { StopRecord(); });
                       });

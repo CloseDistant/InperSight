@@ -118,7 +118,7 @@
                         </WrapPanel>
                         <WrapPanel HorizontalAlignment="Right" Margin="0 20 20 0">
                             <TextBlock VerticalAlignment="Center" Text="WindowSize(point)"  FontSize="{DynamicResource InperNormalFontSize}"/>
-                            <inper:InperTextBox InperVerify="True" FontSize="{DynamicResource InperNormalFontSize}" InperMinValue="2" InperMaxValue="99999" InperTextType="Int" Text="{Binding ElementName=ConditionsCombox,Path=SelectionBoxItem.WindowSize,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InperTextBoxBaseStyle}" Width="90" HorizontalAlignment="Right" Margin="10 0 0 0"/>
+                            <inper:InperTextBox InperVerify="True" FontSize="{DynamicResource InperNormalFontSize}" InperMinValue="1" InperMaxValue="99999" InperTextType="Int" Text="{Binding ElementName=ConditionsCombox,Path=SelectionBoxItem.WindowSize,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InperTextBoxBaseStyle}" Width="90" HorizontalAlignment="Right" Margin="10 0 0 0"/>
                         </WrapPanel>
                     </StackPanel>
                 </Grid>

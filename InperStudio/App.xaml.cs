@@ -75,6 +75,10 @@ namespace InperStudio
             {
                 File.Copy(Environment.CurrentDirectory + @"\UserConfig.json", jsonPath, true);
             }
+            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "UnderBin")))
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
+            }
             RegisterEvents();
             #endregion
             InperGlobalClass.DataPath = InperGlobalClass.DataPath == string.Empty ? Environment.CurrentDirectory + @"\Data\" : InperGlobalClass.DataPath;

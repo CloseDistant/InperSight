@@ -13,8 +13,11 @@
              xmlns:vm="clr-namespace:InperStudio.ViewModels"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:dd="urn:gong-wpf-dragdrop"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataShowControlViewModel}" KeyUp="{s:Action MarkerMonitor_KeyUp}">
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataShowControlViewModel}" >
     <UserControl.Resources>
+        <convert:GridLengthConverter x:Key="GridLengthConverter"/>
+        <convert:BoolToImageUrlConverter x:Key="BoolToImageUrlConverter"/>
+        <convert:ChannelTypeToEnableConverter x:Key="ChannelTypeToEnableConverter"/>
         <Style x:Key="LeftAxisLabelStyle" TargetType="sc:DefaultTickLabel">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="ContentTemplate">
@@ -27,6 +30,22 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <ItemsPanelTemplate x:Key="YAxesPanel">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{Binding S0Visible, Converter={StaticResource GridLengthConverter}}" />
+                    <RowDefinition Height="0" />
+                    <RowDefinition Height="{Binding S1Visible, Converter={StaticResource GridLengthConverter}}"/>
+                    <RowDefinition Height="0" />
+                    <RowDefinition Height="{Binding S2Visible, Converter={StaticResource GridLengthConverter}}"/>
+                    <RowDefinition Height="0" />
+                    <RowDefinition Height="{Binding S3Visible, Converter={StaticResource GridLengthConverter}}"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </ItemsPanelTemplate>
         <!-- Define style for the SciChartScrollbar -->
         <Style TargetType="sc:SciChartScrollbar">
             <Setter Property="GripsThickness" Value="10"/>
@@ -106,24 +125,34 @@
                         <Button Command="{s:Action YaxisReduce}" CommandParameter="{Binding DataContext,RelativeSource={RelativeSource Mode=Self}}" Margin="0 10" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
                             <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
                         </Button>
+                        <Button Command="{s:Action YaxisSet}" IsEnabled="{Binding Type,Converter={StaticResource ChannelTypeToEnableConverter}}" CommandParameter="{Binding DataContext,RelativeSource={RelativeSource Mode=Self}}" Margin="0 10" Style="{StaticResource InperFreeButton}" Width="25" Height="25" >
+                            <Image Source="{Binding YaxisCountToZero,Converter={StaticResource BoolToImageUrlConverter}}" Stretch="UniformToFill" />
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="合并" Command="{s:Action AllYaxisSetMerge}"/>
+                                    <MenuItem Header="拆分" Command="{s:Action AllYaxisSetSeparate}"/>
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
+                    <sc:SciChartSurface Background="Transparent" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
                         <sc:SciChartSurface.YAxes>
-                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="0" Grid.Column="0" Width="60" 
+                            <sc:NumericAxis Id="Ch0" Visibility="{Binding S0Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="0" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
                                 DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                            <sc:NumericAxis Id="Ch1" Margin="0 5 0 0" Visibility="{Binding S1Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="2" Grid.Column="0" Width="60" 
+                                DrawMajorGridLines="False"
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" />
+                            <sc:NumericAxis Id="Ch2" Margin="0 5 0 0" Visibility="{Binding S2Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="4" Grid.Column="0" Width="60" 
+                                DrawMajorGridLines="False"
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" />
+                            <sc:NumericAxis Id="Ch3" Margin="0 5 0 0" Visibility="{Binding S3Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="6" Grid.Column="0" Width="60" 
+                                DrawMajorGridLines="False"
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" />
                         </sc:SciChartSurface.YAxes>
-                        <sc:SciChartSurface.ChartModifier>
-                            <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
-                                <sc:YAxisDragModifier/>
-                                <!--<chart:CustomZoomExtentsModifier ExecuteOn="MouseLeftButton"  ReceiveHandledEvents="True" />-->
-                                <!--<chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />-->
-                                <sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick" ReceiveHandledEvents="True"/>
-                                <!--<sc:ZoomPanModifier ExecuteOn="MouseMove" ReceiveHandledEvents="True"/>-->
-                            </sc:ModifierGroup>
-                        </sc:SciChartSurface.ChartModifier>
+
                     </sc:SciChartSurface>
                 </Grid>
             </Grid>
@@ -183,16 +212,11 @@
                             <Grid Grid.Column="2" >
                                 <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxis,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
                                     <sc:SciChartSurface.YAxis>
-                                        <sc:NumericAxis DrawMajorBands="False"  TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
+                                        <sc:NumericAxis DrawMajorBands="False" TextFormatting="#0.000"  TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
                                     DrawMajorGridLines="False"
                                     DrawMinorGridLines="False" BorderThickness="0 0 1 0" MaxAutoTicks="6" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRangeChanged="{s:Action NumericAxis_VisibleRangeChanged}" VisibleRange="-1,2"/>
                                     </sc:SciChartSurface.YAxis>
-                                    <sc:SciChartSurface.ChartModifier>
-                                        <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
-                                            <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
-                                            <chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
-                                        </sc:ModifierGroup>
-                                    </sc:SciChartSurface.ChartModifier>
+
                                 </sc:SciChartSurface>
                             </Grid>
                         </Grid>
@@ -233,15 +257,10 @@
                     <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" x:Name="scichartbottom" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxisFixed,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}">
                         <sc:SciChartSurface.YAxis>
                             <sc:NumericAxis DrawMajorBands="False"   TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
-                                    DrawMajorGridLines="False"
+                                    DrawMajorGridLines="False" TextFormatting="#0.000"
                                     DrawMinorGridLines="False" MaxAutoTicks="6" BorderThickness="0 0 1 0" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRangeChanged="{s:Action NumericAxis_VisibleRangeChanged}" VisibleRange="-1,2"/>
                         </sc:SciChartSurface.YAxis>
-                        <sc:SciChartSurface.ChartModifier>
-                            <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
-                                <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
-                                <chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />
-                            </sc:ModifierGroup>
-                        </sc:SciChartSurface.ChartModifier>
+
                     </sc:SciChartSurface>
                 </Grid>
             </Grid>
@@ -269,22 +288,15 @@
                         <sc:SciChartSurface Name="timesAxisSci" Margin="-60 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
                             <sc:SciChartSurface.YAxis>
                                 <sc:NumericAxis DrawMajorBands="False"  
-                                    DrawMajorGridLines="False"  
+                                    DrawMajorGridLines="False"   TextFormatting="#0.000"
                                     DrawMinorGridLines="False"  AxisAlignment="Left" Visibility="Collapsed"/>
                             </sc:SciChartSurface.YAxis>
-                            <sc:SciChartSurface.ChartModifier>
-                                <sc:ModifierGroup  sc:MouseManager.MouseEventGroup="groupId" >
-                                    <sc:ZoomPanModifier ExecuteOn="MouseLeftButton" XyDirection="XDirection"  ReceiveHandledEvents="True" />
-                                    <sc:RubberBandXyZoomModifier FlowDirection="LeftToRight" ExecuteOn="MouseRightButton" ReceiveHandledEvents="True"/>
-                                    <sc:ZoomExtentsModifier ExecuteOn="MouseDoubleClick" ReceiveHandledEvents="True"/>
-                                    <!--<chart:CustomZoomExtentsModifier ExecuteOn="MouseDoubleClick"  ReceiveHandledEvents="True"  />-->
-                                    <sc:RolloverModifier IsEnabled="True" ReceiveHandledEvents="True" DrawVerticalLine="True"/>
-                                </sc:ModifierGroup>
-                            </sc:SciChartSurface.ChartModifier>
+
                         </sc:SciChartSurface>
                     </Border>
                     <Border BorderThickness="1 0 0 0" BorderBrush="{StaticResource InperBorderColor}">
-                        <sc:SciChartScrollbar Name="sciScroll" Grid.Column="1" Height="20" Background="#33000000" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsAllowDragScroll,UpdateSourceTrigger=PropertyChanged}"/>
+                        <!-- -->
+                        <sc:SciChartScrollbar SelectedRangeChanged="{s:Action SciScroll_SelectedRangeChanged}" Name="sciScroll" MouseDoubleClick="{s:Action SciScroll_MouseDoubleClick}" Grid.Column="1" Height="20" Background="#33000000" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsAllowDragScroll,UpdateSourceTrigger=PropertyChanged}"/>
                     </Border>
                 </UniformGrid>
             </Grid>

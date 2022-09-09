@@ -81,7 +81,20 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
-
+        #region 加锁解锁
+        public void LockEvent()
+        {
+            this.view.Topmost = true;
+            view.unLock.Visibility = Visibility.Visible;
+            view._lock.Visibility = Visibility.Collapsed;
+        }
+        public void UnLockEvent()
+        {
+            this.view.Topmost = false;
+            view.unLock.Visibility = Visibility.Collapsed;
+            view._lock.Visibility = Visibility.Visible;
+        }
+        #endregion
         protected override void OnClose()
         {
             BehaviorRecorderKit.StopPreview();

@@ -53,8 +53,8 @@
     "displayNameVisible": true
   },
   "cameraSignalSettings": {
-    "exposure": 20,
-    "sampling": 50,
+    "exposure": 10,
+    "sampling": 60,
     "brightness": 4,
     "recordMode": {
       "isContinuous": true,

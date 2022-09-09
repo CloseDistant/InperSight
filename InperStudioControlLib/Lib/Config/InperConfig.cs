@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -201,7 +202,7 @@ namespace InperStudioControlLib.Lib.Config
             }
             catch (Exception ex)
             {
-
+                Debug.WriteLine(ex.ToString());
             }
         }
         #endregion

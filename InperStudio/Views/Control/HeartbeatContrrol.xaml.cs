@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,6 +65,11 @@ namespace InperStudio.Views.Control
             };
             timer.Start();
             this.Unloaded += (s, e) => timer.Stop();
+        }
+
+        private void TransitioningContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ManulControlViewModel.sprite.Close();
         }
     }
 }

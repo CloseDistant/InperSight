@@ -1,5 +1,8 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Data.Model;
+using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
+using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
@@ -13,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace InperStudio.ViewModels
 {
@@ -55,7 +59,7 @@ namespace InperStudio.ViewModels
             string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             string[] exeArray = exeName.Split('\\');
             KillProcess(exeArray.Last().Split('.').First());
-            Environment.Exit(0);
+            System.Environment.Exit(0);
         }
         private void KillProcess(string processName)
         {
@@ -69,16 +73,107 @@ namespace InperStudio.ViewModels
             }
 
         }
+        public void MainWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            InperGlobalClass.EventSettings.Channels.ForEach(x =>
+            {
+
+                if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
+                {
+                    string[] hotkeys = x.Hotkeys.Split('+');
+                    if (hotkeys.Contains(e.Key.ToString()))
+                    {
+                        AddMarkers(hotkeys, x);
+                    }
+                }
+                else if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                {
+                    if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                    {
+                        string[] hotkeys = x.Condition.Hotkeys.Split('+');
+                        if (hotkeys.Contains(e.Key.ToString()))
+                        {
+                            AddMarkers(hotkeys, x, 1);
+                        }
+                    }
+                }
+
+            });
+        }
+        private void AddMarkers(string[] hotkeys, EventChannelJson x, int type = 0)
+        {
+            int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
+            if (count > 0)
+            {
+                TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
+                if (hotkeys.Count() == 1)
+                {
+                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
+                    {
+                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                        {
+                            CameraTime = time.Ticks,
+                            ChannelId = x.ChannelId,
+                            Color = x.BgColor,
+                            IsIgnore = type == 0 ? true : false,
+                            Type = ChannelTypeEnum.Manual.ToString(),
+                            CreateTime = DateTime.Now,
+                            Name = x.Name,
+                            ConditionId = -1
+                        });
+                        return;
+                    }
+                }
+                if (hotkeys.Count() == 2)
+                {
+                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
+                    {
+                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                        {
+                            CameraTime = time.Ticks,
+                            ChannelId = x.ChannelId,
+                            Color = x.BgColor,
+                            IsIgnore = type == 0 ? true : false,
+                            Type = ChannelTypeEnum.Manual.ToString(),
+                            CreateTime = DateTime.Now,
+                            Name = x.Name,
+                            ConditionId = -1
+                        });
+                        return;
+                    }
+                }
+                if (hotkeys.Count() == 3)
+                {
+                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
+                    {
+                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                        {
+                            CameraTime = time.Ticks,
+                            ChannelId = x.ChannelId,
+                            Color = x.BgColor,
+                            IsIgnore = type == 0 ? true : false,
+                            Type = ChannelTypeEnum.Manual.ToString(),
+                            CreateTime = DateTime.Now,
+                            Name = x.Name,
+                            ConditionId = -1
+                        });
+                        return;
+                    }
+                }
+            }
+        }
         public void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             try
             {
                 if (!InperGlobalClass.IsImportConfig)
                 {
-                    if (MessageBox.Show("Config files unsaved,quit anyway?", "Config", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    if (MessageBox.Show("是否保存并退出?", "Config", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        e.Cancel = true;
-                        return;
+                        MainTitleContentArea.JsonConfigSaveAs();
+                   
+                        //e.Cancel = true;
+                        //return;
                     }
                 }
                 InperConfig.Instance.IsSkip = false;

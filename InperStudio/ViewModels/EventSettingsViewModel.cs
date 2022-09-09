@@ -643,6 +643,16 @@ namespace InperStudio.ViewModels
 
                         if (@enum == EventSettingsTypeEnum.Output)
                         {
+                            if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString()) > 0)
+                            {
+                                var items = InperGlobalClass.EventSettings.Channels.FindAll(x => x.Type == ChannelTypeEnum.Output.ToString());
+                                if(items.FirstOrDefault(f=>f.Condition.Type==ChannelTypeEnum.Light.ToString() || f.Condition.Type==ChannelTypeEnum.AfterExcitation.ToString()) is EventChannelJson channelJson)
+                                {
+                                    Growl.Warning("This condition already exists!", "SuccessMsg");
+                                    ch.IsActive = false;
+                                    return;
+                                }
+                            }
                             EventChannelJson output = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Condition?.Type == ch.Condition?.Type && x.Condition?.ChannelId == ch.Condition?.ChannelId && (x.Type == ch.Type || x.Type == ChannelTypeEnum.Output.ToString()));
                             if (output != null)
                             {
@@ -889,7 +899,32 @@ namespace InperStudio.ViewModels
         #endregion
         protected override void OnClose()
         {
-            InperGlobalClass.IsExistEvent = InperGlobalClass.EventSettings.Channels.Count > 0;
+            int allCount = InperGlobalClass.EventSettings.Channels.Count();
+            if (allCount > 0)
+            {
+                int outputCount = InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString());
+                if (allCount > outputCount)
+                {
+                    InperGlobalClass.IsExistEvent = true;
+                }
+                else
+                {
+                    if (outputCount > 0)
+                    {
+                        int outputDioCount = InperGlobalClass.EventSettings.Channels.FindAll(x => x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null).Count(d => d.Condition.Type == ChannelTypeEnum.Light.ToString() || d.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString());
+                        if (outputCount > outputDioCount)
+                        {
+                            InperGlobalClass.IsExistEvent = true;
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                InperGlobalClass.IsExistEvent = false;
+            }
+            //InperGlobalClass.IsExistEvent = InperGlobalClass.EventSettings.Channels.Count() > 0;
 
             //ManualEvents.Clear();
             //InperGlobalClass.EventSettings.Channels.ForEach(x =>

@@ -72,7 +72,7 @@ namespace InperStudio.Lib.Helper.FilterTools
             }
             catch (Exception ex)
             {
-
+                return r;
             }
             return val;
         }

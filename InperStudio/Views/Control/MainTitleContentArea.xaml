@@ -25,11 +25,11 @@
                         <Image Source="/Lib/Images/New/import config.png" SnapsToDevicePixels="True" Width="14" Height="14" Stretch="Fill"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save Config" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Name="SaveConfig" Click="SaveConfig_Click">
+                <!--<MenuItem Header="Save Config" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Name="SaveConfig" Click="SaveConfig_Click">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/save config.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>
-                </MenuItem>
+                </MenuItem>-->
                 <MenuItem BorderThickness="0 0 0 1" BorderBrush="#E6E6E6"  FontFamily="Arial" Header="Save Config As" Name="SaveConfigAs" Click="SaveConfigAs_Click"  Foreground="#333333" FontSize="12" Width="180">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/save config as.png" Width="14" Height="14" Stretch="Uniform"/>

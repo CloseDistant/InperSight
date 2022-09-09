@@ -249,14 +249,17 @@
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
+    <Compile Include="Lib\Convert\BoolToImageUrlConverter.cs" />
     <Compile Include="Lib\Convert\BoolToStringConverter.cs" />
     <Compile Include="Lib\Convert\ChannelNameSplitConverter.cs" />
+    <Compile Include="Lib\Convert\ChannelTypeToEnableConverter.cs" />
     <Compile Include="Lib\Convert\ChannelTypeToVisibilityConverter.cs" />
     <Compile Include="Lib\Convert\DoubleToBoolConverter.cs" />
     <Compile Include="Lib\Convert\DoubleToBoolReConverter.cs" />
     <Compile Include="Lib\Convert\EventOutputConverter.cs" />
     <Compile Include="Lib\Convert\EventTypeConverter.cs" />
     <Compile Include="Lib\Convert\EventTypeMultiConverter.cs" />
+    <Compile Include="Lib\Convert\GridLengthConverter.cs" />
     <Compile Include="Lib\Convert\ManualToMarkConverter.cs" />
     <Compile Include="Lib\Convert\ObjectToBoolConvert.cs" />
     <Compile Include="Lib\Convert\RoiAIVisibilityConverter.cs" />
@@ -520,6 +523,10 @@
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Lib\Images\New\merge.png" />
+    <Resource Include="Lib\Images\New\separate.png" />
+    <Resource Include="Lib\Images\New\lock.png" />
+    <Resource Include="Lib\Images\New\unlock.png" />
     <Resource Include="Lib\Images\New\文件.png" />
     <Resource Include="Lib\Images\New\trigger.png" />
     <Resource Include="Lib\Images\New\skin.png" />

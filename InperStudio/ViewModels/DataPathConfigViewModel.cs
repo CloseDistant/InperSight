@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Screen = Stylet.Screen;
@@ -101,27 +102,53 @@ namespace InperStudio.ViewModels
         }
         public void InperDialogWindow_ConfirmClickEvent(object sender, ExecutedRoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(InperGlobalClass.DataFolderName))
+            try
             {
-                InperGlobalClass.ShowReminderInfo("The file name can’t be empty!");
-                return;
-            }
-            if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
-            {
-                if (Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Count() > 0)
+                string newName = view.fileName.Text;
+
+                if (string.IsNullOrEmpty(newName))
                 {
-                    InperGlobalClass.ShowReminderInfo("文件夹已存在");
+                    InperGlobalClass.ShowReminderInfo("The file name can’t be empty!");
                     return;
                 }
+                if (newName != InperGlobalClass.DataFolderName)
+                {
+                    if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                    {
+                        if (Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Count() > 0)
+                        {
+                            if (System.Windows.MessageBox.Show(InperGlobalClass.DataFolderName + "文件夹中检测到数据文件，是否创建新的文件夹?", "Ask", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                            {
+                                view.fileName.Text = InperGlobalClass.DataFolderName;
+                                return;
+                            }
+                            else
+                            {
+                                InperGlobalClass.DataFolderName = newName;
+                                Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                            }
+                        }
+                        else
+                        {
+                            Directory.Delete(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                            InperGlobalClass.DataFolderName = newName;
+                            Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                        }
+                    }
+                }
+                RequestClose();
             }
-            RequestClose();
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
         }
         public void FileName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             try
             {
-                var tb = sender as System.Windows.Controls.TextBox;
-                InperGlobalClass.DataFolderName = tb.Text.Replace(" ", "");
+                //var tb = sender as System.Windows.Controls.TextBox;
+                //InperGlobalClass.DataFolderName = tb.Text.Replace(" ", "");
             }
             catch (Exception ex)
             {

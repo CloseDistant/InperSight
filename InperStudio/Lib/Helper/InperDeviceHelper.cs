@@ -36,7 +36,7 @@ namespace InperStudio.Lib.Helper
         public bool IsChecked { get; set; } = false;
         public int GroupId { get; set; }
         public string WaveType { get; set; }
-        public double LightPower { get; set; } = 0;
+        public double LightPower { get; set; } = 40;
     }
     public class PlotData
     {
@@ -1335,7 +1335,7 @@ namespace InperStudio.Lib.Helper
                         x.RenderableSeries.Clear();
                         x.LightModes.ForEach(l =>
                         {
-                            LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = l.LightType, DataSeries = l.XyDataSeries, Stroke = l.WaveColor.Color };
+                            LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = l.LightType, DataSeries = l.XyDataSeries, Stroke = l.WaveColor.Color, YAxisId = "Ch" + l.LightType };
                             line.DataSeries.FifoCapacity = 10 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
                             x.RenderableSeries.Add(line);
                         });
@@ -1361,27 +1361,7 @@ namespace InperStudio.Lib.Helper
                     }
                     if (x.Type == ChannelTypeEnum.Output.ToString())
                     {
-                        Instance.device.SetIOMode((uint)x.ChannelId, IOMode.IOM_OUTPUT);
-                        //Thread.Sleep(50);
-                        //binding dio 输出
-                        if (x.Condition != null)
-                        {
-                            if (x.Condition.Type == ChannelTypeEnum.Light.ToString() || x.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
-                            {
-                                if (x.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
-                                {
-                                    device.SwitchLight((uint)x.Condition.ChannelId, true);
-                                }
-                                List<byte> bindDios = new List<byte>();
-
-                                bindDios.Add((byte)x.Condition.ChannelId);
-                                string ob = "00000000";
-                                ob = ob.Insert(7 - x.ChannelId, "1").Remove(8, 1);
-                                bindDios.Add(System.Convert.ToByte(ob, 2));
-
-                                device.SetBindDio(bindDios);
-                            }
-                        }
+                        DioBindingLightSet(x);
                     }
                 });
 
@@ -1414,6 +1394,30 @@ namespace InperStudio.Lib.Helper
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
+            }
+        }
+        public void DioBindingLightSet(EventChannelJson json)
+        {
+            Instance.device.SetIOMode((uint)json.ChannelId, IOMode.IOM_OUTPUT);
+            //Thread.Sleep(50);
+            //binding dio 输出
+            if (json.Condition != null)
+            {
+                if (json.Condition.Type == ChannelTypeEnum.Light.ToString() || json.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
+                {
+                    if (json.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
+                    {
+                        device.SwitchLight((uint)json.Condition.ChannelId, true);
+                    }
+                    List<byte> bindDios = new List<byte>();
+
+                    bindDios.Add((byte)json.Condition.ChannelId);
+                    string ob = "00000000";
+                    ob = ob.Insert(7 - json.ChannelId, "1").Remove(8, 1);
+                    bindDios.Add(System.Convert.ToByte(ob, 2));
+
+                    device.SetBindDio(bindDios);
+                }
             }
         }
         public void AiSettingFunc(int channelId, uint statu)//statu=1 是配置  =0 是取消配置
@@ -1468,7 +1472,6 @@ namespace InperStudio.Lib.Helper
         }
         public void TimeSpanAxis_VisibleRangeChanged(object sender, SciChart.Charting.Visuals.Events.VisibleRangeChangedEventArgs e)
         {
-
             foreach (var item in Instance.CameraChannels)
             {
                 item.TimeSpanAxis.VisibleRange = e.NewVisibleRange;

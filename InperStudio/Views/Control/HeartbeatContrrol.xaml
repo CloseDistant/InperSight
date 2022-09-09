@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
     </UserControl.Resources>
-    <hc:TransitioningContentControl>
+    <hc:TransitioningContentControl MouseDoubleClick="TransitioningContentControl_MouseDoubleClick">
         <Grid>
             <hc:WaveProgressBar Name="wavePB" Value="90" WaveFill="LightSeaGreen" Text="123" ShowText="False"/>
             <TextBlock x:Name="fileSize" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontSize="14" Margin="0 0 0 10" FontWeight="Bold"/>

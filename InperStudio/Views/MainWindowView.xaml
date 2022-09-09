@@ -17,7 +17,7 @@
         NonClientAreaBackground="{DynamicResource InperTheme}"
         NonClientAreaForeground="White"
         Icon="../InperSignal.ico"
-        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" KeyUp="{s:Action MainWindow_KeyUp}"
         Title="inper" ShowTitle="False"  hc:Dialog.Token="MainDialog" MinWidth="1000" MinHeight="660" x:Name="MainWindow" Closing="{s:Action MainWindow_Closing}">
     <Grid Background="{StaticResource InperMainPageColor}">
         <Grid.RowDefinitions>

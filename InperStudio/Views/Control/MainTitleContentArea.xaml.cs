@@ -152,7 +152,7 @@ namespace InperStudio.Views.Control
                 App.Log.Error(ex.ToString());
             }
         }
-        private void JsonConfigSaveAs()
+        public static void JsonConfigSaveAs()
         {
             try
             {
@@ -170,6 +170,7 @@ namespace InperStudio.Views.Control
                 string fname = dlg.FileName;
                 File.Copy(InperJsonConfig.filepath, fname, true);
                 InperJsonConfig.filepath = fname;
+                InperGlobalClass.IsImportConfig = true;
             }
             catch (Exception ex)
             {

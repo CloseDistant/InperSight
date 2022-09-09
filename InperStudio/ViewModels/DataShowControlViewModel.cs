@@ -6,6 +6,7 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
+using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Visuals;
 using SciChart.Data.Model;
 using Stylet;
@@ -39,7 +40,6 @@ namespace InperStudio.ViewModels
         private double visibleValue = 10;
         private ConcurrentQueue<HotKeysListen> _hotKeysListens = new ConcurrentQueue<HotKeysListen>();
 
-        private int _HotKeyQueueEvent = 0;
         public double VisibleValue
         {
             get => visibleValue;
@@ -123,6 +123,55 @@ namespace InperStudio.ViewModels
             }
         }
         #region methods
+        private void ChartZoomExtents()
+        {
+            for (int i = 0; i < InperDeviceHelper.Instance.CameraChannels.Count; i++)
+            {
+                var item = this.view.dataList.ItemContainerGenerator.ContainerFromIndex(i) as ListBoxItem;
+                SciChartSurface sciChartSurface = InperClassHelper.FindVisualChild<SciChartSurface>(item);
+                sciChartSurface.ZoomState = ZoomStates.AtExtents;
+                sciChartSurface.AnimateZoomExtents(TimeSpan.FromMilliseconds(200));
+            }
+        }
+        public void SciScroll_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                ChartZoomExtents();
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void SciScroll_SelectedRangeChanged(object sender, SciChart.Charting.Visuals.Events.SelectedRangeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.EventType != SciChart.Charting.Visuals.Events.SelectedRangeEventType.ExternalSource)
+                {
+                    for (int i = 0; i < InperDeviceHelper.Instance.CameraChannels.Count; i++)
+                    {
+                        if (i != 0)
+                        {
+                            var item = this.view.dataList.ItemContainerGenerator.ContainerFromIndex(i) as ListBoxItem;
+                            SciChartSurface sciChartSurface = InperClassHelper.FindVisualChild<SciChartSurface>(item);
+                            sciChartSurface.ZoomState = ZoomStates.UserZooming;
+
+                            sciChartSurface.XAxis.VisibleRange = e.SelectedRange;
+                        }
+                    }
+
+                }
+                InperDeviceHelper.Instance.EventChannelChart.TimeSpanAxis.VisibleRange = e.SelectedRange;
+                InperDeviceHelper.Instance.EventChannelChart.EventTimeSpanAxis.VisibleRange = e.SelectedRange;
+                InperDeviceHelper.Instance.EventChannelChart.EventTimeSpanAxisFixed.VisibleRange = e.SelectedRange;
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
         public void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
             try
@@ -169,102 +218,120 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                view.sciScroll.Axis = InperDeviceHelper.Instance.CameraChannels.Last().TimeSpanAxis;
+                view.sciScroll.Axis = InperDeviceHelper.Instance.CameraChannels.First().TimeSpanAxis;
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
         }
-        public void MarkerMonitor_KeyUp(object sender, KeyEventArgs e)
+        #region 合并拆分
+        public void YaxisSet(object sender)
         {
-            InperGlobalClass.EventSettings.Channels.ForEach(x =>
+            try
             {
-
-                if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
+                CameraChannel channel = sender as CameraChannel;
+                if (!channel.YaxisCountToZero)
                 {
-                    string[] hotkeys = x.Hotkeys.Split('+');
-                    if (hotkeys.Contains(e.Key.ToString()))
+                    channel.S0Visible = true;
+                    channel.S1Visible = false;
+                    channel.S2Visible = false;
+                    channel.S3Visible = false;
+                    channel.RenderableSeries.ToList().ForEach(line =>
                     {
-                        AddMarkers(hotkeys, x);
-                    }
+                        line.YAxisId = "Ch0";
+                    });
                 }
-                else if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                else
                 {
-                    if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                    channel.S0Visible = false;
+                    channel.S1Visible = false;
+                    channel.S2Visible = false;
+                    channel.S3Visible = false;
+                    channel.RenderableSeries.ToList().ForEach(line =>
                     {
-                        string[] hotkeys = x.Condition.Hotkeys.Split('+');
-                        if (hotkeys.Contains(e.Key.ToString()))
+                        int groupId = int.Parse((line as LineRenderableSeriesViewModel).Tag.ToString());
+                        switch (groupId)
                         {
-                            AddMarkers(hotkeys, x, 1);
+                            case 0:
+                                channel.S0Visible = true;
+                                break;
+                            case 1:
+                                channel.S1Visible = true;
+                                break;
+                            case 2:
+                                channel.S2Visible = true;
+                                break;
+                            case 3:
+                                channel.S3Visible = true;
+                                break;
+
                         }
-                    }
+                        line.YAxisId = "Ch" + (line as LineRenderableSeriesViewModel).Tag.ToString();
+                    });
                 }
-
-            });
-        }
-        private void AddMarkers(string[] hotkeys, EventChannelJson x, int type = 0)
-        {
-            int count = InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count;
-            if (count > 0)
+                channel.YaxisCountToZero = !channel.YaxisCountToZero;
+            }
+            catch (Exception ex)
             {
-                TimeSpan time = (TimeSpan)InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues[count - 1];
-                if (hotkeys.Count() == 1)
-                {
-                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])))
-                    {
-                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
-                        {
-                            CameraTime = time.Ticks,
-                            ChannelId = x.ChannelId,
-                            Color = x.BgColor,
-                            IsIgnore = type == 0 ? true : false,
-                            Type = ChannelTypeEnum.Manual.ToString(),
-                            CreateTime = DateTime.Now,
-                            Name = x.Name,
-                            ConditionId = -1
-                        });
-                        return;
-                    }
-                }
-                if (hotkeys.Count() == 2)
-                {
-                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])))
-                    {
-                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
-                        {
-                            CameraTime = time.Ticks,
-                            ChannelId = x.ChannelId,
-                            Color = x.BgColor,
-                            IsIgnore = type == 0 ? true : false,
-                            Type = ChannelTypeEnum.Manual.ToString(),
-                            CreateTime = DateTime.Now,
-                            Name = x.Name,
-                            ConditionId = -1
-                        });
-                        return;
-                    }
-                }
-                if (hotkeys.Count() == 3)
-                {
-                    if (Keyboard.IsKeyUp((Key)Enum.Parse(typeof(Key), hotkeys[0])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[1])) && Keyboard.IsKeyDown((Key)Enum.Parse(typeof(Key), hotkeys[2])))
-                    {
-                        InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
-                        {
-                            CameraTime = time.Ticks,
-                            ChannelId = x.ChannelId,
-                            Color = x.BgColor,
-                            IsIgnore = type == 0 ? true : false,
-                            Type = ChannelTypeEnum.Manual.ToString(),
-                            CreateTime = DateTime.Now,
-                            Name = x.Name,
-                            ConditionId = -1
-                        });
-                        return;
-                    }
-                }
+                App.Log.Error(ex.ToString());
             }
         }
+        public void AllYaxisSetMerge()
+        {
+            InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(x =>
+            {
+                if (x.Type == ChannelTypeEnum.Camera.ToString())
+                {
+                    x.YaxisCountToZero = true;
+                    x.S0Visible = true;
+                    x.S1Visible = false;
+                    x.S2Visible = false;
+                    x.S3Visible = false;
+                    x.RenderableSeries.ToList().ForEach(line =>
+                    {
+                        line.YAxisId = "Ch0";
+                    });
+                }
+            });
+        }
+        public void AllYaxisSetSeparate()
+        {
+            InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(x =>
+            {
+                if (x.Type == ChannelTypeEnum.Camera.ToString())
+                {
+                    x.S0Visible = false;
+                    x.S1Visible = false;
+                    x.S2Visible = false;
+                    x.S3Visible = false;
+                    x.YaxisCountToZero = false;
+
+                    x.RenderableSeries.ToList().ForEach(line =>
+                    {
+                        int groupId = int.Parse((line as LineRenderableSeriesViewModel).Tag.ToString());
+                        switch (groupId)
+                        {
+                            case 0:
+                                x.S0Visible = true;
+                                break;
+                            case 1:
+                                x.S1Visible = true;
+                                break;
+                            case 2:
+                                x.S2Visible = true;
+                                break;
+                            case 3:
+                                x.S3Visible = true;
+                                break;
+
+                        }
+                        line.YAxisId = "Ch" + (line as LineRenderableSeriesViewModel).Tag.ToString();
+                    });
+                }
+            });
+        }
+        #endregion
         public void YaxisAdd(object sender)
         {
             try

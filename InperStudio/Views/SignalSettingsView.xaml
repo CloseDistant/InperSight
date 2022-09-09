@@ -25,6 +25,16 @@
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
+        <Button x:Name="_lock" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action LockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -25 22 0" Cursor="Hand">
+            <Grid>
+                <Image Source="/Lib/Images/New/unlock.png" Stretch="UniformToFill" />
+            </Grid>
+        </Button>
+        <Button x:Name="unLock" Visibility="Collapsed" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action UnLockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -25 22 0" Cursor="Hand">
+            <Grid>
+                <Image Source="/Lib/Images/New/lock.png" Stretch="UniformToFill" />
+            </Grid>
+        </Button>
         <Grid x:Name="camera" Visibility="Collapsed" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -46,6 +56,13 @@
                                 <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="0" Padding="5 0" Margin="3 0 0 0" Width="75" Height="20" FontSize="{DynamicResource InperSmallFontSize}" />
                             </WrapPanel>
                         </Grid>
+                        <Button Margin="0 0 90 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="50" Height="20" x:Name="reset" Command="{s:Action AutoFindFiberRest}" >
+                            <Border Background="#F6F6F6" CornerRadius="2">
+                                <Grid>
+                                    <TextBlock Text="Reset" HorizontalAlignment="Center" FontFamily="{StaticResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="0"/>
+                                </Grid>
+                            </Border>
+                        </Button>
                         <Button Margin="0 0 10 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="70" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
                             <Border Background="#F6F6F6" CornerRadius="2">
                                 <Grid>
@@ -128,7 +145,7 @@
                                     <ControlTemplate>
                                         <WrapPanel Margin="0 2">
                                             <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
-                                            <CheckBox  Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}"  IsChecked="{Binding IsChecked,Mode=OneWay ,UpdateSourceTrigger=PropertyChanged}"/>
+                                            <CheckBox  Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}"  IsChecked="{Binding IsChecked ,UpdateSourceTrigger=PropertyChanged}"/>
                                             <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="10 0 0 0" FontSize="{StaticResource InperNormalFontSize}"/>
                                             <inper:InperTextBox IsEnabled="True" Style="{StaticResource BaseStyle}" Height="20" InperVerify="False" InperTextType="Int" InperMaxValue="100" InperMinValue="0" InperTextChanged="{s:Action LightMode_TextChanged}" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="22 0 0 0"  Padding="0"  Width="66" />
                                         </WrapPanel>
@@ -158,7 +175,7 @@
                 </Grid>
                 <Grid Margin="0 20" >
                     <TextBlock VerticalAlignment="Center" Text="Name"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <hc:TextBox Margin="20 0 0 0" Style="{DynamicResource TextBoxBaseStyle}"  HorizontalAlignment="Right"  MinWidth="160" Text="{Binding ElementName=AnalogChannelCombox,Path=SelectedValue.Name,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action AnalogName_TextChanged}" x:Name="AnalogName"></hc:TextBox>
+                    <TextBox Margin="20 0 0 0" Style="{DynamicResource TextBoxBaseStyle}"  HorizontalAlignment="Right"  MinWidth="160" TextChanged="{s:Action AnalogName_TextChanged}"  Text="{Binding ElementName=AnalogChannelCombox,Path=SelectedValue.Name,UpdateSourceTrigger=PropertyChanged}" x:Name="AnalogName"></TextBox>
                 </Grid>
                 <Grid Margin="0 20" >
                     <TextBlock VerticalAlignment="Center" Text="Color"  FontSize="{DynamicResource InperLargeFontSize}"/>

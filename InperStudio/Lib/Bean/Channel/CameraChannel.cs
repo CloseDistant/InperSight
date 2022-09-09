@@ -44,6 +44,19 @@ namespace InperStudio.Lib.Bean.Channel
         public IRange XVisibleRange { get => xrange; set => SetAndNotify(ref xrange, value); }
         private IRange yrange = new DoubleRange(0, 10);
         public IRange YVisibleRange { get => yrange; set => SetAndNotify(ref yrange, value); }
+        private bool s0Visible = true;
+        public bool S0Visible { get => s0Visible; set => SetAndNotify(ref s0Visible, value); }
+        private bool s1Visible = false;
+        public bool S1Visible { get => s1Visible; set => SetAndNotify(ref s1Visible, value); }
+        private bool s2Visible = false;
+        public bool S2Visible { get => s2Visible; set => SetAndNotify(ref s2Visible, value); }
+        private bool s3Visible = false;
+        public bool S3Visible { get => s3Visible; set => SetAndNotify(ref s3Visible, value); }
+        private bool yaxisCountToZero = false;
+        /// <summary>
+        /// false 多轴 true单轴
+        /// </summary>
+        public bool YaxisCountToZero { get => yaxisCountToZero; set => SetAndNotify(ref yaxisCountToZero, value); }
     }
     public class DioChannel : ChannelBase
     {

@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:ctrl="clr-namespace:InperStudio.Views.Control"
+        xmlns:s="https://github.com/canton7/Stylet"
         xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
@@ -16,6 +17,16 @@
     </inp:InperDialogWindow.Resources>
     <Viewbox>
         <Grid Background="{DynamicResource InperTitlePageColor}">
+            <Button x:Name="_lock" Style="{StaticResource ButtonCustom}" Width="30" Height="30" Command="{s:Action LockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -44 240 0" Cursor="Hand">
+                <Grid>
+                    <Image Source="/Lib/Images/New/unlock.png" Stretch="UniformToFill" />
+                </Grid>
+            </Button>
+            <Button x:Name="unLock" Visibility="Collapsed" Style="{StaticResource ButtonCustom}" Width="30" Height="30" Command="{s:Action UnLockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -44 240 0" Cursor="Hand">
+                <Grid>
+                    <Image Source="/Lib/Images/New/lock.png" Stretch="UniformToFill" />
+                </Grid>
+            </Button>
             <Image Grid.Row="0" Name="image" Stretch="UniformToFill" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
             <TextBlock Visibility="Collapsed" Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
         </Grid>

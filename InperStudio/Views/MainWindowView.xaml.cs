@@ -1,4 +1,6 @@
-﻿namespace InperStudio.Views
+﻿using System;
+
+namespace InperStudio.Views
 {
     /// <summary>
     /// MainWindowView.xaml 的交互逻辑
@@ -9,7 +11,6 @@
         public MainWindowView()
         {
             InitializeComponent();
-
         }
     }
 }
