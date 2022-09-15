@@ -44,6 +44,12 @@ namespace InperStudio.Lib.Bean.Channel
         public IRange XVisibleRange { get => xrange; set => SetAndNotify(ref xrange, value); }
         private IRange yrange = new DoubleRange(0, 10);
         public IRange YVisibleRange { get => yrange; set => SetAndNotify(ref yrange, value); }
+        private IRange yrange1 = new DoubleRange(0, 10);
+        public IRange YVisibleRange1 { get => yrange1; set => SetAndNotify(ref yrange1, value); }
+        private IRange yrange2 = new DoubleRange(0, 10);
+        public IRange YVisibleRange2 { get => yrange2; set => SetAndNotify(ref yrange2, value); }
+        private IRange yrange3 = new DoubleRange(0, 10);
+        public IRange YVisibleRange3 { get => yrange3; set => SetAndNotify(ref yrange3, value); }
         private bool s0Visible = true;
         public bool S0Visible { get => s0Visible; set => SetAndNotify(ref s0Visible, value); }
         private bool s1Visible = false;

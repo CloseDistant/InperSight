@@ -152,7 +152,7 @@ namespace InperStudio.Views.Control
                 App.Log.Error(ex.ToString());
             }
         }
-        public static void JsonConfigSaveAs()
+        public static bool JsonConfigSaveAs()
         {
             try
             {
@@ -165,7 +165,7 @@ namespace InperStudio.Views.Control
 
                 if (r == DialogResult.Cancel)
                 {
-                    return;
+                    return false;
                 }
                 string fname = dlg.FileName;
                 File.Copy(InperJsonConfig.filepath, fname, true);
@@ -176,6 +176,7 @@ namespace InperStudio.Views.Control
             {
                 App.Log.Error(ex.ToString());
             }
+            return true;
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)

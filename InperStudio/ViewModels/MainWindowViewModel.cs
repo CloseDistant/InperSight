@@ -166,15 +166,27 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                bool isCancle = false;
                 if (!InperGlobalClass.IsImportConfig)
                 {
-                    if (MessageBox.Show("是否保存并退出?", "Config", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    InperDialogWindow inperDialogWindow = new InperDialogWindow("Unsaved configuration has been detected.Do you want to save it?");
+                    inperDialogWindow.ClickEvent += (s, statu) =>
                     {
-                        MainTitleContentArea.JsonConfigSaveAs();
-                   
-                        //e.Cancel = true;
-                        //return;
-                    }
+                        if (statu == 0)
+                        {
+                            isCancle = !MainTitleContentArea.JsonConfigSaveAs();
+                        }
+                        else if (statu == 2)
+                        {
+                            isCancle = true;
+                        }
+                    };
+                    inperDialogWindow.ShowDialog();
+                }
+                if (isCancle)
+                {
+                    e.Cancel = true;
+                    return;
                 }
                 InperConfig.Instance.IsSkip = false;
                 SystemSleepHelper.ResotreSleep();
@@ -205,7 +217,7 @@ namespace InperStudio.ViewModels
                         if (!x.Name.StartsWith("MainWindow"))
                         {
                             x.Close();
-                            Thread.Sleep(3000);
+                            Thread.Sleep(300);
                         }
                     }
                 }

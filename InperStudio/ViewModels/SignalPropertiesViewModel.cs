@@ -408,6 +408,9 @@ namespace InperStudio.ViewModels
                             foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                             {
                                 channel.YVisibleRange.Max = value;
+                                channel.YVisibleRange1.Max = value;
+                                channel.YVisibleRange2.Max = value;
+                                channel.YVisibleRange3.Max = value;
                             }
                             CameraSignalSettings.AllChannelConfig.YTop = value;
                         }
@@ -419,6 +422,9 @@ namespace InperStudio.ViewModels
                                 if (channel.ChannelId == item.ChannelId && channel.Type == item.Type)
                                 {
                                     channel.YVisibleRange.Max = value;
+                                    channel.YVisibleRange1.Max = value;
+                                    channel.YVisibleRange2.Max = value;
+                                    channel.YVisibleRange3.Max = value;
                                 }
                             }
                         }
@@ -442,6 +448,9 @@ namespace InperStudio.ViewModels
                             foreach (var channel in InperDeviceHelper.Instance.CameraChannels)
                             {
                                 channel.YVisibleRange.Min = value;
+                                channel.YVisibleRange1.Min = value;
+                                channel.YVisibleRange2.Min = value;
+                                channel.YVisibleRange3.Min = value;
                             }
                             CameraSignalSettings.AllChannelConfig.YBottom = value;
                         }
@@ -454,6 +463,9 @@ namespace InperStudio.ViewModels
                                 if (channel.ChannelId == item.ChannelId && channel.Type == item.Type)
                                 {
                                     channel.YVisibleRange.Min = value;
+                                    channel.YVisibleRange1.Min = value;
+                                    channel.YVisibleRange2.Min = value;
+                                    channel.YVisibleRange3.Min = value;
                                 }
                             }
                         }

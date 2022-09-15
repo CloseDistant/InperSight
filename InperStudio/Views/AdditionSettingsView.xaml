@@ -11,8 +11,8 @@
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib" OtherButtonText="Open all"
-        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="True"
-        Title="Video" SizeToContent="Height" MinHeight="440" Height="440" Width="660" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        mc:Ignorable="d" IsShowMaxButton="False" IsShowMiniButton="False" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="False"
+        Title="Video settings" SizeToContent="Height" MinHeight="440" Height="440" Width="660" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <conv:TriggeString2VisibilityConverter x:Key="TriggeString2VisibilityConverter"/>
@@ -174,7 +174,7 @@
                     <ListBox Margin="0 20" Height="190" ScrollViewer.VerticalScrollBarVisibility="Auto" x:Name="cameraActiveChannel" ItemsSource="{Binding UsedKits}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="-10 0"  MouseLeftButtonDown="{s:Action ActiveVideo_MouseLeftButtonDown}">
+                                <Grid Margin="-10 0" > <!--MouseLeftButtonDown="{s:Action ActiveVideo_MouseLeftButtonDown}"-->
                                     <!--<Label Height="20"  Margin="2 5" Grid.Column="0" Background="{Binding BgColor}" Cursor="Hand"/>-->
                                     <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding CustomName}" />
                                     <Border Width="{Binding ElementName= cameraActiveChannel,Path= ActualWidth}" Margin="0 0 0 -10" BorderBrush="{Binding ElementName= cameraActiveChannel,Path=BorderBrush}" BorderThickness="0 0 0 1"/>

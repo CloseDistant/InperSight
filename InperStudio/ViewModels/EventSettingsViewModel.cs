@@ -646,11 +646,14 @@ namespace InperStudio.ViewModels
                             if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString()) > 0)
                             {
                                 var items = InperGlobalClass.EventSettings.Channels.FindAll(x => x.Type == ChannelTypeEnum.Output.ToString());
-                                if(items.FirstOrDefault(f=>f.Condition.Type==ChannelTypeEnum.Light.ToString() || f.Condition.Type==ChannelTypeEnum.AfterExcitation.ToString()) is EventChannelJson channelJson)
+                                if (ch.Type == ChannelTypeEnum.Light.ToString() || ch.Type == ChannelTypeEnum.AfterExcitation.ToString())
                                 {
-                                    Growl.Warning("This condition already exists!", "SuccessMsg");
-                                    ch.IsActive = false;
-                                    return;
+                                    if (items.FirstOrDefault(f => f.ChannelId == ch.ChannelId && (f.Condition.Type == ChannelTypeEnum.Light.ToString() || f.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())) is EventChannelJson channelJson)
+                                    {
+                                        Growl.Warning("This condition already exists!", "SuccessMsg");
+                                        ch.IsActive = false;
+                                        return;
+                                    }
                                 }
                             }
                             EventChannelJson output = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Condition?.Type == ch.Condition?.Type && x.Condition?.ChannelId == ch.Condition?.ChannelId && (x.Type == ch.Type || x.Type == ChannelTypeEnum.Output.ToString()));
@@ -916,8 +919,11 @@ namespace InperStudio.ViewModels
                         {
                             InperGlobalClass.IsExistEvent = true;
                         }
+                        else
+                        {
+                            InperGlobalClass.IsExistEvent = false;
+                        }
                     }
-
                 }
             }
             else

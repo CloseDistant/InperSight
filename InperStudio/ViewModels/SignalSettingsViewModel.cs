@@ -346,7 +346,8 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                for (int i = 0; i < InperDeviceHelper.CameraChannels.Count; i++)
+                int count = InperDeviceHelper.CameraChannels.Count;
+                for (int i = 0; i < count; i++)
                 {
                     ReduceCircle(null, null);
                 }

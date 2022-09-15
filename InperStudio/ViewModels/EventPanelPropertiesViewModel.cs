@@ -32,17 +32,30 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.EventPanelProperties.HeightAuto = false;
                     InperGlobalClass.EventPanelProperties.HeightFixed = true;
                 };
-                view.fixedValue.LostFocus += (s, e) =>
+                view.fixedValue.TextChanged += (s, e) =>
                 {
-                    double value = 30;
+                    double value = 0;
                     if (double.TryParse(view.fixedValue.Text, out value))
                     {
-                        value = value < 2 ? 30 : (value >= 999 ? 999 : value);
+                        //value = value < 2 ? 30 : (value >= 999 ? 999 : value);
+                        view.fixedValue.Text = value.ToString();
+                        dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = value;
                     }
-                    view.fixedValue.Text = value.ToString();
-                    dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = value;
                 };
-                view.ConfirmClickEvent += (s, e) => RequestClose();
+
+                view.ConfirmClickEvent += (s, e) =>
+                {
+                    double value = 0;
+                    if (double.TryParse(view.fixedValue.Text, out value))
+                    {
+                        if (value < 30 || value > 999)
+                        {
+                            InperGlobalClass.ShowReminderInfo("值不符合要求");
+                            return;
+                        }
+                    }
+                    RequestClose();
+                };
 
                 if (InperGlobalClass.EventPanelProperties.HeightAuto)
                 {

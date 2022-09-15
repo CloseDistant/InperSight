@@ -1,4 +1,5 @@
-﻿using InperStudio.Lib.Bean;
+﻿using GongSolutions.Wpf.DragDrop;
+using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Chart;
 using InperStudio.Lib.Data.Model;
@@ -57,6 +58,8 @@ namespace InperStudio.ViewModels
                     };
                     EventChannelChart.XVisibleRange = new TimeSpanRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(value));
                     EventChannelChart.ViewportManager = new ScrollingViewportManager(value);
+                    view.sciScroll.SelectedRange = new TimeSpanRange(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, (int)value));
+                    Instance_StartCollectEvent(true);
                 }
             }
         }
@@ -348,6 +351,12 @@ namespace InperStudio.ViewModels
 
                 channel.YVisibleRange.Max = Math.Round(value, 2);
                 channel.YVisibleRange.Min = Math.Round(min, 2);
+                channel.YVisibleRange1.Max = Math.Round(value, 2);
+                channel.YVisibleRange1.Min = Math.Round(min, 2);
+                channel.YVisibleRange2.Max = Math.Round(value, 2);
+                channel.YVisibleRange2.Min = Math.Round(min, 2);
+                channel.YVisibleRange3.Max = Math.Round(value, 2);
+                channel.YVisibleRange3.Min = Math.Round(min, 2);
             }
             catch (Exception ex)
             {
@@ -370,6 +379,12 @@ namespace InperStudio.ViewModels
 
                 channel.YVisibleRange.Min = Math.Round(value, 2);
                 channel.YVisibleRange.Max = Math.Round(maxValue, 2);
+                channel.YVisibleRange1.Min = Math.Round(value, 2);
+                channel.YVisibleRange1.Max = Math.Round(maxValue, 2);
+                channel.YVisibleRange2.Min = Math.Round(value, 2);
+                channel.YVisibleRange2.Max = Math.Round(maxValue, 2);
+                channel.YVisibleRange3.Min = Math.Round(value, 2);
+                channel.YVisibleRange3.Max = Math.Round(maxValue, 2);
             }
             catch (Exception ex)
             {
@@ -433,6 +448,7 @@ namespace InperStudio.ViewModels
                 App.Log.Error(ex.ToString());
             }
         }
+
         #endregion
     }
 }

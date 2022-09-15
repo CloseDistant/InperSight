@@ -16,7 +16,7 @@ namespace InperStudio.Lib.Convert
             string res = string.Empty;
             if ((bool)value)
             {
-                res = "/Lib/Images/New/separate.png";
+                res = "/Lib/Images/New/split.png";
 
             }
             else

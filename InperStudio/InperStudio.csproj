@@ -324,6 +324,9 @@
     <Compile Include="Views\Control\HeartbeatContrrol.xaml.cs">
       <DependentUpon>HeartbeatContrrol.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Control\InperDialogWindow.xaml.cs">
+      <DependentUpon>InperDialogWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
@@ -420,6 +423,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Control\HeartbeatContrrol.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Control\InperDialogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -523,6 +530,11 @@
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Lib\Images\New\add1.png" />
+    <Resource Include="Lib\Images\New\add.png" />
+    <Resource Include="Lib\Images\New\reduce.png" />
+    <Resource Include="Lib\Images\New\split.png" />
+    <Resource Include="Lib\Images\New\zoom.png" />
     <Resource Include="Lib\Images\New\merge.png" />
     <Resource Include="Lib\Images\New\separate.png" />
     <Resource Include="Lib\Images\New\lock.png" />

@@ -77,19 +77,6 @@ namespace InperStudio.ViewModels
 
                     view.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        //ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE (PNPClass = 'Image' OR PNPClass = 'Camera')");
-
-                        //Dictionary<int, string> cameras = new Dictionary<int, string>();
-                        //int count = 0;
-                        //foreach (ManagementBaseObject device in searcher.Get())
-                        //{
-                        //    cameras.Add(count, (string)device["Caption"]);
-                        //    count++;
-                        //}
-
-                        //CameraInfoesReader cameraInfoesReader = new CameraInfoesReader();
-                        //var cameras = cameraInfoesReader.GetCameraInfos();
-
                         InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
 
 
@@ -115,7 +102,10 @@ namespace InperStudio.ViewModels
                                 }
                                 else
                                 {
-                                    it.IsActive = true;
+                                    if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
+                                    {
+                                        it.IsActive = true;
+                                    }
                                 }
                             }
                         }
@@ -206,6 +196,40 @@ namespace InperStudio.ViewModels
 
         private void View_ConfirmClickEvent(object arg1, System.Windows.Input.ExecutedRoutedEventArgs arg2)
         {
+
+            if (@enum == AdditionSettingsTypeEnum.Video)
+            {
+                MainWindowViewModel main = null;
+                foreach (System.Windows.Window window in Application.Current.Windows)
+                {
+                    if (window.Name.Contains("MainWindow"))
+                    {
+                        main = window.DataContext as MainWindowViewModel;
+                        break;
+                    }
+                }
+                if (UsedKits.Count != 0 && !InperGlobalClass.IsRecord)
+                {
+                    foreach (var item in UsedKits)
+                    {
+                        if (Application.Current.Windows.OfType<System.Windows.Window>().Count() > 1)
+                        {
+                            var window = Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.Title.Equals(item.CustomName));
+                            if (window != null && window.GetType().Name != "AdditionSettingsView")
+                            {
+                                continue;
+                            }
+                        }
+
+                        if (item.IsActive)
+                        {
+                            var window = new VideoWindowViewModel(item);
+                            main.windowManager.ShowWindow(window);
+                            window.ActivateWith(main);
+                        }
+                    }
+                }
+            }
             if (unusedKits != null)
             {
                 unusedKits.ToList().ForEach(x =>
