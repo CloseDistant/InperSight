@@ -1,0 +1,37 @@
+﻿<inp:InperDialogWindow x:Class="InperStudio.Views.WaveformSettingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InperStudio.Views"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
+        Title="Add Waveform" Height="330" Width="290" d:DataContext="{d:DesignInstance vm:WaveformSettingViewModel}">
+    <Grid>
+        <StackPanel Margin="20 20 20 10">
+            <WrapPanel>
+                <TextBlock Text="Waveform Setting" Foreground="{StaticResource InperTheme}" FontFamily="{StaticResource InperFontFamily}"/>
+                <Border Width="88" Height="1" Background="{StaticResource InperTheme}" Margin="20 0 0 0"/>
+            </WrapPanel>
+            <WrapPanel Margin="0 20 0 0">
+                <TextBlock Text="Pulse (ms)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <TextBox Width="120" Height="20" Margin="35 0 0 0" Name="pluse" TextChanged="{s:Action Pulse_TextChanged}"/>
+            </WrapPanel>
+            <WrapPanel Margin="0 20 0 0">
+                <TextBlock Text="Freq (Hz)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <ComboBox Width="120" Height="20" Margin="43 0 0 0" Name="freq" ItemsSource="{Binding Freqs,UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" SelectionChanged="{s:Action Freq_SelectionChanged}"/>
+            </WrapPanel>
+            <WrapPanel Margin="0 20 0 0">
+                <TextBlock Text="Duration (s)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <TextBox Width="120" Height="20" Margin="30 0 0 0" Name="duration" TextChanged="{s:Action Duration_TextChanged}"/>
+            </WrapPanel>
+            <Grid Background="#FACD91" HorizontalAlignment="Left" Margin="0 20 0 0">
+                <TextBlock Text="The Value must be &lt;= 100" Name="remainder" Visibility="Collapsed" Foreground="#F50404" FontSize="10" FontFamily="{StaticResource InperFontFamily}" Padding="10 5"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</inp:InperDialogWindow>

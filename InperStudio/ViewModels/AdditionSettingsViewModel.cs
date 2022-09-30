@@ -5,6 +5,9 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
+using InperStudio.Views.Control;
+using InperVideo.Camera;
+using InperVideo.Interfaces;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -75,46 +78,58 @@ namespace InperStudio.ViewModels
                     view.video.Visibility = Visibility.Visible;
                     UnusedKits = new ObservableCollection<VideoRecordBean>();
 
-                    view.Dispatcher.BeginInvoke(new Action(() =>
+                    Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
+                    this.view.Dispatcher.BeginInvoke(new Action(async () =>
                     {
-                        InperComputerInfoHelper CompInfo = InperComputerInfoHelper.Instance;
-
-
-                        if (UsedKits.Count == CompInfo.ListCamerasData.Count)
+                        IEnumerable<ICameraInfo> camerInfoList = new List<ICameraInfo>();
+                        await Task.Factory.StartNew(() =>
                         {
-                            return;
-                        }
-                        foreach (KeyValuePair<int, string> c in CompInfo.ListCamerasData)
-                        {
-                            if (!c.Value.Contains("Basler"))
+                            camerInfoList = new CameraInfoesReader().GetCameraInfos();
+                            int i = 0;
+                            foreach (var c in camerInfoList)
                             {
-                                VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == c.Key || x.Name == c.Value);
-                                if (it == null)
+
+                                if (!c.FriendlyName.Contains("Basler"))
                                 {
-                                    var item = new VideoRecordBean(c.Key, c.Value);
-                                    if (item.IsCanOpen)
+                                    VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == i || x.Name == c.FriendlyName);
+                                    if (it == null)
                                     {
-                                        view.Dispatcher.Invoke(() =>
+                                        var item = new VideoRecordBean(i, c.FriendlyName, new CameraParamSet(c.CapabilyItems.FirstOrDefault().Size, c.CapabilyItems.FirstOrDefault().FrameRate, c.CapabilyItems.FirstOrDefault().Format));
+                                        var formats = c.CapabilyItems.GroupBy(ca => ca.Format);
+                                        foreach (var format in formats)
                                         {
-                                            UnusedKits.Add(item);
-                                        });
+                                            item.CapabilyItems.Add(format.Key, format.OrderBy(x => x.FrameRate));
+                                        }
+
+                                        if (item.IsCanOpen)
+                                        {
+                                            view.Dispatcher.Invoke(() =>
+                                            {
+                                                UnusedKits.Add(item);
+                                            });
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
+                                    else
                                     {
-                                        it.IsActive = true;
+                                        if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
+                                        {
+                                            it.IsActive = true;
+                                        }
                                     }
                                 }
+                                i++;
                             }
-                        }
 
 
-                        if (unusedKits.Count > 0)
-                        {
-                            view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
-                        }
+                            if (unusedKits.Count > 0)
+                            {
+                                this.view.Dispatcher.Invoke(() =>
+                                {
+                                    view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
+                                });
+                            }
+                        });
+                        d.Close();
                     }));
                 }
                 else
@@ -278,6 +293,33 @@ namespace InperStudio.ViewModels
                 if (selectCameraItem != null)
                 {
                     selectCameraItem.StartCapture();
+                }
+                view.format.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void Format_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                view.framrate.SelectedIndex = 0;
+
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
+            }
+        }
+        public void FramerateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (view.framrate.SelectedItem != null && selectCameraItem != null)
+                {
+                    selectCameraItem.Reset(new CameraParamSet((view.framrate.SelectedItem as CameraCapabilyItem).Size, (view.framrate.SelectedItem as CameraCapabilyItem).FrameRate, (view.framrate.SelectedItem as CameraCapabilyItem).Format));
                 }
             }
             catch (Exception ex)

@@ -93,6 +93,9 @@
     <Reference Include="HandyControl, Version=3.2.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
       <HintPath>packages\HandyControl.3.2.0\lib\net472\HandyControl.dll</HintPath>
     </Reference>
+    <Reference Include="InperCameraDShow">
+      <HintPath>..\..\..\Users\刘小刀\source\repos\InperCameraDShow\bin\Debug\netstandard2.0\InperCameraDShow.dll</HintPath>
+    </Reference>
     <Reference Include="InperPhotometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\InperPhotometry\bin\Debug\InperPhotometry.dll</HintPath>
@@ -243,11 +246,15 @@
     <Compile Include="Lib\Bean\Mcu_Version.cs" />
     <Compile Include="Lib\Bean\ScrollingViewportManager.cs" />
     <Compile Include="Lib\Bean\SignalChannel.cs" />
+    <Compile Include="Lib\Bean\Stimulus\StimulusBeans.cs" />
+    <Compile Include="Lib\Bean\Stimulus\Sweep.cs" />
+    <Compile Include="Lib\Bean\Stimulus\WaveForm.cs" />
     <Compile Include="Lib\Bean\Tb_Version.cs" />
     <Compile Include="Lib\Bean\VideoFrame.cs" />
     <Compile Include="Lib\Bean\VideoRecordBean.cs" />
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
+    <Compile Include="Lib\Chart\TextBoxAdorner.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
     <Compile Include="Lib\Convert\BoolToImageUrlConverter.cs" />
     <Compile Include="Lib\Convert\BoolToStringConverter.cs" />
@@ -314,7 +321,10 @@
     <Compile Include="ViewModels\SignalPropertiesViewModel.cs" />
     <Compile Include="ViewModels\SignalSettingsViewModel.cs" />
     <Compile Include="ViewModels\StartPageViewModel.cs" />
+    <Compile Include="ViewModels\StimulusSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SweepSettingViewModel.cs" />
     <Compile Include="ViewModels\VideoWindowViewModel.cs" />
+    <Compile Include="ViewModels\WaveformSettingViewModel.cs" />
     <Compile Include="Views\AboutInperSignalView.xaml.cs">
       <DependentUpon>AboutInperSignalView.xaml</DependentUpon>
     </Compile>
@@ -375,8 +385,17 @@
     <Compile Include="Views\StartPageView.xaml.cs">
       <DependentUpon>StartPageView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\StimulusSettingsView.xaml.cs">
+      <DependentUpon>StimulusSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SweepSettingView.xaml.cs">
+      <DependentUpon>SweepSettingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\VideoWindowView.xaml.cs">
       <DependentUpon>VideoWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WaveformSettingView.xaml.cs">
+      <DependentUpon>WaveformSettingView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -494,7 +513,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\StimulusSettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SweepSettingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\VideoWindowView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WaveformSettingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -530,6 +561,11 @@
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Lib\Images\New\delete.png" />
+    <Resource Include="Lib\Images\New\delete_hover.png" />
+    <Resource Include="Lib\Images\New\edit.png" />
+    <Resource Include="Lib\Images\New\edit_hover.png" />
+    <Resource Include="Lib\Images\New\Stimulus_Add.png" />
     <Resource Include="Lib\Images\New\add1.png" />
     <Resource Include="Lib\Images\New\add.png" />
     <Resource Include="Lib\Images\New\reduce.png" />
@@ -558,6 +594,9 @@
     <Resource Include="Lib\Images\New\save config as.png" />
     <Resource Include="Lib\Images\New\video.png" />
     <Resource Include="Lib\Images\New\web.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

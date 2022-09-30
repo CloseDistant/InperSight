@@ -110,6 +110,9 @@ namespace InperStudio.ViewModels
                     case "Output":
                         _ = windowManager.ShowDialog(new EventSettingsViewModel(EventSettingsTypeEnum.Output));
                         break;
+                    case "Stimulus":
+                        _ = windowManager.ShowDialog(new StimulusSettingsViewModel(windowManager));
+                        break;
                     default:
                         break;
                 }

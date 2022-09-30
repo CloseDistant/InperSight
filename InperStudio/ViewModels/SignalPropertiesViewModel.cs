@@ -175,10 +175,22 @@ namespace InperStudio.ViewModels
                     CameraSignalSettings.CameraChannels.ForEach(x =>
                     {
                         x.AutoRange = isFixed;
+                       
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                    InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                     {
                         chn.AutoRange = isFixed;
+                        if (!isFixed)
+                        {
+                            chn.YVisibleRange.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange1.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange1.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange2.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange2.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange3.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange3.Min = double.Parse(view.rangeBottom.Text);
+                        }
                     });
                     CameraSignalSettings.AllChannelConfig.AutoRange = isFixed;
                 }
@@ -190,6 +202,14 @@ namespace InperStudio.ViewModels
                         if (chn.ChannelId == item.ChannelId)
                         {
                             chn.AutoRange = isFixed;
+                            chn.YVisibleRange.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange1.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange1.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange2.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange2.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange3.Max = double.Parse(view.rangeTop.Text);
+                            chn.YVisibleRange3.Min = double.Parse(view.rangeBottom.Text);
                         }
                     });
                 }

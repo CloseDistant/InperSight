@@ -304,6 +304,7 @@ namespace InperStudio.Lib.Helper
                     _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                     _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
                     _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+
                     if (item.LightModes.Count > 0)
                     {
                         if (item.Filters.IsBandpass)
@@ -820,7 +821,7 @@ namespace InperStudio.Lib.Helper
                         }
                         else
                         {
-                            if (cameraChannel.ChannelId == cid && cameraChannel.LightIndex == group && cameraChannel.Type != ChannelTypeEnum.Manual.ToString())
+                            if (cameraChannel.ChannelId == cid && cameraChannel.LightIndex == group && (cameraChannel.Type == ChannelTypeEnum.Camera.ToString() || cameraChannel.Type == ChannelTypeEnum.Analog.ToString()))
                             {
                                 DeltaFData[cid][group].Enqueue(r);
                                 if (DeltaFData[cid][group].Count > cameraChannel.WindowSize)
@@ -1339,6 +1340,19 @@ namespace InperStudio.Lib.Helper
                             line.DataSeries.FifoCapacity = 10 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
                             x.RenderableSeries.Add(line);
                         });
+
+                        if (x.YaxisCountToZero)
+                        {
+                            x.S0Visible = true;
+                            x.S1Visible = false;
+                            x.S2Visible = false;
+                            x.S3Visible = false;
+                            x.RenderableSeries.ToList().ForEach(line =>
+                            {
+                                line.YAxisId = "Ch0";
+                            });
+                        }
+
                     }
                     if (x.Type == ChannelTypeEnum.Analog.ToString())
                     {

@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using InperVideo.Interfaces;
+using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using Stylet;
 using System;
@@ -43,6 +44,12 @@ namespace InperStudio.Lib.Bean
             get => _writeFps;
             set => SetAndNotify(ref _writeFps, value);
         }
+        private Dictionary<string, IEnumerable<ICameraCapabilyItem>> capabilyItems = new Dictionary<string, IEnumerable<ICameraCapabilyItem>>();
+        public Dictionary<string, IEnumerable<ICameraCapabilyItem>> CapabilyItems
+        {
+            get => capabilyItems;
+            set => SetAndNotify(ref capabilyItems, value);
+        }
         public bool IsCanOpen = true;
         #region private
         private VideoCapture _videoCapture;
@@ -54,11 +61,13 @@ namespace InperStudio.Lib.Bean
         private ConcurrentQueue<VideoFrame> _WriteMats = new ConcurrentQueue<VideoFrame>();
         private DateTime dt_start;
         private List<VideoFrame> _calFrames = new List<VideoFrame>();
+        ICameraParamSet _cameraParamSet;
         #endregion
 
         #region methods
-        public VideoRecordBean(int devIndex, string name)
+        public VideoRecordBean(int devIndex, string name, ICameraParamSet cameraParamSet)
         {
+            _cameraParamSet = cameraParamSet;
             _CamIndex = devIndex;
             Name = name;
             Init();
@@ -71,9 +80,18 @@ namespace InperStudio.Lib.Bean
                 IsCanOpen = false;
                 return;
             }
-            _videoCapture.Set(VideoCaptureProperties.FrameWidth, 640d);
-            _videoCapture.Set(VideoCaptureProperties.FrameHeight, 480d);
-            _videoCapture.Set(VideoCaptureProperties.FourCC, FourCC.MJPG);
+            _videoCapture.Set(VideoCaptureProperties.Fps, _cameraParamSet.FrameRate);
+            _videoCapture.Set(VideoCaptureProperties.FrameWidth, _cameraParamSet.Size.Width);
+            _videoCapture.Set(VideoCaptureProperties.FrameHeight, _cameraParamSet.Size.Height);
+            _videoCapture.Set(VideoCaptureProperties.FourCC, FourCC.FromString(_cameraParamSet.Format));
+        }
+        public void Reset(ICameraParamSet cameraParamSet)
+        {
+            _cameraParamSet = cameraParamSet;
+            StopPreview();
+            StopRecording();
+            Init();
+            StartCapture();
         }
         private int _redLock = 0;
         public void StartCapture()
@@ -91,54 +109,60 @@ namespace InperStudio.Lib.Bean
                     Console.WriteLine("摄像头打开失败");
                     return;
                 }
-                Mat Camera = new Mat();
-                while (!readTokenSource.Token.IsCancellationRequested)
+                using (Mat Camera = new Mat())
                 {
-                    try
+                    while (!readTokenSource.Token.IsCancellationRequested)
                     {
-                        if (Interlocked.Exchange(ref _redLock, 1) == 0)
+                        Console.WriteLine(this.GetHashCode());
+                        try
                         {
-                            _ = _videoCapture.Read(Camera);
-                            if (Camera.Empty())//读取视频文件时,判定帧是否为空,如果帧为空,则下方的图片处理会报异常
+                            if (Interlocked.Exchange(ref _redLock, 1) == 0)
                             {
-                                Interlocked.Exchange(ref _redLock, 0);
-                                continue;
-                            }
-                            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                WriteableBitmap = Camera.ToWriteableBitmap();
-                            }));
-                            if (_isRecord)
-                            {
-                                if (_writeFps == null)
+                                _ = _videoCapture.Read(Camera);
+                                if (Camera.Empty())//读取视频文件时,判定帧是否为空,如果帧为空,则下方的图片处理会报异常
                                 {
-                                    VideoFrame videoFrame = new VideoFrame(DateTime.Now, Camera);
-                                    _calFrames.Add(videoFrame);
-                                    _WriteMats.Enqueue(videoFrame);
-                                    TimeSpan acqTime = videoFrame.Time - _calFrames.First().Time;
-                                    if (acqTime >= TimeSpan.FromSeconds(1) && _calFrames.Count > 30)
+                                    Interlocked.Exchange(ref _redLock, 0);
+                                    continue;
+                                }
+                                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                {
+                                    if (!Camera.IsDisposed)
                                     {
-                                        double calFps = (_calFrames.Count - 4) / (videoFrame.Time - _calFrames[3].Time).TotalSeconds;
-                                        WriteFps = (int)Math.Ceiling(calFps * 1.01d);
-                                        _videoWriter = new VideoWriter(_path, FourCC.MJPG, _writeFps.Value, new OpenCvSharp.Size(_videoCapture.FrameWidth, _videoCapture.FrameHeight));
-                                        Interlocked.Exchange(ref _lock, 0);
+                                        WriteableBitmap = Camera.Clone().ToWriteableBitmap();
+                                    }
+                                }));
+                                if (_isRecord)
+                                {
+                                    if (_writeFps == null)
+                                    {
+                                        VideoFrame videoFrame = new VideoFrame(DateTime.Now, Camera);
+                                        _calFrames.Add(videoFrame);
+                                        _WriteMats.Enqueue(videoFrame);
+                                        TimeSpan acqTime = videoFrame.Time - _calFrames.First().Time;
+                                        if (acqTime >= TimeSpan.FromSeconds(1) && _calFrames.Count > 30)
+                                        {
+                                            double calFps = (_calFrames.Count - 4) / (videoFrame.Time - _calFrames[3].Time).TotalSeconds;
+                                            WriteFps = (int)Math.Ceiling(calFps * 1.01d);
+                                            _videoWriter = new VideoWriter(_path, FourCC.MJPG, _writeFps.Value, new OpenCvSharp.Size(_videoCapture.FrameWidth, _videoCapture.FrameHeight));
+                                            Interlocked.Exchange(ref _lock, 0);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        _WriteMats.Enqueue(new VideoFrame(DateTime.Now, Camera));
+                                        _ = Task.Run(() => WriteFrame());
                                     }
                                 }
-                                else
-                                {
-                                    _WriteMats.Enqueue(new VideoFrame(DateTime.Now, Camera));
-                                    _ = Task.Run(() => WriteFrame());
-                                }
+                                Interlocked.Exchange(ref _redLock, 0);
                             }
+                        }
+                        catch (Exception ex)
+                        {
+                            App.Log.Error(ex.ToString());
                             Interlocked.Exchange(ref _redLock, 0);
                         }
+                        Thread.Sleep(1);
                     }
-                    catch (Exception ex)
-                    {
-                        App.Log.Error(ex.ToString());
-                        Interlocked.Exchange(ref _redLock, 0);
-                    }
-                    Thread.Sleep(1);
                 }
             });
         }

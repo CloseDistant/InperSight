@@ -99,6 +99,7 @@ namespace InperStudio.ViewModels
                 }
 
             });
+            e.Handled = true;
         }
         private void AddMarkers(string[] hotkeys, EventChannelJson x, int type = 0)
         {

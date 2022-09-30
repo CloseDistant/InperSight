@@ -164,11 +164,11 @@ namespace InperStudio.ViewModels
                             sciChartSurface.XAxis.VisibleRange = e.SelectedRange;
                         }
                     }
-
                 }
                 InperDeviceHelper.Instance.EventChannelChart.TimeSpanAxis.VisibleRange = e.SelectedRange;
                 InperDeviceHelper.Instance.EventChannelChart.EventTimeSpanAxis.VisibleRange = e.SelectedRange;
                 InperDeviceHelper.Instance.EventChannelChart.EventTimeSpanAxisFixed.VisibleRange = e.SelectedRange;
+
             }
             catch (Exception ex)
             {
@@ -341,22 +341,27 @@ namespace InperStudio.ViewModels
             {
                 CameraChannel channel = sender as CameraChannel;
                 double value = (double)channel.YVisibleRange.Max - 0.1;
-                double min = (double)channel.YVisibleRange.Min + 0.1;
-
-                if (min >= value)
+                double minValue = (double)channel.YVisibleRange.Min + 0.1;
+                double value1 = (double)channel.YVisibleRange1.Min + 0.1;
+                double minValue1 = (double)channel.YVisibleRange1.Max - 0.1;
+                double value2 = (double)channel.YVisibleRange2.Min + 0.1;
+                double minValue2 = (double)channel.YVisibleRange2.Max - 0.1;
+                double value3 = (double)channel.YVisibleRange3.Min + 0.1;
+                double minValue3 = (double)channel.YVisibleRange3.Max - 0.1;
+                if (minValue >= value)
                 {
                     //Growl.Info("Reached the limit", "SuccessMsg");
                     return;
                 }
 
+                channel.YVisibleRange.Min = Math.Round(minValue, 2);
                 channel.YVisibleRange.Max = Math.Round(value, 2);
-                channel.YVisibleRange.Min = Math.Round(min, 2);
-                channel.YVisibleRange1.Max = Math.Round(value, 2);
-                channel.YVisibleRange1.Min = Math.Round(min, 2);
-                channel.YVisibleRange2.Max = Math.Round(value, 2);
-                channel.YVisibleRange2.Min = Math.Round(min, 2);
-                channel.YVisibleRange3.Max = Math.Round(value, 2);
-                channel.YVisibleRange3.Min = Math.Round(min, 2);
+                channel.YVisibleRange1.Min = Math.Round(value1, 2);
+                channel.YVisibleRange1.Max = Math.Round(minValue1, 2);
+                channel.YVisibleRange2.Min = Math.Round(value2, 2);
+                channel.YVisibleRange2.Max = Math.Round(minValue2, 2);
+                channel.YVisibleRange3.Min = Math.Round(value3, 2);
+                channel.YVisibleRange3.Max = Math.Round(minValue3, 2);
             }
             catch (Exception ex)
             {
@@ -370,7 +375,12 @@ namespace InperStudio.ViewModels
                 CameraChannel channel = sender as CameraChannel;
                 double value = (double)channel.YVisibleRange.Min - 0.5;
                 double maxValue = (double)channel.YVisibleRange.Max + 0.5;
-
+                double value1 = (double)channel.YVisibleRange1.Min - 0.5;
+                double maxValue1 = (double)channel.YVisibleRange1.Max + 0.5;
+                double value2 = (double)channel.YVisibleRange2.Min - 0.5;
+                double maxValue2 = (double)channel.YVisibleRange2.Max + 0.5;
+                double value3 = (double)channel.YVisibleRange3.Min - 0.5;
+                double maxValue3 = (double)channel.YVisibleRange3.Max + 0.5;
                 if (maxValue > 100)
                 {
                     //Growl.Warning("Reached the limit", "SuccessMsg");
@@ -379,12 +389,12 @@ namespace InperStudio.ViewModels
 
                 channel.YVisibleRange.Min = Math.Round(value, 2);
                 channel.YVisibleRange.Max = Math.Round(maxValue, 2);
-                channel.YVisibleRange1.Min = Math.Round(value, 2);
-                channel.YVisibleRange1.Max = Math.Round(maxValue, 2);
-                channel.YVisibleRange2.Min = Math.Round(value, 2);
-                channel.YVisibleRange2.Max = Math.Round(maxValue, 2);
-                channel.YVisibleRange3.Min = Math.Round(value, 2);
-                channel.YVisibleRange3.Max = Math.Round(maxValue, 2);
+                channel.YVisibleRange1.Min = Math.Round(value1, 2);
+                channel.YVisibleRange1.Max = Math.Round(maxValue1, 2);
+                channel.YVisibleRange2.Min = Math.Round(value2, 2);
+                channel.YVisibleRange2.Max = Math.Round(maxValue2, 2);
+                channel.YVisibleRange3.Min = Math.Round(value3, 2);
+                channel.YVisibleRange3.Max = Math.Round(maxValue3, 2);
             }
             catch (Exception ex)
             {

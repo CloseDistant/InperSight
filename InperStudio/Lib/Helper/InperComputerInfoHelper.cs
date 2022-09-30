@@ -24,6 +24,7 @@ namespace InperStudio.Lib.Helper
         public List<KeyValuePair<int, string>> ListCamerasData;
 
 
+
         private InperComputerInfoHelper()
         {
             CpuID = GetCpuID();

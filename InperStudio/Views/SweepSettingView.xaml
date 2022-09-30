@@ -1,0 +1,86 @@
+﻿<inp:InperDialogWindow x:Class="InperStudio.Views.SweepSettingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InperStudio.Views"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:sci="http://schemas.abtsoftware.co.uk/scichart"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
+        Title="Add Sweep" Height="420" Width="520" d:DataContext="{d:DesignInstance vm:SweepSettingViewModel}">
+    <Grid Margin="20 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock Text="Sweep setting" Foreground="{StaticResource InperTheme}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <Border Height="1" Background="{StaticResource InperTheme}" Width="328" HorizontalAlignment="Right"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <UniformGrid Columns="2">
+                    <ListBox Margin="0" ItemsSource="{Binding WaveForms}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}" Checked="{s:Action CheckBox_Checked}" Unchecked="{s:Action CheckBox_Unchecked}"/>
+                                    <TextBlock Text="{Binding Index}" VerticalAlignment="Center" Margin="10 0"/>
+                                    <TextBlock Text="{Binding Pulse,StringFormat={} ms}" VerticalAlignment="Center" Margin="10 0"/>
+                                    <TextBlock Text="{Binding Frequence,StringFormat={}{0} Hz}" VerticalAlignment="Center" Margin="10 0"/>
+                                    <TextBlock Text="{Binding Duration,StringFormat={}{0} s}" VerticalAlignment="Center" Margin="10 0"/>
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <StackPanel Margin="20 0 0 0">
+                        <WrapPanel>
+                            <TextBlock Text="Selected" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
+                            <TextBox Width="120" Margin="27 0 0 0" IsEnabled="False" Name="selected"/>
+                        </WrapPanel>
+                        <WrapPanel Margin="0 20 0 0">
+                            <TextBlock Text="Duration (s)" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
+                            <TextBox Width="120" Margin="10 0 0 0" Name="duration" TextChanged="{s:Action Duration_Textchanged}" />
+                        </WrapPanel>
+                        <Grid Background="#FACD91" HorizontalAlignment="Right" Margin="0 20 0 0">
+                            <TextBlock Text="The Value must be &lt;= 100" Name="remainder" Visibility="Collapsed" Foreground="#F50404" FontSize="10" FontFamily="{StaticResource InperFontFamily}" Padding="10 5"/>
+                        </Grid>
+                    </StackPanel>
+                </UniformGrid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock Text="Sweep preview" Foreground="{StaticResource InperTheme}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <Border Height="1" Background="{StaticResource InperTheme}" Width="328" HorizontalAlignment="Right"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Border BorderThickness="1" BorderBrush="#D1D1D1" Margin="0 0 0 15">
+                    <sci:SciChartSurface Background="Transparent">
+                        <sci:SciChartSurface.YAxis>
+                            <sci:NumericAxis DrawMajorBands="False"
+                                    DrawMajorGridLines="False" TextFormatting="#0.000" Visibility="Collapsed"
+                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" BorderBrush="Gray" MaxAutoTicks="1" HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="0,1"/>
+                        </sci:SciChartSurface.YAxis>
+                        <sci:SciChartSurface.XAxis>
+                            <sci:DateTimeAxis DrawMajorBands="False" DrawMajorTicks="False" DrawMinorTicks="False"
+                                DrawMajorGridLines="False" DrawMinorGridLines="False" TextFormatting="HH:mm:ss"/>
+                        </sci:SciChartSurface.XAxis>
+                    </sci:SciChartSurface>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</inp:InperDialogWindow>

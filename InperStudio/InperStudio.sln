@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperStudio", "InperStudio.csproj", "{030B0F0B-0A9C-41F3-9148-BFD8A5830362}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6168BB6B-9375-4A4D-9049-98408981BD53} = {6168BB6B-9375-4A4D-9049-98408981BD53}
+		{76878F87-6EF4-4CA8-97D9-03C6A62532C9} = {76878F87-6EF4-4CA8-97D9-03C6A62532C9}
 		{47D96C9E-1156-4035-AE74-CB36B94B30DD} = {47D96C9E-1156-4035-AE74-CB36B94B30DD}
 		{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0} = {5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}
 	EndProjectSection
@@ -17,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperProtocolStack", "..\InperProtocolStack\InperProtocolStack.csproj", "{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InperVideo", "..\..\..\Users\刘小刀\source\repos\InperVideo\InperVideo.csproj", "{2B721277-C5EA-4725-8461-7089EEC64A62}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InperCameraDShow", "..\..\..\Users\刘小刀\source\repos\InperCameraDShow\InperCameraDShow.csproj", "{76878F87-6EF4-4CA8-97D9-03C6A62532C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +47,10 @@ Global
 		{2B721277-C5EA-4725-8461-7089EEC64A62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B721277-C5EA-4725-8461-7089EEC64A62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B721277-C5EA-4725-8461-7089EEC64A62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76878F87-6EF4-4CA8-97D9-03C6A62532C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76878F87-6EF4-4CA8-97D9-03C6A62532C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76878F87-6EF4-4CA8-97D9-03C6A62532C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76878F87-6EF4-4CA8-97D9-03C6A62532C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

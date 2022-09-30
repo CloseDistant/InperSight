@@ -114,7 +114,7 @@
         <StackPanel Grid.Column="1" VerticalAlignment="Center">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="15 0">
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker" IsDefault="False">
                         <StackPanel>
                             <Grid x:Name="marker">
                                 <Image Source="/Lib/Images/New/marker.png"  Width="18" Height="20" Stretch="Uniform" />
@@ -178,6 +178,40 @@
                                 </Grid.Triggers>
                             </Grid>
                             <TextBlock Margin="0 5 0 0">Output</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Margin="15 0">
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Stimulus">
+                        <StackPanel>
+                            <Grid x:Name="stimulus">
+                                <Image Source="/Lib/Images/New/output.png" Width="16" Height="20" Stretch="Uniform" />
+                                <Grid.Triggers>
+                                    <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                                        <EventTrigger.Actions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="stimulus" Storyboard.TargetProperty="Background">
+                                                        <DiscreteObjectKeyFrame  KeyTime="0:0:0" Value="{StaticResource ButtonBrush}"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger.Actions>
+                                    </EventTrigger>
+                                    <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                                        <EventTrigger.Actions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="stimulus" Storyboard.TargetProperty="Background">
+                                                        <DiscreteObjectKeyFrame  KeyTime="0:0:0" Value="{StaticResource ButtonBrushLeave}"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger.Actions>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                            </Grid>
+                            <TextBlock Margin="0 5 0 0">Stimulus</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>

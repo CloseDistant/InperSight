@@ -47,11 +47,11 @@
                 </RadioButton>
                 <Grid Margin="30 10 0 0" IsEnabled="{Binding ElementName=fixedRange,Path=IsChecked}">
                     <TextBlock VerticalAlignment="Center" Text="Top"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <TextBox Style="{StaticResource InperTextBoxBaseStyle}" Width="130" Name="rangeTop" Margin="20 0"   LostFocus="{s:Action Range_LostFocus}" Text="{Binding ElementName=rangeChannel,Path=SelectedItem.YTop}" HorizontalAlignment="Right" />
+                    <TextBox Style="{StaticResource InperTextBoxBaseStyle}" Width="130" Name="rangeTop" Margin="20 0"   LostFocus="{s:Action Range_LostFocus}" Text="{Binding ElementName=rangeChannel,Path=SelectedItem.YTop,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" />
                 </Grid>
                 <Grid Margin="30 10 0 0" IsEnabled="{Binding ElementName=fixedRange,Path=IsChecked}">
                     <TextBlock VerticalAlignment="Center" Text="Bottom"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                    <TextBox Style="{StaticResource InperTextBoxBaseStyle}" Width="130" Name="rangeBottom" Margin="20 0" LostFocus="{s:Action Range_LostFocus}" Text="{Binding ElementName=rangeChannel,Path=SelectedItem.YBottom}" HorizontalAlignment="Right" />
+                    <TextBox Style="{StaticResource InperTextBoxBaseStyle}" Width="130" Name="rangeBottom" Margin="20 0" LostFocus="{s:Action Range_LostFocus}" Text="{Binding ElementName=rangeChannel,Path=SelectedItem.YBottom,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" />
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock Text="Height (px)" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />

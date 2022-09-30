@@ -210,7 +210,8 @@ namespace InperStudio.ViewModels
                     {
                         InperGlobalClass.CameraSignalSettings.Sampling = Math.Floor(1000 / InperGlobalClass.CameraSignalSettings.Exposure / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
                         Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
-                        InperDeviceHelper.Instance.device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
+                        //InperDeviceHelper.Instance.device.SetFrameRate(InperGlobalClass.CameraSignalSettings.Sampling);
+                        InperGlobalClass.SetSampling(Sampling);
                     }
                 }
             }
@@ -353,6 +354,8 @@ namespace InperStudio.ViewModels
                 }
                 await SetExpourseAndGain();
                 AutoFindFiber();
+                _ = InperDeviceHelper.Instance.device.SetGain(InperGlobalClass.CameraSignalSettings.Gain);
+                _ = InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
             }
             catch (Exception ex)
             {

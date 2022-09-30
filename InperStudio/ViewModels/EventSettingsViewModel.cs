@@ -646,7 +646,7 @@ namespace InperStudio.ViewModels
                             if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString()) > 0)
                             {
                                 var items = InperGlobalClass.EventSettings.Channels.FindAll(x => x.Type == ChannelTypeEnum.Output.ToString());
-                                if (ch.Type == ChannelTypeEnum.Light.ToString() || ch.Type == ChannelTypeEnum.AfterExcitation.ToString())
+                                if (ch.Condition.Type == ChannelTypeEnum.Light.ToString() || ch.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())
                                 {
                                     if (items.FirstOrDefault(f => f.ChannelId == ch.ChannelId && (f.Condition.Type == ChannelTypeEnum.Light.ToString() || f.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString())) is EventChannelJson channelJson)
                                     {

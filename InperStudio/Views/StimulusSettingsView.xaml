@@ -1,0 +1,244 @@
+﻿<inp:InperDialogWindow x:Class="InperStudio.Views.StimulusSettingsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InperStudio.Views"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
+        xmlns:sci="http://schemas.abtsoftware.co.uk/scichart"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels"
+        mc:Ignorable="d" Title="Stimulus" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
+        Width="700" Height="500" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+    <inp:InperDialogWindow.Resources>
+        <Style  TargetType="{x:Type DataGridColumnHeader}">
+            <Style.Triggers>
+                <Trigger Property="SortDirection" Value="Ascending">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Descending">
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Padding" Value="0,6,0,12" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                        <hc:SimplePanel>
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter RecognizesAccessKey="True" VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    <!--<ToggleButton Name="ToggleButtonSortDirection" Grid.Column="1" VerticalAlignment="Center"  Padding="4,0" Width="20" IsEnabled="False" Opacity="1" Foreground="{DynamicResource PrimaryBrush}" Style="{StaticResource ToggleButtonIconTransparent}"  />-->
+                                </Grid>
+                            </Border>
+                            <!--<Thumb Name="PART_LeftHeaderGripper" HorizontalAlignment="Left" Style="{StaticResource ColumnHeaderGripperStyle}" />
+                            <Thumb Name="PART_RightHeaderGripper" HorizontalAlignment="Right" Style="{StaticResource ColumnHeaderGripperStyle}" />-->
+                        </hc:SimplePanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CellStyle" TargetType="DataGridCell">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </inp:InperDialogWindow.Resources>
+    <Grid Margin="25 0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1.8*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <WrapPanel Grid.Row="0" VerticalAlignment="Center">
+                    <TextBlock Text="Waveform" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}"/>
+                    <Button Style="{StaticResource InperFreeButton}" Width="26" Height="20" Margin="10 0 0 0" Command="{s:Action AddWaveformEvent}">
+                        <Image Source="/Lib/Images/New/Stimulus_Add.png" Stretch="UniformToFill" />
+                    </Button>
+                </WrapPanel>
+                <Grid Grid.Row="1">
+                    <DataGrid Margin="0" Height="225" ScrollViewer.CanContentScroll="True" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" FontSize="12" ItemsSource="{Binding WaveForms}" CanUserSortColumns="False" AutoGenerateColumns="False" HorizontalContentAlignment="Center">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="50" Binding="{Binding Index}" Header="Item"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Pulse}" Header="Pulse(ms)"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Frequence}" Header="Freq(Hz)"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="60" Binding="{Binding Duration}" Header="Duration(s)"/>
+                            <DataGridTemplateColumn Width="80" CellStyle="{StaticResource CellStyle}">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <UniformGrid Columns="2">
+                                            <Button Width="18" Height="18" Command="{s:Action Edit_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Cursor" Value="Hand"/>
+                                                        <Setter Property="Template" >
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Image Source="/Lib/Images/New/edit.png" Stretch="Fill" Name="img1"/>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                                            <Setter TargetName="img1" Property="Source" Value="/Lib/Images/New/edit_hover.png"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button  Margin="0 0 0 0" Width="18" Height="18" Command="{s:Action Delete_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Cursor" Value="Hand"/>
+                                                        <Setter Property="Template" >
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Image Source="/Lib/Images/New/delete.png" Stretch="Fill" Name="img2"/>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                                            <Setter TargetName="img2" Property="Source" Value="/Lib/Images/New/delete_hover.png"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </UniformGrid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <WrapPanel Grid.Row="0" VerticalAlignment="Center">
+                    <TextBlock Text="Sweep" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}"/>
+                    <Button Style="{StaticResource InperFreeButton}" Width="26" Height="20" Margin="10 0 0 0" Command="{s:Action AddSweepEvent}">
+                        <Image Source="/Lib/Images/New/Stimulus_Add.png" Stretch="UniformToFill" />
+                    </Button>
+                </WrapPanel>
+                <Grid Grid.Row="1">
+                    <DataGrid Margin="0" Height="225" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" ItemsSource="{Binding Sweeps}" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="False" AutoGenerateColumns="False" HorizontalContentAlignment="Center">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="30" Header=" " CellStyle="{StaticResource CellStyle}">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="40" Binding="{Binding Index}" Header="Item"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="80" Binding="{Binding WaveForm}" Header="Waveform"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="70" Binding="{Binding Duration}" Header="Duration(s)"/>
+                            <DataGridTemplateColumn Width="40" CellStyle="{StaticResource CellStyle}">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <UniformGrid Columns="2">
+                                            <Button Width="18" Height="18" Command="{s:Action Sweep_Edit_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Cursor" Value="Hand"/>
+                                                        <Setter Property="Template" >
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Image Source="/Lib/Images/New/edit.png" Stretch="Fill" Name="img1"/>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                                            <Setter TargetName="img1" Property="Source" Value="/Lib/Images/New/edit_hover.png"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button  Margin="0 0 0 0" Width="18" Height="18" Command="{s:Action Sweep_Delete_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Cursor" Value="Hand"/>
+                                                        <Setter Property="Template" >
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Image Source="/Lib/Images/New/delete.png" Stretch="Fill" Name="img2"/>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                                            <Setter TargetName="img2" Property="Source" Value="/Lib/Images/New/delete_hover.png"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </UniformGrid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock Text="Preview" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}" />
+                <TextBlock Text="Output" VerticalAlignment="Center" Margin="240 0 0 0"/>
+                <ComboBox ItemsSource="{Binding EventChannels}" Name="dio" DisplayMemberPath="Name" Width="120" Height="20" HorizontalAlignment="Left" Margin="300 0 0 0"/>
+                <TextBlock Text="hh:mm:ss" VerticalAlignment="Center" Margin="450 0 0 0"/>
+                <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="440 0 0 0" Name="hour" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
+                <TextBlock Text=":" VerticalAlignment="Center" Margin="550 0 0 0"/>
+                <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="520 0 0 0" Name="minute" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
+                <TextBlock Text=":" VerticalAlignment="Center" Margin="590 0 0 0"/>
+                <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="595 0 0 0" Name="seconds" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Border BorderThickness="1" BorderBrush="#D1D1D1" Margin="0 0 0 15">
+                    <sci:SciChartSurface Background="Transparent">
+                        <sci:SciChartSurface.YAxis>
+                            <sci:NumericAxis DrawMajorBands="False"
+                                    DrawMajorGridLines="False" TextFormatting="#0.000" Visibility="Collapsed"
+                                    DrawMinorGridLines="False" BorderThickness="0 0 1 0" BorderBrush="Gray" MaxAutoTicks="1" HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="0,1"/>
+                        </sci:SciChartSurface.YAxis>
+                        <sci:SciChartSurface.XAxis>
+                            <sci:DateTimeAxis DrawMajorBands="False" DrawMajorTicks="False" DrawMinorTicks="False"
+                                DrawMajorGridLines="False" DrawMinorGridLines="False" TextFormatting="HH:mm:ss"/>
+                        </sci:SciChartSurface.XAxis>
+                    </sci:SciChartSurface>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</inp:InperDialogWindow>

@@ -46,12 +46,15 @@ namespace InperStudio.ViewModels
                 view.ConfirmClickEvent += (s, e) =>
                 {
                     double value = 0;
-                    if (double.TryParse(view.fixedValue.Text, out value))
+                    if ((bool)view.heightFixed.IsChecked)
                     {
-                        if (value < 30 || value > 999)
+                        if (double.TryParse(view.fixedValue.Text, out value))
                         {
-                            InperGlobalClass.ShowReminderInfo("值不符合要求");
-                            return;
+                            if (value < 30 || value > 999)
+                            {
+                                InperGlobalClass.ShowReminderInfo("值不符合要求，最小值为30");
+                                return;
+                            }
                         }
                     }
                     RequestClose();
