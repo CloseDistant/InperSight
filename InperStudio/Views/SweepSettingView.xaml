@@ -9,9 +9,13 @@
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:sci="http://schemas.abtsoftware.co.uk/scichart"
         xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
         Title="Add Sweep" Height="420" Width="520" d:DataContext="{d:DesignInstance vm:SweepSettingViewModel}">
+    <inp:InperDialogWindow.Resources>
+        <chart:CustomTimeSpanLableProvider x:Key="customTimeSpanLableProvider"/>
+    </inp:InperDialogWindow.Resources>
     <Grid Margin="20 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"/>
@@ -27,34 +31,42 @@
                 <Border Height="1" Background="{StaticResource InperTheme}" Width="328" HorizontalAlignment="Right"/>
             </Grid>
             <Grid Grid.Row="1">
-                <UniformGrid Columns="2">
-                    <ListBox Margin="0" ItemsSource="{Binding WaveForms}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <WrapPanel>
-                                    <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}" Checked="{s:Action CheckBox_Checked}" Unchecked="{s:Action CheckBox_Unchecked}"/>
-                                    <TextBlock Text="{Binding Index}" VerticalAlignment="Center" Margin="10 0"/>
-                                    <TextBlock Text="{Binding Pulse,StringFormat={} ms}" VerticalAlignment="Center" Margin="10 0"/>
-                                    <TextBlock Text="{Binding Frequence,StringFormat={}{0} Hz}" VerticalAlignment="Center" Margin="10 0"/>
-                                    <TextBlock Text="{Binding Duration,StringFormat={}{0} s}" VerticalAlignment="Center" Margin="10 0"/>
-                                </WrapPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <StackPanel Margin="20 0 0 0">
-                        <WrapPanel>
-                            <TextBlock Text="Selected" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
-                            <TextBox Width="120" Margin="27 0 0 0" IsEnabled="False" Name="selected"/>
-                        </WrapPanel>
-                        <WrapPanel Margin="0 20 0 0">
-                            <TextBlock Text="Duration (s)" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
-                            <TextBox Width="120" Margin="10 0 0 0" Name="duration" TextChanged="{s:Action Duration_Textchanged}" />
-                        </WrapPanel>
-                        <Grid Background="#FACD91" HorizontalAlignment="Right" Margin="0 20 0 0">
-                            <TextBlock Text="The Value must be &lt;= 100" Name="remainder" Visibility="Collapsed" Foreground="#F50404" FontSize="10" FontFamily="{StaticResource InperFontFamily}" Padding="10 5"/>
-                        </Grid>
-                    </StackPanel>
-                </UniformGrid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <ListBox Margin="0" ItemsSource="{Binding WaveForms}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <WrapPanel>
+                                <CheckBox IsChecked="{Binding IsChecked,Mode=OneWay}" Checked="{s:Action CheckBox_Checked}" Unchecked="{s:Action CheckBox_Unchecked}"/>
+                                <TextBlock Text="{Binding Index}" VerticalAlignment="Center" TextAlignment="Center" Width="30" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Pulse,StringFormat={}{0} ms}" VerticalAlignment="Center" Width="60" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Frequence,StringFormat={}{0} Hz}" VerticalAlignment="Center" Width="50" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Duration,StringFormat={}{0} s}" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="50" TextTrimming="CharacterEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip>
+                                            <TextBlock Text="{Binding Duration,StringFormat={}{0} s}"/>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Margin="20 0 0 0" Grid.Column="1">
+                    <WrapPanel>
+                        <TextBlock Text="Selected" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
+                        <hc:TextBox Width="100"  Margin="27 0 0 0" IsEnabled="False" Name="selected"/>
+                    </WrapPanel>
+                    <WrapPanel Margin="0 20 0 0">
+                        <TextBlock Text="Duration (s)" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
+                        <TextBox Width="100" Margin="10 0 0 0" Name="duration" TextChanged="{s:Action Duration_Textchanged}" />
+                    </WrapPanel>
+                    <Grid Background="#FACD91" HorizontalAlignment="Right" Margin="0 20 0 0">
+                        <TextBlock Text="The Value must be &lt;= 100" Name="remainder" Visibility="Collapsed" Foreground="#F50404" FontSize="10" FontFamily="{StaticResource InperFontFamily}" Padding="10 5"/>
+                    </Grid>
+                </StackPanel>
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
@@ -68,16 +80,26 @@
             </Grid>
             <Grid Grid.Row="1">
                 <Border BorderThickness="1" BorderBrush="#D1D1D1" Margin="0 0 0 15">
-                    <sci:SciChartSurface Background="Transparent">
+                    <sci:SciChartSurface Background="Transparent" Name="scichart">
+                        <sci:SciChartSurface.RenderableSeries>
+                            <sci:FastLineRenderableSeries IsDigitalLine="True" DataSeries="{Binding XyDataSeries,UpdateSourceTrigger=PropertyChanged}" Stroke="Red"/>
+                        </sci:SciChartSurface.RenderableSeries>
                         <sci:SciChartSurface.YAxis>
                             <sci:NumericAxis DrawMajorBands="False"
-                                    DrawMajorGridLines="False" TextFormatting="#0.000" Visibility="Collapsed"
+                                    DrawMajorGridLines="False" TextFormatting="#0.000" Visibility="Collapsed" GrowBy="0.1,0.1"
                                     DrawMinorGridLines="False" BorderThickness="0 0 1 0" BorderBrush="Gray" MaxAutoTicks="1" HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="0,1"/>
                         </sci:SciChartSurface.YAxis>
                         <sci:SciChartSurface.XAxis>
-                            <sci:DateTimeAxis DrawMajorBands="False" DrawMajorTicks="False" DrawMinorTicks="False"
-                                DrawMajorGridLines="False" DrawMinorGridLines="False" TextFormatting="HH:mm:ss"/>
+                            <sci:TimeSpanAxis DrawMajorBands="False" DrawMajorTicks="True" DrawMinorTicks="True"
+                                DrawMajorGridLines="False" DrawMinorGridLines="False" VisibleRange="{Binding XRange,UpdateSourceTrigger=PropertyChanged}" TextFormatting="HH:mm:ss" LabelProvider="{StaticResource customTimeSpanLableProvider}"/>
                         </sci:SciChartSurface.XAxis>
+                        <sci:SciChartSurface.ChartModifier>
+                            <sci:ModifierGroup>
+                                <sci:MouseWheelZoomModifier XyDirection="XDirection"/>
+                                <sci:ZoomExtentsModifier ExecuteOn="MouseDoubleClick"/>
+                                <sci:ZoomPanModifier XyDirection="XDirection"/>
+                            </sci:ModifierGroup>
+                        </sci:SciChartSurface.ChartModifier>
                     </sci:SciChartSurface>
                 </Border>
             </Grid>

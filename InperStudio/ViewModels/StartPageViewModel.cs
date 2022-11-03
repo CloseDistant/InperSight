@@ -93,7 +93,7 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-                        await Task.Delay(2000);
+                        await Task.Delay(1000);
                         (View as StartPageView).loading.Visibility = Visibility.Collapsed;
                         (View as StartPageView).remainder.Text = "Initialization completed";
                         InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());

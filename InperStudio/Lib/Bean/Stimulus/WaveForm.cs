@@ -12,7 +12,7 @@ namespace InperStudio.Lib.Bean.Stimulus
         public int Index { get; set; }
         public ShapeEnum Shape { get; set; }
         public double Pulse { get; set; }
-        public double Frequence { get; set; }
+        public int Frequence { get; set; }
         public double Power { get; set; }
         public int Duration { get; set; }
     }

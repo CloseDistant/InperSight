@@ -78,59 +78,62 @@ namespace InperStudio.ViewModels
                     view.video.Visibility = Visibility.Visible;
                     UnusedKits = new ObservableCollection<VideoRecordBean>();
 
-                    Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
-                    this.view.Dispatcher.BeginInvoke(new Action(async () =>
+                    //Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
+                    //this.view.Dispatcher.BeginInvoke(new Action(async () =>
+                    //{
+                    IEnumerable<ICameraInfo> camerInfoList = new List<ICameraInfo>();
+                    //await Task.Factory.StartNew(() =>
+                    //{
+                    camerInfoList = new CameraInfoesReader().GetCameraInfos();
+                    //});
+                    int i = 0;
+                    foreach (var c in camerInfoList)
                     {
-                        IEnumerable<ICameraInfo> camerInfoList = new List<ICameraInfo>();
-                        await Task.Factory.StartNew(() =>
+
+                        if (!c.FriendlyName.Contains("Basler"))
                         {
-                            camerInfoList = new CameraInfoesReader().GetCameraInfos();
-                            int i = 0;
-                            foreach (var c in camerInfoList)
+                            VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == i || x.Name == c.FriendlyName);
+                            if (it == null)
                             {
-
-                                if (!c.FriendlyName.Contains("Basler"))
+                                var item = new VideoRecordBean(i, c.FriendlyName, new CameraParamSet(c.CapabilyItems.FirstOrDefault().Size, c.CapabilyItems.FirstOrDefault().FrameRate, c.CapabilyItems.FirstOrDefault().Format));
+                                var formats = c.CapabilyItems.OrderBy(f => f.Format).GroupBy(ca => ca.Format);
+                                foreach (var format in formats)
                                 {
-                                    VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == i || x.Name == c.FriendlyName);
-                                    if (it == null)
+                                    if (!format.Key.Equals("RGB24"))
                                     {
-                                        var item = new VideoRecordBean(i, c.FriendlyName, new CameraParamSet(c.CapabilyItems.FirstOrDefault().Size, c.CapabilyItems.FirstOrDefault().FrameRate, c.CapabilyItems.FirstOrDefault().Format));
-                                        var formats = c.CapabilyItems.GroupBy(ca => ca.Format);
-                                        foreach (var format in formats)
-                                        {
-                                            item.CapabilyItems.Add(format.Key, format.OrderBy(x => x.FrameRate));
-                                        }
-
-                                        if (item.IsCanOpen)
-                                        {
-                                            view.Dispatcher.Invoke(() =>
-                                            {
-                                                UnusedKits.Add(item);
-                                            });
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
-                                        {
-                                            it.IsActive = true;
-                                        }
+                                        item.CapabilyItems.Add(format.Key, format.OrderBy(x => x.FrameRate));
                                     }
                                 }
-                                i++;
+
+                                //if (item.IsCanOpen)
+                                //{
+                                //    view.Dispatcher.Invoke(() =>
+                                //    {
+                                UnusedKits.Add(item);
+                                //    });
+                                //}
                             }
-
-
-                            if (unusedKits.Count > 0)
+                            else
                             {
-                                this.view.Dispatcher.Invoke(() =>
+                                if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
                                 {
-                                    view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
-                                });
+                                    it.IsActive = true;
+                                }
                             }
+                        }
+                        i++;
+                    }
+
+
+                    if (unusedKits.Count > 0)
+                    {
+                        this.view.Dispatcher.Invoke(() =>
+                        {
+                            view.CameraCombox.SelectedItem = unusedKits.First(x => x.IsActive == false);
                         });
-                        d.Close();
-                    }));
+                    }
+                    //}));
+                    //d.Close();
                 }
                 else
                 {
@@ -211,7 +214,6 @@ namespace InperStudio.ViewModels
 
         private void View_ConfirmClickEvent(object arg1, System.Windows.Input.ExecutedRoutedEventArgs arg2)
         {
-
             if (@enum == AdditionSettingsTypeEnum.Video)
             {
                 MainWindowViewModel main = null;
@@ -247,11 +249,16 @@ namespace InperStudio.ViewModels
             }
             if (unusedKits != null)
             {
-                unusedKits.ToList().ForEach(x =>
+                //unusedKits.ToList().ForEach(x =>
+                //{
+                //    x.StopPreview();
+                //});
+                foreach (var item in unusedKits)
                 {
-                    x.StopPreview();
-                });
+                    item.StopPreview();
+                }
             }
+
             this.RequestClose();
 
         }
@@ -269,7 +276,7 @@ namespace InperStudio.ViewModels
                 {
                     if (UnusedKits.Count > 0)
                     {
-                        UnusedKits.ToList().ForEach(x => x.StopPreview());
+                        UnusedKits.ToList().ForEach(x => { x.StopPreview(); });
                     }
                 }
             }
@@ -289,11 +296,15 @@ namespace InperStudio.ViewModels
                     selectCameraItem.StopPreview();
                 }
                 selectCameraItem = view.CameraCombox.SelectedItem as VideoRecordBean;
-
+                //Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
                 if (selectCameraItem != null)
                 {
+                    //await Task.Factory.StartNew(() =>
+                    //{
                     selectCameraItem.StartCapture();
+                    //});
                 }
+                //d.Close();
                 view.format.SelectedIndex = 0;
             }
             catch (Exception ex)
@@ -306,7 +317,6 @@ namespace InperStudio.ViewModels
             try
             {
                 view.framrate.SelectedIndex = 0;
-
             }
             catch (Exception ex)
             {

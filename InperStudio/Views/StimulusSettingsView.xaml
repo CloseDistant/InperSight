@@ -5,14 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:sci="http://schemas.abtsoftware.co.uk/scichart"
+        xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         mc:Ignorable="d" Title="Stimulus" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
         Width="700" Height="500" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+        <chart:CustomTimeSpanLableProvider x:Key="customTimeSpanLableProvider"/>
         <Style  TargetType="{x:Type DataGridColumnHeader}">
             <Style.Triggers>
                 <Trigger Property="SortDirection" Value="Ascending">
@@ -54,7 +58,7 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </inp:InperDialogWindow.Resources>
-    <Grid Margin="25 0">
+    <Grid Margin="25 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
         <Grid.RowDefinitions>
             <RowDefinition Height="1.8*"/>
             <RowDefinition Height="*"/>
@@ -150,7 +154,7 @@
                             <DataGridTemplateColumn Width="30" Header=" " CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}"/>
+                                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}" Checked="{s:Action Sweep_Checked}" Unchecked="{s:Action Sweep_Unchecked}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -226,16 +230,26 @@
             </Grid>
             <Grid Grid.Row="1">
                 <Border BorderThickness="1" BorderBrush="#D1D1D1" Margin="0 0 0 15">
-                    <sci:SciChartSurface Background="Transparent">
+                    <sci:SciChartSurface Background="Transparent" Name="sciChart">
+                        <sci:SciChartSurface.RenderableSeries>
+                            <sci:FastLineRenderableSeries IsDigitalLine="True" DataSeries="{Binding XyDataSeries,UpdateSourceTrigger=PropertyChanged}" Stroke="Red"/>
+                        </sci:SciChartSurface.RenderableSeries>
                         <sci:SciChartSurface.YAxis>
                             <sci:NumericAxis DrawMajorBands="False"
-                                    DrawMajorGridLines="False" TextFormatting="#0.000" Visibility="Collapsed"
+                                    DrawMajorGridLines="False" TextFormatting="#0.000" Visibility="Collapsed" GrowBy="0.1,0.1"
                                     DrawMinorGridLines="False" BorderThickness="0 0 1 0" BorderBrush="Gray" MaxAutoTicks="1" HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRange="0,1"/>
                         </sci:SciChartSurface.YAxis>
                         <sci:SciChartSurface.XAxis>
-                            <sci:DateTimeAxis DrawMajorBands="False" DrawMajorTicks="False" DrawMinorTicks="False"
-                                DrawMajorGridLines="False" DrawMinorGridLines="False" TextFormatting="HH:mm:ss"/>
+                            <sci:TimeSpanAxis DrawMajorBands="False" DrawMajorTicks="True" DrawMinorTicks="True"
+                                DrawMajorGridLines="False" DrawMinorGridLines="False" VisibleRange="{Binding XRange,UpdateSourceTrigger=PropertyChanged}" TextFormatting="HH:mm:ss" LabelProvider="{StaticResource customTimeSpanLableProvider}"/>
                         </sci:SciChartSurface.XAxis>
+                        <sci:SciChartSurface.ChartModifier>
+                            <sci:ModifierGroup>
+                                <sci:MouseWheelZoomModifier XyDirection="XDirection"/>
+                                <sci:ZoomExtentsModifier ExecuteOn="MouseDoubleClick"/>
+                                <sci:ZoomPanModifier XyDirection="XDirection"/>
+                            </sci:ModifierGroup>
+                        </sci:SciChartSurface.ChartModifier>
                     </sci:SciChartSurface>
                 </Border>
             </Grid>

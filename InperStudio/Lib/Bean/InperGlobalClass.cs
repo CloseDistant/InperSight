@@ -26,6 +26,7 @@ namespace InperStudio.Lib.Bean
         private static EventPanelProperties eventPanelProperties = InperJsonHelper.GetEventPanelProperties();
         private static CameraSignalSettings cameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
         private static EventSettings eventSettings = InperJsonHelper.GetEventSettings();
+        private static StimulusSettings stimulusSettings = InperJsonHelper.GetStimulusSettings() ?? new StimulusSettings();
 
         private static AdditionRecordConditionsTypeEnum additionRecordConditionsStart = AdditionRecordConditionsTypeEnum.Immediately;
         private static AdditionRecordConditionsTypeEnum additionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Immediately;
@@ -133,6 +134,15 @@ namespace InperStudio.Lib.Bean
             {
                 eventSettings = value;
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(EventSettings)));
+            }
+        }
+        public static StimulusSettings StimulusSettings
+        {
+            get => stimulusSettings;
+            set
+            {
+                stimulusSettings = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(StimulusSettings)));
             }
         }
         public static AdditionRecordConditionsTypeEnum AdditionRecordConditionsStart

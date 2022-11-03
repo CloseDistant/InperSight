@@ -39,6 +39,14 @@ namespace InperStudio.Lib.Helper
         {
             SetResByT(eventSettings, type);
         }
+        public static StimulusSettings GetStimulusSettings(string type = "stimulusSettings")
+        {
+            return GetResByT<StimulusSettings>(type) ?? default;
+        }
+        public static void SetStimulusSettings(StimulusSettings stimulusSettings, string type = "stimulusSettings")
+        {
+            SetResByT(stimulusSettings, type);
+        }
         private static T GetResByT<T>(string type)
         {
             JObject res = InperJsonConfig.Instance.Readjson();

@@ -67,12 +67,16 @@
     <Compile Include="CmdPhotometry\CmdMeasureMode.cs" />
     <Compile Include="CmdPhotometry\CmdOutputIO.cs" />
     <Compile Include="CmdPhotometry\CmdSaveID.cs" />
+    <Compile Include="CmdPhotometry\CmdSendExposure.cs" />
     <Compile Include="CmdPhotometry\CmdSendFile.cs" />
     <Compile Include="CmdPhotometry\CmdSetBindDio.cs" />
+    <Compile Include="CmdPhotometry\CmdSetCHNSweep.cs" />
     <Compile Include="CmdPhotometry\CmdSetFileLength.cs" />
     <Compile Include="CmdPhotometry\CmdSetFrameRate.cs" />
+    <Compile Include="CmdPhotometry\CmdSetGBLWF.cs" />
     <Compile Include="CmdPhotometry\CmdSetIOStatus.cs" />
     <Compile Include="CmdPhotometry\CmdSetLightPower.cs" />
+    <Compile Include="CmdPhotometry\CmdSetSweepState.cs" />
     <Compile Include="CmdPhotometry\CmdSetTrigger.cs" />
     <Compile Include="CmdPhotometry\CmdStart.cs" />
     <Compile Include="CmdPhotometry\CmdStop.cs" />

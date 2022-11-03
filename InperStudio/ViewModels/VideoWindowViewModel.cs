@@ -98,9 +98,9 @@ namespace InperStudio.ViewModels
         protected override void OnClose()
         {
             BehaviorRecorderKit.StopPreview();
-            BehaviorRecorderKit.StopRecording(1);
+            //BehaviorRecorderKit.StopRecording();
             BehaviorRecorderKit.IsActive = false;
-            foreach(var item in InperGlobalClass.ActiveVideos)
+            foreach (var item in InperGlobalClass.ActiveVideos)
             {
                 if (item.Name.Equals(BehaviorRecorderKit.Name))
                 {

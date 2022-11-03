@@ -52,6 +52,7 @@ namespace InperStudio.ViewModels
             ActiveItem = new DataShowControlViewModel(windowManager);
 
             windowView.NonClientAreaContent = new MainTitleContentArea();
+            InperDeviceHelper.Instance.device.SetSweepState(0);
         }
         protected override void OnClose()
         {

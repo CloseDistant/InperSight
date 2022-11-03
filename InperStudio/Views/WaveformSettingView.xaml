@@ -23,7 +23,7 @@
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
                 <TextBlock Text="Freq (Hz)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
-                <ComboBox Width="120" Height="20" Margin="43 0 0 0" Name="freq" ItemsSource="{Binding Freqs,UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" SelectionChanged="{s:Action Freq_SelectionChanged}"/>
+                <ComboBox Width="120" Height="20" Margin="43 0 0 0" Name="freq" ItemsSource="{Binding Freqs,UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" /> <!--SelectionChanged="{s:Action Freq_SelectionChanged}"-->
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
                 <TextBlock Text="Duration (s)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>

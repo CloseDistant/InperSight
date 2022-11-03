@@ -2,6 +2,7 @@
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.ViewModels;
@@ -64,6 +65,23 @@ namespace InperStudio.Views.Control
                     InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
                     InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                     InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
+                    InperGlobalClass.StimulusSettings = InperJsonHelper.GetStimulusSettings() ?? new Lib.Helper.JsonBean.StimulusSettings();
+
+                    if (InperGlobalClass.StimulusSettings.Sweeps.Count > 0)
+                    {
+                        StimulusBeans.Instance.Sweeps.Clear();
+                        InperGlobalClass.StimulusSettings.Sweeps.ToList().ForEach(x => StimulusBeans.Instance.Sweeps.Add(x));
+                    }
+                    if (InperGlobalClass.StimulusSettings.WaveForms.Count > 0)
+                    {
+                        StimulusBeans.Instance.WaveForms.Clear();
+                        InperGlobalClass.StimulusSettings.WaveForms.ToList().ForEach(x => StimulusBeans.Instance.WaveForms.Add(x));
+                    }
+                    StimulusBeans.Instance.DioID = InperGlobalClass.StimulusSettings.DioID;
+                    StimulusBeans.Instance.IsConfigSweep = InperGlobalClass.StimulusSettings.IsConfigSweep;
+                    StimulusBeans.Instance.Hour = InperGlobalClass.StimulusSettings.Hour;
+                    StimulusBeans.Instance.Minute = InperGlobalClass.StimulusSettings.Minute;
+                    StimulusBeans.Instance.Seconds = InperGlobalClass.StimulusSettings.Seconds;
 
                     InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
                     InperGlobalClass.SetSampling(InperGlobalClass.CameraSignalSettings.Sampling);

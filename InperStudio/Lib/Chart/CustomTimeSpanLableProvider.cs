@@ -24,7 +24,7 @@ namespace InperStudio.Lib.Chart
             var value = (TimeSpan)dataValue;
             if (DataShowControlViewModel.TextFormat.Equals("hh:mm:ss"))
             {
-                return dataValue.ToString();
+                return value.ToString("c");
             }
             if (DataShowControlViewModel.TextFormat.Equals("ms"))
             {

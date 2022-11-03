@@ -105,9 +105,13 @@ namespace InperProtocolStack
                 LightDesc ld = new LightDesc((uint)lightConfigInfo.ID, lightConfigInfo.WaveLength, lightConfigInfo.MaxPower);
                 LightSourceList.Add(ld);
             }
-            info.IsOutput = param.Skip(skipLength).Take(1).First() == 1 ? true : false;
-            skipLength += 1;
-            info.OutputId = param.Skip(skipLength).Take(1).First();
+            if (param.Length > skipLength)
+            {
+                info.IsOutput = param.Skip(skipLength).Take(1).First() == 1 ? true : false;
+                skipLength += 1;
+                info.OutputId = param.Skip(skipLength).Take(1).First();
+            }
+
             PhotometryInfo = info;
         }
         public List<LightDesc> LightSourceList { get; private set; } = new List<LightDesc>();
@@ -216,6 +220,38 @@ namespace InperProtocolStack
             return;
         }
 
+        public void SendExposure(uint exposure)
+        {
+            CmdSendExposure cmd = new CmdSendExposure();
+            cmd.SetCmdParam(exposure);
+            _TC.Transmit(cmd);
+            return;
+        }
+        public void SetGBLWF(List<WaverformStruct> waverforms)
+        {
+            waverforms.ToList().ForEach(x =>
+            {
+                CmdSetGBLWF cmd = new CmdSetGBLWF();
+                cmd.SetCmdParam(x);
+                _TC.Transmit(cmd);
+
+            });
+            return;
+        }
+        public void SetSweepState(int state)
+        {
+            CmdSetSweepState cmd = new CmdSetSweepState();
+            cmd.SetCmdParam(state);
+            _TC.Transmit(cmd);
+            return;
+        }
+        public void SetCHNSweep(List<byte> datas)
+        {
+            CmdSetCHNSweep cmd = new CmdSetCHNSweep();
+            cmd.SetCmdParam(datas);
+            _TC.Transmit(cmd);
+            return;
+        }
         public void SetBindDio(List<byte> lightIds)
         {
             CmdSetBindDio cmd = new CmdSetBindDio();

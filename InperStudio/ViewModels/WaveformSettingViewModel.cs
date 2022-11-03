@@ -13,7 +13,7 @@ namespace InperStudio.ViewModels
 {
     public class WaveformSettingViewModel : Screen
     {
-        private int[] freqs = new int[3];
+        private int[] freqs = new int[] { };
         public int[] Freqs
         {
             get => freqs;
@@ -35,39 +35,71 @@ namespace InperStudio.ViewModels
         protected override void OnViewLoaded()
         {
             base.OnViewLoaded();
-
             view = this.View as WaveformSettingView;
+            var gys = GetGYS((int)InperGlobalClass.CameraSignalSettings.Sampling).OrderBy(x => x).ToList();
+            Freqs = new int[gys.Count];
+            for (int i = 0; i < gys.Count; i++)
+            {
+                Freqs[i] = gys[i];
+            }
 
             if (isExist)
             {
                 view.pluse.Text = waveForm.Pulse.ToString();
-                view.freq.SelectedValue = waveForm.Frequence;
+                int index = Freqs.ToList().IndexOf(waveForm.Frequence) < 0 ? 0 : Freqs.ToList().IndexOf(waveForm.Frequence);
+                view.freq.SelectedValue = Freqs[index];
                 view.duration.Text = waveForm.Duration.ToString();
+            }
+            else
+            {
+                view.freq.SelectedValue = Freqs[0];
             }
 
             this.view.ConfirmClickEvent += (s, e) =>
             {
+                waveForm.Frequence = int.Parse(view.freq.SelectedValue.ToString());
                 if (isExist)
                 {
                     StimulusBeans.Instance.WaveForms.Remove(StimulusBeans.Instance.WaveForms.FirstOrDefault(x => x.Index == waveForm.Index));
                 }
                 else
                 {
-                    if (waveForm.Pulse <= 0 || waveForm.Duration <= 0 || waveForm.Frequence <= 0)
+                    if (waveForm.Pulse < 0 || waveForm.Duration <= 0 || waveForm.Frequence <= 0)
                     {
-                        this.view.remainder.Text = "值不能为空";
+                        this.view.remainder.Text = "The value cannot be empty";
                         this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                         return;
                     }
-                    waveForm.Index = StimulusBeans.Instance.WaveForms.Count + 1;
+                    if (StimulusBeans.Instance.WaveForms.Count > 0)
+                    {
+                        waveForm.Index = StimulusBeans.Instance.WaveForms.OrderBy(x => x.Index).Last().Index + 1;
+                    }
+                    else
+                    {
+                        waveForm.Index = 1;
+                    }
                 }
-                StimulusBeans.Instance.WaveForms.Add(waveForm);
+                StimulusBeans.Instance.WaveForms.Insert(waveForm.Index - 1, waveForm);
                 this.RequestClose();
             };
-            Freqs[0] = (int)InperGlobalClass.CameraSignalSettings.Sampling;
-            Freqs[1] = (int)InperGlobalClass.CameraSignalSettings.Sampling / 2;
-            Freqs[2] = (int)InperGlobalClass.CameraSignalSettings.Sampling / 4;
-            view.freq.SelectedValue = freqs[0];
+        }
+        private List<int> GetGYS(int num)
+        {
+            if (num == 1)
+            {
+                return new List<int>() { 1 };
+            }
+            List<int> list = new List<int>() { 1, num };
+            int temp = 2;
+            while (temp < num)
+            {
+                if (num % temp == 0)
+                {
+                    list.Add(temp);
+                }
+                temp++;
+            }
+            return list;
         }
         public void Pulse_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -78,21 +110,22 @@ namespace InperStudio.ViewModels
                 {
                     if (int.TryParse(tb.Text, out int res))
                     {
-                        if (res < InperGlobalClass.CameraSignalSettings.Exposure)
+                        double maxPulse = (1000 / InperGlobalClass.CameraSignalSettings.Sampling - InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.LightMode.Count) / InperGlobalClass.CameraSignalSettings.LightMode.Count;
+                        if (res < maxPulse)
                         {
                             waveForm.Pulse = res;
                             this.view.remainder.Visibility = System.Windows.Visibility.Collapsed;
                         }
                         else
                         {
-                            this.view.remainder.Text = "The Value must be < " + InperGlobalClass.CameraSignalSettings.Exposure;
+                            this.view.remainder.Text = "The Value must be < " + maxPulse.ToString("0.00");
                             this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                             return;
                         }
                     }
                     else
                     {
-                        this.view.remainder.Text = "无效的值";
+                        this.view.remainder.Text = "The value input is not valid";
                         this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                     }
                 }
@@ -114,6 +147,7 @@ namespace InperStudio.ViewModels
                         if (res > 0)
                         {
                             waveForm.Duration = res;
+                            this.view.remainder.Visibility = System.Windows.Visibility.Collapsed;
                         }
                         else
                         {
@@ -124,7 +158,7 @@ namespace InperStudio.ViewModels
                     }
                     else
                     {
-                        this.view.remainder.Text = "无效的值";
+                        this.view.remainder.Text = "The value input is not valid";
                         this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                     }
                 }

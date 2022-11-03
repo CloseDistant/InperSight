@@ -35,7 +35,7 @@
     <Grid x:Name="Root_Gird">
         <Grid.ColumnDefinitions>
             <ColumnDefinition  Width="2.5*" />
-            <ColumnDefinition  Width="2.5*" />
+            <ColumnDefinition  Width="3.5*" />
             <ColumnDefinition  Width="2.5*" />
             <ColumnDefinition  Width="4*"  />
         </Grid.ColumnDefinitions>
@@ -181,11 +181,11 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <StackPanel Margin="15 0">
+                <StackPanel Margin="15 0" Visibility="{Binding IsShowStimulus,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Stimulus">
                         <StackPanel>
                             <Grid x:Name="stimulus">
-                                <Image Source="/Lib/Images/New/output.png" Width="16" Height="20" Stretch="Uniform" />
+                                <Image Source="/Lib/Images/New/stimulus.png" Width="20" Height="20" Stretch="Uniform" />
                                 <Grid.Triggers>
                                     <EventTrigger RoutedEvent="Mouse.MouseEnter">
                                         <EventTrigger.Actions>
@@ -429,6 +429,5 @@
                 </StackPanel>
             </WrapPanel>
         </StackPanel>
-
     </Grid>
 </UserControl>

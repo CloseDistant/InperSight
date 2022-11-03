@@ -22,6 +22,9 @@ namespace InperStudio.ViewModels
         public MainWindowViewModel MainWindowViewModel { get; private set; }
 
         public static Sprite sprite = null;
+
+        private bool isShowStimulus = InperDeviceHelper.Instance.device.PhotometryInfo.IsOutput;
+        public bool IsShowStimulus { get => isShowStimulus; set => SetAndNotify(ref isShowStimulus, value); }
         #endregion
         public ManulControlViewModel(IWindowManager windowManager)
         {
@@ -111,6 +114,11 @@ namespace InperStudio.ViewModels
                         _ = windowManager.ShowDialog(new EventSettingsViewModel(EventSettingsTypeEnum.Output));
                         break;
                     case "Stimulus":
+                        if (InperGlobalClass.CameraSignalSettings.LightMode.Count == 0)
+                        {
+                            InperGlobalClass.ShowReminderInfo("Please finish fiber settings first");
+                            break;
+                        }
                         _ = windowManager.ShowDialog(new StimulusSettingsViewModel(windowManager));
                         break;
                     default:
@@ -361,14 +369,17 @@ namespace InperStudio.ViewModels
                     }
                     DataPathConfigViewModel.DataList.Clear();
 
-                    foreach (VideoRecordBean item in InperGlobalClass.ActiveVideos)
-                    {
-                        if (item.IsActive && item.AutoRecord)
-                        {
-                            item.StopRecording();
-                        }
-                    }
                     Dialog d = Dialog.Show<ProgressDialog>("MainDialog");
+                    await Task.Factory.StartNew(() =>
+                    {
+                        foreach (VideoRecordBean item in InperGlobalClass.ActiveVideos)
+                        {
+                            if (item.IsActive && item.AutoRecord)
+                            {
+                                item.StopRecording();
+                            }
+                        }
+                    });
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
                     await Task.Factory.StartNew(() => { InperDeviceHelper.Instance.StopCollect(tokenSource); }, tokenSource.Token);
                     await Task.Delay(1000);

@@ -307,6 +307,7 @@
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventPanelProperties.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventSettings.cs" />
+    <Compile Include="Lib\Helper\JsonBean\StimulusSettings.cs" />
     <Compile Include="ViewModels\AboutInperSignalViewModel.cs" />
     <Compile Include="ViewModels\AdditionSettingsViewModel.cs" />
     <Compile Include="ViewModels\DataPathConfigViewModel.cs" />
@@ -561,6 +562,7 @@
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Lib\Images\New\stimulus.png" />
     <Resource Include="Lib\Images\New\delete.png" />
     <Resource Include="Lib\Images\New\delete_hover.png" />
     <Resource Include="Lib\Images\New\edit.png" />

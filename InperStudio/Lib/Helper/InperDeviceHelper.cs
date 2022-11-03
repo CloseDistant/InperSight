@@ -1294,6 +1294,7 @@ namespace InperStudio.Lib.Helper
             try
             {
                 _ = device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
+                device.SendExposure((uint)InperGlobalClass.CameraSignalSettings.Exposure);
                 InperGlobalClass.SetSampling(InperGlobalClass.CameraSignalSettings.Sampling);
 
                 _adPreTime.Clear();

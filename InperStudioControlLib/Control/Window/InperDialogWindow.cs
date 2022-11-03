@@ -12,6 +12,7 @@ namespace InperStudioControlLib.Control.Window
         #region event property
         public event Action<object, ExecutedRoutedEventArgs> ConfirmClickEvent;
         public event Action<object> OtherClickEvent;
+        public event Action<object> CancelClickEvent;
         #endregion
 
         public InperDialogWindow()
@@ -50,7 +51,7 @@ namespace InperStudioControlLib.Control.Window
                 WindowState = WindowState.Maximized;
             }
         }
-        private void CloseButton_Event(object sender, ExecutedRoutedEventArgs e) { Close(); e.Handled = true; }
+        private void CloseButton_Event(object sender, ExecutedRoutedEventArgs e) { CancelClickEvent?.Invoke(e); Close(); e.Handled = true; }
         private void ConfirmButton_Event(object sender, ExecutedRoutedEventArgs e) { ConfirmClickEvent?.Invoke(sender, e); e.Handled = true; }
         private void OtherButton_Event(object sender, ExecutedRoutedEventArgs e)
         {

@@ -231,21 +231,27 @@ namespace InperProtocolStack.TransmissionCtrl
                 if (_CommandCache.TryDequeue(out Command cmd))
                 {
                     tokenSource = new CancellationTokenSource();
-                    _ = _UARTA.SendDataUsb(cmd.GetBytes(), 1);
-                    await TaskExecute(tokenSource.Token, cmd.GetBytes());
+                    List<byte> vs = cmd.GetBytes();
+                    if (vs.Count == 64)
+                    {
+                        vs = cmd.GetBytes();
+                        vs.Add(0);
+                    }
+                    _ = _UARTA.SendDataUsb(vs, 1);
+                    await TaskExecute(tokenSource.Token, vs);
                 }
                 Interlocked.Exchange(ref _pLock, 0);
                 if (_CommandCache.Count > 0)
                 {
-                    Task.Run(() => { TransmittingProcess(); });
+                    _ = Task.Run(() => { TransmittingProcess(); });
                 }
             }
         }
 
- 
+
         private void Confirm(uint sequence, uint intent)
         {
-            if (intent==255)
+            if (intent == 255)
             {
                 tokenSource.Cancel();
             }

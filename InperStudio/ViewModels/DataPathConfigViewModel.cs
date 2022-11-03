@@ -135,6 +135,12 @@ namespace InperStudio.ViewModels
                             Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
                         }
                     }
+                    else
+                    {
+                        InperGlobalClass.DataFolderName = newName;
+                        Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    }
+
                 }
                 RequestClose();
             }

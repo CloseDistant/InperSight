@@ -54,7 +54,7 @@
   },
   "cameraSignalSettings": {
     "exposure": 10,
-    "sampling": 60,
+    "sampling": 40,
     "brightness": 4,
     "recordMode": {
       "isContinuous": true,
@@ -71,5 +71,14 @@
     "channels": [],
     "marker": null,
     "output": null
+  },
+  "stimulusSettings": {
+    "dioID": -1,
+    "isConfigSweep": false,
+    "hour": 0,
+    "minute": 0,
+    "seconds": 0,
+    "waveforms": [],
+    "sweeps": []
   }
 }

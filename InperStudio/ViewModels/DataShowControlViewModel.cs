@@ -38,9 +38,9 @@ namespace InperStudio.ViewModels
         public EventChannelChart EventChannelChart { get => eventChannel; set => SetAndNotify(ref eventChannel, value); }
         public List<string> TextLableFormatting { get; set; } = new List<string>();
         public static string TextFormat = "hh:mm:ss";
-        private double visibleValue = 10;
         private ConcurrentQueue<HotKeysListen> _hotKeysListens = new ConcurrentQueue<HotKeysListen>();
 
+        private double visibleValue = 10;
         public double VisibleValue
         {
             get => visibleValue;

@@ -201,10 +201,13 @@ namespace InperStudio.ViewModels
                     if (!rx.IsMatch(com.Text))
                     {
                         com.Text = Math.Floor(double.Parse(com.Text)).ToString();
-                        return;
+                        return; 
                     }
                     this.view.Exposure.Text = Expourse = com.Text;
                     _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(com.Text));
+
+                    InperDeviceHelper.Instance.device.SendExposure((uint)InperGlobalClass.CameraSignalSettings.Exposure);
+
                     InperGlobalClass.CameraSignalSettings.Exposure = double.Parse(com.Text);
                     if (InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.Sampling * (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count) > 1000)
                     {
@@ -236,9 +239,9 @@ namespace InperStudio.ViewModels
                         com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         return;
                     }
-                    if (double.Parse(com.Text) > 330 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count))
+                    if (double.Parse(com.Text) > 300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count))
                     {
-                        Growl.Warning("不能大于 " + (330 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count)), "SuccessMsg");
+                        Growl.Warning("不能大于 " + (300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count)), "SuccessMsg");
                         com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         return;
                     }

@@ -1,4 +1,5 @@
 ﻿using InperProtocolStack;
+using InperProtocolStack.CmdPhotometry;
 using System;
 using System.Collections.Generic;
 
@@ -164,7 +165,22 @@ namespace InperDeviceManagement
         {
             _CS.SetLightPower(light_id, power_in_percent / 100);
         }
-
+        public void SendExposure(uint exposure)
+        {
+            _CS.SendExposure(exposure);
+        }
+        public void SetGBLWF(List<WaverformStruct> waverforms)
+        {
+            _CS.SetGBLWF(waverforms);
+        }
+        public void SetSweepState(int state)
+        {
+            _CS.SetSweepState(state);
+        }
+        public void SetCHNSweep(List<byte> datas)
+        {
+            _CS.SetCHNSweep(datas);
+        }
         public void SetBindDio(List<byte> lights)
         {
             _CS.SetBindDio(lights);

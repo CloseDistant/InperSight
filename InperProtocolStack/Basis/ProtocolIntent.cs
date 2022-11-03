@@ -25,6 +25,9 @@
         ///Functional Intent///
         public const byte INTENT_START = 0x40;
         public const byte INTENT_STOP = 0x41;
+        public const byte INTENT_SET_GBL_WF = 0x50;
+        public const byte INTENT_SET_CHN_SWEEP = 0x51;
+        public const byte INTENT_SET_SWEEP_STATE = 0x52;
         public const byte INTENT_MEASURE_MODE = 0x10;
         public const byte INTENT_LIGHT_HOLD_ON = 0x11;
         public const byte INTENT_INQ_INFO = 0x12;
@@ -32,6 +35,7 @@
         public const byte INTENT_INQ_RUN_STATUS = 0x14;
         public const byte INTENT_RETURN_RUN_STATUS = 0x15;
         public const byte INTENT_SET_BIND_DIO = 0x16;
+        public const byte INTENT_SET_EXPOURSE = 0x19;
         public const byte INTENT_SET_FRAME_RATE = 0x20;
         public const byte INTENT_SWITCH_LIGHT_MODE = 0x21;
         public const byte INTENT_SET_LIGHT_PWR = 0x22;

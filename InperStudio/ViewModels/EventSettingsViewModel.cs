@@ -2,6 +2,7 @@
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
@@ -67,15 +68,18 @@ namespace InperStudio.ViewModels
                 {
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
-                        markerChannels.Add(new EventChannel()
+                        if ((int)item.Value != StimulusBeans.Instance.DioID || !StimulusBeans.Instance.IsConfigSweep)
                         {
-                            IsActive = false,
-                            ChannelId = (int)item.Value,
-                            SymbolName = item.Key.ToString(),
-                            Name = item.Key.ToString(),
-                            BgColor = InperColorHelper.ColorPresetList[(int)item.Value],
-                            Type = ChannelTypeEnum.DIO.ToString()
-                        });
+                            markerChannels.Add(new EventChannel()
+                            {
+                                IsActive = false,
+                                ChannelId = (int)item.Value,
+                                SymbolName = item.Key.ToString(),
+                                Name = item.Key.ToString(),
+                                BgColor = InperColorHelper.ColorPresetList[(int)item.Value],
+                                Type = ChannelTypeEnum.DIO.ToString()
+                            });
+                        }
                     }
 
                     foreach (Channel item in InperGlobalClass.CameraSignalSettings.CameraChannels)
@@ -157,31 +161,31 @@ namespace InperStudio.ViewModels
                         BgColor = InperColorHelper.ColorPresetList[0],
                         Type = ChannelTypeEnum.Manual.ToString()
                     });
-                    if (InperDeviceHelper.Instance.device.PhotometryInfo.IsOutput)
-                    {
-                        InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
-                        {
-                            ConditionsChannels.Add(new EventChannel()
-                            {
-                                IsActive = false,
-                                ChannelId = x.GroupId,
-                                SymbolName = x.WaveType.Split(' ').First(),
-                                Name = x.WaveType.Split(' ').First(),
-                                BgColor = InperColorHelper.ColorPresetList[0],
-                                Type = ChannelTypeEnum.Light.ToString()
-                            });
-                        });
+                    //if (InperDeviceHelper.Instance.device.PhotometryInfo.IsOutput)
+                    //{
+                    //    InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
+                    //    {
+                    //        ConditionsChannels.Add(new EventChannel()
+                    //        {
+                    //            IsActive = false,
+                    //            ChannelId = x.GroupId,
+                    //            SymbolName = x.WaveType.Split(' ').First(),
+                    //            Name = x.WaveType.Split(' ').First(),
+                    //            BgColor = InperColorHelper.ColorPresetList[0],
+                    //            Type = ChannelTypeEnum.Light.ToString()
+                    //        });
+                    //    });
 
-                        ConditionsChannels.Add(new EventChannel()
-                        {
-                            IsActive = false,
-                            ChannelId = InperDeviceHelper.Instance.device.PhotometryInfo.OutputId,
-                            SymbolName = "After-excitation",
-                            Name = "After-excitation",
-                            BgColor = InperColorHelper.ColorPresetList[0],
-                            Type = ChannelTypeEnum.AfterExcitation.ToString()
-                        });
-                    }
+                    //    ConditionsChannels.Add(new EventChannel()
+                    //    {
+                    //        IsActive = false,
+                    //        ChannelId = InperDeviceHelper.Instance.device.PhotometryInfo.OutputId,
+                    //        SymbolName = "After-excitation",
+                    //        Name = "After-excitation",
+                    //        BgColor = InperColorHelper.ColorPresetList[0],
+                    //        Type = ChannelTypeEnum.AfterExcitation.ToString()
+                    //    });
+                    //}
                 }
                 //配置文件匹配  并设置当前可用通道
                 foreach (EventChannelJson item in InperGlobalClass.EventSettings.Channels)

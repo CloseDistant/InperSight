@@ -1,5 +1,7 @@
 ﻿using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Views;
+using SciChart.Charting.Model.DataSeries;
+using SciChart.Data.Model;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -20,17 +22,35 @@ namespace InperStudio.ViewModels
             get => waveForms;
             set => SetAndNotify(ref waveForms, value);
         }
+        private TimeSpanRange xRange = new TimeSpanRange(new TimeSpan(0), new TimeSpan(0, 0, 10));
+        public TimeSpanRange XRange { get => xRange; set => SetAndNotify(ref xRange, value); }
+        private XyDataSeries<TimeSpan, double> xyDataSeries = new XyDataSeries<TimeSpan, double>();
+        public XyDataSeries<TimeSpan, double> XyDataSeries
+        {
+            get => xyDataSeries;
+            set => SetAndNotify(ref xyDataSeries, value);
+        }
         SweepSettingView view;
         Sweep sweep = new Sweep();
 
         public SweepSettingViewModel()
         {
+            WaveForms.ToList().ForEach(w =>
+            {
+                w.IsChecked = false;
+            });
         }
         bool isExist = false;
         public SweepSettingViewModel(Sweep _sweep)
         {
             sweep = _sweep;
             isExist = true;
+
+            var select = sweep.WaveForm.Split(',').ToList();
+            WaveForms.ToList().ForEach(w =>
+            {
+                w.IsChecked = select.Contains(w.Index.ToString()) ? true : false;
+            });
         }
         protected override void OnViewLoaded()
         {
@@ -52,27 +72,69 @@ namespace InperStudio.ViewModels
                 {
                     if (sweep.Duration <= 0 || string.IsNullOrEmpty(sweep.WaveForm))
                     {
-                        this.view.remainder.Text = "值不能为空";
-                        this.view.remainder.Visibility = System.Windows.Visibility.Visible;
+                        view.remainder.Text = "The value cannot be empty";
+                        view.remainder.Visibility = Visibility.Visible;
                         return;
                     }
-                    sweep.Index = StimulusBeans.Instance.Sweeps.Count + 1;
+                    if (StimulusBeans.Instance.Sweeps.Count > 0)
+                    {
+                        sweep.Index = StimulusBeans.Instance.Sweeps.OrderBy(x => x.Index).Last().Index + 1;
+                    }
+                    else
+                    {
+                        sweep.Index = 1;
+                    }
                 }
-                StimulusBeans.Instance.Sweeps.Add(sweep);
+                if (!string.IsNullOrEmpty(sweep.WaveForm))
+                {
+                    StimulusBeans.Instance.Sweeps.Insert(sweep.Index - 1, sweep);
+                }
                 this.RequestClose();
             };
+            view.selected.TextChanged += (s, e) =>
+            {
+                if (!string.IsNullOrEmpty(view.selected.Text.Trim()))
+                {
+                    List<WaveForm> drawWaveForms = new List<WaveForm>();
+
+                    foreach (var item in view.selected.Text.Split(','))
+                    {
+                        if (WaveForms.ToList().FirstOrDefault(x => x.Index == int.Parse(item)) is WaveForm waveForm)
+                        {
+                            drawWaveForms.Add(waveForm);
+                        }
+                    }
+
+                    if (double.TryParse(view.duration.Text, out double res))
+                    {
+                        if (res > 0)
+                        {
+                            XyDataSeries.Clear();
+                            XyDataSeries = StimulusBeans.Instance.GetXyDataSeries(drawWaveForms, res);
+                            view.scichart.ZoomExtents();
+                        }
+                    }
+                }
+                else
+                {
+                    xyDataSeries.Clear();
+                }
+            };
+
         }
         public void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             try
             {
                 var wf = (sender as CheckBox).DataContext as WaveForm;
-                this.view.selected.Text += ',' + wf.Index.ToString();
-                if (view.selected.Text.StartsWith(","))
+                wf.IsChecked = true;
+                string str = this.view.selected.Text + "," + wf.Index.ToString();
+                if (str.StartsWith(","))
                 {
-                    view.selected.Text = view.selected.Text.Substring(1);
+                    str = str.Substring(1);
                 }
-                sweep.WaveForm = view.selected.Text;
+                sweep.WaveForm = str;
+                view.selected.Text = str;
             }
             catch (Exception ex)
             {
@@ -85,18 +147,20 @@ namespace InperStudio.ViewModels
             try
             {
                 var wf = (sender as CheckBox).DataContext as WaveForm;
-
+                wf.IsChecked = false;
                 var res = this.view.selected.Text.Split(',').ToList();
                 if (res.Contains(wf.Index.ToString()))
                 {
                     res.Remove(wf.Index.ToString());
                     view.selected.Text = string.Empty;
+                    string str = string.Empty;
                     res.ForEach(x =>
                     {
-                        view.selected.Text += x + ',';
+                        str += x + ',';
                     });
-                    view.selected.Text = res.Count == 0 ? "" : view.selected.Text.Substring(0, view.selected.Text.Length - 1);
-                    sweep.WaveForm = view.selected.Text;
+                    str = res.Count == 0 ? "" : str.Substring(0, str.Length - 1);
+                    sweep.WaveForm = str;
+                    view.selected.Text = str;
                 }
             }
             catch (Exception ex)
@@ -114,17 +178,20 @@ namespace InperStudio.ViewModels
                     if (res > 0)
                     {
                         sweep.Duration = res;
+                        XyDataSeries.Clear();
+                        XyDataSeries = StimulusBeans.Instance.GetXyDataSeries(WaveForms.ToList().FindAll(x => x.IsChecked), res);
+                        view.scichart.ZoomExtents();
                         this.view.remainder.Visibility = Visibility.Collapsed;
                     }
                     else
                     {
-                        this.view.remainder.Text = "无效的值";
+                        this.view.remainder.Text = "The value input is not valid";
                         this.view.remainder.Visibility = Visibility.Visible;
                     }
                 }
                 else
                 {
-                    this.view.remainder.Text = "无效的值";
+                    this.view.remainder.Text = "The value input is not valid";
                     this.view.remainder.Visibility = Visibility.Visible;
                 }
             }
