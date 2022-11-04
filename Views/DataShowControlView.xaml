@@ -1,0 +1,223 @@
+﻿<UserControl x:Class="InperSight.Views.DataShowControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:local="clr-namespace:InperSight.Views"
+             xmlns:global="clr-namespace:InperSight.Lib.Bean"
+             xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
+             xmlns:sc="http://schemas.abtsoftware.co.uk/scichart"
+             xmlns:convert="clr-namespace:InperSight.Lib.Convert"
+             xmlns:vm="clr-namespace:InperSight.ViewModels"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:chart="clr-namespace:InperSight.Lib.Chart"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataShowControlViewModel}">
+    <UserControl.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+        <convert:ChannelNameSplitConverter x:Key="ChannelNameSplitConverter" />
+        <Style x:Key="LeftAxisLabelStyle" TargetType="sc:DefaultTickLabel">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Width="50" TextAlignment="Right" Text="{Binding Text}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="sc:SciChartScrollbar">
+            <Setter Property="GripsThickness" Value="10"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <!-- Define style for resizing grips -->
+            <Setter Property="GripsStyle">
+                <Setter.Value>
+                    <Style TargetType="Control">
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Control">
+                                    <Border BorderThickness="1" CornerRadius="3" BorderBrush="{StaticResource InperTheme}" Opacity=".5" Background="#F1F1F1" Height="20">
+                                        <!--<Line Stroke="Black" X1="0" Y1="0" X2="0" Y2="1" Stretch="Fill" StrokeThickness="2"/>-->
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <!-- Define style for viewport area -->
+            <Setter Property="ViewportStyle">
+                <Setter.Value>
+                    <Style TargetType="Control">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Control">
+                                    <Border BorderThickness="0" BorderBrush="Black" Background="LightSlateGray" Opacity=".8"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <!-- Define style for non selected area -->
+            <Setter Property="NonSelectedAreaStyle">
+                <Setter.Value>
+                    <Style TargetType="Path">
+                        <Setter Property="Fill" Value="Transparent"/>
+                        <Setter Property="IsEnabled" Value="False"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate x:Key="ListDataTemplate">
+            <Grid x:Name="chartItem" Background="Transparent" Margin="0 -1" Height="{Binding Height,UpdateSourceTrigger=PropertyChanged}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 0 0 1" />
+                <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
+                    <TextBlock MaxHeight="30" x:Name="test"  TextTrimming="CharacterEllipsis" Margin="2 5" TextAlignment="Center" Text="{Binding Name,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource ChannelNameSplitConverter}}"  HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="100"  >
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                        <TextBlock.ToolTip>
+                            <TextBlock Text="{Binding Name}"/>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                </Border>
+                <Grid Grid.Column="1">
+                    <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Button Command="{s:Action YaxisAdd}" CommandParameter="{Binding DataContext,RelativeSource={RelativeSource Mode=Self}}" Margin="0 0 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
+                            <!--<Image Source="/Lib/Images/New/add.png"  Stretch="UniformToFill"/>-->
+                        </Button>
+                        <Button  Click="{s:Action YaxisNormal}" Margin="0 15 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20"  HorizontalAlignment="Center">
+                            <!--<Path Fill="#1875F0" Stretch="Uniform" Data="M0,91.67h25v25h16.67V75H0V91.67z M25,25H0v16.67h41.67V0H25C25,0,25,25,25,25z M75,116.67h16.67v-25h25V75H75  V116.67z M91.67,25V0H75v41.67h41.67V25H91.67z"/>-->
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="M0,91.67h25v25h16.67V75H0V91.67z M25,25H0v16.67h41.67V0H25C25,0,25,25,25,25z M75,116.67h16.67v-25h25V75H75  V116.67z M91.67,25V0H75v41.67h41.67V25H91.67z"/>
+                            <!--<Image Source="/Lib/Images/New/zoom.png"  Stretch="UniformToFill"/>-->
+                        </Button>
+                        <Button Command="{s:Action YaxisReduce}" CommandParameter="{Binding DataContext,RelativeSource={RelativeSource Mode=Self}}" Margin="0 15" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
+                            <!--<Image Source="/Lib/Images/New/reduce.png"  Stretch="UniformToFill"/>-->
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="2">
+                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}" RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
+                        <sc:SciChartSurface.YAxes>
+                            <sc:NumericAxis TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="0" Grid.Column="0" Width="60" 
+                                DrawMajorGridLines="False"
+                                DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="Always" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        </sc:SciChartSurface.YAxes>
+                    </sc:SciChartSurface>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <ScrollViewer Name="dataScroll">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <ListBox x:Name="dataList" Margin="-3 0 0 -3" ItemsSource="{Binding ChartDatas}" hc:ScrollViewerAttach.AutoHide="False"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="False" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
+                     ItemTemplate="{StaticResource ListDataTemplate}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="1" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="1" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=IsExistEvent,Converter={StaticResource boolToVisibilityPositive}}">
+            <Grid x:Name="fixedBottom" MouseDown="{s:Action Grid_MouseDown}"  Background="Transparent" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.ColumnSpan="3"  BorderBrush="Gray" Opacity="1" BorderThickness="0 1 0 1"/>
+                <Border Grid.Column="0" BorderBrush="Gray"  BorderThickness="0 0 1 0">
+                    <TextBlock TextWrapping="Wrap" Text="Event"  hc:TextBlockAttach.AutoTooltip="True"  TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Margin="3 0" VerticalAlignment="Center">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Border>
+                <Grid Grid.Column="1">
+                    <Border BorderBrush="Gray"  BorderThickness="0 0 1 0" />
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 20">
+                        <Button  Margin="0 10 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
+                        </Button>
+                        <Button  Margin="0 10 0 0" Style="{StaticResource InperFreeButton}" Width="20" Height="20" HorizontalAlignment="Center" >
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="M0,91.67h25v25h16.67V75H0V91.67z M25,25H0v16.67h41.67V0H25C25,0,25,25,25,25z M75,116.67h16.67v-25h25V75H75  V116.67z M91.67,25V0H75v41.67h41.67V25H91.67z"/>
+                        </Button>
+                        <Button  Margin="0 10" Style="{StaticResource InperFreeButton}" Width="20" Height="20" >
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="2">
+                    <sc:SciChartSurface Background="Transparent" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" x:Name="scichartbottom" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}"  RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding EventTimeSpanAxis,UpdateSourceTrigger=PropertyChanged}"  Annotations="{sc:AnnotationsBinding Annotations,UpdateSourceTrigger=PropertyChanged}" >
+                        <sc:SciChartSurface.YAxis>
+                            <sc:NumericAxis DrawMajorBands="False"   TickLabelStyle="{StaticResource LeftAxisLabelStyle}"
+                                    DrawMajorGridLines="False" TextFormatting="#0.000"
+                                    DrawMinorGridLines="False" MaxAutoTicks="6" BorderThickness="0 0 1 0" BorderBrush="Gray"  HorizontalContentAlignment="Right" AxisAlignment="Left" AutoRange="Never" VisibleRangeChanged="{s:Action NumericAxis_VisibleRangeChanged}" VisibleRange="-1,2"/>
+                        </sc:SciChartSurface.YAxis>
+                    </sc:SciChartSurface>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Border Grid.Row="2" BorderThickness="0 1 0 1" BorderBrush="{StaticResource InperBorderColor}" >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="139"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <UniformGrid Rows="2" Grid.Column="0" Panel.ZIndex="999" Background="{StaticResource InperDialogContentColor}">
+                    <ComboBox Height="24" Width="100" MinHeight="24" Padding="3 0" FontSize="12" SelectionChanged="{s:Action TextFormat_SelectionChanged}" ItemsSource="{Binding TextLableFormatting}" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 7">
+                        <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Add">
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
+                        </Button>
+                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperTextType="Double" InperMinValue="1" InperMaxValue="9999" InperVerify="True" Width="45" Height="25" MinHeight="25" Margin="5 0" Padding="0" HorizontalContentAlignment="Center" Text="{Binding VisibleValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                        <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Reduce">
+                            <Path Fill="#1875F0" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
+                        </Button>
+                    </WrapPanel>
+                </UniformGrid>
+                <UniformGrid Rows="2" Grid.Column="1" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" >
+                    <Border BorderThickness="1 0 0 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{StaticResource InperBorderColor}">
+                        <sc:SciChartSurface Name="timesAxisSci" Margin="0 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
+                            <sc:SciChartSurface.YAxis>
+                                <sc:NumericAxis DrawMajorBands="False"  
+                                    DrawMajorGridLines="False"   TextFormatting="#0.000"
+                                    DrawMinorGridLines="False"  AxisAlignment="Left" Visibility="Collapsed"/>
+                            </sc:SciChartSurface.YAxis>
+                        </sc:SciChartSurface>
+                    </Border>
+                    <Border BorderThickness="1 0 0 0" BorderBrush="{StaticResource InperBorderColor}">
+                        <!-- -->
+                        <sc:SciChartScrollbar SelectedRangeChanged="{s:Action SciScroll_SelectedRangeChanged}" Name="sciScroll" MouseDoubleClick="{s:Action SciScroll_MouseDoubleClick}" Grid.Column="1" Height="20" Background="#33000000" Margin="6 0 " IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsAllowDragScroll,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+                </UniformGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

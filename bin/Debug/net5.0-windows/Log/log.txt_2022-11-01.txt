@@ -1,0 +1,292 @@
+2022-11-01 11:18:46,285 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:18:46,291 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:19:05,348 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:19:05,353 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:26:12,742 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:26:12,749 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:27:04,792 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:27:04,799 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:27:32,287 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:27:32,292 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:28:45,659 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:28:45,666 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:30:06,688 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:30:06,699 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:32:25,075 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:32:25,081 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:33:23,242 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:33:23,249 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:34:24,982 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:34:24,989 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:35:54,138 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:35:54,144 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 11:36:29,059 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 11:36:29,067 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 14:14:13,585 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 14:14:13,591 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 14:16:51,097 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 14:16:51,102 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 14:20:46,489 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 14:20:46,496 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 15:38:22,669 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 15:38:22,676 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 16:10:05,853 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 16:10:05,860 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 16:11:05,248 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 16:11:05,255 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 16:19:46,501 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 16:19:46,507 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 16:31:08,870 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 16:31:08,876 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 16:37:59,805 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 16:37:59,812 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 16:43:20,488 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 16:43:20,494 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 17:19:24,488 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 17:19:24,494 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 17:20:22,151 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 17:20:22,158 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 17:24:06,027 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 17:24:06,033 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 17:24:21,023 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,061 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,098 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,135 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,172 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,212 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,270 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,306 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,845 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:21,881 [1] ERROR InfoLogger - System.ArgumentException: Destination array is not long enough to copy all the items in the collection. Check array index and length. (Parameter 'value')
+   at System.BitConverter.ToInt64(Byte[] value, Int32 startIndex)
+   at System.BitConverter.ToUInt64(Byte[] value, Int32 startIndex)
+   at InperSight.Lib.Helper.InperDeviceHelper.SendCommand(Byte[] packet) in C:\张金宽\InperSight\Lib\Helper\InperDeviceHelper.cs:line 162
+2022-11-01 17:24:35,594 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 17:24:35,601 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 17:38:42,800 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 17:38:42,805 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 17:39:32,796 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 17:39:32,801 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 18:25:41,553 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 18:25:41,560 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 18:30:10,129 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 18:30:10,135 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 18:35:14,925 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 18:35:14,931 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 18:35:52,962 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 18:35:52,969 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 18:37:23,280 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 18:37:23,288 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 18:40:22,948 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 18:40:22,957 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:13:41,495 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:13:41,501 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:14:13,409 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:14:13,415 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:15:04,771 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:15:04,780 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:16:48,711 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:16:48,717 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:33:11,713 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:33:11,718 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:35:51,412 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:35:51,418 [1] INFO  InfoLogger - pid=00f8
+2022-11-01 19:36:26,082 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:36:26,090 [1] INFO  InfoLogger - pid=00f8
+2022-11-01 19:39:06,584 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:39:06,591 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:39:38,538 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:39:38,544 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:40:08,406 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:40:08,414 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:40:54,498 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:40:54,505 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:41:23,542 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:41:23,549 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:42:00,532 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:42:00,539 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:42:38,222 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:42:38,228 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:43:17,297 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:43:17,305 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 19:44:45,014 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 19:44:45,019 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:13:45,500 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:13:45,508 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:14:39,128 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:14:39,134 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:16:49,324 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:16:49,331 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:17:58,706 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:17:58,712 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:31:14,418 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:31:14,426 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:32:08,689 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:32:08,695 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:34:48,655 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:34:48,664 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:35:46,100 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:46,124 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:47,072 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:47,098 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:47,331 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:47,356 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:47,590 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:47,615 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:48,362 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:48,620 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:35:48,844 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:46:37,428 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:46:37,434 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:46:56,888 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:00,022 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:01,726 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:04,818 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:06,182 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:07,532 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:08,623 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:13,265 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:14,226 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:28,273 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:47:39,818 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:48:43,679 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:48:48,163 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:49:16,244 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:49:57,214 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:49:57,221 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:50:20,390 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:50:28,143 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:51:21,679 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:51:21,686 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:51:56,527 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:52:33,880 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:57:26,047 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 21:57:26,053 [1] INFO  InfoLogger - pid=00f9
+2022-11-01 21:57:50,892 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:57:56,237 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 21:57:57,452 [1] ERROR InfoLogger - System.FormatException: Input string was not in a correct format.
+   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Double.Parse(String s)
+   at InperSight.ViewModels.CameraSettingViewModel.TextBox_TextChanged(Object sender, TextChangedEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 628
+2022-11-01 22:10:20,812 [1] INFO  InfoLogger - vid=04b4
+2022-11-01 22:10:20,820 [1] INFO  InfoLogger - pid=00f9

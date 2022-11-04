@@ -1,0 +1,10 @@
+{
+  "CameraSetting": {
+    "FPS": 30,
+    "Gain": 0,
+    "FocusPlane": 0,
+    "UpperLevel": 0,
+    "LowerLevel": 0,
+    "cameraChannels": []
+  }
+}

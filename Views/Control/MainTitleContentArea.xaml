@@ -1,0 +1,82 @@
+﻿<Border x:Class="InperSight.Views.Control.MainTitleContentArea"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:InperSight.Views.Control"
+             xmlns:global="clr-namespace:InperSight.Lib.Bean"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d">
+    <Border.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+    </Border.Resources>
+    <Grid HorizontalAlignment="Stretch"  >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Menu Margin="0 -5 0 0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center">
+            <MenuItem Header="Inper Sight" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" Padding="10 8" FontSize="13">
+                <MenuItem  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Header="Import Config" Foreground="#333333"  FontSize="12" FontFamily="Arial" Width="180" Name="ImportConfig" Click="ImportConfig_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/import config.png" SnapsToDevicePixels="True" Width="14" Height="14" Stretch="Fill"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <!--<MenuItem Header="Save Config" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Name="SaveConfig" Click="SaveConfig_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/save config.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>-->
+                <MenuItem BorderThickness="0 0 0 1" BorderBrush="#E6E6E6"  FontFamily="Arial" Header="Save Config As" Name="SaveConfigAs" Click="SaveConfigAs_Click"  Foreground="#333333" FontSize="12" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/save config as.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Feedback" Foreground="#333333"  Command="hc:ControlCommands.OpenLink" CommandParameter="mailto:support@inper.com" FontSize="12" FontFamily="Arial" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/feedback.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Web"  Command="hc:ControlCommands.OpenLink" CommandParameter="https://www.inper.com" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/web.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="About Inper Signal" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Click="About_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/about.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <hc:SimplePanel Grid.Column="1"  MouseDown="Border_MouseDown" Name="move1"/>
+        <Button Grid.Column="2" Cursor="Hand" x:Name="DataFolderName" Click="DataFolderName_Click" IsEnabled="{Binding InperGlobalClass.IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Button.Template>
+                <ControlTemplate>
+                    <WrapPanel VerticalAlignment="Center">
+                        <Image Source="/Lib/Images/文件.png" Width="15" Height="15" Stretch="UniformToFill" VerticalAlignment="Center" Margin="0 0 5 0" />
+                        <TextBlock x:Name="dic_name" Foreground="White" FontSize="13" Text="{Binding InperGlobalClass.DataFolderName,UpdateSourceTrigger=PropertyChanged}" hc:TextBlockAttach.AutoTooltip="True" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </WrapPanel>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <hc:SimplePanel Grid.Column="3"  MouseDown="Border_MouseDown" Name="move2"/>
+        <Button Grid.Column="4" Name="skin" Style="{StaticResource InperFreeButton}" Click="Skin_Click"  Margin="0 0 10 0" Width="16" Height="16" VerticalAlignment="Center">
+            <Image Source="/Lib/Images/skin.png" Stretch="Fill" />
+        </Button>
+        <Popup AllowsTransparency="True" Grid.Column="1" PlacementTarget="{Binding ElementName=skin}" HorizontalOffset="-80" Name="PopupConfig" VerticalOffset="15" StaysOpen="False">
+            <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="4" Margin="16" Effect="{StaticResource EffectShadow3}">
+                <ListBox x:Name="SkinList" SelectionChanged="SkinList_SelectionChanged"  Background="Transparent" BorderThickness="0" Margin="10" HorizontalAlignment="Stretch" Width="210"  Style="{StaticResource WrapPanelHorizontalListBox}" ItemsSource="{Binding SkinColorList,UpdateSourceTrigger=PropertyChanged}" >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Label Height="30" Width="30" Margin="2 5" Background="{Binding}" Cursor="Hand"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Popup>
+    </Grid>
+</Border>
