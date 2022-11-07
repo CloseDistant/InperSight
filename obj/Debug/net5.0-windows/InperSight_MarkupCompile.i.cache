@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\张金宽\InperSight\obj\Debug\net5.0-windows\
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\
 InperSight
 none
 false
 TRACE;DEBUG;NET;NET5_0;NETCOREAPP
-C:\张金宽\InperSight\App.xaml
+C:\Users\10252\source\repos\InperSight\App.xaml
 6869087844
 
 30-501388828
-234-1325512180
+234-1358237237
 Views\CameraSettingView.xaml;Views\Control\MainTitleContentArea.xaml;Views\DataShowControlView.xaml;Views\MainWindowView.xaml;Views\ManulControlView.xaml;Views\StartPageView.xaml;
 
-False
+True
 

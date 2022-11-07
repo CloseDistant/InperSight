@@ -80,7 +80,7 @@ namespace InperSight.Lib.Helper
             {
 
                 Mat mat = new();
-                Cv2.ConvertScaleAbs(e.Context.MatFrame.Clone(), mat, InperGlobalClass.CameraSettingJsonBean.UpperLevel , InperGlobalClass.CameraSettingJsonBean.LowerLevel );
+                Cv2.ConvertScaleAbs(e.Context.MatFrame.FrameMat.Clone(), mat, InperGlobalClass.CameraSettingJsonBean.UpperLevel , InperGlobalClass.CameraSettingJsonBean.LowerLevel );
                 if (isSwitchToFrame)
                 {
                     OpenCvSharp.Rect rect = new OpenCvSharp.Rect((int)frameLeft, (int)frameTop, (int)frameWidth, (int)frameHeight);
@@ -102,7 +102,7 @@ namespace InperSight.Lib.Helper
                 using (var bitmap = new Bitmap(stream))
                 {
                     var hBitmap = bitmap.GetHbitmap();
-                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, 111Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                     DeleteObject(hBitmap);
                 }
                 return source;

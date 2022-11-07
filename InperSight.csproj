@@ -45,13 +45,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Users\刘小刀\source\repos\InperCameraDShow\InperCameraDShow.csproj" />
-    <ProjectReference Include="..\InperStudio2.0\InperStudioControlLib\InperStudioControlLib.csproj" />
+    <ProjectReference Include="..\InperCameraDShow\InperCameraDShow\InperCameraDShow.csproj" />
+    <ProjectReference Include="..\InperStudio2.0\InperStudio2.0\InperStudioControlLib\InperStudioControlLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Windows.Forms">
-      <HintPath>..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.Windows.Forms.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.Windows.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
 

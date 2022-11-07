@@ -1,9 +1,9 @@
 ### GPU Capability Test ###
    Is BGRA feature required: TRUE
 
-Examining Graphics Adapter: NVIDIA GeForce GT 730
-   VRAM: 2007Mb
-   DeviceId: 4743
+Examining Graphics Adapter: NVIDIA GeForce RTX 3070
+   VRAM: 8043Mb
+   DeviceId: 9352
 
    Visual Xccelerator Engine Direct3D9 Compatibility
       Determines whether the adapter is blacklisted due to its unstable work... FALSE
@@ -13,21 +13,7 @@ Examining Graphics Adapter: NVIDIA GeForce GT 730
       Trying to create Direct3D9Ex Device (WPF Compatibility)... SUCCESS
       Trying to create Direct3D11 Device... SUCCESS
 
-   Rank: 3002007 Points
-
-Examining Graphics Adapter: Intel(R) UHD Graphics 630
-   VRAM: 128Mb
-   DeviceId: 39877
-
-   Visual Xccelerator Engine Direct3D9 Compatibility
-      Determines whether the adapter is blacklisted due to its unstable work... FALSE
-      Trying to create Direct3D9 Device... SUCCESS
-
-   Visual Xccelerator Engine Direct3D11 Compatibility
-      Trying to create Direct3D9Ex Device (WPF Compatibility)... SUCCESS
-      Trying to create Direct3D11 Device... SUCCESS
-
-   Rank: 3000128 Points
+   Rank: 3008043 Points
 
 Examining Graphics Adapter: Microsoft Basic Render Driver
    VRAM: 0Mb
@@ -43,7 +29,7 @@ Examining Graphics Adapter: Microsoft Basic Render Driver
 
    Rank: 2000000 Points
 
-Selected Graphics Adapter, where DeviceId is: 4743
+Selected Graphics Adapter, where DeviceId is: 9352
    Is Direct3D9 Supported: TRUE
    Is Direct3D11 Supported: TRUE
    Is Blacklisted: FALSE
