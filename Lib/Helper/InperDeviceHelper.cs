@@ -4,8 +4,11 @@ using InperSight.Lib.Config;
 using InperVideo.Camera;
 using InperVideo.Interfaces;
 using OpenCvSharp;
+using SciChart.Charting.Model.ChartSeries;
+using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -46,6 +49,7 @@ namespace InperSight.Lib.Helper
             get => _WBMPPreview;
             set => SetAndNotify(ref _WBMPPreview, value);
         }
+        public bool MiniscopeIsStartCaptrue = false;
         public int _CamIndex;
         public double ImageWidth { get; set; }
         public double ImageHeight { get; set; }
@@ -64,9 +68,11 @@ namespace InperSight.Lib.Helper
             _CamIndex = devIndex;
             videoAcquirer = new VideoAcquirerFactory().CreateVideoCapturer(devIndex, cameraParamSet);
             videoAcquirer.MatRtShowCreated += VideoAcquirer_MatRtShowCreated;
+            Task.Factory.StartNew(() => GreyValueShow());
         }
         public void MiniscopeStartCapture()
         {
+            MiniscopeIsStartCaptrue = true;
             videoAcquirer.StartAcq();
             InitDevice();
         }
@@ -74,25 +80,30 @@ namespace InperSight.Lib.Helper
         {
             videoAcquirer.StopAcq();
         }
+        public void MiniscopeFpsReset(int fps)
+        {
+            videoAcquirer.MiniscopeFpsReset(fps);
+        }
+        public void MiniScopeStartRecord(string path)
+        {
+            videoAcquirer.StartRecord(path);
+        }
+        /// <summary>
+        /// 第一次接收时间
+        /// </summary>
+        DateTime? _firstTime;
         private void VideoAcquirer_MatRtShowCreated(object sender, MatRtShowEventArgs e)
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
             {
-
-                Mat mat = new();
-                Cv2.ConvertScaleAbs(e.Context.MatFrame.Clone(), mat, InperGlobalClass.CameraSettingJsonBean.UpperLevel , InperGlobalClass.CameraSettingJsonBean.LowerLevel );
-                if (isSwitchToFrame)
+                if (_firstTime == null)
                 {
-                    OpenCvSharp.Rect rect = new OpenCvSharp.Rect((int)frameLeft, (int)frameTop, (int)frameWidth, (int)frameHeight);
-                    mat = mat[rect];
+                    _firstTime = e.Context.MatFrame.Time;
                 }
-                using (MemoryStream memoryStream = mat.ToMemoryStream(".bmp"))
-                { 
-                    WBMPPreview = ToImageSource(memoryStream);
-                }
-                e.Context.Callback();
-                mat.Dispose();
-            }));
+                _GreyValueDraw.Enqueue(e.Context.MatFrame.Clone());
+            }
+            _GreyValueShowQueue.Enqueue(e.Context.MatFrame.Clone());
+            e.Context.Callback();
         }
         private ImageSource ToImageSource(MemoryStream stream)
         {
@@ -113,6 +124,104 @@ namespace InperSight.Lib.Helper
             }
             return null;
         }
+        #region 渲染存储相关
+        ConcurrentQueue<VideoFrame> _GreyValueShowQueue = new ConcurrentQueue<VideoFrame>();
+        private void GreyValueShow()
+        {
+            try
+            {
+                while (true)
+                {
+                    if (_GreyValueShowQueue.TryDequeue(out VideoFrame _mat))
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            Mat mat = new();
+                            Cv2.ConvertScaleAbs(_mat.FrameMat, mat, InperGlobalClass.CameraSettingJsonBean.UpperLevel, InperGlobalClass.CameraSettingJsonBean.LowerLevel);
+                            if (isSwitchToFrame)
+                            {
+                                OpenCvSharp.Rect rect = new OpenCvSharp.Rect((int)frameLeft, (int)frameTop, (int)frameWidth, (int)frameHeight);
+                                mat = mat[rect];
+                            }
+                            using (MemoryStream memoryStream = mat.ToMemoryStream(".bmp"))
+                            {
+                                WBMPPreview = ToImageSource(memoryStream);
+                            }
+                            mat.Dispose();
+                        }));
+                    }
+                    Thread.Sleep(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+        }
+        ConcurrentQueue<VideoFrame> _GreyValueDraw = new ConcurrentQueue<VideoFrame>();
+        CancellationTokenSource _greyValueToCalculateCancel = new CancellationTokenSource();
+        private void GreyValueToCalculate()
+        {
+            try
+            {
+                while (!_greyValueToCalculateCancel.IsCancellationRequested)
+                {
+                    if (_GreyValueDraw.TryDequeue(out VideoFrame mat))
+                    {
+
+                        Parallel.ForEach(CameraChannels, item =>
+                         {
+                             double r = (double)mat.FrameMat.Mean(item.Mask) / 655.35;
+                             using (item.RenderableSeries.First().DataSeries.SuspendUpdates())
+                             {
+                                 (item.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>).Append(new TimeSpan(mat.Time.Subtract((DateTime)_firstTime).Ticks), r);
+                             }
+                         });
+                    }
+                    Thread.Sleep(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+
+        #region
+        public void Start(bool isRecord)
+        {
+            try
+            {
+                InperGlobalClass.IsPreview = !isRecord;
+                InperGlobalClass.IsRecord = isRecord;
+                InperGlobalClass.IsStop = false;
+
+                _greyValueToCalculateCancel = new CancellationTokenSource();
+                Task.Run(() => GreyValueToCalculate(), _greyValueToCalculateCancel.Token);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.ToString());
+            }
+        }
+        public void Stop()
+        {
+            try
+            {
+                InperGlobalClass.IsStop = true;
+                InperGlobalClass.IsPreview = false;
+                InperGlobalClass.IsRecord = false;
+
+                _greyValueToCalculateCancel.Cancel();
+                _firstTime = null;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.ToString());
+            }
+        }
+        #endregion
 
         #region 命令相关
         private void InitDevice()

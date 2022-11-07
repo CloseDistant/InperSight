@@ -1,5 +1,6 @@
 ﻿using InperSight.Lib.Bean;
 using InperSight.Lib.Config;
+using InperSight.Lib.Helper;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -91,10 +92,13 @@ namespace InperSight.ViewModels
                 switch (type)
                 {
                     case "Preview":
+                        InperDeviceHelper.GetInstance().Start(false);
                         break;
                     case "Start":
+                        InperDeviceHelper.GetInstance().Start(true);
                         break;
                     case "Stop":
+                        InperDeviceHelper.GetInstance().Stop();
                         break;
                     default:
                         break;

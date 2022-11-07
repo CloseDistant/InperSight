@@ -158,10 +158,6 @@
                         <ComboBoxItem>25</ComboBoxItem>
                         <ComboBoxItem>30</ComboBoxItem>
                     </ComboBox>
-                    <!--<TextBox Style="{StaticResource TextBox.Small}" TextAlignment="Center" x:Name="fps" Text="{Binding CameraSetting.FPS,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action TextBox_TextChanged}" Width="64" Height="20" Margin="10 0"/>-->
-                    <!--<Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
-                    </Button>-->
                 </WrapPanel>
             </Grid>
             <Grid Margin="10">
@@ -172,13 +168,6 @@
                         <ComboBoxItem>Medium</ComboBoxItem>
                         <ComboBoxItem>High</ComboBoxItem>
                     </ComboBox>
-                    <!--<Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
-                        <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
-                    </Button>
-                    <TextBox Style="{StaticResource TextBox.Small}" x:Name="gain" TextAlignment="Center" Text="{Binding CameraSetting.Gain,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action TextBox_TextChanged}" Width="64" Height="20" Margin="10 0"/>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
-                    </Button>-->
                 </WrapPanel>
             </Grid>
             <Grid Margin="10">
@@ -189,12 +178,11 @@
                             <TextBlock Text="{Binding ElementName=focusPlane,Path=Value}"/>
                         </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="focusPlane">
                         <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                     </Button>
                     <Slider Value="{Binding CameraSetting.FocusPlane,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="focusPlane" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="-127" Maximum="127"/>
-                    <!--<TextBox Style="{StaticResource TextBox.Small}" TextAlignment="Center" x:Name="focusPlane" Text="{Binding CameraSetting.FocusPlane,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action TextBox_TextChanged}" Width="64" Height="20" Margin="10 0"/>-->
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="focusPlane">
                         <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
                     </Button>
                 </WrapPanel>
@@ -207,31 +195,29 @@
                             <TextBlock Text="{Binding ElementName=upperLevel,Path=Value}"/>
                         </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="upperLevel">
                         <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                     </Button>
                     <Slider Value="{Binding CameraSetting.UpperLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="upperLevel" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="10"/>
-                    <!--<TextBox Style="{StaticResource TextBox.Small}" x:Name="upperLevel" TextAlignment="Center" Text="{Binding CameraSetting.UpperLevel,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action TextBox_TextChanged}" Width="64" Height="20" Margin="10 0"/>-->
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="upperLevel">
                         <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
                     </Button>
                 </WrapPanel>
             </Grid>
             <Grid Margin="10">
                 <TextBlock Text="Lower Level" Foreground="#333333" VerticalAlignment="Center"/>
-               
+
                 <WrapPanel HorizontalAlignment="Right">
                     <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=lowerLevel,Path=Value,StringFormat={}{0:f2}}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
                         <TextBlock.ToolTip>
                             <TextBlock Text="{Binding ElementName=lowerLevel,Path=Value}"/>
                         </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="lowerLevel">
                         <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                     </Button>
                     <Slider Value="{Binding CameraSetting.LowerLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="lowerLevel" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
-                    <!--<TextBox Style="{StaticResource TextBox.Small}" x:Name="lowerLevel" TextAlignment="Center" Text="{Binding CameraSetting.LowerLevel,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action TextBox_TextChanged}" Width="64" Height="20" Margin="10 0"/>-->
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="lowerLevel">
                         <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
                     </Button>
                 </WrapPanel>
@@ -248,12 +234,11 @@
                             <TextBlock Text="{Binding ElementName=excitLowerLevel,Path=Value}"/>
                         </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="excitLowerLevel">
                         <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                     </Button>
-                    <Slider Value="{Binding CameraSetting.FocusPlane,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray" x:Name="excitLowerLevel" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
-                    <!--<TextBox Style="{StaticResource TextBox.Small}" TextAlignment="Center" x:Name="excitLowerLevel" Text="{Binding CameraSetting.ExcitLowerLevel,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="{s:Action TextBox_TextChanged}" Width="64" Height="20" Margin="10 0"/>-->
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand">
+                    <Slider Value="{Binding CameraSetting.ExcitLowerLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray" x:Name="excitLowerLevel" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
+                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="excitLowerLevel">
                         <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
                     </Button>
                 </WrapPanel>
