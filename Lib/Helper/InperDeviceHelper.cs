@@ -102,7 +102,7 @@ namespace InperSight.Lib.Helper
                 using (var bitmap = new Bitmap(stream))
                 {
                     var hBitmap = bitmap.GetHbitmap();
-                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, 111Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                     DeleteObject(hBitmap);
                 }
                 return source;
