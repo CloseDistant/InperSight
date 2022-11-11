@@ -50,7 +50,10 @@ namespace InperSight.ViewModels
         protected override void OnViewLoaded()
         {
             base.OnViewLoaded();
-            InperDeviceHelper.GetInstance().MiniscopeStartCapture();
+            if (!InperDeviceHelper.MiniscopeIsStartCaptrue)
+            {
+                InperDeviceHelper.GetInstance().MiniscopeStartCapture();
+            }
 
             view = this.View as CameraSettingView;
             view.ConfirmClickEvent += (s, e) => { RequestClose(); };
@@ -94,7 +97,7 @@ namespace InperSight.ViewModels
                     Canvas.SetTop(currentEllipse, x.Top);
                     view.drawAreaCanvas.Children.Add(currentEllipse);
                     var layer = AdornerLayer.GetAdornerLayer(currentEllipse);
-                    layer.Add(new InperAdorner(currentEllipse, x.ChannelId.ToString(), Brushes.Red, currentEllipse.Width / 2 - 3, currentEllipse.Height / 2 - 6));
+                    layer.Add(new InperAdorner(currentEllipse, x.ChannelId.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color)), currentEllipse.Width / 2 - 3, currentEllipse.Height / 2 - 6));
                     if (InperDeviceHelper.GetInstance().CameraChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId) == null)
                     {
                         _ = AddChannel();
@@ -334,7 +337,8 @@ namespace InperSight.ViewModels
                 {
                     addRoiEventState = false;
                     var layer = AdornerLayer.GetAdornerLayer(currentEllipse);
-                    layer.Add(new InperAdorner(currentEllipse, InperDeviceHelper.GetInstance().CameraChannels.Count.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[InperDeviceHelper.GetInstance().CameraChannels.Count])), currentEllipse.Width / 2 - 3, currentEllipse.Height / 2 - 6));
+                    var color = InperColorHelper.ColorPresetList[InperDeviceHelper.GetInstance().CameraChannels.Count];
+                    layer.Add(new InperAdorner(currentEllipse, InperDeviceHelper.GetInstance().CameraChannels.Count.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)), currentEllipse.Width / 2 - 3, currentEllipse.Height / 2 - 6));
                     #region 通道添加
                     CameraChannel cameraChannel = AddChannel();
                     //配置文件添加
@@ -342,7 +346,7 @@ namespace InperSight.ViewModels
                     {
                         ChannelId = cameraChannel.ChannelId,
                         Name = cameraChannel.Name,
-                        Color = InperColorHelper.ColorPresetList[InperDeviceHelper.CameraChannels.Count],
+                        Color = color,
                         Diameter = currentEllipse.Width,
                         Left = (double)currentEllipse.GetValue(Canvas.LeftProperty),
                         Top = (double)currentEllipse.GetValue(Canvas.TopProperty),
@@ -622,10 +626,6 @@ namespace InperSight.ViewModels
         {
             try
             {
-                if (!(sender as Slider).IsFocused)
-                {
-                    return;
-                }
                 string type = (sender as Slider).Name;
                 switch (type)
                 {
@@ -662,6 +662,7 @@ namespace InperSight.ViewModels
                     case "fps":
                         double value = double.Parse(((sender as ComboBox).SelectedValue as ComboBoxItem).Content.ToString());
                         CameraSetting.FPS = (int)value;
+                        InperDeviceHelper.MiniscopeFpsReset(CameraSetting.FPS);
                         InperDeviceHelper.DevcieParamSet(DeviceParamProperties.FRAMERATE, value);
                         break;
                     case "gain":
@@ -669,6 +670,100 @@ namespace InperSight.ViewModels
                         double _vlaue = _type == "Low" ? 1 : _type == "Medium" ? 2 : 3.5;
                         CameraSetting.Gain = _vlaue;
                         InperDeviceHelper.DevcieParamSet(DeviceParamProperties.GAIN, _vlaue);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.ToString());
+            }
+        }
+        public void Param_Reduce_Event(string param)
+        {
+            try
+            {
+                switch (param)
+                {
+                    case "focusPlane":
+                        CameraSetting.FocusPlane -= 1;
+                        if (CameraSetting.FocusPlane < -127)
+                        {
+                            CameraSetting.FocusPlane = -127;
+                        }
+                        view.focusPlane.Value = CameraSetting.FocusPlane;
+                        break;
+                    case "upperLevel":
+                        CameraSetting.UpperLevel -= 1;
+                        if (CameraSetting.UpperLevel < 0)
+                        {
+                            CameraSetting.UpperLevel = 0;
+                        }
+                        view.upperLevel.Value = CameraSetting.UpperLevel;
+                        break;
+                    case "lowerLevel":
+                        CameraSetting.LowerLevel -= 1;
+                        if (CameraSetting.LowerLevel < 0)
+                        {
+                            CameraSetting.LowerLevel = 0;
+                        }
+                        view.lowerLevel.Value = CameraSetting.LowerLevel;
+                        break;
+                    case "excitLowerLevel":
+                        CameraSetting.ExcitLowerLevel -= 1;
+                        if (CameraSetting.ExcitLowerLevel < 0)
+                        {
+                            CameraSetting.ExcitLowerLevel = 0;
+                        }
+                        view.excitLowerLevel.Value = CameraSetting.ExcitLowerLevel;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.ToString());
+            }
+        }
+        public void Param_Add_Event(string param)
+        {
+            try
+            {
+                switch (param)
+                {
+                    case "focusPlane":
+                        CameraSetting.FocusPlane += 1;
+                        if (CameraSetting.FocusPlane > 127)
+                        {
+                            CameraSetting.FocusPlane = 127;
+                        }
+                        view.focusPlane.Value = CameraSetting.FocusPlane;
+                        break;
+                    case "upperLevel":
+                        CameraSetting.UpperLevel += 1;
+                        if (CameraSetting.UpperLevel > 10)
+                        {
+                            CameraSetting.UpperLevel = 10;
+                        }
+                        view.upperLevel.Value = CameraSetting.UpperLevel;
+                        break;
+                    case "lowerLevel":
+                        CameraSetting.LowerLevel += 1;
+                        if (CameraSetting.LowerLevel > 100)
+                        {
+                            CameraSetting.LowerLevel = 100;
+                        }
+                        view.lowerLevel.Value = CameraSetting.LowerLevel;
+                        break;
+                    case "excitLowerLevel":
+                        CameraSetting.ExcitLowerLevel += 1;
+                        if (CameraSetting.ExcitLowerLevel > 100)
+                        {
+                            CameraSetting.ExcitLowerLevel = 100;
+                        }
+                        view.excitLowerLevel.Value = CameraSetting.ExcitLowerLevel;
                         break;
                     default:
                         break;
