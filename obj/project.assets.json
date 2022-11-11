@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net5.0-windows7.0": {
+      "Aliyun.OSS.DotNetCore/2.8.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Aliyun.OSS.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Aliyun.OSS.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "BouncyCastle.NetCore/1.8.5": {
         "type": "package",
         "compile": {
@@ -544,6 +557,19 @@
           }
         }
       },
+      "SharpZipLib/1.4.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.0.4": {
         "type": "package",
         "dependencies": {
@@ -647,7 +673,7 @@
           "lib/netstandard2.0/SQLitePCLRaw.provider.dynamic_cdecl.dll": {}
         }
       },
-      "SqlSugarCore/5.1.3.27": {
+      "SqlSugarCore/5.1.3.32": {
         "type": "package",
         "dependencies": {
           "Microsoft.Data.SqlClient": "2.1.1",
@@ -1313,6 +1339,21 @@
     }
   },
   "libraries": {
+    "Aliyun.OSS.DotNetCore/2.8.0": {
+      "sha512": "KuTKnZiusOHJgWSr2vxwsvOWcFac6ahO8PrKQ/C647f/RGCTPHvOm1a6UEZgQcGewsEChqOqzEvU1pLvlw7xlQ==",
+      "type": "package",
+      "path": "aliyun.oss.dotnetcore/2.8.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "aliyun.oss.dotnetcore.2.8.0.nupkg.sha512",
+        "aliyun.oss.dotnetcore.nuspec",
+        "lib/net40/Aliyun.OSS.dll",
+        "lib/net40/Aliyun.OSS.xml",
+        "lib/netstandard2.0/Aliyun.OSS.dll",
+        "lib/netstandard2.0/Aliyun.OSS.xml"
+      ]
+    },
     "BouncyCastle.NetCore/1.8.5": {
       "sha512": "6uxsQw2UXrt82VQAWC2td3oBSJjUZ3P4u4DliagB8wf67KsU53V8sW9xwdF+IwZOOZFR0TCZuv/YKZ2BlrfAag==",
       "type": "package",
@@ -2128,6 +2169,27 @@
         "scichart.nuspec"
       ]
     },
+    "SharpZipLib/1.4.1": {
+      "sha512": "X8QiHZS7+bbZy85LfpKCAL9oh0yZkiiecWhQL5F1Yn1AKFDYiOzR3UG5vI+9bDYGRGyseVdMW5sTH8mv8LXF1g==",
+      "type": "package",
+      "path": "sharpziplib/1.4.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "images/sharpziplib-nuget-256x256.png",
+        "lib/net6.0/ICSharpCode.SharpZipLib.dll",
+        "lib/net6.0/ICSharpCode.SharpZipLib.pdb",
+        "lib/net6.0/ICSharpCode.SharpZipLib.xml",
+        "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
+        "lib/netstandard2.0/ICSharpCode.SharpZipLib.pdb",
+        "lib/netstandard2.0/ICSharpCode.SharpZipLib.xml",
+        "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll",
+        "lib/netstandard2.1/ICSharpCode.SharpZipLib.pdb",
+        "lib/netstandard2.1/ICSharpCode.SharpZipLib.xml",
+        "sharpziplib.1.4.1.nupkg.sha512",
+        "sharpziplib.nuspec"
+      ]
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.0.4": {
       "sha512": "f5U8Sw0lRym8tTraJ2zm6OqcDrcrEVvcKDtYlKSLs3Ox9SerkwkPXiFXb/uiW0g2tJdUw6oBhsxI/l5DoRxXMg==",
       "type": "package",
@@ -2201,15 +2263,15 @@
         "sqlitepclraw.provider.dynamic_cdecl.nuspec"
       ]
     },
-    "SqlSugarCore/5.1.3.27": {
-      "sha512": "G+Dw656a/PeITClVSTUZCc1s3k3qZ+mj62/iNQMqPkjHtJU7lk5QbN8aFJGieorjlkwLp9qUjisNj7Dhh5rCYA==",
+    "SqlSugarCore/5.1.3.32": {
+      "sha512": "Rd+N9idSgHMmAZ3c93UV/h2xMDqkR+0uFXxiJMKDwOEeqIVcG207OzoXt15/D4Sk6oxwksZuqK4AMft35QPSjA==",
       "type": "package",
-      "path": "sqlsugarcore/5.1.3.27",
+      "path": "sqlsugarcore/5.1.3.32",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.1/SqlSugar.dll",
-        "sqlsugarcore.5.1.3.27.nupkg.sha512",
+        "sqlsugarcore.5.1.3.32.nupkg.sha512",
         "sqlsugarcore.nuspec"
       ]
     },
@@ -3884,6 +3946,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0-windows7.0": [
+      "Aliyun.OSS.DotNetCore >= 2.8.0",
       "HandyControl >= 3.3.0",
       "InperCameraDShow >= 1.0.0",
       "InperStudioControlLib >= 1.0.0",
@@ -3893,7 +3956,8 @@
       "OpenCvSharp4.Windows >= 4.6.0.20220608",
       "OpenCvSharp4.runtime.win >= 4.6.0.20220608",
       "SciChart >= 6.6.0.26505",
-      "SqlSugarCore >= 5.1.3.27",
+      "SharpZipLib >= 1.4.1",
+      "SqlSugarCore >= 5.1.3.32",
       "Stylet >= 1.3.6",
       "log4net >= 2.0.15"
     ]
@@ -3949,6 +4013,10 @@
       "net5.0-windows7.0": {
         "targetAlias": "net5.0-windows",
         "dependencies": {
+          "Aliyun.OSS.DotNetCore": {
+            "target": "Package",
+            "version": "[2.8.0, )"
+          },
           "HandyControl": {
             "target": "Package",
             "version": "[3.3.0, )"
@@ -3977,9 +4045,13 @@
             "target": "Package",
             "version": "[6.6.0.26505, )"
           },
+          "SharpZipLib": {
+            "target": "Package",
+            "version": "[1.4.1, )"
+          },
           "SqlSugarCore": {
             "target": "Package",
-            "version": "[5.1.3.27, )"
+            "version": "[5.1.3.32, )"
           },
           "Stylet": {
             "target": "Package",

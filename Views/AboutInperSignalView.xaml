@@ -1,0 +1,61 @@
+﻿<inp:InperDialogWindow x:Class="InperSight.Views.AboutInperSignalView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InperSight.Views"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        mc:Ignorable="d"
+        Title="About Inper Sight" IsShowBottomAllButton="False" Width="530" Height="440" IsShowMiniButton="False" IsShowMaxButton="False" IsShowBottom="False">
+    <inp:InperDialogWindow.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Regular"/>
+            <Setter Property="FontFamily" Value="Arial-Regular"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+    </inp:InperDialogWindow.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" BorderThickness="0 0 1 0" BorderBrush="#BDBDBD">
+            <Grid>
+                <Image Source="/Lib/Images/Logo.png" Margin="0 100 0 0" VerticalAlignment="Top" Width="56" Height="56" Stretch="UniformToFill" />
+                <TextBlock x:Name="vn" Text="version number" HorizontalAlignment="Center" Margin="0 170 0 0"/>
+            </Grid>
+        </Border>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="Software Information" FontSize="16" Margin="28 32 0 0" />
+                <Border Background="#E2E2E2" Height="1" Width="267" Margin="28 15 0 0" HorizontalAlignment="Left"/>
+                <UniformGrid Rows="2" Columns="2" Margin="28 15 0 0">
+                    <TextBlock Text="Release Date:"/>
+                    <TextBlock x:Name="releaseData" Text="2022-07-09"/>
+                    <TextBlock Text="Version:" Margin="0 8 0 0"/>
+                    <TextBlock x:Name="version" Text="V1.0.3" Margin="0 8 0 0"/>
+                </UniformGrid>
+                <TextBlock x:Name="content" Margin="28 15 0 0" TextWrapping="WrapWithOverflow"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1">
+                <TextBlock Text="Device Specification" FontSize="16" Margin="28 15 0 0"/>
+                <Border Background="#E2E2E2" Height="1" Width="267" Margin="28 15 0 0" HorizontalAlignment="Left"/>
+                <UniformGrid Rows="3" Columns="2" Margin="28 15 0 0">
+                    <TextBlock Text="Light:"/>
+                    <TextBlock x:Name="light"/>
+                    <TextBlock Text="Model:" Margin="0 5 0 0"/>
+                    <TextBlock x:Name="model" Text="Model" Margin="0 5 0 0"/>
+                    <TextBlock Text="SN:" Margin="0 8 0 0"/>
+                    <TextBlock x:Name="sn" Text="SN" Margin="0 8 0 0"/>
+                </UniformGrid>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</inp:InperDialogWindow>

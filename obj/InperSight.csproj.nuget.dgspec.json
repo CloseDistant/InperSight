@@ -121,6 +121,10 @@
         "net5.0-windows7.0": {
           "targetAlias": "net5.0-windows",
           "dependencies": {
+            "Aliyun.OSS.DotNetCore": {
+              "target": "Package",
+              "version": "[2.8.0, )"
+            },
             "HandyControl": {
               "target": "Package",
               "version": "[3.3.0, )"
@@ -149,9 +153,13 @@
               "target": "Package",
               "version": "[6.6.0.26505, )"
             },
+            "SharpZipLib": {
+              "target": "Package",
+              "version": "[1.4.1, )"
+            },
             "SqlSugarCore": {
               "target": "Package",
-              "version": "[5.1.3.27, )"
+              "version": "[5.1.3.32, )"
             },
             "Stylet": {
               "target": "Package",

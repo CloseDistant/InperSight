@@ -118,13 +118,13 @@ namespace InperSight.Views.Control
         }
         private void DataFolderName_Click(object sender, RoutedEventArgs e)
         {
-            //foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
-            //{
-            //    if (window.Name.Contains("MainWindow"))
-            //    {
-            //        (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Path));
-            //    }
-            //}
+            foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+            {
+                if (window.Name.Contains("MainWindow"))
+                {
+                    (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new DataPathConfigViewModel(DataConfigPathTypeEnum.Path));
+                }
+            }
         }
         private void SkinList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -136,13 +136,13 @@ namespace InperSight.Views.Control
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            //foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
-            //{
-            //    if (window.Name.Contains("MainWindow"))
-            //    {
-            //        (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new AboutInperSignalViewModel());
-            //    }
-            //}
+            foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+            {
+                if (window.Name.Contains("MainWindow"))
+                {
+                    (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new AboutInperSignalViewModel());
+                }
+            }
         }
     }
 }

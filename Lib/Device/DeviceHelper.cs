@@ -29,6 +29,10 @@ namespace InperSight.Lib.Device
         {
             KeyValuePair<int, ICameraInfo>? keyValuePair = null;
             IEnumerable<ICameraInfo> camerInfoList = new CameraInfoesReader().GetCameraInfos();
+            if (camerInfoList == null)
+            {
+                return null;
+            }
             int index = 0;
             foreach (var info in camerInfoList)
             {

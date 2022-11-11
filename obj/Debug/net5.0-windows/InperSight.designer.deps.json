@@ -6,6 +6,14 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
+      "Aliyun.OSS.DotNetCore/2.8.0": {
+        "runtime": {
+          "lib/netstandard2.0/Aliyun.OSS.dll": {
+            "assemblyVersion": "2.8.0.0",
+            "fileVersion": "2.8.0.0"
+          }
+        }
+      },
       "BouncyCastle.NetCore/1.8.5": {
         "runtime": {
           "lib/netstandard2.0/BouncyCastle.Crypto.dll": {
@@ -406,6 +414,14 @@
           }
         }
       },
+      "SharpZipLib/1.4.1": {
+        "runtime": {
+          "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll": {
+            "assemblyVersion": "1.4.1.12",
+            "fileVersion": "1.4.1.12"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.0.4": {
         "dependencies": {
           "SQLitePCLRaw.core": "2.0.4",
@@ -514,7 +530,7 @@
           }
         }
       },
-      "SqlSugarCore/5.1.3.27": {
+      "SqlSugarCore/5.1.3.32": {
         "dependencies": {
           "Microsoft.Data.SqlClient": "2.1.1",
           "Microsoft.Data.Sqlite": "5.0.5",
@@ -529,8 +545,8 @@
         },
         "runtime": {
           "lib/netstandard2.1/SqlSugar.dll": {
-            "assemblyVersion": "5.1.3.27",
-            "fileVersion": "5.1.3.27"
+            "assemblyVersion": "5.1.3.32",
+            "fileVersion": "5.1.3.32"
           }
         }
       },
@@ -999,6 +1015,13 @@
     }
   },
   "libraries": {
+    "Aliyun.OSS.DotNetCore/2.8.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KuTKnZiusOHJgWSr2vxwsvOWcFac6ahO8PrKQ/C647f/RGCTPHvOm1a6UEZgQcGewsEChqOqzEvU1pLvlw7xlQ==",
+      "path": "aliyun.oss.dotnetcore/2.8.0",
+      "hashPath": "aliyun.oss.dotnetcore.2.8.0.nupkg.sha512"
+    },
     "BouncyCastle.NetCore/1.8.5": {
       "type": "package",
       "serviceable": true,
@@ -1223,6 +1246,13 @@
       "path": "scichart/6.6.0.26505",
       "hashPath": "scichart.6.6.0.26505.nupkg.sha512"
     },
+    "SharpZipLib/1.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-X8QiHZS7+bbZy85LfpKCAL9oh0yZkiiecWhQL5F1Yn1AKFDYiOzR3UG5vI+9bDYGRGyseVdMW5sTH8mv8LXF1g==",
+      "path": "sharpziplib/1.4.1",
+      "hashPath": "sharpziplib.1.4.1.nupkg.sha512"
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.0.4": {
       "type": "package",
       "serviceable": true,
@@ -1251,12 +1281,12 @@
       "path": "sqlitepclraw.provider.dynamic_cdecl/2.0.4",
       "hashPath": "sqlitepclraw.provider.dynamic_cdecl.2.0.4.nupkg.sha512"
     },
-    "SqlSugarCore/5.1.3.27": {
+    "SqlSugarCore/5.1.3.32": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-G+Dw656a/PeITClVSTUZCc1s3k3qZ+mj62/iNQMqPkjHtJU7lk5QbN8aFJGieorjlkwLp9qUjisNj7Dhh5rCYA==",
-      "path": "sqlsugarcore/5.1.3.27",
-      "hashPath": "sqlsugarcore.5.1.3.27.nupkg.sha512"
+      "sha512": "sha512-Rd+N9idSgHMmAZ3c93UV/h2xMDqkR+0uFXxiJMKDwOEeqIVcG207OzoXt15/D4Sk6oxwksZuqK4AMft35QPSjA==",
+      "path": "sqlsugarcore/5.1.3.32",
+      "hashPath": "sqlsugarcore.5.1.3.32.nupkg.sha512"
     },
     "SqlSugarCore.Dm/1.0.0": {
       "type": "package",

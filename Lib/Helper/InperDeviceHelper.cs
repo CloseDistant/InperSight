@@ -1,6 +1,9 @@
 ﻿using InperSight.Lib.Bean;
+using InperSight.Lib.Bean.Data;
+using InperSight.Lib.Bean.Data.Model;
 using InperSight.Lib.Chart.Channel;
 using InperSight.Lib.Config;
+using InperSight.ViewModels;
 using InperVideo.Camera;
 using InperVideo.Interfaces;
 using OpenCvSharp;
@@ -158,8 +161,8 @@ namespace InperSight.Lib.Helper
                 Debug.WriteLine(ex.ToString());
             }
         }
-        ConcurrentQueue<VideoFrame> _GreyValueDraw = new ConcurrentQueue<VideoFrame>();
-        CancellationTokenSource _greyValueToCalculateCancel = new CancellationTokenSource();
+        ConcurrentQueue<VideoFrame> _GreyValueDraw = new();
+        CancellationTokenSource _greyValueToCalculateCancel = new();
         private void GreyValueToCalculate()
         {
             try
@@ -168,15 +171,52 @@ namespace InperSight.Lib.Helper
                 {
                     if (_GreyValueDraw.TryDequeue(out VideoFrame mat))
                     {
-
+                        string _saveStr = string.Empty;
+                        TimeSpan time = new(mat.Time.Subtract((DateTime)_firstTime).Ticks);
                         Parallel.ForEach(CameraChannels, item =>
                          {
                              double r = (double)mat.FrameMat.Mean(item.Mask) / 655.35;
+                             _saveStr += item.ChannelId + "," + r + " ";
                              using (item.RenderableSeries.First().DataSeries.SuspendUpdates())
                              {
-                                 (item.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>).Append(new TimeSpan(mat.Time.Subtract((DateTime)_firstTime).Ticks), r);
+                                 (item.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>).Append(time, r);
                              }
                          });
+                        if (!string.IsNullOrEmpty(_saveStr))
+                        {
+                            _saveStrs.Enqueue(new ChannelRecord()
+                            {
+                                CameraTime = time.Ticks,
+                                CreateTime = DateTime.Now,
+                                Value = _saveStr
+                            });
+                        }
+                    }
+                    Thread.Sleep(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+        }
+        ConcurrentQueue<ChannelRecord> _saveStrs = new();
+        CancellationTokenSource _greyValueToSaveCancel = new();
+        List<ChannelRecord> _recordsCache = new();
+        private void GreyValueToSave()
+        {
+            try
+            {
+                while (!_greyValueToSaveCancel.IsCancellationRequested)
+                {
+                    if (_saveStrs.TryDequeue(out ChannelRecord str))
+                    {
+                        _recordsCache.Add(str);
+                        if (_recordsCache.Count >= InperGlobalClass.CameraSettingJsonBean.FPS * 5)
+                        {
+                            App.SqlDataInit.ChannelRecordSave(_recordsCache);
+                            _recordsCache.Clear();
+                        }
                     }
                     Thread.Sleep(2);
                 }
@@ -188,7 +228,7 @@ namespace InperSight.Lib.Helper
         }
         #endregion
 
-        #region
+        #region start stop
         public void Start(bool isRecord)
         {
             try
@@ -196,9 +236,20 @@ namespace InperSight.Lib.Helper
                 InperGlobalClass.IsPreview = !isRecord;
                 InperGlobalClass.IsRecord = isRecord;
                 InperGlobalClass.IsStop = false;
-
-                _greyValueToCalculateCancel = new CancellationTokenSource();
+                Parallel.ForEach(CameraChannels, item =>
+                {
+                    item.RenderableSeries.First().DataSeries.Clear();
+                });
+                _greyValueToCalculateCancel = new();
                 Task.Run(() => GreyValueToCalculate(), _greyValueToCalculateCancel.Token);
+                if (InperGlobalClass.IsRecord)
+                {
+                    App.SqlDataInit = new();
+
+                    _greyValueToSaveCancel = new();
+                    Task.Run(() => GreyValueToSave(), _greyValueToSaveCancel.Token);
+                    MiniScopeStartRecord(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("_HHmmss")));
+                }
             }
             catch (Exception ex)
             {
@@ -209,12 +260,32 @@ namespace InperSight.Lib.Helper
         {
             try
             {
+                if (InperGlobalClass.IsRecord)
+                {
+                    if (NoteSettingViewModel.NotesCache.Count > 0)
+                    {
+                        App.SqlDataInit.NoteSave(NoteSettingViewModel.NotesCache);
+                        NoteSettingViewModel.NotesCache.Clear();
+                    }
+                }
                 InperGlobalClass.IsStop = true;
                 InperGlobalClass.IsPreview = false;
                 InperGlobalClass.IsRecord = false;
-
                 _greyValueToCalculateCancel.Cancel();
+                _greyValueToSaveCancel.Cancel();
                 _firstTime = null;
+
+                MiniscopeStopCapture();
+                MiniscopeStartCapture();
+
+                if (Directory.GetDirectories(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0 || Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0)
+                {
+                    InperGlobalClass.DataFolderName = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                    {
+                        Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    }
+                }
             }
             catch (Exception ex)
             {

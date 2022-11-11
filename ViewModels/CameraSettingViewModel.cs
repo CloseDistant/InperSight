@@ -10,6 +10,7 @@ using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Data.Model;
+using SqlSugar;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -68,8 +69,9 @@ namespace InperSight.ViewModels
                 view.frame.RaiseEvent(eventArgs);
                 currentRectangle.Visibility = Visibility.Collapsed;
             }
-            view.gain.SelectedIndex = 0;
-            view.fps.SelectedIndex = 4;
+            view.gain.SelectedIndex = InperGlobalClass.CameraSettingJsonBean.Gain == 1 ? 0 : InperGlobalClass.CameraSettingJsonBean.Gain == 2 ? 1 : 2;
+            view.fps.SelectedIndex = InperGlobalClass.CameraSettingJsonBean.FPS == 10 ? 0 : InperGlobalClass.CameraSettingJsonBean.FPS == 15 ? 1 :
+                InperGlobalClass.CameraSettingJsonBean.FPS == 20 ? 2 : InperGlobalClass.CameraSettingJsonBean.FPS == 25 ? 3 : 4;
         }
         protected override void OnClose()
         {
@@ -610,9 +612,9 @@ namespace InperSight.ViewModels
         {
             try
             {
-                System.Windows.Forms.FolderBrowserDialog m_Dialog = new();
-                m_Dialog.SelectedPath = System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName) + "/";
-                System.Windows.Forms.DialogResult result = m_Dialog.ShowDialog();
+                System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe");
+                psi.Arguments = "/e,/select," + System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName);
+                System.Diagnostics.Process.Start(psi);
             }
             catch (Exception ex)
             {

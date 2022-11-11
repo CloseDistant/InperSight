@@ -1,0 +1,28 @@
+﻿<inp:InperDialogWindow x:Class="InperSight.Views.NoteSettingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
+        xmlns:vm="clr-namespace:InperSight.ViewModels"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:local="clr-namespace:InperSight.Views"
+        mc:Ignorable="d"  d:DataContext="{d:DesignInstance vm:NoteSettingViewModel}"
+        Title="Note" Height="300" Width="375" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False">
+    <Grid>
+        <Border x:Name="RichBorder" Grid.Row="1" CornerRadius="0" Background="{DynamicResource InperMainPageColor}">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollViewer x:Name="TagScroll" HorizontalAlignment="Left" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                    <StackPanel x:Name="TagListValue"/>
+                </ScrollViewer>
+                <RichTextBox MinWidth="120" Grid.Row="1" x:Name="NoteContent" PreviewKeyUp="{s:Action NoteContent_KeyDown}"   Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource InperTheme}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</inp:InperDialogWindow>

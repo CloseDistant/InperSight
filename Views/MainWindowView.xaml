@@ -17,7 +17,7 @@
         NonClientAreaBackground="{DynamicResource InperTheme}"
         NonClientAreaForeground="White"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
-        Title="inper" ShowTitle="False"  hc:Dialog.Token="MainDialog" MinWidth="1000" MinHeight="660" x:Name="MainWindow" Closing="{s:Action MainWindow_Closing}">
+        Title="inper" ShowTitle="False"  hc:Dialog.Token="MainDialog" MinWidth="1000" MinHeight="660" x:Name="MainWindow">
     <Grid Background="{StaticResource InperMainPageColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="66" />

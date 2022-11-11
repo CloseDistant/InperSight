@@ -224,3 +224,12 @@ C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\InperSight.cspro
 C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\refint\InperSight.dll
 C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\InperSight.genruntimeconfig.cache
 C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\ref\InperSight.dll
+C:\Users\10252\source\repos\InperSight\bin\Debug\net5.0-windows\InperSight.dll.config
+C:\Users\10252\source\repos\InperSight\bin\Debug\net5.0-windows\Aliyun.OSS.dll
+C:\Users\10252\source\repos\InperSight\bin\Debug\net5.0-windows\ICSharpCode.SharpZipLib.dll
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\DataPathConfigView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\DataPathConfigView.baml
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\AboutInperSignalView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\AboutInperSignalView.baml
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\NoteSettingView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\NoteSettingView.baml

@@ -3,6 +3,7 @@ using HandyControl.Data;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,6 +72,20 @@ namespace InperSight.Lib.Bean
             gc.CopyFromScreen(left, top, 0, 0, new System.Drawing.Size(width, height));
 
             image.Save(path, System.Drawing.Imaging.ImageFormat.Bmp);
+        }
+        public static void DeleteEmptyDirectory(string path)
+        {
+            string[] files = Directory.GetDirectories(path);
+            if (files.Length > 0)
+            {
+                foreach (string file in files)
+                {
+                    if (Directory.GetFiles(file).Length == 0)
+                    {
+                        Directory.Delete(file, true);
+                    }
+                }
+            }
         }
     }
 }

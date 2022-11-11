@@ -1,4 +1,5 @@
-﻿using InperSight.Views;
+﻿using InperSight.Lib.Bean;
+using InperSight.Views;
 using InperSight.Views.Control;
 using Stylet;
 using System;
@@ -36,6 +37,7 @@ namespace InperSight.ViewModels
         }
         protected override void OnClose()
         {
+            InperGlobalFunc.DeleteEmptyDirectory(InperGlobalClass.DataPath);
             RequestClose();
             string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             string[] exeArray = exeName.Split('\\');

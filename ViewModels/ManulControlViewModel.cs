@@ -74,6 +74,14 @@ namespace InperSight.ViewModels
                     case "Video":
                         break;
                     case "Note":
+                        if (InperGlobalFunc.GetWindowByNameChar("Note") == null)
+                        {
+                            windowManager.ShowWindow(new NoteSettingViewModel());
+                        }
+                        else
+                        {
+                            InperGlobalFunc.GetWindowByNameChar("Note").Activate();
+                        }
                         break;
                     default:
                         break;

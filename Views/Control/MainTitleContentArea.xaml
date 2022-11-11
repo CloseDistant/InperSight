@@ -45,7 +45,7 @@
                         <Image Source="/Lib/Images/New/web.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="About Inper Signal" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Click="About_Click">
+                <MenuItem Header="About Inper Sight" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Click="About_Click">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/about.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>

@@ -2,10 +2,16 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
+    <Compile Update="Views\AboutInperSignalView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\CameraSettingView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Control\MainTitleContentArea.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\DataPathConfigView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\MainWindowView.xaml.cs">
@@ -14,21 +20,33 @@
     <Compile Update="Views\ManulControlView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\NoteSettingView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\StartPageView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\AboutInperSignalView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\CameraSettingView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Control\MainTitleContentArea.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\DataPathConfigView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\MainWindowView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ManulControlView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\NoteSettingView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\StartPageView.xaml">
