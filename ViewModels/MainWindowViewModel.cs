@@ -1,4 +1,5 @@
 ﻿using InperSight.Lib.Bean;
+using InperSight.Lib.Helper;
 using InperSight.Views;
 using InperSight.Views.Control;
 using Stylet;
@@ -27,16 +28,18 @@ namespace InperSight.ViewModels
         }
         protected override void OnViewLoaded()
         {
+            base.OnViewLoaded();
             windowView = View as MainWindowView;
 
             ManulControlViewModel = new ManulControlViewModel(windowManager);
             ActiveItem = new DataShowControlViewModel(windowManager);
 
             windowView.NonClientAreaContent = new MainTitleContentArea();
-            base.OnViewLoaded();
+            windowManager.ShowWindow(new CameraSettingViewModel());
         }
         protected override void OnClose()
         {
+            InperDeviceHelper.GetInstance().DevcieParamSet(DeviceParamProperties.LED, 0d);
             InperGlobalFunc.DeleteEmptyDirectory(InperGlobalClass.DataPath);
             RequestClose();
             string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;

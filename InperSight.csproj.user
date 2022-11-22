@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup />
+  <PropertyGroup>
+    <_LastSelectedProfileId>C:\Users\10252\source\repos\InperSight\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Update="Views\AboutInperSignalView.xaml.cs">
       <SubType>Code</SubType>
@@ -9,6 +11,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Control\MainTitleContentArea.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Control\VideoUserControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\DataPathConfigView.xaml.cs">
@@ -26,6 +31,12 @@
     <Compile Update="Views\StartPageView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\VideoSettingView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\VideoShowView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\AboutInperSignalView.xaml">
@@ -35,6 +46,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Control\MainTitleContentArea.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Control\VideoUserControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\DataPathConfigView.xaml">
@@ -50,6 +64,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\StartPageView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\VideoSettingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\VideoShowView.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

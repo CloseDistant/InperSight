@@ -1,0 +1,17 @@
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\InperSight.csproj.AssemblyReference.cache
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\AboutInperSignalView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\CameraSettingView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\Control\MainTitleContentArea.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\Control\VideoUserControl.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\DataPathConfigView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\DataShowControlView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\MainWindowView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\ManulControlView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\NoteSettingView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\StartPageView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\VideoSettingView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\Views\VideoShowView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\App.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\InperSight_MarkupCompile.cache
+C:\Users\10252\source\repos\InperSight\obj\Release\net5.0-windows\InperSight_MarkupCompile.lref

@@ -89,6 +89,7 @@ namespace InperSight.ViewModels
                 };
             }
             view.timesAxisSci.XAxis.LabelProvider = new CustomTimeSpanLableProvider();
+            InperDeviceHelper.GetInstance().StartCollectEvent += Instance_StartCollectEvent;
         }
         private void Instance_StartCollectEvent(bool obj)
         {
@@ -183,6 +184,33 @@ namespace InperSight.ViewModels
                 LoggerHelper.Error(ex.ToString());
             }
         }
+        public void SciScroll_SelectedRangeChanged(object sender, SciChart.Charting.Visuals.Events.SelectedRangeChangedEventArgs e)
+        {
+            try
+            {
+                if (e.EventType != SciChart.Charting.Visuals.Events.SelectedRangeEventType.ExternalSource)
+                {
+                    for (int i = 0; i < InperDeviceHelper.GetInstance().CameraChannels.Count; i++)
+                    {
+                        if (i != 0)
+                        {
+                            var item = this.view.dataList.ItemContainerGenerator.ContainerFromIndex(i) as ListBoxItem;
+                            SciChartSurface sciChartSurface = InperGlobalFunc.FindVisualChild<SciChartSurface>(item);
+                            sciChartSurface.ZoomState = ZoomStates.UserZooming;
+
+                            sciChartSurface.XAxis.VisibleRange = e.SelectedRange;
+                        }
+                    }
+                }
+                InperDeviceHelper.GetInstance().EventChannelChart.TimeSpanAxis.VisibleRange = e.SelectedRange;
+                //InperDeviceHelper.GetInstance().EventChannelChart.EventTimeSpanAxis.VisibleRange = e.SelectedRange;
+
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.ToString());
+            }
+        }
         public void SciScroll_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             try
@@ -217,6 +245,17 @@ namespace InperSight.ViewModels
                         view.timesAxisSci.XAxis.TextFormatting = TextFormat;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.ToString());
+            }
+        }
+        public void SciScrollSet()
+        {
+            try
+            {
+                view.sciScroll.Axis = InperDeviceHelper.GetInstance().CameraChannels.First().TimeSpanAxis;
             }
             catch (Exception ex)
             {

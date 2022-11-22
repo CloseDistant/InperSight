@@ -233,3 +233,9 @@ C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\AboutInper
 C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\AboutInperSignalView.baml
 C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\NoteSettingView.g.cs
 C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\NoteSettingView.baml
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\VideoSettingView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\VideoSettingView.baml
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\Control\VideoUserControl.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\VideoShowView.g.cs
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\Control\VideoUserControl.baml
+C:\Users\10252\source\repos\InperSight\obj\Debug\net5.0-windows\Views\VideoShowView.baml

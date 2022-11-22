@@ -35,7 +35,7 @@
     <Grid x:Name="Root_Gird">
         <Grid.ColumnDefinitions>
             <ColumnDefinition  Width="2.5*" />
-            <ColumnDefinition  Width="2.5*" />
+            <ColumnDefinition  Width="0.1*" />
             <ColumnDefinition  Width="2.5*" />
             <ColumnDefinition  Width="4*"  />
         </Grid.ColumnDefinitions>
@@ -45,7 +45,7 @@
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action SignalSettingsShow}" CommandParameter="Camera">
                         <StackPanel>
                             <Grid x:Name="fibers">
-                                <Image Source="/Lib/Images/Manual/fibers.png" Width="20" Height="20" Stretch="Uniform"/>
+                                <Image Source="/Lib/Images/Manual/imaging.png" Width="20" Height="20" Stretch="Uniform"/>
                                 <Grid.Triggers>
                                     <EventTrigger RoutedEvent="Mouse.MouseEnter">
                                         <EventTrigger.Actions>
@@ -71,7 +71,7 @@
                                     </EventTrigger>
                                 </Grid.Triggers>
                             </Grid>
-                            <TextBlock Margin="0 5 0 0">Fibers</TextBlock>
+                            <TextBlock Margin="0 5 0 0">Insight</TextBlock>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -111,7 +111,7 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Visibility="Collapsed">
             <WrapPanel HorizontalAlignment="Center">
                 <StackPanel Margin="15 0">
                     <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Marker" IsDefault="False">

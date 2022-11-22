@@ -1,6 +1,7 @@
 ﻿using InperSight.Lib.Bean;
 using InperSight.Lib.Config;
 using InperSight.Lib.Helper;
+using InperSight.Views;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -26,13 +27,14 @@ namespace InperSight.ViewModels
                 switch (type)
                 {
                     case "Camera":
-                        if (InperGlobalFunc.GetWindowByNameChar("Imaging") == null)
+                        if (InperGlobalFunc.GetWindowByNameChar("Insight") == null)
                         {
-                            windowManager.ShowWindow(new CameraSettingViewModel());
+                            var camera = new CameraSettingViewModel();
+                            windowManager.ShowWindow(camera);
                         }
                         else
                         {
-                            _ = InperGlobalFunc.GetWindowByNameChar("Imaging").Activate();
+                            _ = InperGlobalFunc.GetWindowByNameChar("Insight").Activate();
                         }
                         break;
                     case "Analog":
@@ -72,6 +74,7 @@ namespace InperSight.ViewModels
                     case "Trigger":
                         break;
                     case "Video":
+                        _ = windowManager.ShowDialog(new VideoSettingViewModel());
                         break;
                     case "Note":
                         if (InperGlobalFunc.GetWindowByNameChar("Note") == null)

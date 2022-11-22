@@ -6,243 +6,257 @@
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:global="clr-namespace:InperSight.Lib.Helper"
         xmlns:local="clr-namespace:InperSight.Views"
+        xmlns:bean="clr-namespace:InperSight.Lib.Bean"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:vm="clr-namespace:InperSight.ViewModels"
         mc:Ignorable="d" IsShowTopAllButton="False" ResizeMode="NoResize"
-        Title="Imaging" Width="700" Height="595" d:DataContext="{d:DesignInstance vm:CameraSettingViewModel}" Name="camera" IsShowCancleButton="True" IsShowOtherButton="False">
+        Title="Insight" Width="700" Height="595" d:DataContext="{d:DesignInstance vm:CameraSettingViewModel}" Name="camera" IsShowCancleButton="False" IsShowOtherButton="False">
     <inp:InperDialogWindow.Resources>
+        <bean:InperGlobalClass x:Key="InperGlobalClass" />
         <global:InperDeviceHelper x:Key="InperDeviceHelper" />
         <SolidColorBrush x:Key="bgColor">#F2F2F2</SolidColorBrush>
         <SolidColorBrush x:Key="btnTextColor1">#FFFFFF</SolidColorBrush>
         <SolidColorBrush x:Key="btnTextColor2">#666666</SolidColorBrush>
     </inp:InperDialogWindow.Resources>
-    <Grid Background="{StaticResource bgColor}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.5*"/>
-            <ColumnDefinition Width="1"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <!--left-->
-        <Grid Grid.Column="0" Margin=" 0 0 0 0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height=".25*"/>
-            </Grid.RowDefinitions>
-            <!--top-->
-            <Border Grid.Row="0" Margin="25 20 25 0" BorderBrush="{StaticResource InperBorderColor}" BorderThickness="1">
-                <Grid>
-                    <!--画图区域-->
-                    <Canvas VerticalAlignment="Top" Name="drawAreaCanvas" MouseLeftButtonDown="{s:Action Image_MouseLeftButtonDown}" MouseLeftButtonUp="{s:Action Image_MouseLeftButtonUp}" MouseMove="{s:Action Image_MouseMove}" MouseLeave="{s:Action Image_MouseLeave}" Background="Transparent" Panel.ZIndex="999" Height="351" Width="351"/>
-                    <!--图像显示-->
-                    <Image Stretch="Uniform" VerticalAlignment="Top" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
-                    <!--工具栏-->
-                    <WrapPanel VerticalAlignment="Bottom" Margin="0 0 0 0" Height="32" Background="#E8E8E8">
-                        <Button Style="{StaticResource InperFreeButton}" Width="50" Height="20" Margin="10 8 0 0" x:Name="home" Command="{s:Action HomeShowEvent}">
-                            <Border Background="{StaticResource InperTheme}" CornerRadius="2" x:Name="bd1">
-                                <TextBlock Text="Home" Name="t1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
-                            </Border>
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd1" Storyboard.TargetProperty="Background">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource InperTheme}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd2" Storyboard.TargetProperty="Background">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bgColor}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t1" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor1}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t2" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor2}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Button.Triggers>
-                        </Button>
-                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action FrameShowEvent}" x:Name="frame" Width="50" Height="20" Margin="10 8 0 0">
-                            <Border CornerRadius="2" x:Name="bd2">
-                                <TextBlock Text="Frame" Name="t2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#666666" FontSize="14"/>
-                            </Border>
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd2" Storyboard.TargetProperty="Background">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource InperTheme}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd1" Storyboard.TargetProperty="Background">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bgColor}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t2" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor1}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t1" Storyboard.TargetProperty="Foreground">
-                                                <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor2}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Button.Triggers>
-                        </Button>
-                        <Button Style="{StaticResource InperFreeButton}" Width="30" Height="20" Margin="130 8 0 0">
-                            <TextBlock x:Name="tb3" VerticalAlignment="Center" Text="Df/f" HorizontalAlignment="Center" Foreground="{StaticResource btnTextColor2}"/>
-                        </Button>
-                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Margin="10 8 10 0" Command="{s:Action CutViewEvent}">
-                            <Image Source="/Lib/Images/Camera/cut.png" Stretch="UniformToFill"/>
-                        </Button>
-                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Margin="0 8 0 0" Command="{s:Action ShowImagePath}">
-                            <Image Source="/Lib/Images/Camera/path.png" Stretch="UniformToFill"/>
-                        </Button>
-                    </WrapPanel>
-                </Grid>
-            </Border>
-            <!--bottom-->
-            <Grid Grid.Row="1">
+    <Grid>
+        <!--<Button x:Name="_lock" Visibility="Collapsed" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action LockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -28 20 0" Cursor="Hand">
+            <Grid>
+                <Image Source="/Lib/Images/unlock.png" Stretch="UniformToFill" />
+            </Grid>
+        </Button>
+        <Button x:Name="unLock" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action UnLockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -28 20 0" Cursor="Hand">
+            <Grid>
+                <Image Source="/Lib/Images/lock.png" Stretch="UniformToFill" />
+            </Grid>
+        </Button>-->
+        <Grid Background="{StaticResource bgColor}" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="1"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!--left-->
+            <Grid Grid.Column="0" Margin=" 0 0 0 0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height=".25*"/>
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 5 25 0">
-                        <TextBlock Text="Frame Setting" Margin="0 0 5 0"/>
-                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0" Cursor="Hand" Command="{s:Action FrameAddEvent}">
-                            <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill"/>
-                        </Button>
-                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0" Cursor="Hand" Command="{s:Action FrameDeleteEvent}">
-                            <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill"/>
-                        </Button>
-                        <!--<Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0 0 0" Cursor="Hand" Command="{s:Action FrameClearEvent}">
+                <!--top-->
+                <Border Grid.Row="0" Margin="25 20 25 0" BorderBrush="{StaticResource InperBorderColor}" BorderThickness="1">
+                    <Grid>
+                        <!--画图区域-->
+                        <Canvas VerticalAlignment="Top" Name="drawAreaCanvas" MouseLeftButtonDown="{s:Action Image_MouseLeftButtonDown}" MouseLeftButtonUp="{s:Action Image_MouseLeftButtonUp}" MouseMove="{s:Action Image_MouseMove}" MouseLeave="{s:Action Image_MouseLeave}" Background="Transparent" Panel.ZIndex="999" Height="351" Width="351"/>
+                        <!--图像显示-->
+                        <Image Stretch="Uniform" VerticalAlignment="Top" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
+                        <!--工具栏-->
+                        <WrapPanel VerticalAlignment="Bottom" Margin="0 0 0 0" Height="32" Background="#E8E8E8">
+                            <Button Style="{StaticResource InperFreeButton}" Width="50" Height="20" Margin="10 8 0 0" x:Name="home" Command="{s:Action HomeShowEvent}">
+                                <Border Background="{StaticResource InperTheme}" CornerRadius="2" x:Name="bd1">
+                                    <TextBlock Text="Home" Name="t1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
+                                </Border>
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd1" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource InperTheme}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd2" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bgColor}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t1" Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor1}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t2" Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor2}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            <Button Style="{StaticResource InperFreeButton}" Command="{s:Action FrameShowEvent}" x:Name="frame" Width="50" Height="20" Margin="10 8 0 0">
+                                <Border CornerRadius="2" x:Name="bd2">
+                                    <TextBlock Text="Frame" Name="t2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#666666" FontSize="14"/>
+                                </Border>
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd2" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource InperTheme}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="bd1" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bgColor}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t2" Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor1}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetName="t1" Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource btnTextColor2}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            <Button Style="{StaticResource InperFreeButton}" Width="30" Height="20" Margin="130 8 0 0" Command="{s:Action DeltaFModeEvent}" Cursor="Hand">
+                                <TextBlock x:Name="tb3" VerticalAlignment="Center" Text="DF/F" HorizontalAlignment="Center" Foreground="{StaticResource btnTextColor2}"/>
+                            </Button>
+                            <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Margin="10 8 10 0" Command="{s:Action CutViewEvent}">
+                                <Image Source="/Lib/Images/Camera/cut.png" Stretch="UniformToFill"/>
+                            </Button>
+                            <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Margin="0 8 0 0" Command="{s:Action ShowImagePath}">
+                                <Image Source="/Lib/Images/Camera/path.png" Stretch="UniformToFill"/>
+                            </Button>
+                        </WrapPanel>
+                    </Grid>
+                </Border>
+                <!--bottom-->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 5 25 0">
+                            <TextBlock Text="Frame Setting" Margin="0 0 5 0"/>
+                            <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0" Cursor="Hand" Command="{s:Action FrameAddEvent}">
+                                <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill"/>
+                            </Button>
+                            <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0" Cursor="Hand" Command="{s:Action FrameDeleteEvent}">
+                                <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill"/>
+                            </Button>
+                            <!--<Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0 0 0" Cursor="Hand" Command="{s:Action FrameClearEvent}">
                             <Image Source="/Lib/Images/Camera/delete.png" Stretch="UniformToFill"/>
                         </Button>-->
-                    </WrapPanel>
-                </Grid>
-                <WrapPanel Grid.Row="1" Margin="25 0" HorizontalAlignment="Right">
-                    <TextBlock Text="Name"  VerticalAlignment="Center"/>
-                    <TextBox VerticalAlignment="Center" Margin="10 0" Text="Neuron 1"  x:Name="neuronName" Width="80" Height="20" />
-                    <TextBlock Text="ROI" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="roiType" VerticalAlignment="Center" Margin="10 0" Width="85">
-                        <ComboBoxItem IsSelected="True">Circle</ComboBoxItem>
-                        <ComboBoxItem>Rectangle</ComboBoxItem>
-                        <ComboBoxItem>Ploygon</ComboBoxItem>
-                    </ComboBox>
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AddRoiEvent}" Width="20" Height="20" Margin="5 0" Cursor="Hand">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DeleteRoiEvent}" Width="20" Height="20" Margin="5 0" Cursor="Hand">
-                        <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill"/>
-                    </Button>
-                    <!--<Button Style="{StaticResource InperFreeButton}" Command="{s:Action ClearRoiEvent}" Width="20" Height="20" Margin="5 0 0 0" Cursor="Hand">
+                        </WrapPanel>
+                    </Grid>
+                    <WrapPanel Grid.Row="1" Margin="25 0" HorizontalAlignment="Right">
+                        <TextBlock Text="Name"  VerticalAlignment="Center"/>
+                        <TextBox VerticalAlignment="Center" Margin="10 0" Text="Neuron 1"  x:Name="neuronName" Width="80" Height="20" />
+                        <TextBlock Text="ROI" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="roiType" VerticalAlignment="Center" Margin="10 0" Width="85" ToolTip="{Binding ElementName=roiType,Path=SelectedValue.Content}">
+                            <ComboBoxItem IsSelected="True">Circle</ComboBoxItem>
+                            <ComboBoxItem>Rectangle</ComboBoxItem>
+                            <!--<ComboBoxItem>Ploygon</ComboBoxItem>-->
+                        </ComboBox>
+                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AddRoiEvent}" Width="20" Height="20" Margin="5 0" Cursor="Hand">
+                            <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill"/>
+                        </Button>
+                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DeleteRoiEvent}" Width="20" Height="20" Margin="5 0" Cursor="Hand" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                            <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill"/>
+                        </Button>
+                        <!--<Button Style="{StaticResource InperFreeButton}" Command="{s:Action ClearRoiEvent}" Width="20" Height="20" Margin="5 0 0 0" Cursor="Hand">
                         <Image Source="/Lib/Images/Camera/delete.png" Stretch="UniformToFill"/>
                     </Button>-->
-                </WrapPanel>
+                    </WrapPanel>
+                </Grid>
             </Grid>
-        </Grid>
-        <Border Grid.Column="1" Width="1" Background="{StaticResource InperBorderColor}"/>
-        <!--right-->
-        <StackPanel Grid.Column="2" Margin="10 20 0 0">
-            <WrapPanel>
-                <TextBlock Text="Settings" Foreground="{StaticResource InperTheme}" FontSize="16"/>
-                <Border Width="150" Margin="10 0 0 0" Height="1" VerticalAlignment="Center" Background="{StaticResource InperTheme}" Opacity=".6"/>
-            </WrapPanel>
-            <Grid Margin="10">
-                <TextBlock Text="FPS" Foreground="#333333" VerticalAlignment="Center"/>
-                <WrapPanel HorizontalAlignment="Right">
-                    <ComboBox x:Name="fps" SelectionChanged="{s:Action FpsAndGain_SelectionChanged}" s:View.ActionTarget="{Binding}" Width="124" Height="20">
-                        <ComboBoxItem>10</ComboBoxItem>
-                        <ComboBoxItem>15</ComboBoxItem>
-                        <ComboBoxItem>20</ComboBoxItem>
-                        <ComboBoxItem>25</ComboBoxItem>
-                        <ComboBoxItem>30</ComboBoxItem>
-                    </ComboBox>
+            <Border Grid.Column="1" Width="1" Background="{StaticResource InperBorderColor}"/>
+            <!--right-->
+            <StackPanel Grid.Column="2" Margin="10 20 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                <WrapPanel>
+                    <TextBlock Text="Settings" Foreground="{StaticResource InperTheme}" FontSize="16"/>
+                    <Border Width="150" Margin="10 0 0 0" Height="1" VerticalAlignment="Center" Background="{StaticResource InperTheme}" Opacity=".6"/>
                 </WrapPanel>
-            </Grid>
-            <Grid Margin="10">
-                <TextBlock Text="Gain" Foreground="#333333" VerticalAlignment="Center"/>
-                <WrapPanel HorizontalAlignment="Right">
-                    <ComboBox x:Name="gain" SelectionChanged="{s:Action FpsAndGain_SelectionChanged}" s:View.ActionTarget="{Binding}" Width="124" Height="20">
-                        <ComboBoxItem>Low</ComboBoxItem>
-                        <ComboBoxItem>Medium</ComboBoxItem>
-                        <ComboBoxItem>High</ComboBoxItem>
-                    </ComboBox>
-                </WrapPanel>
-            </Grid>
-            <Grid Margin="10">
-                <TextBlock Text="Focus Plane" Foreground="#333333" VerticalAlignment="Center"/>
-                <WrapPanel HorizontalAlignment="Right">
-                    <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=focusPlane,Path=Value}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
-                        <TextBlock.ToolTip>
-                            <TextBlock Text="{Binding ElementName=focusPlane,Path=Value}"/>
-                        </TextBlock.ToolTip>
+                <Grid Margin="10">
+                    <TextBlock Text="FPS" Foreground="#333333" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Right">
+                        <ComboBox x:Name="fps" SelectionChanged="{s:Action FpsAndGain_SelectionChanged}" s:View.ActionTarget="{Binding}" Width="124" Height="20">
+                            <ComboBoxItem>10</ComboBoxItem>
+                            <ComboBoxItem>15</ComboBoxItem>
+                            <ComboBoxItem>20</ComboBoxItem>
+                            <ComboBoxItem>25</ComboBoxItem>
+                            <ComboBoxItem>30</ComboBoxItem>
+                        </ComboBox>
+                    </WrapPanel>
+                </Grid>
+                <Grid Margin="10">
+                    <TextBlock Text="Gain" Foreground="#333333" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Right">
+                        <ComboBox x:Name="gain" SelectionChanged="{s:Action FpsAndGain_SelectionChanged}" s:View.ActionTarget="{Binding}" Width="124" Height="20">
+                            <ComboBoxItem>Low</ComboBoxItem>
+                            <ComboBoxItem>Medium</ComboBoxItem>
+                            <ComboBoxItem>High</ComboBoxItem>
+                        </ComboBox>
+                    </WrapPanel>
+                </Grid>
+                <Grid Margin="10">
+                    <TextBlock Text="Focus Plane" Foreground="#333333" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Right">
+                        <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=focusPlane,Path=Value}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="{Binding ElementName=focusPlane,Path=Value}"/>
+                            </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="focusPlane">
-                        <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
-                    </Button>
-                    <Slider Value="{Binding CameraSetting.FocusPlane,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="focusPlane" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="-127" Maximum="127"/>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="focusPlane">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
-                    </Button>
-                </WrapPanel>
-            </Grid>
-            <Grid Margin="10">
-                <TextBlock Text="Upper Level" Foreground="#333333" VerticalAlignment="Center"/>
-                <WrapPanel HorizontalAlignment="Right">
-                    <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=upperLevel,Path=Value,StringFormat={}{0:f2}}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
-                        <TextBlock.ToolTip>
-                            <TextBlock Text="{Binding ElementName=upperLevel,Path=Value}"/>
-                        </TextBlock.ToolTip>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="focusPlane">
+                            <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
+                        </Button>
+                        <Slider Value="{Binding CameraSetting.FocusPlane,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="focusPlane" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="-127" Maximum="127"/>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="focusPlane">
+                            <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
+                        </Button>
+                    </WrapPanel>
+                </Grid>
+                <Grid Margin="10">
+                    <TextBlock Text="Alpha " Foreground="#333333" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Right">
+                        <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=upperLevel,Path=Value,StringFormat={}{0:f2}}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="{Binding ElementName=upperLevel,Path=Value}"/>
+                            </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="upperLevel">
-                        <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
-                    </Button>
-                    <Slider Value="{Binding CameraSetting.UpperLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="upperLevel" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="10"/>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="upperLevel">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
-                    </Button>
-                </WrapPanel>
-            </Grid>
-            <Grid Margin="10">
-                <TextBlock Text="Lower Level" Foreground="#333333" VerticalAlignment="Center"/>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="upperLevel">
+                            <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
+                        </Button>
+                        <Slider Value="{Binding CameraSetting.UpperLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="upperLevel" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="10"/>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="upperLevel">
+                            <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
+                        </Button>
+                    </WrapPanel>
+                </Grid>
+                <Grid Margin="10">
+                    <TextBlock Text="Beta " Foreground="#333333" VerticalAlignment="Center"/>
 
-                <WrapPanel HorizontalAlignment="Right">
-                    <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=lowerLevel,Path=Value,StringFormat={}{0:f2}}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
-                        <TextBlock.ToolTip>
-                            <TextBlock Text="{Binding ElementName=lowerLevel,Path=Value}"/>
-                        </TextBlock.ToolTip>
+                    <WrapPanel HorizontalAlignment="Right">
+                        <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=lowerLevel,Path=Value,StringFormat={}{0:f2}}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="{Binding ElementName=lowerLevel,Path=Value}"/>
+                            </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="lowerLevel">
-                        <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
-                    </Button>
-                    <Slider Value="{Binding CameraSetting.LowerLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="lowerLevel" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="lowerLevel">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
-                    </Button>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="lowerLevel">
+                            <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
+                        </Button>
+                        <Slider Value="{Binding CameraSetting.LowerLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray"  x:Name="lowerLevel" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="lowerLevel">
+                            <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
+                        </Button>
+                    </WrapPanel>
+                </Grid>
+                <WrapPanel Margin="0 20">
+                    <TextBlock Text="Excitation Light" Foreground="{StaticResource InperTheme}" FontSize="16"/>
+                    <Border Width="100" Margin="10 0 0 0" Height="1" VerticalAlignment="Center" Background="{StaticResource InperTheme}" Opacity=".6"/>
                 </WrapPanel>
-            </Grid>
-            <WrapPanel Margin="0 20">
-                <TextBlock Text="Excitation Light" Foreground="{StaticResource InperTheme}" FontSize="16"/>
-                <Border Width="100" Margin="10 0 0 0" Height="1" VerticalAlignment="Center" Background="{StaticResource InperTheme}" Opacity=".6"/>
-            </WrapPanel>
-            <Grid Margin="10">
-                <TextBlock Text="470 nm(%)" Foreground="#333333" VerticalAlignment="Center"/>
-                <WrapPanel HorizontalAlignment="Right">
-                    <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=excitLowerLevel,Path=Value}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
-                        <TextBlock.ToolTip>
-                            <TextBlock Text="{Binding ElementName=excitLowerLevel,Path=Value}"/>
-                        </TextBlock.ToolTip>
+                <Grid Margin="10">
+                    <TextBlock Text="470 nm(%)" Foreground="#333333" VerticalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Right">
+                        <TextBlock IsEnabled="False" Width="30" Margin="0 0 3 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=excitLowerLevel,Path=Value}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="{Binding ElementName=excitLowerLevel,Path=Value}"/>
+                            </TextBlock.ToolTip>
                     </TextBlock>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="excitLowerLevel">
-                        <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
-                    </Button>
-                    <Slider Value="{Binding CameraSetting.ExcitLowerLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray" x:Name="excitLowerLevel" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
-                    <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="excitLowerLevel">
-                        <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
-                    </Button>
-                </WrapPanel>
-            </Grid>
-        </StackPanel>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="excitLowerLevel">
+                            <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
+                        </Button>
+                        <Slider Value="{Binding CameraSetting.ExcitLowerLevel,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray" x:Name="excitLowerLevel" IsSnapToTickEnabled="True" ValueChanged="{s:Action Slider_ValueChanged}" Width="84" Minimum="0" Maximum="100"/>
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Add_Event}" CommandParameter="excitLowerLevel">
+                            <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill" />
+                        </Button>
+                    </WrapPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
     </Grid>
 </inp:InperDialogWindow>

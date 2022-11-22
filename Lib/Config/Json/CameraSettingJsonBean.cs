@@ -8,7 +8,7 @@ namespace InperSight.Lib.Config.Json
 {
     public class CameraSettingJsonBean
     {
-        public int FPS { get; set; } = 30;
+        public int FPS { get; set; } = 20;
         public double Gain { get; set; } = 1;
         public double FocusPlane { get; set; } = 0;
         public double UpperLevel { get; set; } = 1;

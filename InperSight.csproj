@@ -6,6 +6,8 @@
     <UseWPF>true</UseWPF>
     
     <RootNamespace>InperSight</RootNamespace>
+    
+    <ApplicationIcon>InperSight.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -18,8 +20,11 @@
     <None Remove="Lib\Images\Camera\delete.png" />
     <None Remove="Lib\Images\Camera\path.png" />
     <None Remove="Lib\Images\Camera\reduce.png" />
+    <None Remove="Lib\Images\Inpersight.png" />
+    <None Remove="Lib\Images\lock.png" />
     <None Remove="Lib\Images\Logo.png" />
     <None Remove="Lib\Images\Manual\fibers.png" />
+    <None Remove="Lib\Images\Manual\imaging.png" />
     <None Remove="Lib\Images\Manual\marker.png" />
     <None Remove="Lib\Images\Manual\note.png" />
     <None Remove="Lib\Images\Manual\output.png" />
@@ -28,7 +33,12 @@
     <None Remove="Lib\Images\Manual\stop.png" />
     <None Remove="Lib\Images\Manual\video.png" />
     <None Remove="Lib\Images\skin.png" />
+    <None Remove="Lib\Images\unlock.png" />
     <None Remove="Lib\Images\文件.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="InperSight.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,8 +73,11 @@
     <Resource Include="Lib\Images\Camera\delete.png" />
     <Resource Include="Lib\Images\Camera\path.png" />
     <Resource Include="Lib\Images\Camera\reduce.png" />
+    <Resource Include="Lib\Images\Inpersight.png" />
+    <Resource Include="Lib\Images\lock.png" />
     <Resource Include="Lib\Images\Logo.png" />
     <Resource Include="Lib\Images\Manual\fibers.png" />
+    <Resource Include="Lib\Images\Manual\imaging.png" />
     <Resource Include="Lib\Images\Manual\marker.png" />
     <Resource Include="Lib\Images\Manual\note.png" />
     <Resource Include="Lib\Images\Manual\output.png" />
@@ -73,6 +86,7 @@
     <Resource Include="Lib\Images\Manual\stop.png" />
     <Resource Include="Lib\Images\Manual\video.png" />
     <Resource Include="Lib\Images\skin.png" />
+    <Resource Include="Lib\Images\unlock.png" />
     <Resource Include="Lib\Images\文件.png" />
   </ItemGroup>
 

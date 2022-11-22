@@ -25,7 +25,7 @@ namespace InperSight.Lib.Device
             }
             return deviceHelper;
         }
-        public KeyValuePair<int, ICameraInfo>? GetCameraInfo()
+        public KeyValuePair<int, ICameraInfo>? GetMiniscopeCameraInfo()
         {
             KeyValuePair<int, ICameraInfo>? keyValuePair = null;
             IEnumerable<ICameraInfo> camerInfoList = new CameraInfoesReader().GetCameraInfos();
@@ -48,6 +48,26 @@ namespace InperSight.Lib.Device
             }
 
             return keyValuePair;
+        }
+        public Dictionary<int ,ICameraInfo> GetCameraInfo()
+        {
+            Dictionary<int ,ICameraInfo> cameraInfo = new Dictionary<int ,ICameraInfo>();
+
+            IEnumerable<ICameraInfo> camerInfoList = new CameraInfoesReader().GetCameraInfos();
+            if (camerInfoList == null)
+            {
+                return null;
+            }
+            int index = 0;
+            foreach (var info in camerInfoList)
+            {
+                if (!info.DevicePath.Contains("vid_04b4"))
+                {
+                    cameraInfo.Add(index, info);
+                }
+                index++;
+            }
+            return cameraInfo;
         }
     }
 }

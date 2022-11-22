@@ -1,0 +1,30 @@
+﻿<inp:InperDialogWindow x:Class="InperSight.Views.VideoShowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InperSight.Views"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
+        xmlns:vm="clr-namespace:InperSight.ViewModels"
+        mc:Ignorable="d" IsShowBottomAllButton="False"
+        Title="{Binding BehaviorRecorderKit.CustomName}" Height="395" Width="430" MinWidth="430" MinHeight="328" d:DataContext="{d:DesignInstance vm:VideoShowViewModel}">
+    <Grid>
+        <Button x:Name="_lock" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action LockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -25 170 0" Cursor="Hand">
+            <Grid>
+                <Image Source="/Lib/Images/unlock.png" Stretch="UniformToFill" />
+            </Grid>
+        </Button>
+        <Button x:Name="unLock" Visibility="Collapsed" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action UnLockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -25 170 0" Cursor="Hand">
+            <Grid>
+                <Image Source="/Lib/Images/lock.png" Stretch="UniformToFill" />
+            </Grid>
+        </Button>
+        <Viewbox Stretch="Uniform">
+            <Grid Background="{DynamicResource InperTitlePageColor}">
+                <Image Grid.Row="0" Name="image" Stretch="UniformToFill" Source="{Binding BehaviorRecorderKit.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"  />
+                <!--<TextBlock Visibility="Collapsed" Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>-->
+            </Grid>
+        </Viewbox>
+    </Grid>
+</inp:InperDialogWindow>

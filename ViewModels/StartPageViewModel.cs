@@ -26,11 +26,15 @@ namespace InperSight.ViewModels
             base.OnViewLoaded();
             FindDevice();
         }
+        public void SearchAgain()
+        {
+            FindDevice();
+        }
         private void FindDevice()
         {
             _ = View.Dispatcher.BeginInvoke(new Action(async () =>
             {
-                KeyValuePair<int, InperVideo.Interfaces.ICameraInfo>? device = DeviceHelper.GetDeviceHelper().GetCameraInfo();
+                KeyValuePair<int, InperVideo.Interfaces.ICameraInfo>? device = DeviceHelper.GetDeviceHelper().GetMiniscopeCameraInfo();
                 if (device != null)
                 {
                     InperDeviceHelper.GetInstance().ImageWidth = device.Value.Value.CapabilyItems.First().Size.Width;

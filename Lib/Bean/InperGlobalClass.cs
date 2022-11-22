@@ -1,4 +1,5 @@
 ﻿using InperSight.Lib.Config.Json;
+using InperSight.Lib.Helper;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,8 @@ namespace InperSight.Lib.Bean
         private static string dataFolderName = string.Empty;
         private static bool isExistEvent = false;
         private static bool isAllowDragScroll = false;
-        private static CameraSettingJsonBean cameraSettingJsonBean = new CameraSettingJsonBean();
+        private static ObservableCollection<VideoDeviceHelper> activeVideos = new();
+        private static CameraSettingJsonBean cameraSettingJsonBean = new();
         #endregion
 
         #region properties
@@ -95,6 +97,15 @@ namespace InperSight.Lib.Bean
         {
             get => cameraSettingJsonBean;
             set => cameraSettingJsonBean = value;
+        }
+        public static ObservableCollection<VideoDeviceHelper> ActiveVideos
+        {
+            get => activeVideos;
+            set
+            {
+                activeVideos = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ActiveVideos)));
+            }
         }
         #endregion
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;

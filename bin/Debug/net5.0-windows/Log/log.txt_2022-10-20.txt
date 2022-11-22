@@ -1,3 +1,0 @@
-2022-10-20 16:08:10,501 [1] ERROR InfoLogger - System.ArgumentNullException: Value cannot be null. (Parameter 'visual')
-   at System.Windows.Documents.AdornerLayer.GetAdornerLayer(Visual visual)
-   at InperSight.ViewModels.CameraSettingViewModel.Image_MouseLeftButtonUp(Object sender, MouseButtonEventArgs e) in C:\张金宽\InperSight\ViewModels\CameraSettingViewModel.cs:line 96

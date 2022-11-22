@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -41,27 +42,27 @@ namespace InperSight.Views.Control
         {
             try
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog
+                OpenFileDialog openFileDialog = new()
                 {
                     Filter = "Json|*.inper"
                 };
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     InperGlobalClass.IsImportConfig = true;
-                    if (InperGlobalFunc.GetWindowByNameChar("Imaging") != null)
+                    if (InperGlobalFunc.GetWindowByNameChar("Insight") != null)
                     {
-                        InperGlobalFunc.GetWindowByNameChar("Imaging").Close();
+                        InperGlobalFunc.GetWindowByNameChar("Insight").Close();
                     }
                     InperJsonConfig.filepath = openFileDialog.FileName;
                     InperGlobalClass.CameraSettingJsonBean = JsonHelper.GetCameraSetting();
 
-                    foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
-                    {
+                    foreach (Window window in System.Windows.Application.Current.Windows)
+                    {                        
                         if (window.Name.Contains("MainWindow"))
                         {
                             CameraSettingViewModel _window = new();
                             (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
-                            _window.RequestClose();
+                            //_window.RequestClose();
                         }
                     }
                 }

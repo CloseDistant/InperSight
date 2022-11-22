@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET5_0;NETCOREAPP
 C:\Users\10252\source\repos\InperSight\App.xaml
-9235253034
+12-810753381
 
-42-1538922110
+48-2016074669
 236-200184284
-Views\AboutInperSignalView.xaml;Views\CameraSettingView.xaml;Views\Control\MainTitleContentArea.xaml;Views\DataPathConfigView.xaml;Views\DataShowControlView.xaml;Views\MainWindowView.xaml;Views\ManulControlView.xaml;Views\NoteSettingView.xaml;Views\StartPageView.xaml;
+Views\AboutInperSignalView.xaml;Views\CameraSettingView.xaml;Views\Control\MainTitleContentArea.xaml;Views\Control\VideoUserControl.xaml;Views\DataPathConfigView.xaml;Views\DataShowControlView.xaml;Views\MainWindowView.xaml;Views\ManulControlView.xaml;Views\NoteSettingView.xaml;Views\StartPageView.xaml;Views\VideoSettingView.xaml;Views\VideoShowView.xaml;
 
-False
+True
 

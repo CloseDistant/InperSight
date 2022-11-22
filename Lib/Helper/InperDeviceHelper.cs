@@ -4,6 +4,7 @@ using InperSight.Lib.Bean.Data.Model;
 using InperSight.Lib.Chart.Channel;
 using InperSight.Lib.Config;
 using InperSight.ViewModels;
+using InperSight.Views;
 using InperVideo.Camera;
 using InperVideo.Interfaces;
 using OpenCvSharp;
@@ -21,6 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -60,9 +62,10 @@ namespace InperSight.Lib.Helper
         private IVideoAcquirer videoAcquirer;
         public BindableCollection<CameraChannel> CameraChannels { get; set; } = new BindableCollection<CameraChannel>();
         public EventChannel EventChannelChart { get; set; } = new EventChannel();
-
+        public event Action<bool> StartCollectEvent;
         #region frame 视野相关
         public bool isSwitchToFrame = false;
+        public bool isDeltaF = false;
         public double frameLeft = 0d, frameTop = 0d, frameWidth = 0d, frameHeight = 0d;
         #endregion
         public void MiniscopeCameraInit(int devIndex, ICameraParamSet cameraParamSet)
@@ -129,6 +132,10 @@ namespace InperSight.Lib.Helper
         }
         #region 渲染存储相关
         ConcurrentQueue<VideoFrame> _GreyValueShowQueue = new ConcurrentQueue<VideoFrame>();
+        DateTime baseLinePreviousTimeStamp;
+        int baseLineFrameBufWritePos;
+        Mat baseLineFrame;
+        Mat[] baseLineFrameBuffer = new Mat[128];
         private void GreyValueShow()
         {
             try
@@ -137,15 +144,66 @@ namespace InperSight.Lib.Helper
                 {
                     if (_GreyValueShowQueue.TryDequeue(out VideoFrame _mat))
                     {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        Mat mat = new();
+                        Cv2.ConvertScaleAbs(_mat.FrameMat, mat, InperGlobalClass.CameraSettingJsonBean.UpperLevel, InperGlobalClass.CameraSettingJsonBean.LowerLevel);
+                        if (isSwitchToFrame)
                         {
-                            Mat mat = new();
-                            Cv2.ConvertScaleAbs(_mat.FrameMat, mat, InperGlobalClass.CameraSettingJsonBean.UpperLevel, InperGlobalClass.CameraSettingJsonBean.LowerLevel);
-                            if (isSwitchToFrame)
+                            OpenCvSharp.Rect rect = new OpenCvSharp.Rect((int)frameLeft, (int)frameTop, (int)frameWidth, (int)frameHeight);
+                            mat = mat[rect];
+                        }
+                        if (isDeltaF)
+                        {
+                            if (_mat.Time.Subtract(baseLinePreviousTimeStamp).TotalMilliseconds > 50)
                             {
-                                OpenCvSharp.Rect rect = new OpenCvSharp.Rect((int)frameLeft, (int)frameTop, (int)frameWidth, (int)frameHeight);
-                                mat = mat[rect];
+                                var tempMat1 = mat.Clone();
+                                tempMat1.ConvertTo(tempMat1, MatType.CV_32F);
+                                tempMat1 = tempMat1 / 128;
+                                if (baseLineFrameBufWritePos == 0)
+                                {
+                                    baseLineFrame = tempMat1;
+                                }
+                                else if (baseLineFrameBufWritePos < 128)
+                                {
+                                    baseLineFrame += tempMat1;
+                                }
+                                else
+                                {
+                                    baseLineFrame += tempMat1;
+                                    baseLineFrame -= baseLineFrameBuffer[baseLineFrameBufWritePos % 128];
+                                }
+                                baseLineFrameBuffer[baseLineFrameBufWritePos % 128] = tempMat1.Clone();
+                                baseLinePreviousTimeStamp = _mat.Time;
+                                baseLineFrameBufWritePos++;
                             }
+                            mat.ConvertTo(mat, MatType.CV_32F);
+                            Cv2.Divide(mat, baseLineFrame, mat);
+                            mat = ((mat - 1.0) + 0.02) * 256 * 10;
+                            mat.ConvertTo(mat, MatType.CV_8U);
+                        }
+                        unsafe
+                        {
+                            byte* addr = (byte*)mat.Data;
+                            int index;
+                            for (int row = 0; row < mat.Rows; row++)
+                            {
+                                var pxvec = mat.Ptr(row);
+                                for (int col = 0; col < mat.Cols; col++)
+                                {
+                                    index = (int)(mat.Step() * row + (col * 3));
+                                    int b = addr[index];
+                                    int g = addr[index + 1];
+                                    int r = addr[index + 2];
+                                    if ((b + g + r) / 3 > 0xFA)
+                                    {
+                                        addr[index] = 0x00;
+                                        addr[index + 1] = 0x00;
+                                        addr[index + 2] = 0xFF;
+                                    }
+                                }
+                            }
+                        }
+                        Application.Current.Dispatcher.Invoke(new Action(() =>
+                        {
                             using (MemoryStream memoryStream = mat.ToMemoryStream(".bmp"))
                             {
                                 WBMPPreview = ToImageSource(memoryStream);
@@ -192,7 +250,7 @@ namespace InperSight.Lib.Helper
                             });
                         }
                     }
-                    Thread.Sleep(2);
+                    Thread.Sleep(1);
                 }
             }
             catch (Exception ex)
@@ -218,7 +276,7 @@ namespace InperSight.Lib.Helper
                             _recordsCache.Clear();
                         }
                     }
-                    Thread.Sleep(2);
+                    Thread.Sleep(1);
                 }
             }
             catch (Exception ex)
@@ -240,15 +298,37 @@ namespace InperSight.Lib.Helper
                 {
                     item.RenderableSeries.First().DataSeries.Clear();
                 });
+                _GreyValueDraw = new();
+                _saveStrs = new();
+                _recordsCache = new();
                 _greyValueToCalculateCancel = new();
+
                 Task.Run(() => GreyValueToCalculate(), _greyValueToCalculateCancel.Token);
+
+                foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window.Name.Contains("MainWindow"))
+                    {
+                        ((window.DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
+                    }
+                }
+                StartCollectEvent?.Invoke(true);
+                InperGlobalClass.IsAllowDragScroll = true;
+
                 if (InperGlobalClass.IsRecord)
                 {
                     App.SqlDataInit = new();
 
                     _greyValueToSaveCancel = new();
                     Task.Run(() => GreyValueToSave(), _greyValueToSaveCancel.Token);
-                    MiniScopeStartRecord(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("_HHmmss")));
+                    MiniScopeStartRecord(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss")));
+                    foreach (var item in InperGlobalClass.ActiveVideos)
+                    {
+                        if (item.IsActive && item.AutoRecord)
+                        {
+                            item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item.CustomName));
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -359,7 +439,7 @@ namespace InperSight.Lib.Helper
                     break;
             }
         }
-        private unsafe void SendCommand(byte[] packet)
+        private void SendCommand(byte[] packet)
         {
             try
             {

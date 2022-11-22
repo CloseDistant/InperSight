@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>InperSight</id>
+    <version>1.0.0</version>
+    <authors>InperSight</authors>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework="net5.0-windows7.0">
+        <dependency id="InperCameraDShow" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="InperStudioControlLib" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Aliyun.OSS.DotNetCore" version="2.8.0" exclude="Build,Analyzers" />
+        <dependency id="HandyControl" version="3.3.0" exclude="Build,Analyzers" />
+        <dependency id="LibUsbDotNet" version="2.2.29" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="13.0.1" exclude="Build,Analyzers" />
+        <dependency id="OpenCvSharp4" version="4.6.0.20220608" exclude="Build,Analyzers" />
+        <dependency id="OpenCvSharp4.Windows" version="4.6.0.20220608" exclude="Build,Analyzers" />
+        <dependency id="OpenCvSharp4.runtime.win" version="4.6.0.20220608" exclude="Build,Analyzers" />
+        <dependency id="SciChart" version="6.6.0.26505" exclude="Build,Analyzers" />
+        <dependency id="SharpZipLib" version="1.4.1" exclude="Build,Analyzers" />
+        <dependency id="SqlSugarCore" version="5.1.3.32" exclude="Build,Analyzers" />
+        <dependency id="Stylet" version="1.3.6" exclude="Build,Analyzers" />
+        <dependency id="log4net" version="2.0.15" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework="net5.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+    </frameworkReferences>
+  </metadata>
+  <files>
+    <file src="C:\Users\10252\source\repos\InperSight\bin\Debug\net5.0-windows\InperSight.runtimeconfig.json" target="lib\net5.0-windows7.0\InperSight.runtimeconfig.json" />
+    <file src="C:\Users\10252\source\repos\InperSight\bin\Debug\net5.0-windows\InperSight.dll" target="lib\net5.0-windows7.0\InperSight.dll" />
+  </files>
+</package>

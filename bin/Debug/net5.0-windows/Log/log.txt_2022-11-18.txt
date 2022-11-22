@@ -1,0 +1,24 @@
+2022-11-18 10:48:50,360 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 10:48:50,364 [1] INFO  InfoLogger - pid=00f9
+2022-11-18 10:49:18,459 [1] ERROR InfoLogger - System.NullReferenceException: Object reference not set to an instance of an object.
+   at InperSight.ViewModels.CameraSettingViewModel.Shape_MouseDown(Object sender, MouseButtonEventArgs e) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 376
+2022-11-18 10:49:28,935 [1] ERROR InfoLogger - System.NullReferenceException: Object reference not set to an instance of an object.
+   at InperSight.ViewModels.CameraSettingViewModel.Shape_MouseDown(Object sender, MouseButtonEventArgs e) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 376
+2022-11-18 10:52:16,557 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 10:52:16,561 [1] INFO  InfoLogger - pid=00f9
+2022-11-18 10:52:32,152 [1] ERROR InfoLogger - System.NullReferenceException: Object reference not set to an instance of an object.
+   at InperSight.ViewModels.CameraSettingViewModel.Shape_MouseDown(Object sender, MouseButtonEventArgs e) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 376
+2022-11-18 10:53:15,762 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 10:53:15,767 [1] INFO  InfoLogger - pid=00f9
+2022-11-18 14:13:15,730 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 14:13:15,734 [1] INFO  InfoLogger - pid=00f9
+2022-11-18 14:14:19,182 [1] ERROR InfoLogger - System.InvalidOperationException: Sequence contains no elements
+   at System.Linq.ThrowHelper.ThrowNoElementsException()
+   at System.Linq.Enumerable.First[TSource](IEnumerable`1 source)
+   at InperSight.ViewModels.DataShowControlViewModel.SciScrollSet() in C:\Users\10252\source\repos\InperSight\ViewModels\DataShowControlViewModel.cs:line 258
+2022-11-18 15:27:50,472 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 15:27:50,476 [1] INFO  InfoLogger - pid=00f9
+2022-11-18 15:34:24,196 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 15:34:24,199 [1] INFO  InfoLogger - pid=00f9
+2022-11-18 15:35:28,118 [1] INFO  InfoLogger - vid=04b4
+2022-11-18 15:35:28,122 [1] INFO  InfoLogger - pid=00f9
