@@ -550,15 +550,13 @@
     <Resource Include="Lib\Images\inper.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="InperSignal.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Lib\Images\Logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Lib\Images\InperSignal.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="InperSignal.ico" />
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

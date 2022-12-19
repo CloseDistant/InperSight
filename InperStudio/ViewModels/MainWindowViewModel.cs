@@ -30,6 +30,7 @@ namespace InperStudio.ViewModels
         public LeftToolsControlViewModel LeftToolsControlViewModel { get => leftToolsControlViewModel; set => SetAndNotify(ref leftToolsControlViewModel, value); }
         public ManulControlViewModel ManulControlViewModel { get => manulControlViewModel; set => SetAndNotify(ref manulControlViewModel, value); }
         public static BindableCollection<ListChartValues<TimeSpan, double>> ChartDatas { get; set; } = new BindableCollection<ListChartValues<TimeSpan, double>>();
+        public DataShowControlViewModel DataShowControlViewModel { get; set; }
         #endregion
 
         #region 构造和重载
@@ -49,7 +50,8 @@ namespace InperStudio.ViewModels
 
             LeftToolsControlViewModel = new LeftToolsControlViewModel(windowManager);
             ManulControlViewModel = new ManulControlViewModel(windowManager);
-            ActiveItem = new DataShowControlViewModel(windowManager);
+            DataShowControlViewModel= new DataShowControlViewModel(windowManager);
+            ActiveItem = DataShowControlViewModel;
 
             windowView.NonClientAreaContent = new MainTitleContentArea();
             InperDeviceHelper.Instance.device.SetSweepState(0);

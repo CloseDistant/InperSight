@@ -56,6 +56,8 @@
         <Style x:Key="CellStyle" TargetType="DataGridCell">
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         </Style>
     </inp:InperDialogWindow.Resources>
     <Grid Margin="25 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
@@ -90,7 +92,7 @@
                             <DataGridTemplateColumn Width="80" CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <UniformGrid Columns="2">
+                                        <UniformGrid Columns="3">
                                             <Button Width="18" Height="18" Command="{s:Action Edit_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
                                                 <Button.Style>
                                                     <Style TargetType="Button">
@@ -110,6 +112,7 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
+                                            <Border/>
                                             <Button  Margin="0 0 0 0" Width="18" Height="18" Command="{s:Action Delete_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
                                                 <Button.Style>
                                                     <Style TargetType="Button">
@@ -149,7 +152,7 @@
                     </Button>
                 </WrapPanel>
                 <Grid Grid.Row="1">
-                    <DataGrid Margin="0" Height="225" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" ItemsSource="{Binding Sweeps}" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="False" AutoGenerateColumns="False" HorizontalContentAlignment="Center">
+                    <DataGrid Margin="0" Height="225" ScrollViewer.CanContentScroll="True" FontSize="12" ScrollViewer.VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" Name="sweepsSource" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="False" AutoGenerateColumns="False" HorizontalContentAlignment="Center">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Width="30" Header=" " CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -164,7 +167,7 @@
                             <DataGridTemplateColumn Width="40" CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <UniformGrid Columns="2">
+                                        <UniformGrid Columns="3">
                                             <Button Width="18" Height="18" Command="{s:Action Sweep_Edit_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
                                                 <Button.Style>
                                                     <Style TargetType="Button">
@@ -184,6 +187,7 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
+                                            <Border/>
                                             <Button  Margin="0 0 0 0" Width="18" Height="18" Command="{s:Action Sweep_Delete_Event}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self},Path=DataContext}">
                                                 <Button.Style>
                                                     <Style TargetType="Button">

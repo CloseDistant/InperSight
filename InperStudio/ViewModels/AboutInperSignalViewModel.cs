@@ -1,4 +1,5 @@
-﻿using InperStudio.Lib.Helper;
+﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
 using Stylet;
@@ -7,10 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace InperStudio.ViewModels
 {
-    public class AboutInperSignalViewModel : Screen
+    public class AboutInperSignalViewModel : Stylet.Screen
     {
         private AboutInperSignalView view;
         public AboutInperSignalViewModel()
@@ -33,6 +35,23 @@ namespace InperStudio.ViewModels
             }
             view.model.Text = InperDeviceHelper.Instance.device.PhotometryInfo.Model.ToString();
             view.sn.Text = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
+
+            if (InperGlobalClass.isNoNetwork)
+            {
+                view.ts.Text = "Unable to connect to the network";
+            }
+       
+            if (!string.IsNullOrEmpty(InperGlobalClass.latestVersion))
+            {
+                if (InperConfig.Instance.Version.Equals(InperGlobalClass.latestVersion))
+                {
+                    view.ts.Text = "Latest Version";
+                }
+                else
+                {
+                    view.ts.Text = "The latest version is " + InperGlobalClass.latestVersion + ", Please restart the software to update";
+                }
+            }
         }
     }
 }

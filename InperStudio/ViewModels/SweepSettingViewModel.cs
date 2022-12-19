@@ -35,22 +35,23 @@ namespace InperStudio.ViewModels
 
         public SweepSettingViewModel()
         {
-            WaveForms.ToList().ForEach(w =>
-            {
-                w.IsChecked = false;
-            });
+            //WaveForms.ToList().ForEach(w =>
+            //{
+            //    w.IsChecked = false;
+            //});
         }
         bool isExist = false;
+        public event EventHandler<double> SwepTimeChangeEvent;
         public SweepSettingViewModel(Sweep _sweep)
         {
             sweep = _sweep;
             isExist = true;
 
-            var select = sweep.WaveForm.Split(',').ToList();
-            WaveForms.ToList().ForEach(w =>
-            {
-                w.IsChecked = select.Contains(w.Index.ToString()) ? true : false;
-            });
+            //var select = sweep.WaveForm.Split(',').ToList();
+            //WaveForms.ToList().ForEach(w =>
+            //{
+            //    w.IsChecked = select.Contains(w.Index.ToString()) ? true : false;
+            //});
         }
         protected override void OnViewLoaded()
         {
@@ -90,21 +91,23 @@ namespace InperStudio.ViewModels
                     StimulusBeans.Instance.Sweeps.Insert(sweep.Index - 1, sweep);
                 }
                 this.RequestClose();
+                SwepTimeChangeEvent?.Invoke(this, double.Parse(string.IsNullOrEmpty(view.duration.Text) ? "0" : view.duration.Text));
             };
             view.selected.TextChanged += (s, e) =>
             {
                 if (!string.IsNullOrEmpty(view.selected.Text.Trim()))
                 {
                     List<WaveForm> drawWaveForms = new List<WaveForm>();
-
+                    double _duration = 0d;
                     foreach (var item in view.selected.Text.Split(','))
                     {
                         if (WaveForms.ToList().FirstOrDefault(x => x.Index == int.Parse(item)) is WaveForm waveForm)
                         {
                             drawWaveForms.Add(waveForm);
+                            _duration += waveForm.Duration;
                         }
                     }
-
+                    view.duration.Text = _duration.ToString();
                     if (double.TryParse(view.duration.Text, out double res))
                     {
                         if (res > 0)
@@ -117,55 +120,115 @@ namespace InperStudio.ViewModels
                 }
                 else
                 {
+                    view.duration.Text = String.Empty;
                     xyDataSeries.Clear();
                 }
             };
 
         }
+        [Obsolete]
         public void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             try
             {
-                var wf = (sender as CheckBox).DataContext as WaveForm;
-                wf.IsChecked = true;
-                string str = this.view.selected.Text + "," + wf.Index.ToString();
-                if (str.StartsWith(","))
-                {
-                    str = str.Substring(1);
-                }
-                sweep.WaveForm = str;
-                view.selected.Text = str;
+                //var wf = (sender as CheckBox).DataContext as WaveForm;
+                //wf.IsChecked = true;
+                //string str = this.view.selected.Text + "," + wf.Index.ToString();
+                //if (str.StartsWith(","))
+                //{
+                //    str = str.Substring(1);
+                //}
+                //sweep.WaveForm = str;
+                //view.selected.Text = str;
+                //if (string.IsNullOrEmpty(view.duration.Text))
+                //{
+                //    view.duration.Text = wf.Duration.ToString();
+                //}
+                //else
+                //{
+                //    view.duration.Text = (int.Parse(view.duration.Text) + wf.Duration).ToString();
+                //}
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
             }
         }
-
+        [Obsolete]
         public void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             try
             {
-                var wf = (sender as CheckBox).DataContext as WaveForm;
-                wf.IsChecked = false;
-                var res = this.view.selected.Text.Split(',').ToList();
-                if (res.Contains(wf.Index.ToString()))
-                {
-                    res.Remove(wf.Index.ToString());
-                    view.selected.Text = string.Empty;
-                    string str = string.Empty;
-                    res.ForEach(x =>
-                    {
-                        str += x + ',';
-                    });
-                    str = res.Count == 0 ? "" : str.Substring(0, str.Length - 1);
-                    sweep.WaveForm = str;
-                    view.selected.Text = str;
-                }
+                //var wf = (sender as CheckBox).DataContext as WaveForm;
+                //wf.IsChecked = false;
+                //var res = this.view.selected.Text.Split(',').ToList();
+                //if (res.Contains(wf.Index.ToString()))
+                //{
+                //    res.Remove(wf.Index.ToString());
+                //    view.selected.Text = string.Empty;
+                //    string str = string.Empty;
+                //    res.ForEach(x =>
+                //    {
+                //        str += x + ',';
+                //    });
+                //    str = res.Count == 0 ? "" : str.Substring(0, str.Length - 1);
+                //    sweep.WaveForm = str;
+                //    view.selected.Text = str;
+
+                //    view.duration.Text = (int.Parse(view.duration.Text) - wf.Duration).ToString() == "0" ? "" : (int.Parse(view.duration.Text) - wf.Duration).ToString();
+                //}
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
+            }
+        }
+        public void MarkerMove(string type)
+        {
+            try
+            {
+                if (type.Equals("rightMove"))
+                {
+                    var wf = this.view.sweepsList.SelectedItem as WaveForm;
+                    if (wf != null)
+                    {
+                        string str = this.view.selected.Text + "," + wf.Index.ToString();
+                        if (str.StartsWith(","))
+                        {
+                            str = str.Substring(1);
+                        }
+                        sweep.WaveForm = str;
+                        view.selected.Text = str;
+                        //if (string.IsNullOrEmpty(view.duration.Text))
+                        //{
+                        //    view.duration.Text = wf.Duration.ToString();
+                        //}
+                        //else
+                        //{
+                        //    view.duration.Text = (int.Parse(view.duration.Text) + wf.Duration).ToString();
+                        //}
+                    }
+                }
+                else
+                {
+                    var res = this.view.selected.Text.Split(',').ToList();
+                    if (res.Count > 0)
+                    {
+                        res.RemoveAt(res.Count - 1);
+                        string str = string.Empty;
+                        res.ForEach(x =>
+                        {
+                            str += x + ',';
+                        });
+                        str = res.Count == 0 ? "" : str.Substring(0, str.Length - 1);
+                        sweep.WaveForm = str;
+                        view.selected.Text = str;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.Message);
             }
         }
         public void Duration_Textchanged(object sender, TextChangedEventArgs e)
@@ -177,9 +240,19 @@ namespace InperStudio.ViewModels
                 {
                     if (res > 0)
                     {
+                        List<WaveForm> wf = new List<WaveForm>();
+                        var arr = view.selected.Text.Split(',');
+                        if (arr.Length > 0)
+                        {
+                            for (int i = 0; i < arr.Length; i++)
+                            {
+                                var item = WaveForms.ToList().FirstOrDefault(x => x.Index == int.Parse(arr[i]));
+                                wf.Add(item);
+                            }
+                        }
                         sweep.Duration = res;
                         XyDataSeries.Clear();
-                        XyDataSeries = StimulusBeans.Instance.GetXyDataSeries(WaveForms.ToList().FindAll(x => x.IsChecked), res);
+                        XyDataSeries = StimulusBeans.Instance.GetXyDataSeries(wf, res);
                         view.scichart.ZoomExtents();
                         this.view.remainder.Visibility = Visibility.Collapsed;
                     }

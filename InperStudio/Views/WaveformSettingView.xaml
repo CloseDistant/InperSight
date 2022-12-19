@@ -10,7 +10,7 @@
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
         mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
-        Title="Add Waveform" Height="330" Width="290" d:DataContext="{d:DesignInstance vm:WaveformSettingViewModel}">
+        Title="Waveform" Height="330" Width="290" d:DataContext="{d:DesignInstance vm:WaveformSettingViewModel}">
     <Grid>
         <StackPanel Margin="20 20 20 10">
             <WrapPanel>

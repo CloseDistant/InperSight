@@ -39,14 +39,14 @@ namespace InperStudio.ViewModels
         public List<string> TextLableFormatting { get; set; } = new List<string>();
         public static string TextFormat = "hh:mm:ss";
         private ConcurrentQueue<HotKeysListen> _hotKeysListens = new ConcurrentQueue<HotKeysListen>();
-
+        public static double ShowVisibleValue = 10;
         private double visibleValue = 10;
         public double VisibleValue
         {
             get => visibleValue;
             set
             {
-
+                ShowVisibleValue = value;
                 SetAndNotify(ref visibleValue, value);
                 if (value > 0)
                 {
@@ -132,9 +132,16 @@ namespace InperStudio.ViewModels
             {
                 var item = this.view.dataList.ItemContainerGenerator.ContainerFromIndex(i) as ListBoxItem;
                 SciChartSurface sciChartSurface = InperClassHelper.FindVisualChild<SciChartSurface>(item);
-                sciChartSurface.ZoomState = ZoomStates.AtExtents;
-                sciChartSurface.AnimateZoomExtents(TimeSpan.FromMilliseconds(200));
+                if (sciChartSurface != null)
+                {
+                    sciChartSurface.ZoomState = ZoomStates.AtExtents;
+                    sciChartSurface.AnimateZoomExtents(TimeSpan.FromMilliseconds(200));
+                }
             }
+        }
+        public void ChartZoomExtentsExport()
+        {
+            ChartZoomExtents();
         }
         public void SciScroll_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {

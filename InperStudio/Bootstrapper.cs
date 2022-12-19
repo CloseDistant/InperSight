@@ -31,11 +31,11 @@ namespace InperStudio
                     DbType = DbType.MySql,
                     IsAutoCloseConnection = true //不设成true要手动close
                 });
-
                 List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
 
                 if (list != null && list.Count() > 0)
                 {
+                    InperGlobalClass.latestVersion = list.Last().Version_Number;
                     Tb_Version ver = list.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Version);
                     if (ver != null)
                     {
@@ -54,22 +54,26 @@ namespace InperStudio
                             }
                         }
                     }
-                    InperConfig.Instance.ReleaseData = list.Last().UploadTime.ToString("yyyy-MM-dd");
-                    if (!string.IsNullOrEmpty(list.Last().Desc))
+                    InperConfig.Instance.ReleaseData = list.Last(x=>x.Version_Number==InperConfig.Instance.Version).UploadTime.ToString("yyyy-MM-dd");
+                    if (!string.IsNullOrEmpty(list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc))
                     {
                         InperConfig.Instance.VersionDesc = string.Empty;
-                        if (list.Last().Desc.Contains('@'))
+                        if (list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc.Contains('@'))
                         {
-                            list.Last().Desc.Split('@').ToList().ForEach(desc =>
+                            list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc.Split('@').ToList().ForEach(desc =>
                             {
                                 InperConfig.Instance.VersionDesc += desc + Environment.NewLine;
                             });
                         }
                         else
                         {
-                            InperConfig.Instance.VersionDesc = list.Last().Desc;
+                            InperConfig.Instance.VersionDesc = list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc;
                         }
                     }
+                }
+                else
+                {
+
                 }
                 InperConfig.Instance.IsSkip = false;
                 db.Close();
@@ -78,6 +82,7 @@ namespace InperStudio
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
+                InperGlobalClass.isNoNetwork = true;
             }
             // Perform any other configuration before the application starts
         }

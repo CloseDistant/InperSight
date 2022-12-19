@@ -97,11 +97,11 @@
                 </WrapPanel>
                 <WrapPanel Margin="0 10 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Exposure (ms)" VerticalAlignment="Center" Margin="0 0 13 0" Width="80"/>
-                    <ComboBox TextBoxBase.TextChanged="{s:Action Exposure_TextChanged}" Margin="20 0 0 0" IsEditable="True" x:Name="Exposure" Text="{Binding Expourse,UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Exposures,UpdateSourceTrigger=PropertyChanged}" Padding="4 0" MinHeight="20" MinWidth="66" FontSize="{DynamicResource InperNormalFontSize}"/>
+                    <ComboBox TextBoxBase.TextChanged="{s:Action Exposure_TextChanged}" Margin="20 0 0 0" IsEditable="True" x:Name="Exposure" Text="{Binding Expourse,UpdateSourceTrigger=PropertyChanged}" Padding="4 0" MinHeight="20" MinWidth="66" FontSize="{DynamicResource InperNormalFontSize}"/>
                 </WrapPanel>
                 <WrapPanel Margin="0 10 0 0"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Sampling (fps)" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>
-                    <ComboBox TextBoxBase.TextChanged="{s:Action Sampling_TextChanged}" x:Name="Sampling" Text="{Binding Sampling,UpdateSourceTrigger=PropertyChanged}" IsEditable="True" ItemsSource="{Binding FPS,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ComboBoxBaseStyle}" Padding="4 0" Margin="20 0 0 0" MinHeight="20" MinWidth="66" FontSize="{DynamicResource InperNormalFontSize}"/>
+                    <ComboBox TextBoxBase.TextChanged="{s:Action Sampling_TextChanged}" x:Name="Sampling" Text="{Binding Sampling,UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource ComboBoxBaseStyle}" Padding="4 0" Margin="20 0 0 0" MinHeight="20" MinWidth="66" FontSize="{DynamicResource InperNormalFontSize}"/>
                 </WrapPanel>
                 <WrapPanel Margin="0 10"  IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock Text="Gain" VerticalAlignment="Center" Width="80" Margin="0 0 13 0"/>

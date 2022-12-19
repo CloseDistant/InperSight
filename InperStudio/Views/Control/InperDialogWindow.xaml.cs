@@ -42,5 +42,9 @@ namespace InperStudio.Views.Control
             ClickEvent?.Invoke(this, 2);
             this.Close();
         }
+        public void HideCancleButton()
+        {
+            this.cancel.Visibility = Visibility.Collapsed;
+        }
     }
 }

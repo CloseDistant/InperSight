@@ -88,6 +88,7 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
+                            InperClassHelper.GetWindowByNameChar("Camera Signal").Show();
                             InperClassHelper.GetWindowByNameChar("Camera Signal").Activate();
                         }
                         break;
@@ -187,6 +188,11 @@ namespace InperStudio.ViewModels
         }
         private async void PreviewRecord()
         {
+            if (InperGlobalClass.IsOpenLightMeasureMode)
+            {
+                InperGlobalClass.ShowReminderInfo("Currently on measure mode, please switch to the experiment mode");
+                return;
+            }
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
             InperDeviceHelper.Instance.device.Start();
@@ -198,7 +204,7 @@ namespace InperStudio.ViewModels
             }
             if (!InperDeviceHelper.Instance.InitDataStruct())
             {
-                InperGlobalClass.ShowReminderInfo("数据初始化失败");
+                InperGlobalClass.ShowReminderInfo("Data initialization failed");
                 return;
             }
             if (!InperDeviceHelper.Instance.AllLightOpen())
@@ -214,7 +220,6 @@ namespace InperStudio.ViewModels
             InperGlobalClass.IsRecord = false;
             InperGlobalClass.IsStop = false;
 
-
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
             InperGlobalClass.IsAllowDragScroll = true;
         }
@@ -222,6 +227,11 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                if (InperGlobalClass.IsOpenLightMeasureMode)
+                {
+                    InperGlobalClass.ShowReminderInfo("Currently on measure mode, please switch to the experiment mode");
+                    return;
+                }
                 if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
                 {
                     var obj = InperJsonHelper.GetAdditionRecordJson("stop");
@@ -253,7 +263,7 @@ namespace InperStudio.ViewModels
                 }
                 if (!InperDeviceHelper.Instance.InitDataStruct())
                 {
-                    InperGlobalClass.ShowReminderInfo("数据初始化失败");
+                    InperGlobalClass.ShowReminderInfo("Data initialization failed");
                     return;
                 }
                 if (!Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))

@@ -108,7 +108,7 @@ namespace InperStudio.ViewModels
                 var tb = sender as TextBox;
                 if (!string.IsNullOrEmpty(tb.Text))
                 {
-                    if (int.TryParse(tb.Text, out int res))
+                    if (double.TryParse(tb.Text, out double res))
                     {
                         double maxPulse = (1000 / InperGlobalClass.CameraSignalSettings.Sampling - InperGlobalClass.CameraSignalSettings.Exposure * InperGlobalClass.CameraSignalSettings.LightMode.Count) / InperGlobalClass.CameraSignalSettings.LightMode.Count;
                         if (res < maxPulse)
@@ -121,6 +121,14 @@ namespace InperStudio.ViewModels
                             this.view.remainder.Text = "The Value must be < " + maxPulse.ToString("0.00");
                             this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                             return;
+                        }
+                        if (tb.Text.Contains('.'))
+                        {
+                            if (tb.Text.Split('.').Last().Length > 2)
+                            {
+                                tb.Text = tb.Text.Substring(0, tb.Text.Split('.')[0].Length + 3);
+                                tb.SelectionStart = tb.Text.Length;
+                            }
                         }
                     }
                     else

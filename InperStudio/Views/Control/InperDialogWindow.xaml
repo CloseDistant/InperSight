@@ -32,8 +32,8 @@
                 <Grid Grid.Row="1">
                     <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Button  Style="{StaticResource InperBottomButtonStyle}" Name="yes" Click="Yes_Click" IsHitTestVisible="True"  ContentStringFormat="Yes" Width="76" Height="28" />
-                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="no" Click="No_Click" IsHitTestVisible="True"  ContentStringFormat="No" Width="76" Height="28" Margin="30 0" />
-                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="cancel" Click="Cancle_Click" IsHitTestVisible="True"  ContentStringFormat="Cancel" Width="76" Height="28" />
+                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="no" Click="No_Click" IsHitTestVisible="True"  ContentStringFormat="No" Width="76" Height="28" Margin="30 0 0 0" Cursor="Hand" />
+                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="cancel" Click="Cancle_Click" IsHitTestVisible="True"  ContentStringFormat="Cancel" Width="76" Height="28" Margin="30 0 0 0" />
                     </WrapPanel>
                 </Grid>
             </Grid>

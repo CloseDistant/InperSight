@@ -12,6 +12,7 @@ using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Axes;
+using SciChart.Data.Model;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -53,8 +54,8 @@ namespace InperStudio.ViewModels
         private InperDeviceHelper deviceHelper;
         public InperDeviceHelper InperDeviceHelper { get => deviceHelper; set => SetAndNotify(ref deviceHelper, value); }
         public List<string> Exposures { get; set; } = InperParameters.Exposures;
-        private BindableCollection<double> fps = InperParameters.FPS;
-        public BindableCollection<double> FPS { get => fps; set => SetAndNotify(ref fps, value); }
+        //private List<double> fps = InperParameters.FPS.ToList();
+        public List<double> FPS { get; set; } = InperParameters.FPS.ToList();
         public bool IsContinuous { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous;
         public bool IsInterval { get; set; } = InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval;
         private double sampling = InperGlobalClass.CameraSignalSettings.Sampling;
@@ -73,6 +74,17 @@ namespace InperStudio.ViewModels
         protected override void OnViewLoaded()
         {
             view = this.View as SignalSettingsView;
+            view.ConfirmClickEvent += (s, e) =>
+            {
+                if (@enum != SignalSettingsTypeEnum.Camera)
+                {
+                    RequestClose();
+                }
+                else
+                {
+                    this.view.Hide();
+                }
+            };
             for (int i = 0; i < 8; i++)
             {
                 AnalogChannels.Add(new SignalCameraChannel() { ChannelId = i + 101, NickName = "AI-" + (i + 1), Name = "AI-" + (i + 1) + "-", BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[i])) });
@@ -152,10 +164,6 @@ namespace InperStudio.ViewModels
                 default:
                     break;
             }
-            view.ConfirmClickEvent += (s, e) =>
-            {
-                RequestClose();
-            };
         }
 
         #region methods  Camera
@@ -201,7 +209,7 @@ namespace InperStudio.ViewModels
                     if (!rx.IsMatch(com.Text))
                     {
                         com.Text = Math.Floor(double.Parse(com.Text)).ToString();
-                        return; 
+                        return;
                     }
                     this.view.Exposure.Text = Expourse = com.Text;
                     _ = InperDeviceHelper.Instance.device.SetExposure(double.Parse(com.Text));
@@ -333,6 +341,9 @@ namespace InperStudio.ViewModels
                         });
                     }
                 }
+
+                view.Exposure.ItemsSource = Exposures;
+                view.Sampling.ItemsSource = FPS;
             }
             catch (Exception ex)
             {
@@ -559,9 +570,9 @@ namespace InperStudio.ViewModels
 
                 foreach (WaveGroup wave in InperDeviceHelper.Instance.LightWaveLength)
                 {
+                    SetYaxidVisible(item, wave.GroupId, wave.IsChecked);
                     if (wave.IsChecked)
                     {
-                        SetYaxidVisible(item, wave.GroupId, true);
                         LightMode<TimeSpan, double> mode = new LightMode<TimeSpan, double>()
                         {
                             LightType = wave.GroupId,
@@ -575,11 +586,40 @@ namespace InperStudio.ViewModels
                         item.RenderableSeries.Add(line);
                     }
                 }
-
+                if (InperDeviceHelper.Instance.CameraChannels.Count > 0)
+                {
+                    item.XVisibleRange = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault().XVisibleRange;
+                    item.ViewportManager = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault().ViewportManager;
+                }
+                else
+                {
+                    item.XVisibleRange = new TimeSpanRange(new TimeSpan(0), new TimeSpan(0, 0, (int)DataShowControlViewModel.ShowVisibleValue));
+                    item.ViewportManager = new ScrollingViewportManager(DataShowControlViewModel.ShowVisibleValue);
+                }
                 InperDeviceHelper.Instance.CameraChannels.Add(item);
                 InperDeviceHelper.Instance._LoopCannels.Add(item);
                 Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
 
+                if (InperGlobalClass.IsPreview)
+                {
+                    MainWindowViewModel main = null;
+                    foreach (System.Windows.Window window in Application.Current.Windows)
+                    {
+                        if (window.Name.Contains("MainWindow"))
+                        {
+                            main = window.DataContext as MainWindowViewModel;
+                            break;
+                        }
+                    }
+                    if (InperDeviceHelper.Instance.CameraChannels.Count == 1 && main != null)
+                    {
+                         main.DataShowControlViewModel.SciScrollSet();
+                    }
+                    //if (main != null)
+                    //{
+                    //    main.DataShowControlViewModel.ChartZoomExtentsExport();
+                    //}
+                }
                 if (channel == null)
                 {
                     InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Channel()
@@ -968,6 +1008,8 @@ namespace InperStudio.ViewModels
                 {
                     if ((bool)tb.IsChecked)
                     {
+                        InperGlobalClass.IsOpenLightMeasureMode = true;
+                        InperDeviceHelper.device.SetMeasureMode(true);
                         if ((bool)this.view.interval.IsChecked)
                         {
                             InperDeviceHelper.Instance._Metronome.Stop();
@@ -988,17 +1030,22 @@ namespace InperStudio.ViewModels
 
                         #region 默认选中第一项
                         var item = this.view.lightMode.ItemContainerGenerator.ContainerFromIndex(0) as ListBoxItem;
-                        RadioButton rb = InperClassHelper.FindVisualChild<RadioButton>(item);
-                        rb.IsChecked = true;
-                        InperTextBox textBox = InperClassHelper.FindVisualChild<InperTextBox>(item);
-                        if (string.IsNullOrEmpty(textBox.Text))
+                        if (item != null)
                         {
-                            textBox.Text = "40";
+                            RadioButton rb = InperClassHelper.FindVisualChild<RadioButton>(item);
+                            rb.IsChecked = true;
+                            InperTextBox textBox = InperClassHelper.FindVisualChild<InperTextBox>(item);
+                            if (string.IsNullOrEmpty(textBox.Text))
+                            {
+                                textBox.Text = "40";
+                            }
                         }
                         #endregion
                     }
                     else
                     {
+                        InperGlobalClass.IsOpenLightMeasureMode = false;
+                        InperDeviceHelper.device.SetMeasureMode(false);
                         if ((bool)this.view.interval.IsChecked)
                         {
                             InperDeviceHelper.Instance._Metronome.Start();
@@ -1114,7 +1161,7 @@ namespace InperStudio.ViewModels
 
             OpenCvSharp.Point Center = new OpenCvSharp.Point(rect_left + (ellips_diam / 2), rect_top + (ellips_diam / 2));
 
-            mat.Circle(center: Center, radius: (int)(ellips_diam / 4), color: Scalar.White, thickness: (int)(ellips_diam / 2));
+            mat.Circle(center: Center, radius: (int)(ellips_diam / 4), color: Scalar.White, -1);
 
             InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((grid.Children[0] as TextBlock).Text) - 1).Mask = mat;
         }

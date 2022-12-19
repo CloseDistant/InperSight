@@ -1,10 +1,13 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
+using InperProtocolStack.CmdPhotometry;
+using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using Stylet;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
@@ -18,6 +21,7 @@ namespace InperStudio.Lib.Bean
         private static bool isPreview = false;
         private static bool isStop = true;
         private static bool isExistEvent = false;
+        private static bool isOpenLightMeasureMode = false;
         private static bool isAllowDragScroll = false;
         private static string dataPath = string.Empty;
         private static string dataFolderName = string.Empty;
@@ -36,6 +40,8 @@ namespace InperStudio.Lib.Bean
         #endregion
 
         #region properties
+        public static bool isNoNetwork = false;
+        public static string latestVersion = string.Empty;
         public static bool IsImportConfig { get; set; } = false;
         public static DateTime RunTime
         {
@@ -44,6 +50,15 @@ namespace InperStudio.Lib.Bean
             {
                 runTime = value;
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(RunTime)));
+            }
+        }
+        public static bool IsOpenLightMeasureMode
+        {
+            get => isOpenLightMeasureMode;
+            set
+            {
+                isOpenLightMeasureMode = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(IsOpenLightMeasureMode)));
             }
         }
         public static bool IsAllowDragScroll
@@ -193,5 +208,7 @@ namespace InperStudio.Lib.Bean
             InperDeviceHelper.Instance.device.SetFrameRate(sampling * (CameraSignalSettings.LightMode.Count < 1 ? 1 : CameraSignalSettings.LightMode.Count));
             CameraSignalSettings.Sampling = sampling;
         }
+
+
     }
 }

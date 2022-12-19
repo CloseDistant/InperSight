@@ -145,12 +145,15 @@ namespace InperStudio.ViewModels
                     view.stop_source_comb.ItemsSource = Source;
                     view.source_comb.SelectionChanged += Source_comb_SelectionChanged;
                 }
-                view.ConfirmClickEvent += View_ConfirmClickEvent;
-                view.OtherClickEvent += View_OtherClickEvent;
             }
             catch (Exception ex)
             {
                 App.Log.Error(ex.ToString());
+            }
+            finally
+            {
+                view.ConfirmClickEvent += View_ConfirmClickEvent;
+                view.OtherClickEvent += View_OtherClickEvent;
             }
         }
 

@@ -182,7 +182,8 @@
                     </Button>
                 </StackPanel>
                 <StackPanel Margin="15 0" Visibility="{Binding IsShowStimulus,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}">
-                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Stimulus">
+                    <!---->
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action EventSettingsShow}" CommandParameter="Stimulus" Cursor="Hand">
                         <StackPanel>
                             <Grid x:Name="stimulus">
                                 <Image Source="/Lib/Images/New/stimulus.png" Width="20" Height="20" Stretch="Uniform" />

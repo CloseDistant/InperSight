@@ -1,4 +1,6 @@
-﻿using SciChart.Charting.Model.DataSeries;
+﻿using InperProtocolStack.CmdPhotometry;
+using InperStudio.Lib.Helper;
+using SciChart.Charting.Model.DataSeries;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -91,6 +93,102 @@ namespace InperStudio.Lib.Bean.Stimulus
                 App.Log.Error(ex.ToString());
             }
             return new XyDataSeries<TimeSpan, double>();
+        }
+
+        public void StimulusCommandSend()
+        {
+            List<WaverformStruct> waverformStructs = new List<WaverformStruct>();
+            InperGlobalClass.StimulusSettings.WaveForms = new List<WaveForm>();
+            StimulusBeans.Instance.WaveForms.ToList().ForEach(x =>
+            {
+                WaverformStruct waverformStruct = new WaverformStruct()
+                {
+                    ID = x.Index,
+                    WaveformType = 1,
+                    PulseWidth = (float)x.Pulse,
+                    Frequency = (float)x.Frequence,
+                    Duration = x.Duration,
+                    PowerRegionLow = 0,
+                    PowerRegionHigh = 0,
+                    EC_A = 0,
+                    EC_B = 0
+                };
+                waverformStructs.Add(waverformStruct);
+                InperGlobalClass.StimulusSettings.WaveForms.Add(x);
+            });
+
+            if (waverformStructs.Count > 0)
+            {
+                InperDeviceHelper.Instance.device.SetGBLWF(waverformStructs);
+
+                waverformStructs.ForEach(w =>
+                {
+                    App.Log.Info("Waveform:" + w.ID + ":" + "---PulseWidth:" + w.PulseWidth + "---Frequency:" + w.Frequency + "---Duration:" + w.Duration + "---PowerRegionHigh:" + w.PowerRegionHigh + "---PowerRegionLow:" + w.PowerRegionLow + "---EC_A:" + w.EC_A + "---EC_B:" + w.EC_B);
+                });
+            }
+ 
+            #region sweep设置下发
+            CHNSweepStruct cHN = new CHNSweepStruct()
+            {
+                DioID = StimulusBeans.Instance.DioID,
+                TotalTime = StimulusBeans.Instance.Hour * 3600 + StimulusBeans.Instance.Minute * 60 + StimulusBeans.Instance.Seconds,
+                SweepStructs = new SweepStruct[StimulusBeans.Instance.Sweeps.Count(x => x.IsChecked)]
+            };
+            int count = 0;
+            InperGlobalClass.StimulusSettings.Sweeps = new List<Sweep>();
+            StimulusBeans.Instance.Sweeps.ToList().ForEach(x =>
+            {
+                InperGlobalClass.StimulusSettings.Sweeps.Add(x);
+                if (x.IsChecked)
+                {
+                    var indexs = x.WaveForm.Split(',').ToList();
+                    SweepStruct sweepStruct = new SweepStruct()
+                    {
+                        Duration = (float)x.Duration,
+                        WaveformID = new int[indexs.Count]
+                    };
+                    sweepStruct.BasicWaveformCount = indexs.Count;
+                    for (int i = 0; i < indexs.Count; i++)
+                    {
+                        sweepStruct.WaveformID[i] = int.Parse(indexs[i].ToString());
+                    }
+
+                    cHN.SweepStructs[count] = sweepStruct;
+                    count++;
+                }
+            });
+            if (cHN.SweepStructs.Length > 0)
+            {
+                List<byte> datas = new List<byte>();
+                datas.AddRange(BitConverter.GetBytes(cHN.DioID));
+                datas.AddRange(BitConverter.GetBytes(cHN.TotalTime));
+                cHN.SweepStructs.ToList().ForEach(x =>
+                {
+                    datas.AddRange(BitConverter.GetBytes(x.Duration));
+                    datas.AddRange(BitConverter.GetBytes(x.BasicWaveformCount));
+                    x.WaveformID.ToList().ForEach(t =>
+                    {
+                        datas.AddRange(BitConverter.GetBytes(t));
+                    });
+                });
+
+                InperDeviceHelper.Instance.device.SetCHNSweep(datas);
+                InperDeviceHelper.Instance.device.SetSweepState(1);
+                StimulusBeans.Instance.IsConfigSweep = true;
+                StimulusBeans.Instance.Sweeps.ToList().ForEach(x =>
+                {
+                    if (x.IsChecked)
+                    {
+                        App.Log.Info("Sweep:" + x.Index + ":" + "-WaveForms:" + x.WaveForm + "-Duration:" + x.Duration);
+                    }
+                });
+            }
+            else
+            {
+                InperDeviceHelper.Instance.device.SetSweepState(0);
+            }
+         
+            #endregion
         }
     }
 }

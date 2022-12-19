@@ -64,100 +64,17 @@ namespace InperStudio.ViewModels
             };
             view.ConfirmClickEvent += (s, e) =>
             {
-                if (InperGlobalClass.IsStop)
+                if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
                 {
-                    #region waveform 设置下发
-                    List<WaverformStruct> waverformStructs = new List<WaverformStruct>();
-                    InperGlobalClass.StimulusSettings.WaveForms = new List<WaveForm>();
-
-                    StimulusBeans.Instance.WaveForms.ToList().ForEach(x =>
+                    if (StimulusBeans.Instance.DioID == -1)
                     {
-                        WaverformStruct waverformStruct = new WaverformStruct()
-                        {
-                            ID = x.Index,
-                            WaveformType = 1,
-                            PulseWidth = (float)x.Pulse,
-                            Frequency = (float)x.Frequence,
-                            Duration = x.Duration,
-                            PowerRegionLow = 0,
-                            PowerRegionHigh = 0,
-                            EC_A = 0,
-                            EC_B = 0
-                        };
-                        waverformStructs.Add(waverformStruct);
-                        InperGlobalClass.StimulusSettings.WaveForms.Add(x);
-                    });
-
-                    if (waverformStructs.Count > 0)
-                    {
-                        InperDeviceHelper.Instance.device.SetGBLWF(waverformStructs);
-
-                        waverformStructs.ForEach(w =>
-                        {
-                            App.Log.Info("Waveform:" + w.ID + ":" + "---PulseWidth:" + w.PulseWidth + "---Frequency:" + w.Frequency + "---Duration:" + w.Duration + "---PowerRegionHigh:" + w.PowerRegionHigh + "---PowerRegionLow:" + w.PowerRegionLow + "---EC_A:" + w.EC_A + "---EC_B:" + w.EC_B);
-                        });
+                        InperGlobalClass.ShowReminderInfo("No available DIO");
+                        return;
                     }
-                    #endregion
-                    #region sweep设置下发
-                    CHNSweepStruct cHN = new CHNSweepStruct()
-                    {
-                        DioID = StimulusBeans.Instance.DioID,
-                        TotalTime = StimulusBeans.Instance.Hour * 3600 + StimulusBeans.Instance.Minute * 60 + StimulusBeans.Instance.Seconds,
-                        SweepStructs = new SweepStruct[StimulusBeans.Instance.Sweeps.Count(x => x.IsChecked)]
-                    };
-                    int count = 0;
-                    InperGlobalClass.StimulusSettings.Sweeps = new List<Sweep>();
-                    StimulusBeans.Instance.Sweeps.ToList().ForEach(x =>
-                    {
-                        InperGlobalClass.StimulusSettings.Sweeps.Add(x);
-                        if (x.IsChecked)
-                        {
-                            var indexs = x.WaveForm.Split(',').ToList();
-                            SweepStruct sweepStruct = new SweepStruct()
-                            {
-                                Duration = (float)x.Duration,
-                                WaveformID = new int[indexs.Count]
-                            };
-                            sweepStruct.BasicWaveformCount = indexs.Count;
-                            for (int i = 0; i < indexs.Count; i++)
-                            {
-                                sweepStruct.WaveformID[i] = int.Parse(indexs[i].ToString());
-                            }
+                    #region stimulus 设置下发
 
-                            cHN.SweepStructs[count] = sweepStruct;
-                            count++;
-                        }
-                    });
-                    if (cHN.SweepStructs.Length > 0)
-                    {
-                        List<byte> datas = new List<byte>();
-                        datas.AddRange(BitConverter.GetBytes(cHN.DioID));
-                        datas.AddRange(BitConverter.GetBytes(cHN.TotalTime));
-                        cHN.SweepStructs.ToList().ForEach(x =>
-                        {
-                            datas.AddRange(BitConverter.GetBytes(x.Duration));
-                            datas.AddRange(BitConverter.GetBytes(x.BasicWaveformCount));
-                            x.WaveformID.ToList().ForEach(t =>
-                            {
-                                datas.AddRange(BitConverter.GetBytes(t));
-                            });
-                        });
-                       
-                        InperDeviceHelper.Instance.device.SetCHNSweep(datas);
-                        InperDeviceHelper.Instance.device.SetSweepState(1);
-                        StimulusBeans.Instance.IsConfigSweep = true;
-                        StimulusBeans.Instance.Sweeps.ToList().ForEach(x =>
-                        {
-                            if (x.IsChecked)
-                            {
-                                App.Log.Info("Sweep:" + x.Index + ":" + "-WaveForms:" + x.WaveForm + "-Duration:" + x.Duration);
-                            }
-                        });
-                    }
-                    else
-                    {
-                        InperDeviceHelper.Instance.device.SetSweepState(0);
-                    }
+                    StimulusBeans.Instance.StimulusCommandSend();
+
                     if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
                     InperGlobalClass.StimulusSettings.IsConfigSweep = StimulusBeans.Instance.IsConfigSweep;
                     InperGlobalClass.StimulusSettings.DioID = StimulusBeans.Instance.DioID;
@@ -182,15 +99,20 @@ namespace InperStudio.ViewModels
             {
                 EventChannels.Remove(EventChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && item.SymbolName.StartsWith("DIO")));
             }
-            view.dio.SelectedItem = StimulusBeans.Instance.DioID > 0 ? eventChannels.First(x => x.ChannelId == StimulusBeans.Instance.DioID) : eventChannels.First();
-            view.dio.SelectionChanged += (s, e) =>
+            if (EventChannels.Count > 0)
             {
-                StimulusBeans.Instance.DioID = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
-            };
-            StimulusBeans.Instance.DioID = (view.dio.SelectedItem as EventChannel).ChannelId;
-            view.hour.Text = StimulusBeans.Instance.Hour.ToString();
-            view.minute.Text = StimulusBeans.Instance.Minute.ToString();
-            view.seconds.Text = StimulusBeans.Instance.Seconds.ToString();
+                view.dio.SelectedItem = StimulusBeans.Instance.DioID > 0 ? EventChannels.First(x => x.ChannelId == StimulusBeans.Instance.DioID) : EventChannels.First();
+                view.dio.SelectionChanged += (s, e) =>
+                {
+                    StimulusBeans.Instance.DioID = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
+                };
+                StimulusBeans.Instance.DioID = (view.dio.SelectedItem as EventChannel).ChannelId;
+            }
+            //view.hour.Text = StimulusBeans.Instance.Hour.ToString();
+            //view.minute.Text = StimulusBeans.Instance.Minute.ToString();
+            //view.seconds.Text = StimulusBeans.Instance.Seconds.ToString();
+
+            view.sweepsSource.ItemsSource = Sweeps;
         }
         public void AddWaveformEvent()
         {
@@ -245,6 +167,7 @@ namespace InperStudio.ViewModels
                     return;
                 }
                 InperDialogWindow inperDialogWindow = new InperDialogWindow("IsDelete?");
+                inperDialogWindow.HideCancleButton();
                 inperDialogWindow.ClickEvent += (s, statu) =>
                 {
                     if (statu == 0)
@@ -271,8 +194,19 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                this.windowManager.ShowDialog(new SweepSettingViewModel(sweep));
-                DrawChart();
+                var model = new SweepSettingViewModel(sweep);
+                double second = sweep.Duration;
+                model.SwepTimeChangeEvent += (s, e) =>
+                {
+                    TimeSpan timeSpan1 = new TimeSpan(StimulusBeans.Instance.Hour, StimulusBeans.Instance.Minute, StimulusBeans.Instance.Seconds);
+                    var seconds = timeSpan1.TotalSeconds - second + e;
+                    TimeSpan timeSpan = new TimeSpan(0, 0, (int)seconds < 0 ? 0 : (int)seconds);
+                    view.hour.Text = timeSpan.Hours.ToString();
+                    view.minute.Text = timeSpan.Minutes.ToString();
+                    view.seconds.Text = timeSpan.Seconds.ToString();
+                    DrawChart();
+                };
+                this.windowManager.ShowDialog(model);
             }
             catch (Exception ex)
             {
@@ -284,22 +218,29 @@ namespace InperStudio.ViewModels
             try
             {
                 InperDialogWindow inperDialogWindow = new InperDialogWindow("IsDelete?");
+                inperDialogWindow.HideCancleButton();
                 inperDialogWindow.ClickEvent += (s, statu) =>
                 {
                     if (statu == 0)
                     {
                         StimulusBeans.Instance.Sweeps.Remove(sweep);
-                        sweep.WaveForm.Split(',').ToList().ForEach(x =>
-                        {
-                            if (!string.IsNullOrEmpty(x))
-                            {
-                                StimulusBeans.Instance.WaveForms.FirstOrDefault(f => f.Index == int.Parse(x)).IsChecked = false;
-                            }
-                        });
+                        //sweep.WaveForm.Split(',').ToList().ForEach(x =>
+                        //{
+                        //    if (!string.IsNullOrEmpty(x))
+                        //    {
+                        //        StimulusBeans.Instance.WaveForms.FirstOrDefault(f => f.Index == int.Parse(x)).IsChecked = false;
+                        //    }
+                        //});
                         if (selectSweeps.FirstOrDefault(x => x.Index == sweep.Index) is Sweep sweep1)
                         {
                             selectSweeps.Remove(sweep1);
                         }
+                        TimeSpan timeSpan1 = new TimeSpan(StimulusBeans.Instance.Hour, StimulusBeans.Instance.Minute, StimulusBeans.Instance.Seconds);
+                        var seconds = timeSpan1.TotalSeconds - sweep.Duration;
+                        TimeSpan timeSpan = new TimeSpan(0, 0, (int)seconds < 0 ? 0 : (int)seconds);
+                        view.hour.Text = timeSpan.Hours.ToString();
+                        view.minute.Text = timeSpan.Minutes.ToString();
+                        view.seconds.Text = timeSpan.Seconds.ToString();
                         DrawChart();
                     }
                     else
@@ -325,6 +266,15 @@ namespace InperStudio.ViewModels
                 sweep.IsChecked = true;
                 if (selectSweeps.Count(x => x.Index == sweep.Index) == 0)
                 {
+                    TimeSpan timeSpan = new TimeSpan(0, 0, StimulusBeans.Instance.Seconds);
+                    if ((sen as CheckBox).IsFocused)
+                    {
+                        timeSpan = new TimeSpan(0, 0, (int)sweep.Duration + StimulusBeans.Instance.Seconds);
+                    }
+                    view.hour.Text = (StimulusBeans.Instance.Hour + timeSpan.Hours).ToString();
+                    view.minute.Text = (StimulusBeans.Instance.Minute + timeSpan.Minutes).ToString();
+                    view.seconds.Text = timeSpan.Seconds.ToString();
+
                     selectSweeps.Add(sweep);
                     DrawChart();
                 }
@@ -342,6 +292,12 @@ namespace InperStudio.ViewModels
                 sweep.IsChecked = false;
                 if (selectSweeps.FirstOrDefault(x => x.Index == sweep.Index) is Sweep sweep1)
                 {
+                    TimeSpan timeSpan1 = new TimeSpan(StimulusBeans.Instance.Hour, StimulusBeans.Instance.Minute, StimulusBeans.Instance.Seconds);
+                    var seconds = timeSpan1.TotalSeconds - sweep1.Duration;
+                    TimeSpan timeSpan = new TimeSpan(0, 0, (int)seconds < 0 ? 0 : (int)seconds);
+                    view.hour.Text = timeSpan.Hours.ToString();
+                    view.minute.Text = timeSpan.Minutes.ToString();
+                    view.seconds.Text = timeSpan.Seconds.ToString();
                     selectSweeps.Remove(sweep1);
                 }
                 DrawChart();

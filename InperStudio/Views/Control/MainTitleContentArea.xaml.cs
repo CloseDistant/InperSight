@@ -56,9 +56,9 @@ namespace InperStudio.Views.Control
                 };
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (InperClassHelper.GetWindowByNameChar("Camera Signal Settings") != null)
+                    if (InperClassHelper.GetWindowByNameChar("Camera Signal") != null)
                     {
-                        InperClassHelper.GetWindowByNameChar("Camera Signal Settings").Close();
+                        InperClassHelper.GetWindowByNameChar("Camera Signal").Close();
                     }
                     //view.loadPath.Text = openFileDialog.FileName;
                     InperJsonConfig.filepath = openFileDialog.FileName;
@@ -82,6 +82,8 @@ namespace InperStudio.Views.Control
                     StimulusBeans.Instance.Hour = InperGlobalClass.StimulusSettings.Hour;
                     StimulusBeans.Instance.Minute = InperGlobalClass.StimulusSettings.Minute;
                     StimulusBeans.Instance.Seconds = InperGlobalClass.StimulusSettings.Seconds;
+
+                    StimulusBeans.Instance.StimulusCommandSend();
 
                     InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
                     InperGlobalClass.SetSampling(InperGlobalClass.CameraSignalSettings.Sampling);
