@@ -1,6 +1,0 @@
-2022-11-17 17:03:49,579 [1] INFO  InfoLogger - vid=04b4
-2022-11-17 17:03:49,583 [1] INFO  InfoLogger - pid=00f9
-2022-11-17 17:07:15,006 [1] INFO  InfoLogger - vid=04b4
-2022-11-17 17:07:15,010 [1] INFO  InfoLogger - pid=00f9
-2022-11-17 17:07:33,270 [1] INFO  InfoLogger - vid=04b4
-2022-11-17 17:07:33,274 [1] INFO  InfoLogger - pid=00f9

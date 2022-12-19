@@ -1,2 +1,0 @@
-2022-12-15 15:55:15,393 [1] INFO  InfoLogger - vid=04b4
-2022-12-15 15:55:15,396 [1] INFO  InfoLogger - pid=00f9

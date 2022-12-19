@@ -1,8 +1,0 @@
-2022-12-07 17:19:53,512 [1] INFO  InfoLogger - vid=04b4
-2022-12-07 17:19:53,516 [1] INFO  InfoLogger - pid=00f9
-2022-12-07 17:38:09,135 [1] INFO  InfoLogger - vid=04b4
-2022-12-07 17:38:09,139 [1] INFO  InfoLogger - pid=00f9
-2022-12-07 17:39:52,555 [1] INFO  InfoLogger - vid=04b4
-2022-12-07 17:39:52,560 [1] INFO  InfoLogger - pid=00f9
-2022-12-07 17:42:13,429 [1] INFO  InfoLogger - vid=04b4
-2022-12-07 17:42:13,433 [1] INFO  InfoLogger - pid=00f9
