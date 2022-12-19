@@ -9,6 +9,7 @@ using InperSight.Views;
 using OpenCvSharp;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Core.Extensions;
 using SciChart.Data.Model;
 using SqlSugar;
 using Stylet;
@@ -59,12 +60,12 @@ namespace InperSight.ViewModels
             }
 
             view = this.View as CameraSettingView;
-            view.Owner = InperGlobalFunc.GetWindowByNameChar("inper");
-            view.ConfirmClickEvent += (s, e) => { RequestClose(); };
+            view.ConfirmClickEvent += (s, e) => { this.view.Hide(); /*RequestClose();*/ };
             if (InperGlobalClass.CameraSettingJsonBean.CameraChannelConfigs?.Count > 0)
             {
                 NeuronLoade();
             }
+            view.Owner = InperGlobalFunc.GetWindowByNameChar("inper");
             if (InperDeviceHelper.GetInstance().isSwitchToFrame)
             {
                 DrawFrameRect(InperDeviceHelper.GetInstance().frameLeft, InperDeviceHelper.GetInstance().frameTop);
@@ -114,16 +115,38 @@ namespace InperSight.ViewModels
                             Cursor = Cursors.Hand
                         };
                     }
+                    else if (x.Type == RoiShapeEnum.Polygon.ToString())
+                    {
+                        shape = new Polygon()
+                        {
+                            Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color)),
+                            Cursor = Cursors.Hand,
+                            StrokeThickness = 1,
+                            Name = "P_" + x.ChannelId,
+                            Fill = Brushes.Transparent,
+                            Points = new PointCollection(x.Points)
+                        };
+                    }
                     currentShape = shape;
-                    shape.MouseDown += Shape_MouseDown;
-                    Canvas.SetLeft(currentShape, x.Left);
-                    Canvas.SetTop(currentShape, x.Top);
+                    currentShape.MouseDown += Shape_MouseDown;
                     view.drawAreaCanvas.Children.Add(currentShape);
-                    var layer = AdornerLayer.GetAdornerLayer(currentShape);
-                    layer.Add(new InperAdorner(currentShape, x.ChannelId.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color)), x.ChannelId > 10 ? -15 : -10, currentShape.Height / 2 - 6));
                     if (InperDeviceHelper.GetInstance().CameraChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId) == null)
                     {
-                        _ = AddChannel(x.ChannelId);
+                        _ = AddChannel(x.ChannelId, x.Name);
+                    }
+
+                    if (x.Type != RoiShapeEnum.Polygon.ToString())
+                    {
+                        Canvas.SetLeft(currentShape, x.Left);
+                        Canvas.SetTop(currentShape, x.Top);
+                        var layer = AdornerLayer.GetAdornerLayer(currentShape);
+                        layer.Add(new InperAdorner(currentShape, x.ChannelId.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color)), x.ChannelId > 10 ? -15 : -10, currentShape.Height / 2 - 6));
+                    }
+                    else
+                    {
+                        var layer = AdornerLayer.GetAdornerLayer(currentShape);
+                        var p = (currentShape as Polygon).Points.First();
+                        layer.Add(new InperAdorner(currentShape, x.ChannelId.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color)), p.X - 10, p.Y));
                     }
                 });
             }
@@ -142,11 +165,13 @@ namespace InperSight.ViewModels
             {
                 if (currentRectangle != null)
                 {
+                    view.zoomCoefficient.IsEnabled = false;
+                    double scale = InperDeviceHelper.GetInstance().ImageWidth / view.drawAreaCanvas.Width;
+                    InperDeviceHelper.GetInstance().frameLeft = Canvas.GetLeft(currentRectangle) * scale;
+                    InperDeviceHelper.GetInstance().frameTop = Canvas.GetTop(currentRectangle) * scale;
+                    InperDeviceHelper.GetInstance().frameWidth = currentRectangle.Width * scale;
+                    InperDeviceHelper.GetInstance().frameHeight = currentRectangle.Height * scale;
                     InperDeviceHelper.GetInstance().isSwitchToFrame = true;
-                    InperDeviceHelper.GetInstance().frameLeft = Canvas.GetLeft(currentRectangle);
-                    InperDeviceHelper.GetInstance().frameTop = Canvas.GetTop(currentRectangle);
-                    InperDeviceHelper.GetInstance().frameWidth = currentRectangle.Width;
-                    InperDeviceHelper.GetInstance().frameHeight = currentRectangle.Height;
                     for (int i = 0; i < view.drawAreaCanvas.Children.Count; i++)
                     {
                         view.drawAreaCanvas.Children[i].Visibility = Visibility.Collapsed;
@@ -156,6 +181,7 @@ namespace InperSight.ViewModels
                             layer.Visibility = Visibility.Collapsed;
                         }
                     }
+                    InperDeviceHelper.GetInstance().RestDeltaF();
                 }
                 else
                 {
@@ -173,6 +199,7 @@ namespace InperSight.ViewModels
         {
             try
             {
+                view.zoomCoefficient.IsEnabled = true;
                 InperDeviceHelper.GetInstance().isSwitchToFrame = false;
                 if (currentRectangle != null)
                 {
@@ -184,20 +211,35 @@ namespace InperSight.ViewModels
                     {
                         AdornerLayer layer = AdornerLayer.GetAdornerLayer(x);
                         layer.Visibility = Visibility.Visible;
-
-                        x.Width = currentRectangle.Width / view.drawAreaCanvas.Width * x.Width;
-                        x.Height = currentRectangle.Height / view.drawAreaCanvas.Height * x.Height;
-
                         double currentLeft = Canvas.GetLeft(x);
                         double currentTop = Canvas.GetTop(x);
                         double rectLeft = Canvas.GetLeft(currentRectangle);
                         double rectTop = Canvas.GetTop(currentRectangle);
+                        if (!x.GetType().Equals(typeof(Polygon)))
+                        {
+                            x.Width = currentRectangle.Width / view.drawAreaCanvas.Width * x.Width;
+                            x.Height = currentRectangle.Height / view.drawAreaCanvas.Height * x.Height;
+                        }
+                        else
+                        {
+                            PointCollection points = new PointCollection();
+                            (x as Polygon).Points.ForEachDo(x =>
+                            {
+                                x.X = rectLeft + currentRectangle.Width / view.drawAreaCanvas.Width * x.X;
+                                x.Y = rectTop + currentRectangle.Height / view.drawAreaCanvas.Height * x.Y;
+                                points.Add(x);
+                            });
+                            (x as Polygon).Points = points;
+                        }
+
 
                         double actualLeft = rectLeft + currentLeft / view.drawAreaCanvas.Width * currentRectangle.Width;
                         double actualTop = rectTop + currentTop / view.drawAreaCanvas.Height * currentRectangle.Height;
-
-                        x.SetValue(Canvas.LeftProperty, actualLeft);
-                        x.SetValue(Canvas.TopProperty, actualTop);
+                        if (actualLeft.ToString() != double.NaN.ToString() && actualTop.ToString() != double.NaN.ToString())
+                        {
+                            x.SetValue(Canvas.LeftProperty, actualLeft);
+                            x.SetValue(Canvas.TopProperty, actualTop);
+                        }
 
 
                         InperGlobalClass.CameraSettingJsonBean.CameraChannelConfigs.ForEach(xx =>
@@ -209,6 +251,11 @@ namespace InperSight.ViewModels
                                 xx.Top = actualTop;
                                 xx.RectWidth = x.Width;
                                 xx.RectHeight = x.Height;
+
+                            }
+                            if (x.GetType().Equals(typeof(Polygon)))
+                            {
+                                xx.Points = (x as Polygon).Points.ToList();
                             }
                         });
 
@@ -221,16 +268,29 @@ namespace InperSight.ViewModels
                                 layer.Remove(item);
                             }
                         }
-                        layer.Add(new InperAdorner(x, x.Name.Split('_').Last(), Brushes.Red, -10, x.Height / 2 - 6));
+                        if (!x.GetType().Equals(typeof(Polygon)))
+                        {
+                            layer.Add(new InperAdorner(x, x.Name.Split('_').Last(), Brushes.Red, -10, x.Height / 2 - 6));
+                        }
+                        else
+                        {
+                            var p = (x as Polygon).Points.First();
+                            layer.Add(new InperAdorner(x, x.Name.Split('_').Last(), Brushes.Red, p.X - 10, p.Y));
+                        }
                     });
                     switchShapes.Clear();
                 }
                 for (int i = 0; i < view.drawAreaCanvas.Children.Count; i++)
                 {
                     view.drawAreaCanvas.Children[i].Visibility = Visibility.Visible;
+                    if ((view.drawAreaCanvas.Children[i] as Shape).Name.Contains('_'))
+                    {
+                        Panel.SetZIndex(view.drawAreaCanvas.Children[i], 9);
+                    }
                     AdornerLayer layer = AdornerLayer.GetAdornerLayer(view.drawAreaCanvas.Children[i]);
                     layer.Visibility = Visibility.Visible;
                 }
+                InperDeviceHelper.GetInstance().RestDeltaF();
             }
             catch (Exception ex)
             {
@@ -266,17 +326,25 @@ namespace InperSight.ViewModels
             addRoiEventState = true;
             addFrameEventState = false;
             currentShape = null;
-            view.neuronName.Text = "Neuron " + (InperDeviceHelper.GetInstance().CameraChannels.Count + 1);
+            int id = InperDeviceHelper.GetInstance().CameraChannels.Count == 0 ? InperDeviceHelper.GetInstance().CameraChannels.Count + 1 : InperDeviceHelper.GetInstance().CameraChannels.Last().ChannelId + 1;
+            view.neuronName.Text = "Neuron " + id;
             this.view.Cursor = Cursors.Cross;
             if (currentRectangle != null)
             {
                 currentRectangle.Visibility = Visibility.Collapsed;
             }
+            view.addRoiBut.Visibility = Visibility.Collapsed;
+            view.addInperThemeRoiBut.Visibility = Visibility.Visible;
         }
         public void DeleteRoiEvent()
         {
             try
             {
+                if (InperGlobalClass.IsRecord && InperDeviceHelper.GetInstance().CameraChannels.Count < 2)
+                {
+                    InperGlobalFunc.ShowRemainder("运行过程中，Neuron 数量不能小于1");
+                    return;
+                }
                 if (currentShape != null)
                 {
                     if (int.TryParse(currentShape.Name.Split('_').Last(), out int id))
@@ -296,6 +364,13 @@ namespace InperSight.ViewModels
                     currentShape = null;
                 }
                 this.view.Cursor = Cursors.Arrow;
+                addRoiEventState = false;
+                if (currentRectangle != null)
+                {
+                    currentRectangle.Visibility = Visibility.Visible;
+                }
+                view.addRoiBut.Visibility = Visibility.Visible;
+                view.addInperThemeRoiBut.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
             {
@@ -322,6 +397,63 @@ namespace InperSight.ViewModels
                 InperGlobalFunc.ShowRemainder("Clear failed", 2);
             }
         }
+        private void UpdateAdorner()
+        {
+            foreach (UIElement shpe in view.drawAreaCanvas.Children)
+            {
+                var shape = shpe as Shape;
+                if (shape != null)
+                {
+                    if (int.TryParse(shape.Name.Split('_').Last(), out int _id))
+                    {
+                        var _layer = AdornerLayer.GetAdornerLayer(shape);
+                        var _ados = _layer.GetAdorners(shape);
+                        if (_ados.Length > 0)
+                        {
+                            for (int i = 0; i < _ados.Length; i++)
+                            {
+                                _layer.Remove(_ados[i]);
+                            }
+                        }
+                        if (shape.GetType() == typeof(Polygon))
+                        {
+                            var polygon = ((Polygon)shape).Points.First();
+                            _layer.Add(new InperAdorner(shape, _id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[_id % InperColorHelper.ColorPresetList.Count])), polygon.X - 10, polygon.Y, false));
+                        }
+                        else
+                        {
+                            double top = shape.Height.ToString() == double.NaN.ToString() ? shape.ActualHeight / 2 - 6 : shape.Height / 2 - 6;
+                            _layer.Add(new InperAdorner(shape, _id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[_id % InperColorHelper.ColorPresetList.Count])), _id > 10 ? -15 : -10, top, false));
+                        }
+                    }
+                }
+            }
+        }
+        private void UpdateAloneAdorner(UIElement uIElement, int id)
+        {
+            #region 更新当前layer
+            var layer = AdornerLayer.GetAdornerLayer(uIElement);
+            var ados = layer.GetAdorners(uIElement);
+            if (ados.Length > 0)
+            {
+                for (int i = 0; i < ados.Length; i++)
+                {
+                    layer.Remove(ados[i]);
+                }
+            }
+
+            if (uIElement.GetType() == typeof(Polygon))
+            {
+                var p = (uIElement as Polygon).Points.First();
+                layer.Add(new InperAdorner(uIElement, id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[id % InperColorHelper.ColorPresetList.Count])), p.X - 10, p.Y, true));
+            }
+            else
+            {
+                var top = (uIElement as Shape).Height.ToString() == double.NaN.ToString() ? (uIElement as Shape).ActualHeight / 2 - 6 : (uIElement as Shape).Height / 2 - 6;
+                layer.Add(new InperAdorner((uIElement as Shape), id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[id % InperColorHelper.ColorPresetList.Count])), id > 10 ? -15 : -10, top, true));
+            }
+            #endregion
+        }
         public void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
@@ -330,16 +462,26 @@ namespace InperSight.ViewModels
                 {
                     startPoint = e.GetPosition(sender as Canvas);
                     var type = view.roiType.SelectedValue as ComboBoxItem;
-                    if (type.Content.ToString().Equals("Circle"))
+
+                    UpdateAdorner();
+
+                    if (type.Content.ToString().Equals(RoiShapeEnum.Circle.ToString()))
                     {
                         currentShape = DrawCircle();
                     }
-                    else if (type.Content.ToString().Equals("Rectangle"))
+                    else if (type.Content.ToString().Equals(RoiShapeEnum.Rectangle.ToString()))
                     {
                         currentShape = DrawRectangle();
                     }
-                    Canvas.SetLeft(currentShape, startPoint.X);
-                    Canvas.SetTop(currentShape, startPoint.Y);
+                    else if (type.Content.ToString().Equals(RoiShapeEnum.Polygon.ToString()))
+                    {
+                        currentShape = DrawPolygon(startPoint);
+                    }
+                    if (!type.Content.ToString().Equals(RoiShapeEnum.Polygon.ToString()))
+                    {
+                        Canvas.SetLeft(currentShape, startPoint.X);
+                        Canvas.SetTop(currentShape, startPoint.Y);
+                    }
                     view.drawAreaCanvas.Children.Add(currentShape);
 
                     if (InperDeviceHelper.GetInstance().isSwitchToFrame)
@@ -388,41 +530,171 @@ namespace InperSight.ViewModels
 
             return ellipse;
         }
+        private Polygon DrawPolygon(System.Windows.Point point)
+        {
+            int id = InperDeviceHelper.GetInstance().CameraChannels.Count == 0 ? InperDeviceHelper.GetInstance().CameraChannels.Count + 1 : InperDeviceHelper.GetInstance().CameraChannels.Last().ChannelId + 1;
+            Polygon polygon = new()
+            {
+                Name = "P_" + id,
+                Fill = Brushes.Transparent,
+                Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperColorHelper.ColorPresetList[id % InperColorHelper.ColorPresetList.Count])),
+                StrokeThickness = 1,
+                Cursor = Cursors.Hand,
+                Points = new PointCollection()
+            };
+            polygon.Points.Add(point);
+            polygon.MouseDown += Shape_MouseDown;
+            return polygon;
+        }
 
         private void Shape_MouseDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                var ellipse = sender as Shape;
-                if (int.TryParse(ellipse.Name.Split('_').Last(), out int id))
+                if (!addRoiEventState)
                 {
-                    view.neuronName.Text = InperDeviceHelper.GetInstance().CameraChannels.FirstOrDefault(x => x.ChannelId == id).Name;
+                    var ellipse = sender as Shape;
+                    if (int.TryParse(ellipse.Name.Split('_').Last(), out int id))
+                    {
+                        view.neuronName.Text = InperDeviceHelper.GetInstance().CameraChannels.FirstOrDefault(x => x.ChannelId == id).Name;
+                    }
+                    UpdateAdorner();
+                    UpdateAloneAdorner(ellipse, id);
+
+                    currentShape = ellipse;
+                    currentShape.MouseMove += Ellipse_MouseMove;
+                    currentShape.MouseUp += Ellipse_MouseUp;
+                    currentShape.MouseLeave += Ellipse_MouseLeave;
+
+                    shapeIsMove = true;
+                    shapeMoverStartPoint = e.GetPosition(ellipse);
+                    if (ellipse.GetType() == typeof(Polygon))
+                    {
+                        polygonPoints.Clear();
+                        (ellipse as Polygon).Points.ToList().ForEach(x =>
+                        {
+                            polygonPoints.Add(x);
+                        });
+                    }
                 }
-                currentShape = ellipse;
             }
             catch (Exception ex)
             {
                 LoggerHelper.Error(ex.ToString());
             }
         }
+        #region shape 移动
+        bool shapeIsMove = false;
+        System.Windows.Point shapeMoverStartPoint;
+        System.Windows.Point shapeMovePoint;
+        List<System.Windows.Point> polygonPoints = new();
+        private void Ellipse_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (shapeIsMove && currentShape != null)
+            {
+                var movePoint = e.GetPosition(sender as Shape);
+                if (currentShape.GetType() != typeof(Polygon))
+                {
+                    double currentLeft = Canvas.GetLeft(currentShape), currentTop = Canvas.GetTop(currentShape);
+
+                    if ((currentLeft < 3 && (movePoint.X - shapeMovePoint.X) < 0) ||
+                        (currentLeft > (view.drawAreaCanvas.Width - currentShape.Width - 3) && (movePoint.X - shapeMovePoint.X) > 0) ||
+                        (currentTop < 3 && (movePoint.Y - shapeMovePoint.Y) < 0) ||
+                        (currentTop > (view.drawAreaCanvas.Height - currentShape.Height - 3) && (movePoint.Y - shapeMovePoint.Y) > 0))
+                    {
+                        return;
+                    }
+
+                    shapeMovePoint = movePoint;
+                    Canvas.SetTop(currentShape, currentTop + shapeMovePoint.Y - shapeMoverStartPoint.Y);
+                    Canvas.SetLeft(currentShape, currentLeft + shapeMovePoint.X - shapeMoverStartPoint.X);
+                }
+                else
+                {
+                    double moveLeft = movePoint.X - shapeMoverStartPoint.X, moveTop = movePoint.Y - shapeMoverStartPoint.Y;
+                    var poly = currentShape as Polygon;
+
+                    var xMin = polygonPoints.Min(x => x.X);
+                    var xMax = polygonPoints.Max(x => x.X);
+                    var yMin = polygonPoints.Min(y => y.Y);
+                    var yMax = polygonPoints.Max(y => y.Y);
+
+                    if (moveLeft + xMin < 3 || moveLeft + xMax > view.drawAreaCanvas.Width - 3 || moveTop + yMin < 3 || moveTop + yMax > view.drawAreaCanvas.Height - 3)
+                    {
+                        return;
+                    }
+
+                    if (polygonPoints.Count > 0)
+                    {
+                        for (int i = 0; i < polygonPoints.Count; i++)
+                        {
+                            poly.Points[i] = new System.Windows.Point(polygonPoints[i].X + moveLeft, polygonPoints[i].Y + moveTop);
+                        }
+                    }
+                }
+                #region 更新当前layer
+
+                var id = int.Parse((sender as Shape).Name.Split('_').Last());
+                UpdateAloneAdorner(sender as Shape, id);
+                #endregion
+            }
+        }
+        private void Ellipse_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                shapeIsMove = false;
+                if (currentShape != null)
+                {
+                    currentShape.MouseMove -= Ellipse_MouseMove;
+                    currentShape.MouseUp -= Ellipse_MouseUp;
+                    currentShape.MouseLeave -= Ellipse_MouseLeave;
+                    //更新坐标
+                    if (currentShape.GetType() == typeof(Polygon))
+                    {
+                        var poly = currentShape as Polygon;
+                        _ = int.TryParse(currentShape.Name.Split('_').Last(), out int id);
+                        InperGlobalClass.CameraSettingJsonBean.CameraChannelConfigs.FirstOrDefault(x => x.ChannelId == id && x.Type == RoiShapeEnum.Polygon.ToString()).Points = new List<System.Windows.Point>(poly.Points);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.Message);
+            }
+        }
+        private void Ellipse_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Ellipse_MouseUp(null, null);
+        }
+        #endregion
+
         #endregion
         public void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                if (addRoiEventState)
+                if (addRoiEventState && currentShape != null)
                 {
                     _ = int.TryParse(currentShape.Name.Split('_').Last(), out int id);
 
                     addRoiEventState = false;
                     var layer = AdornerLayer.GetAdornerLayer(currentShape);
                     var color = InperColorHelper.ColorPresetList[id % InperColorHelper.ColorPresetList.Count];
-
-                    layer.Add(new InperAdorner(currentShape, id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)), id > 10 ? -15 : -10, currentShape.Height / 2 - 6));
+                    if (currentShape.GetType() == typeof(Polygon))
+                    {
+                        var point = (currentShape as Polygon).Points.First();
+                        layer.Add(new InperAdorner(currentShape, id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)), point.X - 10, point.Y, true));
+                    }
+                    else
+                    {
+                        double top = currentShape.Height.ToString() == double.NaN.ToString() ? currentShape.ActualHeight / 2 - 6 : currentShape.Height / 2 - 6;
+                        layer.Add(new InperAdorner(currentShape, id.ToString(), new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)), id > 10 ? -15 : -10, top, true));
+                    }
                     #region 通道添加
                     CameraChannel cameraChannel = AddChannel(id);
                     //配置文件添加
-                    InperGlobalClass.CameraSettingJsonBean.CameraChannelConfigs.Add(new Lib.Config.Json.CameraChannelConfig()
+                    var chn = new Lib.Config.Json.CameraChannelConfig()
                     {
                         ChannelId = cameraChannel.ChannelId,
                         Name = cameraChannel.Name,
@@ -432,15 +704,22 @@ namespace InperSight.ViewModels
                         RectWidth = currentShape.Width,
                         Left = (double)currentShape.GetValue(Canvas.LeftProperty),
                         Top = (double)currentShape.GetValue(Canvas.TopProperty),
-                        Type = (view.roiType.SelectedItem as ComboBoxItem).Content.ToString() == RoiShapeEnum.Circle.ToString() ? RoiShapeEnum.Circle.ToString() : RoiShapeEnum.Rectangle.ToString()
-                    });
+                        Type = (view.roiType.SelectedItem as ComboBoxItem).Content.ToString() == RoiShapeEnum.Circle.ToString() ? RoiShapeEnum.Circle.ToString() : (view.roiType.SelectedItem as ComboBoxItem).Content.ToString() == RoiShapeEnum.Rectangle.ToString() ? RoiShapeEnum.Rectangle.ToString() : RoiShapeEnum.Polygon.ToString(),
+                    };
+                    if (currentShape.GetType() == typeof(Polygon))
+                    {
+                        chn.Points = (currentShape as Polygon).Points.ToList();
+                    }
+                    InperGlobalClass.CameraSettingJsonBean.CameraChannelConfigs.Add(chn);
                     #endregion
-                    currentShape = null;
+                    //currentShape = null;
                     this.view.Cursor = Cursors.Arrow;
                     if (currentRectangle != null && !InperDeviceHelper.GetInstance().isSwitchToFrame)
                     {
                         currentRectangle.Visibility = Visibility.Visible;
                     }
+                    view.addRoiBut.Visibility = Visibility.Visible;
+                    view.addInperThemeRoiBut.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -448,13 +727,14 @@ namespace InperSight.ViewModels
                 LoggerHelper.Error(ex.ToString());
             }
         }
-        private CameraChannel AddChannel(int channelId)
+        private CameraChannel AddChannel(int channelId, string cName = "")
         {
             CameraChannel cameraChannel = new CameraChannel
             {
-                Name = view.neuronName.Text.ToString(),
+                Name = string.IsNullOrEmpty(cName) ? view.neuronName.Text.ToString() : cName,
                 ChannelId = channelId
             };
+
             cameraChannel.TimeSpanAxis = new SciChart.Charting.Visuals.Axes.TimeSpanAxis()
             {
                 DrawMajorBands = false,
@@ -484,11 +764,21 @@ namespace InperSight.ViewModels
             {
                 //m.Circle(center: Center, radius: (int)(ellips_diam / 4), color: Scalar.White, -1);
                 double angle = ellips_diam > shape_height ? 0 : 180;
-                m.Ellipse(Center, new OpenCvSharp.Size(ellips_diam/2, shape_height/2), angle, 0, 360, Scalar.White, -1);
+                m.Ellipse(Center, new OpenCvSharp.Size(ellips_diam / 2, shape_height / 2), angle, 0, 360, Scalar.White, -1);
+            }
+            else if (ellipse.GetType() == typeof(Rectangle))
+            {
+                m.Rectangle(new OpenCvSharp.Rect(new OpenCvSharp.Point(rect_left, rect_top), new OpenCvSharp.Size(ellips_diam, shape_height)), Scalar.White, -1);
             }
             else
             {
-                m.Rectangle(new OpenCvSharp.Rect(new OpenCvSharp.Point(rect_left, rect_top), new OpenCvSharp.Size(ellips_diam, shape_height)), Scalar.White, -1);
+                OpenCvSharp.Point[] ps = new OpenCvSharp.Point[(ellipse as Polygon).Points.Count];
+                for (int i = 0; i < ps.Length; i++)
+                {
+                    ps[i] = new OpenCvSharp.Point((ellipse as Polygon).Points[i].X * scale, (ellipse as Polygon).Points[i].Y * scale);
+                }
+
+                m.FillPoly(new OpenCvSharp.Point[][] { ps }, Scalar.White);
             }
             return m;
         }
@@ -499,16 +789,15 @@ namespace InperSight.ViewModels
                 if (addRoiEventState && currentShape != null)
                 {
                     var movePoint = e.GetPosition(sender as Canvas);
-                    double currentLeft = Canvas.GetLeft(currentShape), currentTop = Canvas.GetTop(currentShape);
-                    if (currentShape.GetType() == typeof(Ellipse))
+                    if (!currentShape.Name.StartsWith("P"))
                     {
+                        double currentLeft = Canvas.GetLeft(currentShape), currentTop = Canvas.GetTop(currentShape);
                         if (view.drawAreaCanvas.Width - currentLeft < Math.Abs(movePoint.Y - startPoint.Y))
                         {
                             return;
                         }
                         if (Math.Abs(movePoint.Y - startPoint.Y) > 5)
                         {
-                            var diameter = Math.Abs(movePoint.Y - startPoint.Y) > Math.Abs(movePoint.X - startPoint.X) ? Math.Abs(movePoint.Y - startPoint.Y) : Math.Abs(movePoint.X - startPoint.X);
                             currentShape.Width = Math.Abs(movePoint.X - startPoint.X);
                             currentShape.Height = Math.Abs(movePoint.Y - startPoint.Y);
 
@@ -522,26 +811,9 @@ namespace InperSight.ViewModels
                             }
                         }
                     }
-                    else if (currentShape.GetType() == typeof(Rectangle))
+                    else
                     {
-                        if (view.drawAreaCanvas.Width - currentLeft < Math.Abs(movePoint.X - startPoint.X) || view.drawAreaCanvas.Height - currentTop < Math.Abs(movePoint.Y - startPoint.Y))
-                        {
-                            return;
-                        }
-                        if (Math.Abs(movePoint.Y - startPoint.Y) > 5 || Math.Abs(movePoint.X - startPoint.X) > 5)
-                        {
-                            currentShape.Width = Math.Abs(movePoint.X - startPoint.X);
-                            currentShape.Height = Math.Abs(movePoint.Y - startPoint.Y);
-
-                            if (movePoint.Y - startPoint.Y < 0)
-                            {
-                                Canvas.SetTop(currentShape, startPoint.Y - Math.Abs(movePoint.Y - startPoint.Y));
-                            }
-                            if (movePoint.X - startPoint.X < 0)
-                            {
-                                Canvas.SetLeft(currentShape, startPoint.X - Math.Abs(movePoint.X - startPoint.X));
-                            }
-                        }
+                        (currentShape as Polygon).Points.Add(movePoint);
                     }
                 }
             }
@@ -597,8 +869,8 @@ namespace InperSight.ViewModels
         {
             Rectangle rectangle = new()
             {
-                Width = view.drawAreaCanvas.Width / 2,
-                Height = view.drawAreaCanvas.Height / 2,
+                Width = view.drawAreaCanvas.Width / Math.Sqrt(view.zoomCoefficient.Value),
+                Height = view.drawAreaCanvas.Height / Math.Sqrt(view.zoomCoefficient.Value),
                 StrokeThickness = 1,
                 Stroke = Brushes.Red,
                 Fill = Brushes.Transparent
@@ -606,8 +878,8 @@ namespace InperSight.ViewModels
             rectangle.MouseMove += Rectangle_MouseMove;
             rectangle.MouseLeftButtonDown += Rectangle_MouseDown;
             rectangle.MouseLeftButtonUp += Rectangle_MouseLeftButtonUp;
-            Canvas.SetLeft(rectangle, left == 0 ? rectangle.Width / 2 : left);
-            Canvas.SetTop(rectangle, top == 0 ? rectangle.Height / 2 : top);
+            Canvas.SetLeft(rectangle, left == 0 ? (view.drawAreaCanvas.Width - rectangle.Width) / 2 : left);
+            Canvas.SetTop(rectangle, top == 0 ? (view.drawAreaCanvas.Height - rectangle.Height) / 2 : top);
             currentRectangle = rectangle;
             view.drawAreaCanvas.Children.Add(rectangle);
         }
@@ -653,11 +925,11 @@ namespace InperSight.ViewModels
 
                     double left = currentX + moveX <= 0
                         ? currentX
-                        : currentX + moveX > view.drawAreaCanvas.Width / 2 - 1 ? view.drawAreaCanvas.Width / 2 - 1 : currentX + moveX;
+                        : currentX + moveX > view.drawAreaCanvas.Width - rect.Width - 1 ? view.drawAreaCanvas.Width - rect.Width - 1 : currentX + moveX;
 
                     double top = currentY + moveY <= 0
                         ? currentY
-                        : currentY + moveY > view.drawAreaCanvas.Height / 2 - 1 ? view.drawAreaCanvas.Height / 2 - 1 : currentY + moveY;
+                        : currentY + moveY > view.drawAreaCanvas.Height - rect.Height - 1 ? view.drawAreaCanvas.Height - rect.Height - 1 : currentY + moveY;
                     Canvas.SetLeft(rect, left);
                     Canvas.SetTop(rect, top);
                 }
@@ -683,9 +955,31 @@ namespace InperSight.ViewModels
                 LoggerHelper.Error(ex.ToString());
             }
         }
-        public void FrameClearEvent()
+        public void ZoomCoefficient_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            try
+            {
+                if (currentRectangle != null)
+                {
+                    currentRectangle.Width = view.drawAreaCanvas.Width / Math.Sqrt(e.NewValue);
+                    currentRectangle.Height = view.drawAreaCanvas.Height / Math.Sqrt(e.NewValue);
+                    double currentX = Canvas.GetLeft(currentRectangle);
+                    double currentY = Canvas.GetTop(currentRectangle);
 
+                    double left = currentRectangle.Width > view.drawAreaCanvas.Width - currentX ? view.drawAreaCanvas.Width - currentRectangle.Width - 2 :
+                        currentX;
+
+                    double top = currentRectangle.Height > view.drawAreaCanvas.Height - currentY ? view.drawAreaCanvas.Height - currentRectangle.Height - 2 :
+                        currentY;
+                    Canvas.SetLeft(currentRectangle, left);
+                    Canvas.SetTop(currentRectangle, top);
+                }
+                CameraSetting.ZoomCoefficient = e.NewValue;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error(ex.Message);
+            }
         }
         #endregion
 

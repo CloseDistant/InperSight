@@ -83,7 +83,7 @@ namespace InperSight.Views.Control
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.Filter = "Json|*.inper";
                 // 设置默认的文件名。注意！文件扩展名须与Filter匹配
-                dlg.FileName = "UserConfig";
+                dlg.FileName = "InperSightConfig";
                 // 显示对话框
                 DialogResult r = dlg.ShowDialog();
 

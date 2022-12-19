@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "yUhzuAOdErMfiZoKV8Pcd/hf9iU6LQtOgt+ExMuxWMWkcNF0+f2rDU0Kzx486idoEbD+0cvF9ZVXlxfCIXTVCw==",
+  "dgSpecHash": "SnHlUei9Dp4QrHNOf1p6G87SoXYEpB1BKbd5/tQtOyHUdnx9zIUxihEkuO/kNw3XjfqeV/7aljEuWD96G+Hl4Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\10252\\source\\repos\\InperSight\\InperSight.csproj",
   "expectedPackageFiles": [
@@ -80,10 +80,10 @@
     "C:\\Users\\10252\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.17\\microsoft.netcore.app.host.win-x64.5.0.17.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512"
+    "C:\\Users\\10252\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\10252\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\10252\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.17\\microsoft.netcore.app.host.win-x64.5.0.17.nupkg.sha512"
   ],
   "logs": []
 }

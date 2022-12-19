@@ -10,6 +10,6 @@ namespace InperSight.Lib.Enum
     {
         Circle,
         Rectangle,
-        Ploygon
+        Polygon
     }
 }

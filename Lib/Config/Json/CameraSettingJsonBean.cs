@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace InperSight.Lib.Config.Json
 {
@@ -14,6 +15,7 @@ namespace InperSight.Lib.Config.Json
         public double UpperLevel { get; set; } = 1;
         public double LowerLevel { get; set; } = 0;
         public double ExcitLowerLevel { get; set; } = 10;
+        public double ZoomCoefficient { get; set; } = 2;
         public List<CameraChannelConfig> CameraChannelConfigs { get; set; } = new List<CameraChannelConfig>();
     }
 
@@ -27,6 +29,7 @@ namespace InperSight.Lib.Config.Json
         public double Diameter { get; set; }
         public double RectWidth { get; set; }
         public double RectHeight { get; set; }
+        public List<Point> Points { get; set; } = new List<Point>();
         public string Type { get; set; }
     }
 }

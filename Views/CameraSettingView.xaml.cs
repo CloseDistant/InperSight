@@ -23,7 +23,6 @@ namespace InperSight.Views
         {
             InitializeComponent();
         }
-
         
     }
 }

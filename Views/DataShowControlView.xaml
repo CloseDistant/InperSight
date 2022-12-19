@@ -204,7 +204,7 @@
                 </UniformGrid>
                 <UniformGrid Rows="2" Grid.Column="1" DataContext="{Binding EventChannelChart,UpdateSourceTrigger=PropertyChanged}" >
                     <Border BorderThickness="1 0 0 1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{StaticResource InperBorderColor}">
-                        <sc:SciChartSurface Name="timesAxisSci" Margin="0 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
+                        <sc:SciChartSurface Name="timesAxisSci" Margin="-60 0 0 0" ClipModifierSurface="True"  Background="Transparent" sc:PerformanceHelper.EnableExtremeResamplers="True" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" Grid.Column="1" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}">
                             <sc:SciChartSurface.YAxis>
                                 <sc:NumericAxis DrawMajorBands="False"  
                                     DrawMajorGridLines="False"   TextFormatting="#0.000"

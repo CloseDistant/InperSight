@@ -1,0 +1,101 @@
+2022-11-24 14:16:26,917 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:16:26,922 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:17:06,915 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:17:06,919 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:17:35,846 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:17:35,851 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:18:31,011 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:18:31,015 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:19:59,591 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:19:59,594 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:20:30,670 [1] ERROR InfoLogger - System.NullReferenceException: Object reference not set to an instance of an object.
+   at InperSight.ViewModels.CameraSettingViewModel.Image_MouseLeftButtonUp(Object sender, MouseButtonEventArgs e) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 471
+2022-11-24 14:22:24,153 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:22:24,157 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:27:35,599 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:27:35,603 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:30:10,602 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:30:10,606 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:33:31,607 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:33:31,611 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:52:15,732 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:52:15,736 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 14:55:22,717 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 14:55:22,721 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:02:32,900 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:02:32,904 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:04:56,803 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:04:56,807 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:07:05,140 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:07:05,144 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:12:26,880 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:12:26,884 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:18:57,178 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:18:57,183 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:20:37,018 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:20:37,022 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:22:10,800 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:22:10,804 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:24:07,461 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:24:07,465 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:26:06,945 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:26:06,949 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:28:27,103 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:28:27,107 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:31:35,551 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:31:35,555 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:37:05,155 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:37:05,159 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:37:42,564 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:37:42,568 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:38:27,453 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:38:27,457 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:39:15,859 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:39:15,863 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 15:42:19,290 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 15:42:19,294 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:02:36,039 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:02:36,043 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:06:38,597 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:06:38,601 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:10:22,272 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:10:22,276 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:13:18,964 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:13:18,968 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:18:26,509 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:18:26,513 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:23:32,574 [1] ERROR InfoLogger - System.ArgumentNullException: Value cannot be null. (Parameter 'visual')
+   at System.Windows.Documents.AdornerLayer.GetAdornerLayer(Visual visual)
+   at InperSight.ViewModels.CameraSettingViewModel.Shape_MouseDown(Object sender, MouseButtonEventArgs e)
+2022-11-24 16:23:35,283 [1] ERROR InfoLogger - System.ArgumentNullException: Value cannot be null. (Parameter 'visual')
+   at System.Windows.Documents.AdornerLayer.GetAdornerLayer(Visual visual)
+   at InperSight.ViewModels.CameraSettingViewModel.Shape_MouseDown(Object sender, MouseButtonEventArgs e)
+2022-11-24 16:23:36,453 [1] ERROR InfoLogger - System.ArgumentNullException: Value cannot be null. (Parameter 'visual')
+   at System.Windows.Documents.AdornerLayer.GetAdornerLayer(Visual visual)
+   at InperSight.ViewModels.CameraSettingViewModel.Shape_MouseDown(Object sender, MouseButtonEventArgs e)
+2022-11-24 16:24:34,509 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:24:34,512 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:25:14,832 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:25:14,836 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:31:16,710 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:31:16,714 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:33:33,215 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:33:33,219 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:37:59,924 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:37:59,928 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:39:18,124 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:39:18,128 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:42:32,190 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:42:32,194 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:46:10,848 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:46:10,851 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:49:31,288 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:49:31,291 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:51:28,163 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:51:28,167 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 16:58:42,143 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 16:58:42,147 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 17:02:52,275 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 17:02:52,279 [1] INFO  InfoLogger - pid=00f9
+2022-11-24 17:04:59,118 [1] INFO  InfoLogger - vid=04b4
+2022-11-24 17:04:59,122 [1] INFO  InfoLogger - pid=00f9

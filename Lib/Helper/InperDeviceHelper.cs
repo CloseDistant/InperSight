@@ -136,11 +136,17 @@ namespace InperSight.Lib.Helper
         int baseLineFrameBufWritePos;
         Mat baseLineFrame;
         Mat[] baseLineFrameBuffer = new Mat[128];
+        public void RestDeltaF()
+        {
+            baseLinePreviousTimeStamp = new DateTime();
+            baseLineFrameBufWritePos = 0;
+            baseLineFrameBuffer = new Mat[128];
+        }
         private void GreyValueShow()
         {
-            try
+            while (true)
             {
-                while (true)
+                try
                 {
                     if (_GreyValueShowQueue.TryDequeue(out VideoFrame _mat))
                     {
@@ -213,10 +219,10 @@ namespace InperSight.Lib.Helper
                     }
                     Thread.Sleep(2);
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
             }
         }
         ConcurrentQueue<VideoFrame> _GreyValueDraw = new();
@@ -231,15 +237,15 @@ namespace InperSight.Lib.Helper
                     {
                         string _saveStr = string.Empty;
                         TimeSpan time = new(mat.Time.Subtract((DateTime)_firstTime).Ticks);
-                        Parallel.ForEach(CameraChannels, item =>
-                         {
-                             double r = (double)mat.FrameMat.Mean(item.Mask) / 655.35;
-                             _saveStr += item.ChannelId + "," + r + " ";
-                             using (item.RenderableSeries.First().DataSeries.SuspendUpdates())
-                             {
-                                 (item.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>).Append(time, r);
-                             }
-                         });
+                        foreach (var item in CameraChannels)
+                        {
+                            double r = (double)mat.FrameMat.Mean(item.Mask) / 655.35;
+                            _saveStr += item.ChannelId + "," + r + " ";
+                            using (item.RenderableSeries.First().DataSeries.SuspendUpdates())
+                            {
+                                (item.RenderableSeries.First().DataSeries as XyDataSeries<TimeSpan, double>).Append(time, r);
+                            }
+                        }
                         if (!string.IsNullOrEmpty(_saveStr))
                         {
                             _saveStrs.Enqueue(new ChannelRecord()
@@ -291,7 +297,12 @@ namespace InperSight.Lib.Helper
         {
             try
             {
-                InperGlobalClass.IsPreview = !isRecord;
+                if (CameraChannels.Count == 0)
+                {
+                    InperGlobalFunc.ShowRemainder("未添加Neuron");
+                    return;
+                }
+                InperGlobalClass.IsPreview = !isRecord || isRecord;
                 InperGlobalClass.IsRecord = isRecord;
                 InperGlobalClass.IsStop = false;
                 Parallel.ForEach(CameraChannels, item =>
@@ -302,7 +313,7 @@ namespace InperSight.Lib.Helper
                 _saveStrs = new();
                 _recordsCache = new();
                 _greyValueToCalculateCancel = new();
-
+                _firstTime = null;
                 Task.Run(() => GreyValueToCalculate(), _greyValueToCalculateCancel.Token);
 
                 foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
@@ -346,6 +357,18 @@ namespace InperSight.Lib.Helper
                     {
                         App.SqlDataInit.NoteSave(NoteSettingViewModel.NotesCache);
                         NoteSettingViewModel.NotesCache.Clear();
+                    }
+                    foreach (var item in InperGlobalClass.ActiveVideos)
+                    {
+                        if (item.IsActive && item.AutoRecord)
+                        {
+                            item.StopRecording();
+                        }
+                    }
+                    if (_recordsCache.Count >= 0)
+                    {
+                        App.SqlDataInit.ChannelRecordSave(_recordsCache);
+                        _recordsCache.Clear();
                     }
                 }
                 InperGlobalClass.IsStop = true;

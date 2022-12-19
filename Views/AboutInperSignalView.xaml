@@ -49,7 +49,7 @@
                 <Border Background="#E2E2E2" Height="1" Width="267" Margin="28 15 0 0" HorizontalAlignment="Left"/>
                 <UniformGrid Rows="3" Columns="2" Margin="28 15 0 0">
                     <TextBlock Text="Light:"/>
-                    <TextBlock x:Name="light"/>
+                    <TextBlock x:Name="light" Text="470nm"/>
                     <TextBlock Text="Model:" Margin="0 5 0 0"/>
                     <TextBlock x:Name="model" Text="Model" Margin="0 5 0 0"/>
                     <TextBlock Text="SN:" Margin="0 8 0 0"/>

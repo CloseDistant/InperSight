@@ -34,6 +34,7 @@ namespace InperSight.ViewModels
                         }
                         else
                         {
+                            InperGlobalFunc.GetWindowByNameChar("Insight").Show();
                             _ = InperGlobalFunc.GetWindowByNameChar("Insight").Activate();
                         }
                         break;

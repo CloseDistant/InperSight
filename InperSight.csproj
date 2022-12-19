@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <None Remove="Lib\Images\Camera\add.png" />
+    <None Remove="Lib\Images\Camera\addInperTheme.png" />
     <None Remove="Lib\Images\Camera\cut.png" />
     <None Remove="Lib\Images\Camera\delete.png" />
     <None Remove="Lib\Images\Camera\path.png" />
@@ -35,6 +36,10 @@
     <None Remove="Lib\Images\skin.png" />
     <None Remove="Lib\Images\unlock.png" />
     <None Remove="Lib\Images\文件.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Lib\Images\Camera\addInperTheme.png" />
   </ItemGroup>
 
   <ItemGroup>

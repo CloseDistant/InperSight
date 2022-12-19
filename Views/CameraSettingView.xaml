@@ -51,7 +51,7 @@
                         <Image Stretch="Uniform" VerticalAlignment="Top" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}"/>
                         <!--工具栏-->
                         <WrapPanel VerticalAlignment="Bottom" Margin="0 0 0 0" Height="32" Background="#E8E8E8">
-                            <Button Style="{StaticResource InperFreeButton}" Width="50" Height="20" Margin="10 8 0 0" x:Name="home" Command="{s:Action HomeShowEvent}">
+                            <Button Style="{StaticResource InperFreeButton}" Width="50" Height="20" Margin="10 8 0 0" x:Name="home" Command="{s:Action HomeShowEvent}" Cursor="Hand">
                                 <Border Background="{StaticResource InperTheme}" CornerRadius="2" x:Name="bd1">
                                     <TextBlock Text="Home" Name="t1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
                                 </Border>
@@ -122,6 +122,12 @@
                     <Grid Grid.Row="0">
                         <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 5 25 0">
                             <TextBlock Text="Frame Setting" Margin="0 0 5 0"/>
+                            <TextBlock IsEnabled="False" Width="30" Margin="0 0 0 0" Foreground="{StaticResource InperTheme}" Text="{Binding ElementName=zoomCoefficient,Path=Value,StringFormat={}{0:f2}}" TextAlignment="Center" VerticalAlignment="Center" FontSize="12">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding ElementName=zoomCoefficient,Path=Value}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <Slider Value="{Binding CameraSetting.ZoomCoefficient,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Background="LightGray" ValueChanged="{s:Action ZoomCoefficient_ValueChanged}" Width="90" Margin="5 0 10 0" Name="zoomCoefficient" Maximum="16" Minimum="2"/>
                             <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="5 0" Cursor="Hand" Command="{s:Action FrameAddEvent}">
                                 <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill"/>
                             </Button>
@@ -135,17 +141,20 @@
                     </Grid>
                     <WrapPanel Grid.Row="1" Margin="25 0" HorizontalAlignment="Right">
                         <TextBlock Text="Name"  VerticalAlignment="Center"/>
-                        <TextBox VerticalAlignment="Center" Margin="10 0" Text="Neuron 1"  x:Name="neuronName" Width="80" Height="20" />
-                        <TextBlock Text="ROI" VerticalAlignment="Center"/>
+                        <TextBox VerticalAlignment="Center" Margin="10 0" Text="Neuron 1" IsEnabled="False" x:Name="neuronName" Width="80" Height="20" />
+                        <TextBlock Text="Neuron" VerticalAlignment="Center"/>
                         <ComboBox x:Name="roiType" VerticalAlignment="Center" Margin="10 0" Width="85" ToolTip="{Binding ElementName=roiType,Path=SelectedValue.Content}">
                             <ComboBoxItem IsSelected="True">Circle</ComboBoxItem>
                             <ComboBoxItem>Rectangle</ComboBoxItem>
-                            <!--<ComboBoxItem>Ploygon</ComboBoxItem>-->
+                            <ComboBoxItem>Polygon</ComboBoxItem>
                         </ComboBox>
-                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AddRoiEvent}" Width="20" Height="20" Margin="5 0" Cursor="Hand">
+                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action AddRoiEvent}" Name="addRoiBut" Width="20" Height="20" Margin="5 0" Cursor="Hand">
                             <Image Source="/Lib/Images/Camera/add.png" Stretch="UniformToFill"/>
                         </Button>
-                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DeleteRoiEvent}" Width="20" Height="20" Margin="5 0" Cursor="Hand" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <Button Style="{StaticResource InperFreeButton}" Name="addInperThemeRoiBut" Width="20" Height="20" Margin="5 0" Cursor="Hand" Visibility="Collapsed">
+                            <Image Source="/Lib/Images/Camera/addInperTheme.png" Stretch="UniformToFill"/>
+                        </Button>
+                        <Button Style="{StaticResource InperFreeButton}" Command="{s:Action DeleteRoiEvent}" Name="deleteRoiBut" Width="20" Height="20" Margin="5 0" Cursor="Hand">
                             <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill"/>
                         </Button>
                         <!--<Button Style="{StaticResource InperFreeButton}" Command="{s:Action ClearRoiEvent}" Width="20" Height="20" Margin="5 0 0 0" Cursor="Hand">
@@ -190,7 +199,7 @@
                             <TextBlock.ToolTip>
                                 <TextBlock Text="{Binding ElementName=focusPlane,Path=Value}"/>
                             </TextBlock.ToolTip>
-                    </TextBlock>
+                        </TextBlock>
                         <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="focusPlane">
                             <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                         </Button>
@@ -207,7 +216,7 @@
                             <TextBlock.ToolTip>
                                 <TextBlock Text="{Binding ElementName=upperLevel,Path=Value}"/>
                             </TextBlock.ToolTip>
-                    </TextBlock>
+                        </TextBlock>
                         <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="upperLevel">
                             <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                         </Button>
@@ -225,7 +234,7 @@
                             <TextBlock.ToolTip>
                                 <TextBlock Text="{Binding ElementName=lowerLevel,Path=Value}"/>
                             </TextBlock.ToolTip>
-                    </TextBlock>
+                        </TextBlock>
                         <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand"  Command="{s:Action Param_Reduce_Event}" CommandParameter="lowerLevel">
                             <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                         </Button>
@@ -246,7 +255,7 @@
                             <TextBlock.ToolTip>
                                 <TextBlock Text="{Binding ElementName=excitLowerLevel,Path=Value}"/>
                             </TextBlock.ToolTip>
-                    </TextBlock>
+                        </TextBlock>
                         <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Cursor="Hand" Command="{s:Action Param_Reduce_Event}" CommandParameter="excitLowerLevel">
                             <Image Source="/Lib/Images/Camera/reduce.png" Stretch="UniformToFill" />
                         </Button>

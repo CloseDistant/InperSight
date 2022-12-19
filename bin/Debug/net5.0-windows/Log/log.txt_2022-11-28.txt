@@ -1,0 +1,60 @@
+2022-11-28 10:43:09,483 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 10:43:09,487 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 10:44:33,813 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 10:44:33,817 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 10:46:55,904 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 10:46:55,907 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 10:50:52,185 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 10:50:52,188 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 10:51:00,829 [1] ERROR InfoLogger - System.InvalidOperationException: 指定的元素已经是另一个元素的逻辑子元素。请先将其断开连接。
+   at System.Windows.FrameworkElement.ChangeLogicalParent(DependencyObject newParent)
+   at System.Windows.FrameworkElement.AddLogicalChild(Object child)
+   at System.Windows.Controls.UIElementCollection.AddInternal(UIElement element)
+   at InperSight.ViewModels.CameraSettingViewModel.<NeuronLoade>b__12_0(CameraChannelConfig x) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 146
+   at System.Collections.Generic.List`1.ForEach(Action`1 action)
+   at InperSight.ViewModels.CameraSettingViewModel.NeuronLoade() in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 88
+2022-11-28 10:51:33,320 [1] ERROR InfoLogger - System.InvalidOperationException: 指定的元素已经是另一个元素的逻辑子元素。请先将其断开连接。
+   at System.Windows.FrameworkElement.ChangeLogicalParent(DependencyObject newParent)
+   at System.Windows.FrameworkElement.AddLogicalChild(Object child)
+   at System.Windows.Controls.UIElementCollection.AddInternal(UIElement element)
+   at InperSight.ViewModels.CameraSettingViewModel.<NeuronLoade>b__12_0(CameraChannelConfig x) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 146
+   at System.Collections.Generic.List`1.ForEach(Action`1 action)
+   at InperSight.ViewModels.CameraSettingViewModel.NeuronLoade() in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 88
+2022-11-28 10:54:13,241 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 10:54:13,245 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 11:36:46,562 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 11:36:46,566 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 14:06:25,417 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 14:06:25,421 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:28:47,672 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:28:47,676 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:37:10,448 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:37:10,452 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:41:22,956 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:41:22,961 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:42:57,095 [1] ERROR InfoLogger - System.NullReferenceException: Object reference not set to an instance of an object.
+   at InperSight.ViewModels.CameraSettingViewModel.<NeuronLoade>b__12_0(CameraChannelConfig x) in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 143
+   at System.Collections.Generic.List`1.ForEach(Action`1 action)
+   at InperSight.ViewModels.CameraSettingViewModel.NeuronLoade() in C:\Users\10252\source\repos\InperSight\ViewModels\CameraSettingViewModel.cs:line 88
+2022-11-28 16:47:19,146 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:47:19,151 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:48:05,119 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:48:05,123 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:50:48,571 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:50:48,575 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:52:05,658 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:52:05,663 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:56:10,730 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:56:10,734 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 16:56:54,918 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 16:56:54,922 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 17:13:14,947 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 17:13:14,951 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 17:14:04,033 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 17:14:04,037 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 17:18:24,851 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 17:18:24,855 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 17:20:48,559 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 17:20:48,563 [1] INFO  InfoLogger - pid=00f9
+2022-11-28 17:21:49,078 [1] INFO  InfoLogger - vid=04b4
+2022-11-28 17:21:49,082 [1] INFO  InfoLogger - pid=00f9
