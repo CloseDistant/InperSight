@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "SnHlUei9Dp4QrHNOf1p6G87SoXYEpB1BKbd5/tQtOyHUdnx9zIUxihEkuO/kNw3XjfqeV/7aljEuWD96G+Hl4Q==",
+  "dgSpecHash": "CiJ7tzWVO9MCD8t0I/mU67e8WulQreK0OEy8SGQSq9cedyGGkG0rDAHnjaHDB611C8pdJdzRQCbalBrg6tw5dw==",
   "success": true,
   "projectFilePath": "C:\\Users\\10252\\source\\repos\\InperSight\\InperSight.csproj",
   "expectedPackageFiles": [
@@ -34,7 +34,6 @@
     "C:\\Users\\10252\\.nuget\\packages\\opencvsharp4\\4.6.0.20220608\\opencvsharp4.4.6.0.20220608.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\opencvsharp4.runtime.win\\4.6.0.20220608\\opencvsharp4.runtime.win.4.6.0.20220608.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\opencvsharp4.windows\\4.6.0.20220608\\opencvsharp4.windows.4.6.0.20220608.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\opencvsharp4.wpfextensions\\4.6.0.20220608\\opencvsharp4.wpfextensions.4.6.0.20220608.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\oracle.manageddataaccess.core\\3.21.1\\oracle.manageddataaccess.core.3.21.1.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\scichart\\6.6.0.26505\\scichart.6.6.0.26505.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\sharpziplib\\1.4.1\\sharpziplib.1.4.1.nupkg.sha512",
@@ -79,11 +78,7 @@
     "C:\\Users\\10252\\.nuget\\packages\\system.text.json\\4.7.1\\system.text.json.4.7.1.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
     "C:\\Users\\10252\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
-    "C:\\Users\\10252\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.17\\microsoft.netcore.app.host.win-x64.5.0.17.nupkg.sha512"
+    "C:\\Users\\10252\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
   ],
   "logs": []
 }

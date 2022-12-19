@@ -2,7 +2,6 @@
 using InperVideo.Camera;
 using InperVideo.Interfaces;
 using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
 using Stylet;
 using System;
 using System.Collections.Concurrent;

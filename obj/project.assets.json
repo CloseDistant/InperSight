@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net5.0-windows7.0": {
+    "net7.0-windows7.0": {
       "Aliyun.OSS.DotNetCore/2.8.0": {
         "type": "package",
         "compile": {
@@ -403,18 +403,18 @@
           "System.Text.Encoding.CodePages": "4.4.0"
         },
         "compile": {
-          "lib/net5.0/MySql.Data.dll": {
+          "lib/net6.0/MySql.Data.dll": {
             "related": ".xml"
           },
-          "lib/net5.0/Ubiety.Dns.Core.dll": {},
-          "lib/net5.0/ZstdNet.dll": {}
+          "lib/net6.0/Ubiety.Dns.Core.dll": {},
+          "lib/net6.0/ZstdNet.dll": {}
         },
         "runtime": {
-          "lib/net5.0/MySql.Data.dll": {
+          "lib/net6.0/MySql.Data.dll": {
             "related": ".xml"
           },
-          "lib/net5.0/Ubiety.Dns.Core.dll": {},
-          "lib/net5.0/ZstdNet.dll": {}
+          "lib/net6.0/Ubiety.Dns.Core.dll": {},
+          "lib/net6.0/ZstdNet.dll": {}
         }
       },
       "Newtonsoft.Json/13.0.1": {
@@ -453,12 +453,12 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netcoreapp3.1/OpenCvSharp.dll": {
+          "lib/net6.0/OpenCvSharp.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp3.1/OpenCvSharp.dll": {
+          "lib/net6.0/OpenCvSharp.dll": {
             "related": ".xml"
           }
         }
@@ -491,24 +491,7 @@
         "type": "package",
         "dependencies": {
           "OpenCvSharp4": "4.6.0.20220608",
-          "OpenCvSharp4.WpfExtensions": "4.6.0.20220608",
           "OpenCvSharp4.runtime.win": "4.6.0.20220608"
-        }
-      },
-      "OpenCvSharp4.WpfExtensions/4.6.0.20220608": {
-        "type": "package",
-        "dependencies": {
-          "OpenCvSharp4": "4.6.0.20220608"
-        },
-        "compile": {
-          "lib/netcoreapp3.1/OpenCvSharp.WpfExtensions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netcoreapp3.1/OpenCvSharp.WpfExtensions.dll": {
-            "related": ".xml"
-          }
         }
       },
       "Oracle.ManagedDataAccess.Core/3.21.1": {
@@ -560,12 +543,12 @@
       "SharpZipLib/1.4.1": {
         "type": "package",
         "compile": {
-          "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll": {
+          "lib/net6.0/ICSharpCode.SharpZipLib.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.1/ICSharpCode.SharpZipLib.dll": {
+          "lib/net6.0/ICSharpCode.SharpZipLib.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -1093,12 +1076,12 @@
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
         "type": "package",
         "compile": {
-          "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
             "related": ".xml"
           }
         },
@@ -2107,21 +2090,6 @@
         ".signature.p7s",
         "opencvsharp4.windows.4.6.0.20220608.nupkg.sha512",
         "opencvsharp4.windows.nuspec"
-      ]
-    },
-    "OpenCvSharp4.WpfExtensions/4.6.0.20220608": {
-      "sha512": "P1v9OVFSx8/wdZaqNceDXPBOy1EpeZ5PNezdf8bbPd8CRD85k5DTRDOlgoQ3X9pJTsRyx6cU0HkpwPz67ulcuA==",
-      "type": "package",
-      "path": "opencvsharp4.wpfextensions/4.6.0.20220608",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net461/OpenCvSharp.WpfExtensions.xml",
-        "lib/net48/OpenCvSharp.WpfExtensions.dll",
-        "lib/netcoreapp3.1/OpenCvSharp.WpfExtensions.dll",
-        "lib/netcoreapp3.1/OpenCvSharp.WpfExtensions.xml",
-        "opencvsharp4.wpfextensions.4.6.0.20220608.nupkg.sha512",
-        "opencvsharp4.wpfextensions.nuspec"
       ]
     },
     "Oracle.ManagedDataAccess.Core/3.21.1": {
@@ -3945,7 +3913,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net5.0-windows7.0": [
+    "net7.0-windows7.0": [
       "Aliyun.OSS.DotNetCore >= 2.8.0",
       "HandyControl >= 3.3.0",
       "InperCameraDShow >= 1.0.0",
@@ -3984,15 +3952,15 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net5.0-windows"
+        "net7.0-windows"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net5.0-windows7.0": {
-          "targetAlias": "net5.0-windows",
+        "net7.0-windows7.0": {
+          "targetAlias": "net7.0-windows",
           "projectReferences": {
             "C:\\Users\\10252\\source\\repos\\InperCameraDShow\\InperCameraDShow\\InperCameraDShow.csproj": {
               "projectPath": "C:\\Users\\10252\\source\\repos\\InperCameraDShow\\InperCameraDShow\\InperCameraDShow.csproj"
@@ -4010,8 +3978,8 @@
       }
     },
     "frameworks": {
-      "net5.0-windows7.0": {
-        "targetAlias": "net5.0-windows",
+      "net7.0-windows7.0": {
+        "targetAlias": "net7.0-windows",
         "dependencies": {
           "Aliyun.OSS.DotNetCore": {
             "target": "Package",
@@ -4073,24 +4041,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[5.0.17, 5.0.17]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
