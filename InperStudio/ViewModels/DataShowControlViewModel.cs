@@ -119,6 +119,7 @@ namespace InperStudio.ViewModels
                 InperDeviceHelper.Instance.StartCollectEvent += Instance_StartCollectEvent;
 
                 view.timesAxisSci.XAxis.LabelProvider = new CustomTimeSpanLableProvider();
+
             }
             catch (Exception ex)
             {
