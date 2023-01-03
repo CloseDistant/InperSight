@@ -1079,7 +1079,7 @@ namespace InperStudio.ViewModels
                      if (x.GroupId == sen.GroupId)
                      {
                          //x.IsChecked = true;
-                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
+                         //InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
                          InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
 
                          this.view.waveView.SelectedItem = x;
@@ -1087,7 +1087,7 @@ namespace InperStudio.ViewModels
                      else
                      {
                          //x.IsChecked = false;
-                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                         //InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                          InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
                      }
                  });
