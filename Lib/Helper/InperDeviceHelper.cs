@@ -297,11 +297,11 @@ namespace InperSight.Lib.Helper
         {
             try
             {
-                if (CameraChannels.Count == 0)
-                {
-                    InperGlobalFunc.ShowRemainder("未添加Neuron");
-                    return;
-                }
+                //if (CameraChannels.Count == 0)
+                //{
+                //    InperGlobalFunc.ShowRemainder("未添加Neuron");
+                //    return;
+                //}
                 InperGlobalClass.IsPreview = !isRecord || isRecord;
                 InperGlobalClass.IsRecord = isRecord;
                 InperGlobalClass.IsStop = false;

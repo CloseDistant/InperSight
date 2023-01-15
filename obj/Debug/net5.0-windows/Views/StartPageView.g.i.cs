@@ -107,7 +107,7 @@ namespace InperSight.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/InperSight;V1.0.0.0;component/views/startpageview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/InperSight;component/views/startpageview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\StartPageView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
