@@ -26,7 +26,7 @@
             <Grid>
                 <Image Source="/Lib/Images/InperSignal.png" Margin="0 100 0 0" VerticalAlignment="Top" Width="56" Height="56" Stretch="UniformToFill" />
                 <TextBlock x:Name="vn" Text="version number" HorizontalAlignment="Center" Margin="0 170 0 0"/>
-                <TextBlock x:Name="ts" Text="Latest Version" HorizontalAlignment="Center" Margin="10 200 10 0" TextWrapping="WrapWithOverflow" FontSize="12" Foreground="Red" FontFamily="Arial"/>
+                <TextBlock x:Name="ts" Text="Latest Version" HorizontalAlignment="Center" Margin="10 200 10 0" TextWrapping="WrapWithOverflow" FontSize="12" Foreground="{StaticResource InperTheme}" Opacity=".8" FontFamily="Arial"/>
             </Grid>
         </Border>
         <Grid Grid.Column="1">

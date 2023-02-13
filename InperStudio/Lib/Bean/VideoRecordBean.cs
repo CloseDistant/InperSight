@@ -72,7 +72,7 @@ namespace InperStudio.Lib.Bean
             videoAcquirer = new VideoAcquirerFactory().CreateVideoCapturer(devIndex, cameraParamSet);
             videoAcquirer.MatRtShowCreated += VideoAcquirer_MatRtShowCreated;
         }
-        
+
         private void VideoAcquirer_MatRtShowCreated(object sender, MatRtShowEventArgs e)
         {
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
@@ -127,7 +127,17 @@ namespace InperStudio.Lib.Bean
         }
         public void StopPreview()
         {
-            videoAcquirer.StopAcq();
+            try
+            {
+                if (videoAcquirer != null)
+                {
+                    videoAcquirer.StopAcq();
+                }
+            }
+            catch (Exception ex)
+            {
+                
+            }
         }
         #endregion
     }

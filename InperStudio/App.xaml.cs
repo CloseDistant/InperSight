@@ -33,7 +33,7 @@ namespace InperStudio
         private static System.Threading.Mutex mutex;
 
         protected override void OnStartup(StartupEventArgs e)
-        {
+        {      
             if (System.Diagnostics.Process.GetProcessesByName("UpgradeClient").ToList().Count > 0)
             {
                 //MessageBox.Show("正在运行中");

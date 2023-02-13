@@ -56,7 +56,7 @@ namespace InperStudio.ViewModels
             }
             if (string.IsNullOrEmpty(view.fileName.Text))
             {
-                view.fileName.Text = DateTime.Now.ToString("yyyyMMddHHmmss");
+                view.fileName.Text = DateTime.Now.ToString("yyyyMMddHHmmss"); 
             }
         }
         public void AddItemCmd()
@@ -113,11 +113,11 @@ namespace InperStudio.ViewModels
                 }
                 if (newName != InperGlobalClass.DataFolderName)
                 {
-                    if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)))
+                    if (Directory.Exists(Path.Combine(InperGlobalClass.DataPath, newName)))
                     {
-                        if (Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Count() > 0)
+                        if (Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, newName)).Count() > 0)
                         {
-                            if (System.Windows.MessageBox.Show(InperGlobalClass.DataFolderName + "文件夹中检测到数据文件，是否创建新的文件夹?", "Ask", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                            if (System.Windows.MessageBox.Show(newName + "文件夹已存在，是否覆盖?", "Ask", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                             {
                                 view.fileName.Text = InperGlobalClass.DataFolderName;
                                 return;
@@ -125,14 +125,15 @@ namespace InperStudio.ViewModels
                             else
                             {
                                 InperGlobalClass.DataFolderName = newName;
+                                DelectDir(Path.Combine(InperGlobalClass.DataPath, newName));
                                 Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
                             }
                         }
                         else
                         {
-                            Directory.Delete(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
                             InperGlobalClass.DataFolderName = newName;
-                            Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                            Directory.Delete(Path.Combine(InperGlobalClass.DataPath, newName));
+                            Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, newName));
                         }
                     }
                     else
@@ -162,5 +163,30 @@ namespace InperStudio.ViewModels
             }
         }
         #endregion
+        public void DelectDir(string srcPath)
+        {
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(srcPath);
+                FileSystemInfo[] fileinfo = dir.GetFileSystemInfos(); //返回目录中所有文件和子目录
+                foreach (FileSystemInfo i in fileinfo)
+                {
+                    if (i is DirectoryInfo) //判断是否文件夹
+                    {
+                        DirectoryInfo subdir = new DirectoryInfo(i.FullName);
+                        subdir.Delete(true); //删除子目录和文件
+                    }
+                    else
+                    {
+                        File.Delete(i.FullName); //删除指定文件
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
     }
 }
