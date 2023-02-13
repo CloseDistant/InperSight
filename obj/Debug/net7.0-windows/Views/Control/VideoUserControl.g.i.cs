@@ -78,7 +78,7 @@ namespace InperSight.Views.Control {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/InperSight;V1.0.0.0;component/views/control/videousercontrol.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/InperSight;component/views/control/videousercontrol.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\..\Views\Control\VideoUserControl.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
