@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace InperStudio.ViewModels
 {
@@ -21,6 +22,7 @@ namespace InperStudio.ViewModels
         public StartPageViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
+            System.Windows.Application.Current.Resources["InperTheme"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperConfig.Instance.ThemeColor));
         }
         async Task TaskExecute(CancellationToken token)
         {
@@ -46,19 +48,9 @@ namespace InperStudio.ViewModels
             try
             {
                 Version = InperConfig.Instance.Version;
-                DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
+                
+                DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
                 FileInfo[] files = root.GetFiles();
-                if (files.Count() > 1)
-                {
-                    var _files = files.OrderByDescending(x => x.LastWriteTime).Take(1).ToArray();
-                    for (int i = 0; i < files.Length; i++)
-                    {
-                        if (files[i].Name != _files[0].Name)
-                        {
-                            File.Delete(files[i].FullName);
-                        }
-                    }
-                }
                 UnderUpgradeFunc under = new UnderUpgradeFunc();
                 if (!under.DeviceIsExist)
                 {
@@ -71,12 +63,12 @@ namespace InperStudio.ViewModels
                     #region 下位机更新
                     if (files.Length > 0)
                     {
-                        under.SendFile(root.GetFiles(), tokenStart);
+                        under.SendFile(files, tokenStart);
                         await TaskExecute(tokenStart.Token);
-                        if (!under.DeviceIsRestart)
-                        {
-                            MessageBox.Show("Updating successful . Changes will take effect after restarting photometry devices.");
-                        }
+                        //if (!under.DeviceIsRestart)
+                        //{
+                        //    MessageBox.Show("Updating successful . Changes will take effect after restarting photometry devices.");
+                        //}
                     }
                     else
                     {
@@ -103,8 +95,10 @@ namespace InperStudio.ViewModels
                         uint DEVICE_INFO_PUB = 0x000000E8;
 
                         InperDeviceHelper.Instance.device.GetDeviceInfo(SMARTLIGHT_INFO);
-                        await Task.Delay(1000);
+                        await Task.Delay(500);
                         InperDeviceHelper.Instance.device.GetDeviceInfo(DEVICE_INFO_PUB);
+                        await Task.Delay(500);
+                        InperLogExtentHelper.InitLogDatabase();
 
                         windowManager.ShowWindow(new MainWindowViewModel(windowManager));
                         RequestClose();
@@ -114,7 +108,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex,this.GetType().Name);
             }
         }
         public void Close()

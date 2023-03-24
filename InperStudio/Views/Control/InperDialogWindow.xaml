@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InperStudio.Views.Control"
         mc:Ignorable="d"
-        Title="Tips" Height="215" Width="380" WindowStyle="None" AllowsTransparency="True" Topmost="False" WindowStartupLocation="CenterScreen">
+        Title="Tips" Height="215" Width="380" WindowStyle="None" AllowsTransparency="True" Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Background>
         <SolidColorBrush Color="Transparent"/>
     </Window.Background>

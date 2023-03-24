@@ -1,5 +1,6 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data.Model;
+using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using Stylet;
 using System;
@@ -67,7 +68,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion

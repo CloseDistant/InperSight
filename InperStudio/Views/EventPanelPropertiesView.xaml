@@ -26,12 +26,12 @@
                 <hc:Divider Width="50" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
             </Grid>
             <Grid Margin="0 10">
-                <RadioButton x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left">
+                <RadioButton IsChecked="False" x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left">
                     <TextBlock Text="Auto" Margin="5 0"/>
                 </RadioButton>
             </Grid>
             <Grid Margin="0 10">
-                <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed">
+                <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" IsChecked="True">
                     <TextBlock Text="Fixed" Margin="5 0" />
                 </RadioButton>
                 <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Double" InperMaxValue="999" InperMinValue="1" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding Source={StaticResource InperGlobalClass},Path=EventPanelProperties.HeightFixedValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  />

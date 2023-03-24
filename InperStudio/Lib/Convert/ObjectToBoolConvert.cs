@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InperStudio.Lib.Helper;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -15,7 +16,7 @@ namespace InperStudio.Lib.Convert
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             return enable;
         }

@@ -3,10 +3,12 @@ using LibUsbDotNet;
 using LibUsbDotNet.Main;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace InperProtocolStack.UnderUpgrade
 {
@@ -85,37 +87,44 @@ namespace InperProtocolStack.UnderUpgrade
 
             Write(new CmdInitMcu().GetBytes().ToArray());
             await TaskExecute(tokenSource.Token);
+
             foreach (FileInfo x in files.OrderBy(x => x.LastWriteTime).ToList())
             {
                 Console.WriteLine("进入到文件");
                 Write(new CmdGetHashVal().GetBytes().ToArray()); //获取下位机hsah值
                 await TaskExecute(tokenSourceHash.Token);
+                string _hashval = string.Empty;
+                using (FileStream fs = new FileStream(x.FullName, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                    byte[] retVal = md5.ComputeHash(fs);
+                    _hashval = BitConverter.ToString(retVal).Replace("-", ""); //获取当前文件hash值
+                }
+                //if (underhashval.StartsWith("FFFFFFFFFFFF"))
+                //{
+                //    cancellation.Cancel();
+                //    return;
+                //}
                 if (!DeviceIsRestart)
                 {
-                    cancellation.Cancel();
-                    if (MyUsbDevice.IsOpen)
+                    if (underhashval == _hashval || string.IsNullOrEmpty(underhashval))
                     {
-                        MyUsbDevice.Close();
+                        DeviceIsRestart = true;
+                        //File.Delete(x.FullName);
+                        CmdAppRun _cmdAppRun = new CmdAppRun();
+                        Write(_cmdAppRun.GetBytes().ToArray());
+                        await TaskExecute(tokenSourceRun.Token);
+                        cancellation.Cancel();
+                        if (MyUsbDevice.IsOpen)
+                        {
+                            MyUsbDevice.Close();
+                        }
+                        return;
                     }
-                    return;
                 }
 
                 if (x.Extension.Contains("bin"))
                 {
-                    string _hashval = string.Empty;
-                    using (FileStream fs = new FileStream(x.FullName, FileMode.Open, FileAccess.ReadWrite))
-                    {
-                        System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-                        byte[] retVal = md5.ComputeHash(fs);
-                        _hashval = BitConverter.ToString(retVal).Replace("-", ""); //获取当前文件hash值
-
-                    }
-                    if (hashval == _hashval)
-                    {
-                        File.Delete(x.FullName);
-                        continue;
-                    }
-
                     CmdSetFileLength length = new CmdSetFileLength();
                     length.SetCmdParam((uint)x.Length);
                     Write(length.GetBytes().ToArray());
@@ -151,9 +160,11 @@ namespace InperProtocolStack.UnderUpgrade
                             tokenSourceHash = new CancellationTokenSource(new TimeSpan(0, 0, 3));
                             await TaskExecute(tokenSourceHash.Token);
 
-                            if (hashval == _hashval)
+                            if (underhashval == _hashval)
                             {
-                                File.Delete(x.FullName);
+                                //MessageBox.Show("下位机更新完成");
+                                //File.Delete(x.FullName);
+                                DeviceIsRestart = true;
                                 continue;
                             }
                         }
@@ -174,6 +185,7 @@ namespace InperProtocolStack.UnderUpgrade
 
         private bool isstart = false;
         private string hashval = string.Empty;
+        private string underhashval = string.Empty;
         private int count = 0;
         private readonly int send_length = 2048;
         //private event Action<string, bool> GetHashVal;
@@ -191,9 +203,9 @@ namespace InperProtocolStack.UnderUpgrade
             if (e.Buffer[3] == 0xEF)
             {
                 var _hashVal = e.Buffer.Skip(20).Take(16).ToArray();
-                hashval = BitConverter.ToString(_hashVal).Replace("-", "");
-                Console.WriteLine(hashval);
-                DeviceIsRestart = true;
+                underhashval = BitConverter.ToString(_hashVal).Replace("-", "");
+                Console.WriteLine("hashval_" + underhashval);
+                //DeviceIsRestart = true;
                 tokenSourceHash.Cancel();
             }
             if (isstart)

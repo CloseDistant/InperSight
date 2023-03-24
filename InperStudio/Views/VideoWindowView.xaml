@@ -11,7 +11,7 @@
         xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
-        Title="{Binding BehaviorRecorderKit.CustomName}" Height="395" Width="430" MinWidth="430" MinHeight="328" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}">
+        Title="{Binding BehaviorRecorderKit.CustomName}" Height="395" Width="430" MinWidth="430" MinHeight="328" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}" Closing="{s:Action Window_Closing}">
     <inp:InperDialogWindow.Resources>
         <conv:VideoIntToTIme x:Key="VideoIntToTIme"/>
     </inp:InperDialogWindow.Resources>

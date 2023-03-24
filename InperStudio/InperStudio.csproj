@@ -93,8 +93,9 @@
     <Reference Include="HandyControl, Version=3.2.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
       <HintPath>packages\HandyControl.3.2.0\lib\net472\HandyControl.dll</HintPath>
     </Reference>
-    <Reference Include="InperCameraDShow">
-      <HintPath>..\..\..\Users\刘小刀\source\repos\InperCameraDShow\bin\Debug\netstandard2.0\InperCameraDShow.dll</HintPath>
+    <Reference Include="InperCameraDShow, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\InperCameraDShow\InperCameraDShow\bin\Debug\netstandard2.0\InperCameraDShow.dll</HintPath>
     </Reference>
     <Reference Include="InperPhotometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -186,17 +187,20 @@
       <HintPath>packages\System.Drawing.Common.5.0.2\lib\net461\System.Drawing.Common.dll</HintPath>
     </Reference>
     <Reference Include="System.Management" />
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Text.Encoding.CodePages, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encoding.CodePages.7.0.0\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
@@ -289,6 +293,11 @@
     <Compile Include="Lib\Data\Model\OutputMarker.cs" />
     <Compile Include="Lib\Data\Model\TablesDesc.cs" />
     <Compile Include="Lib\Data\Model\Tag.cs" />
+    <Compile Include="Lib\Data\Monitor\ApiResult.cs" />
+    <Compile Include="Lib\Data\Monitor\Device_Log.cs" />
+    <Compile Include="Lib\Data\Monitor\Device_Statu.cs" />
+    <Compile Include="Lib\Data\Monitor\Device_Use_Monitor.cs" />
+    <Compile Include="Lib\Data\Monitor\Inpersignal_module_use.cs" />
     <Compile Include="Lib\Data\SqlDataInit.cs" />
     <Compile Include="Lib\Enum\InperEnums.cs" />
     <Compile Include="Lib\Enum\InperParameters.cs" />
@@ -296,6 +305,7 @@
     <Compile Include="Lib\Helper\FilterTools\OnLineFilterTool.cs" />
     <Compile Include="Lib\Helper\HighAccurateTimer.cs" />
     <Compile Include="Lib\Helper\HotKey\HotKeyHelper.cs" />
+    <Compile Include="Lib\Helper\HttpClientHelper.cs" />
     <Compile Include="Lib\Helper\ImageRecognition\AutoFocusHelper.cs" />
     <Compile Include="Lib\Helper\InperClassExtensionHelper.cs" />
     <Compile Include="Lib\Helper\InperClassHelper.cs" />
@@ -303,6 +313,7 @@
     <Compile Include="Lib\Helper\InperComputerInfoHelper.cs" />
     <Compile Include="Lib\Helper\InperDeviceHelper.cs" />
     <Compile Include="Lib\Helper\InperJsonHelper.cs" />
+    <Compile Include="Lib\Helper\InperLogExtentHelper.cs" />
     <Compile Include="Lib\Helper\InpertProductConfig.cs" />
     <Compile Include="Lib\Helper\JsonBean\AdditionRecordConditions.cs" />
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
@@ -320,6 +331,7 @@
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ManulControlViewModel.cs" />
     <Compile Include="ViewModels\NoteSettingViewModel.cs" />
+    <Compile Include="ViewModels\PreferenceWindowViewModel.cs" />
     <Compile Include="ViewModels\SignalPropertiesViewModel.cs" />
     <Compile Include="ViewModels\SignalSettingsViewModel.cs" />
     <Compile Include="ViewModels\StartPageViewModel.cs" />
@@ -378,6 +390,9 @@
     <Compile Include="Views\NoteSettingView.xaml.cs">
       <DependentUpon>NoteSettingView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\PreferenceWindowView.xaml.cs">
+      <DependentUpon>PreferenceWindowView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SignalPropertiesView.xaml.cs">
       <DependentUpon>SignalPropertiesView.xaml</DependentUpon>
     </Compile>
@@ -435,6 +450,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Lib\Resources\en_us.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lib\Resources\zh_cn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AboutInperSignalView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -500,6 +523,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NoteSettingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PreferenceWindowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -599,6 +626,7 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -24,6 +24,26 @@ namespace InperStudioControlLib.Lib.Config
         private string mcuKey;
         private string releaseData;
         private string versionDesc;
+        private string themeColor;
+        private string language;
+        public string Language
+        {
+            get => language;
+            set
+            {
+                language = value;
+                SetConfigValue("language", language);
+            }
+        }
+        public string ThemeColor
+        {
+            get => themeColor;
+            set
+            {
+                themeColor = value;
+                SetConfigValue("themeColor", themeColor);
+            }
+        }
         public string ReleaseData
         {
             get => releaseData;
@@ -160,6 +180,8 @@ namespace InperStudioControlLib.Lib.Config
             mcuKey = GetConfigValue("mcuKey");
             releaseData = GetConfigValue("releaseData");
             versionDesc = GetConfigValue("versionDesc");
+            themeColor = GetConfigValue("themeColor");
+            language = GetConfigValue("language");
         }
         #endregion
 

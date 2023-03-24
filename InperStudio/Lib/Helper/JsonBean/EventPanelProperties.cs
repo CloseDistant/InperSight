@@ -6,8 +6,8 @@ namespace InperStudio.Lib.Helper.JsonBean
 {
     public class EventPanelProperties
     {
-        public bool HeightAuto { get; set; } = true;
-        public bool HeightFixed { get; set; } = false;
+        public bool HeightAuto { get; set; } = false;
+        public bool HeightFixed { get; set; } = true;
         public double HeightFixedValue { get; set; } = 100;
         public bool DisplayLockedBottom { get; set; } = true;
         private bool displayNameVisible = true;

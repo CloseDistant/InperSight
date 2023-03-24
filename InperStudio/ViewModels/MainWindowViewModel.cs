@@ -45,16 +45,23 @@ namespace InperStudio.ViewModels
         }
         protected override void OnViewLoaded()
         {
-            base.OnViewLoaded();
-            windowView = View as MainWindowView;
+            try
+            {
+                base.OnViewLoaded();
+                windowView = View as MainWindowView;
 
-            LeftToolsControlViewModel = new LeftToolsControlViewModel(windowManager);
-            ManulControlViewModel = new ManulControlViewModel(windowManager);
-            DataShowControlViewModel= new DataShowControlViewModel(windowManager);
-            ActiveItem = DataShowControlViewModel;
+                LeftToolsControlViewModel = new LeftToolsControlViewModel(windowManager);
+                ManulControlViewModel = new ManulControlViewModel(windowManager);
+                DataShowControlViewModel = new DataShowControlViewModel(windowManager);
+                ActiveItem = DataShowControlViewModel;
 
-            windowView.NonClientAreaContent = new MainTitleContentArea();
-            InperDeviceHelper.Instance.device.SetSweepState(0);
+                windowView.NonClientAreaContent = new MainTitleContentArea();
+                InperDeviceHelper.Instance.device.SetSweepState(0);
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex,this.GetType().Name);
+            }
         }
         protected override void OnClose()
         {
@@ -225,11 +232,13 @@ namespace InperStudio.ViewModels
                         }
                     }
                 }
+                InperLogExtentHelper.DeviceStatuSet(1);
+                InperLogExtentHelper.DeviceUseMonitorOpenCountSet();
                 base.OnClose();
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion
@@ -237,13 +246,13 @@ namespace InperStudio.ViewModels
         #region
         public void ButtonVisibilitySwitch_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.windowView.main.ColumnDefinitions[1].Width = new GridLength(0);
+            this.windowView.main.ColumnDefinitions[0].Width = new GridLength(0);
         }
         public void ButtonVisibilitySwitch_Checked(object sender, RoutedEventArgs e)
         {
             if ((sender as ToggleButton).IsFocused)
             {
-                this.windowView.main.ColumnDefinitions[1].Width = GridLength.Auto;
+                this.windowView.main.ColumnDefinitions[0].Width = GridLength.Auto;
             }
         }
 

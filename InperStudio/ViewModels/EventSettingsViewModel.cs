@@ -283,7 +283,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
 
@@ -366,7 +366,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Hotkeys_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -413,7 +413,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void PopButton_Click(object sender, RoutedEventArgs e)
@@ -504,7 +504,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void ConditionsChannelCombox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -540,7 +540,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void MarkerColorList_Selected(object sender, SelectionChangedEventArgs e)
@@ -563,7 +563,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void MarkerMove(string moveType)
@@ -858,7 +858,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Test_MouseEnter(object sender, MouseEventArgs e)
@@ -900,7 +900,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion

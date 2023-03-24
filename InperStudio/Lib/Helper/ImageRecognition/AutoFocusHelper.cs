@@ -56,7 +56,7 @@ namespace InperStudio.Lib.Helper.ImageRecognition
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, "AutoFocusHelper");
             }
             return default;
         }

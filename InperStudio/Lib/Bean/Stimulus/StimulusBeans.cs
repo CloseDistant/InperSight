@@ -90,7 +90,7 @@ namespace InperStudio.Lib.Bean.Stimulus
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             return new XyDataSeries<TimeSpan, double>();
         }

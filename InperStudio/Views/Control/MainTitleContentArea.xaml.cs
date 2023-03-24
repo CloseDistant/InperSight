@@ -169,7 +169,7 @@ namespace InperStudio.Views.Control
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public static bool JsonConfigSaveAs()
@@ -194,7 +194,7 @@ namespace InperStudio.Views.Control
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, "MainTitleContentArea");
             }
             return true;
         }
@@ -241,6 +241,24 @@ namespace InperStudio.Views.Control
                 {
                     (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new AboutInperSignalViewModel());
                 }
+            }
+        }
+
+        private void Language_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window.Name.Contains("MainWindow"))
+                    {
+                        (window.DataContext as MainWindowViewModel).windowManager.ShowDialog(new PreferenceWindowViewModel());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Log.Error(ex.ToString());
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Data.Model;
+using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using Stylet;
 using System;
@@ -103,7 +104,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
     }

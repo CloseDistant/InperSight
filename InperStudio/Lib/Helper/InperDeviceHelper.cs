@@ -152,7 +152,7 @@ namespace InperStudio.Lib.Helper
                         }
                         catch (Exception ex)
                         {
-                            App.Log.Error(ex.ToString());
+                            InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                         }
                         finally
                         {
@@ -283,7 +283,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public bool InitDataStruct()
@@ -355,7 +355,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                 return false;
             }
             return true;
@@ -394,7 +394,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public Mat _ImageShowMat = new Mat();
@@ -421,7 +421,7 @@ namespace InperStudio.Lib.Helper
                     unsafe
                     {
                         Marshal.Copy(_ImageShowMat.Data, _SwapBuffer, 0, VisionWidth * VisionHeight);
-                        System.Windows.Application.Current?.Dispatcher.Invoke(new Action(() =>
+                        Application.Current?.Dispatcher.Invoke(new Action(() =>
                         {
                             _WBMPPreview.Lock();
                             Marshal.Copy(_SwapBuffer, 0, _WBMPPreview.BackBuffer, VisionWidth * VisionHeight);
@@ -435,19 +435,24 @@ namespace InperStudio.Lib.Helper
         private int[] _cameraSkipCountArray = new int[4];
         private int _cameraSkipCount = 0;
         private int _FrameProcLock = 0;
+        int count = 0;
         public void FrameProc()
         {
             if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
             {
                 while (_MatQ.TryDequeue(out MarkedMat m))
                 {
+                    if (count < 20)
+                    {
+                        count++;
+                        m.ImageMat.SaveImage(count + ".bmp");
+                    }
                     long ts = m.Timestamp - _PlottingStartTime;
                     time = ts;
                     ConcurrentBag<string> values = new ConcurrentBag<string>();
                     ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
                     foreach (var mask in _LoopCannels)
                     {
-
                         double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
 
                         if (mask.Offset)
@@ -534,7 +539,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private void AdSamplingConv(double sampling, IntPtr ptr)
@@ -853,7 +858,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                 Interlocked.Exchange(ref deltaFObj, 0);
             }
         }
@@ -1162,7 +1167,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                 Interlocked.Exchange(ref _DrawMarker, 0);
             }
         }
@@ -1181,10 +1186,11 @@ namespace InperStudio.Lib.Helper
                 time = 0;
                 _frameProcTaskTokenSource.Cancel();
                 _updateTaskTokenSource.Cancel();
+                count = 0;
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void StopCollect(CancellationTokenSource tokenSource)
@@ -1280,7 +1286,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             finally
             {
@@ -1408,7 +1414,7 @@ namespace InperStudio.Lib.Helper
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void DioBindingLightSet(EventChannelJson json)

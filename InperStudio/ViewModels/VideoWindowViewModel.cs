@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudio.Views.Control;
 using Stylet;
@@ -60,7 +61,7 @@ namespace InperStudio.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        App.Log.Error(ex.ToString());
+                        InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                     }
                 };
                 bottomControl.record.Click += (s, e) =>
@@ -78,7 +79,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #region 加锁解锁
@@ -95,6 +96,21 @@ namespace InperStudio.ViewModels
             view._lock.Visibility = Visibility.Visible;
         }
         #endregion
+
+        public void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            InperDialogWindow inperDialogWindow = new InperDialogWindow("This will stop video recording,are you sure to close?");
+            inperDialogWindow.HideCancleButton();
+            inperDialogWindow.ClickEvent += (s, statu) =>
+            {
+                if (statu == 1)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            };
+            inperDialogWindow.ShowDialog();
+        }
         protected override void OnClose()
         {
             BehaviorRecorderKit.StopPreview();

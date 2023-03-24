@@ -183,7 +183,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Exposure_TextChanged(object sender, TextChangedEventArgs e)
@@ -231,7 +231,7 @@ namespace InperStudio.ViewModels
                 Growl.Warning(new GrowlInfo() { Message = "Error!", Token = "SuccessMsg", WaitTime = 1 });
                 Expourse = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                 (sender as System.Windows.Controls.ComboBox).Text = Expourse;
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Sampling_TextChanged(object sender, TextChangedEventArgs e)
@@ -272,7 +272,7 @@ namespace InperStudio.ViewModels
             {
                 Growl.Warning(new GrowlInfo() { Message = "Error!", Token = "SuccessMsg", WaitTime = 1 });
                 Sampling = InperGlobalClass.CameraSignalSettings.Sampling;
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #region 加锁解锁
@@ -347,7 +347,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             finally
             {
@@ -373,7 +373,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private void AutoFindFiber()
@@ -419,7 +419,7 @@ namespace InperStudio.ViewModels
                     _loopCount++;
                     if (_loopCount > 10)
                     {
-                        InperGlobalClass.ShowReminderInfo("未找到光纤端面，请手动添加");
+                        //InperGlobalClass.ShowReminderInfo("未找到光纤端面，请手动添加");
                         break;
                     }
                     Thread.Sleep(10);
@@ -460,7 +460,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void ReduceCircle(object sender, RoutedEventArgs e)
@@ -474,19 +474,20 @@ namespace InperStudio.ViewModels
                         view.ellipseCanvas.Children.Remove(moveGrid);
                         _ = EllipseBorder.Remove(moveGrid);
 
-                        CameraChannel item = InperDeviceHelper.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
-                        _ = InperDeviceHelper.CameraChannels.Remove(item);
+                        CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
+                        _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
                         InperDeviceHelper.Instance._LoopCannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance._LoopCannels.Where(x => x.ChannelId != item.ChannelId));
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Camera.ToString());
                         if (channel != null)
                         {
                             _ = InperGlobalClass.CameraSignalSettings.CameraChannels.Remove(channel);
                         }
-                        view.channelName.Text = InperDeviceHelper.CameraChannels.Count > 0 ? InperDeviceHelper.CameraChannels.Last().Name : "";
+                        view.channelName.Text = InperDeviceHelper.Instance.CameraChannels.Count > 0 ? InperDeviceHelper.Instance.CameraChannels.Last().Name : "";
                         if (EllipseBorder.Count > 0)
                         {
                             SetDefaultCircle(EllipseBorder.Last());
                         }
+
                     }
                     if (EllipseBorder.Count == 0)
                     {
@@ -496,7 +497,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private Grid DrawCircle(int index, double diameter, double ytop, double ybottom, Channel _channel = null)
@@ -613,12 +614,12 @@ namespace InperStudio.ViewModels
                     }
                     if (InperDeviceHelper.Instance.CameraChannels.Count == 1 && main != null)
                     {
-                         main.DataShowControlViewModel.SciScrollSet();
+                        main.DataShowControlViewModel.SciScrollSet();
                     }
-                    //if (main != null)
-                    //{
-                    //    main.DataShowControlViewModel.ChartZoomExtentsExport();
-                    //}
+                    if (main != null)
+                    {
+                        main.DataShowControlViewModel.ChartZoomExtentsExport();
+                    }
                 }
                 if (channel == null)
                 {
@@ -700,7 +701,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Grid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -759,7 +760,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void ChannelRoi_TextChanged(object sender, TextChangedEventArgs e)
@@ -794,7 +795,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #region 灯光和采样率属性配置
@@ -873,7 +874,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion
@@ -888,7 +889,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Gain_TextChanged(object sender, TextChangedEventArgs e)
@@ -913,7 +914,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void LightMode_UnChecked(object sender, RoutedEventArgs e)
@@ -978,7 +979,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private void SetYaxidVisible(CameraChannel cameraChannel, int groupId, bool statu)
@@ -986,10 +987,10 @@ namespace InperStudio.ViewModels
             switch (groupId)
             {
                 case 0:
-                    cameraChannel.S0Visible = statu;
+                    cameraChannel.S1Visible = statu;
                     break;
                 case 1:
-                    cameraChannel.S1Visible = statu;
+                    cameraChannel.S0Visible = statu;
                     break;
                 case 2:
                     cameraChannel.S2Visible = statu;
@@ -998,6 +999,17 @@ namespace InperStudio.ViewModels
                     cameraChannel.S3Visible = statu;
                     break;
             }
+            MainWindowViewModel main = null;
+            foreach (System.Windows.Window window in Application.Current.Windows)
+            {
+                if (window.Name.Contains("MainWindow"))
+                {
+                    main = window.DataContext as MainWindowViewModel;
+                    break;
+                }
+            }
+            (main.ActiveItem as DataShowControlViewModel).AllYaxisSetMerge();
+            (main.ActiveItem as DataShowControlViewModel).AllYaxisSetSeparate();
         }
         public void LightTestMode_Checked(object sender, RoutedEventArgs e)
         {
@@ -1014,7 +1026,7 @@ namespace InperStudio.ViewModels
                         {
                             InperDeviceHelper.Instance._Metronome.Stop();
                         }
-                        this.view.waveView.IsEnabled = true;
+                        //this.view.waveView.IsEnabled = true;
                         InperDeviceHelper.Instance.LightWaveLength.ToList().ForEach(x =>
                         {
                             //if (x.IsChecked)
@@ -1066,7 +1078,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void TestMode_rb_Checked(object sender, RoutedEventArgs e)
@@ -1079,7 +1091,7 @@ namespace InperStudio.ViewModels
                      if (x.GroupId == sen.GroupId)
                      {
                          //x.IsChecked = true;
-                         //InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
+                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, true);
                          InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
 
                          this.view.waveView.SelectedItem = x;
@@ -1087,7 +1099,7 @@ namespace InperStudio.ViewModels
                      else
                      {
                          //x.IsChecked = false;
-                         //InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
+                         InperDeviceHelper.Instance.device.SwitchLight((uint)x.GroupId, false);
                          InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, 0);
                      }
                  });
@@ -1095,7 +1107,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void TestMode_rb_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -1119,7 +1131,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void LightMode_TextChanged(object sender, TextChangedEventArgs e)
@@ -1148,7 +1160,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private void SetMat(Mat mat, Grid grid)
@@ -1219,7 +1231,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion
@@ -1258,7 +1270,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void AnalogChannelCombox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1274,7 +1286,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void AnalogColorList_Selected(object sender, RoutedEventArgs e)
@@ -1287,7 +1299,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void AnalogMover(string moveType)
@@ -1388,7 +1400,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion
@@ -1421,7 +1433,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             //finally
             //{

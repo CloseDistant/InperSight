@@ -1,15 +1,20 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data;
+using InperStudio.Lib.Helper;
 using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.Helper;
 using log4net;
+using OpenCvSharp;
 using SciChart.Charting.Visuals;
 using System;
+using System.Device.Location;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -33,7 +38,8 @@ namespace InperStudio
         private static System.Threading.Mutex mutex;
 
         protected override void OnStartup(StartupEventArgs e)
-        {      
+        {
+            //var a= GetstringIpAddress("183.128.136.161");
             if (System.Diagnostics.Process.GetProcessesByName("UpgradeClient").ToList().Count > 0)
             {
                 //MessageBox.Show("正在运行中");
@@ -52,7 +58,7 @@ namespace InperStudio
             }
             // Set this code once in App.xaml.cs or application startup
             SciChartSurface.SetRuntimeLicenseKey("RYLnOXgjEruY2Nh2EmZx86QLNsGKveD+J1b1iVWLO/mjGdIVZKUyaBJdgcEa9nqdJwNoEMA6Y9b3ltO3v3TqSVlvFRdm8W1FPibVBc7QmCjDO6jljcyZUV8STM8SFkdVuNKQNwKFlhDba8OY9fuPQBSMY/V0atNGBTc4cscDyOyofJxxPjZbUenA+PkmFAE+tHD4m0VU2dkUqFKYGkf6czcfLOCrIwcnxFJKjHr/+qLSTgDwF3Mh4k34YP7g0MxGBdlllTJTDHKBruQ1ZiBYPOZptgAnNM9VjLi1DWoOrjIzNaHfA+16tcLmdRWunHdPPQU/f+uCOaNjfcHPASoAuNWRoDd1f9xZw8ZdGWJXJ9XtSLjCzod+cTQP02fxJABATC/V9y0RqudDwdUCyGduKX0ESOz6JqHTCR7qysmdy+xWgg27t31PUeXT0WuGhwcEARl5o2UM4eVemwnCmErwX6mS6ac9Pv2gWKRxuiUkgE0UxOf9O/cVxfJ+IcwlQP+BxlPF6uMnUSfjSTu5GCohkSHANUzWcVJSPjNvwjDi2xhr/mDfSIV4yn33wjG7/aJBf2cXuKgIhyA6RzId2FNB2ZstwGD1zPqVT3A=");
-            
+
             #region 配置文件初始化
 
             string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
@@ -114,7 +120,7 @@ namespace InperStudio
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                Log.Info(ex.ToString());
             }
         }
 
@@ -122,7 +128,7 @@ namespace InperStudio
         {
             TaskScheduler.UnobservedTaskException += (sender, args) =>
             {
-                Log.Error(args.Exception.Message);
+                InperLogExtentHelper.LogExtent(args.Exception, "app");
                 args.SetObserved();
             };
 

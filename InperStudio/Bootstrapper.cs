@@ -1,7 +1,9 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper;
 using InperStudio.ViewModels;
 using InperStudioControlLib.Lib.Config;
 using MySql.Data.MySqlClient;
+using SciChart.Core.Extensions;
 using SqlSugar;
 using Stylet;
 using StyletIoC;
@@ -25,6 +27,28 @@ namespace InperStudio
         {
             try
             {
+                //if(!File.Exists(Path.Combine(Environment.CurrentDirectory, "hash.txt")))
+                //{
+                //    File.Create(Path.Combine(Environment.CurrentDirectory, "hash.txt"));
+                //}
+                if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup")))
+                {
+                    Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
+                }
+                DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBin"));
+                FileInfo[] files = root.GetFiles();
+                if (files.Length > 0)
+                {
+                    InperClassHelper.DelectDir(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
+                    Directory.Delete(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
+                    Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
+
+                    File.Copy(files.Last().FullName, Path.Combine(Environment.CurrentDirectory, "UnderBinBackup", files.Last().Name), true);
+                    files.ForEachDo(x =>
+                    {
+                        File.Delete(x.FullName);
+                    });
+                }
                 SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
                 {
                     ConnectionString = InperConfig.Instance.ConStr + MySqlSslMode.None,//连接符字串
@@ -54,7 +78,7 @@ namespace InperStudio
                             }
                         }
                     }
-                    InperConfig.Instance.ReleaseData = list.Last(x=>x.Version_Number==InperConfig.Instance.Version).UploadTime.ToString("yyyy-MM-dd");
+                    InperConfig.Instance.ReleaseData = list.Last(x => x.Version_Number == InperConfig.Instance.Version).UploadTime.ToString("yyyy-MM-dd");
                     if (!string.IsNullOrEmpty(list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc))
                     {
                         InperConfig.Instance.VersionDesc = string.Empty;
@@ -81,8 +105,8 @@ namespace InperStudio
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
                 InperGlobalClass.isNoNetwork = true;
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             // Perform any other configuration before the application starts
         }

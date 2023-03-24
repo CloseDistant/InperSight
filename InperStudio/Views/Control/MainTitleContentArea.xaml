@@ -19,8 +19,8 @@
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Menu Margin="0 -5 0 0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center">
-            <MenuItem Header="Inper Signal" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" Padding="10 8" FontSize="13">
-                <MenuItem  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Header="Import Config" Foreground="#333333"  FontSize="12" FontFamily="Arial" Width="180" Name="ImportConfig" Click="ImportConfig_Click">
+            <MenuItem Header="Inper Signal" FontFamily="{DynamicResource InperFontFamily}" Foreground="White" Style="{StaticResource MenuItemBaseStyle}" Padding="10 8" FontSize="13">
+                <MenuItem  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Header="{DynamicResource openConfigFile}" Foreground="#333333"  FontSize="12" Width="180" Name="ImportConfig" Click="ImportConfig_Click">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/import config.png" SnapsToDevicePixels="True" Width="14" Height="14" Stretch="Fill"/>
                     </MenuItem.Icon>
@@ -30,22 +30,27 @@
                         <Image Source="/Lib/Images/New/save config.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>
                 </MenuItem>-->
-                <MenuItem BorderThickness="0 0 0 1" BorderBrush="#E6E6E6"  FontFamily="Arial" Header="Save Config As" Name="SaveConfigAs" Click="SaveConfigAs_Click"  Foreground="#333333" FontSize="12" Width="180">
+                <MenuItem BorderThickness="0 0 0 1" BorderBrush="#E6E6E6" Header="{DynamicResource saveConfigFile}" Name="SaveConfigAs" Click="SaveConfigAs_Click"  Foreground="#333333" FontSize="12" Width="180">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/save config as.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Feedback" Foreground="#333333"  Command="hc:ControlCommands.OpenLink" CommandParameter="mailto:support@inper.com" FontSize="12" FontFamily="Arial" Width="180">
+                <MenuItem Header="{DynamicResource email}" Foreground="#333333"  Command="hc:ControlCommands.OpenLink" CommandParameter="mailto:support@inper.com" FontSize="12" Width="180">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/feedback.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Web"  Command="hc:ControlCommands.OpenLink" CommandParameter="https://www.inper.com" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180">
+                <MenuItem Header="{DynamicResource web}" Command="hc:ControlCommands.OpenLink" CommandParameter="https://www.inper.com" Foreground="#333333" FontSize="12" Width="180">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/web.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="About Inper Signal" Foreground="#333333" FontSize="12" FontFamily="Arial" Width="180" Click="About_Click">
+                <MenuItem Header="{DynamicResource aboutInperSignal}" Foreground="#333333" FontSize="12" Width="180" Click="About_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Lib/Images/New/about.png" Width="14" Height="14" Stretch="Uniform"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{DynamicResource preferenceSetting}" Foreground="#333333" FontSize="12" Width="180" Click="Language_Click">
                     <MenuItem.Icon>
                         <Image Source="/Lib/Images/New/about.png" Width="14" Height="14" Stretch="Uniform"/>
                     </MenuItem.Icon>

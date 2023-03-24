@@ -72,7 +72,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void SignalSettingsShow(string type)
@@ -99,7 +99,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void EventSettingsShow(string type)
@@ -128,7 +128,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void AdditionSettingsShow(string type)
@@ -159,7 +159,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void RecordSettingsShow(string type)
@@ -183,7 +183,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private async void PreviewRecord()
@@ -195,7 +195,6 @@ namespace InperStudio.ViewModels
             }
             InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
             InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
-            InperDeviceHelper.Instance.device.Start();
 
             if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
             {
@@ -214,6 +213,7 @@ namespace InperStudio.ViewModels
             }
 
             InperDeviceHelper.Instance.StartCollect();
+            InperDeviceHelper.Instance.device.Start();
             await StartAndStopShowMarker(ChannelTypeEnum.Start);
 
             InperGlobalClass.IsPreview = true;
@@ -223,6 +223,7 @@ namespace InperStudio.ViewModels
             ((((View as ManulControlView).Parent as ContentControl).DataContext as MainWindowViewModel).ActiveItem as DataShowControlViewModel).SciScrollSet();
             InperGlobalClass.IsAllowDragScroll = true;
         }
+        DateTime startTime, endTime;
         private async void StartRecord()
         {
             try
@@ -254,7 +255,6 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.ShowReminderInfo("Please select at least one light");
                     return;
                 }
-                InperDeviceHelper.Instance.device.Start();
 
                 if (InperDeviceHelper.Instance.CameraChannels.Count <= 0)
                 {
@@ -291,6 +291,7 @@ namespace InperStudio.ViewModels
 
                 InperDeviceHelper.Instance.StartCollect();
 
+                InperDeviceHelper.Instance.device.Start();
                 foreach (var item in InperGlobalClass.ActiveVideos)
                 {
                     if (item.IsActive && item.AutoRecord)
@@ -298,6 +299,7 @@ namespace InperStudio.ViewModels
                         item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item.CustomName));
                     }
                 }
+                //Thread.Sleep(200);
 
                 InperGlobalClass.IsRecord = true;
                 InperGlobalClass.IsPreview = true;
@@ -329,17 +331,19 @@ namespace InperStudio.ViewModels
 
                 sprite = Sprite.Show(new HeartbeatContrrol());
 
+                startTime = DateTime.Now;
+
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         private async void StopRecord(int type = 0)
         {
+            bool isrecord = false;
             try
             {
-                bool isrecord = false;
                 if (InperGlobalClass.IsRecord)
                 {
                     Task task = StopTriggerStrategy();
@@ -353,12 +357,13 @@ namespace InperStudio.ViewModels
                         sprite.Close();
                         sprite = null;
                     }
+                    endTime = DateTime.Now;
                 }
+                InperDeviceHelper.Instance.device.Stop();
                 if (type == 0)
                 {
                     await StartAndStopShowMarker(ChannelTypeEnum.Stop);
                 }
-                InperDeviceHelper.Instance.device.Stop();
                 InperGlobalClass.IsRecord = false;
                 InperGlobalClass.IsPreview = false;
                 InperGlobalClass.IsStop = true;
@@ -369,6 +374,7 @@ namespace InperStudio.ViewModels
 
                 if (isrecord)
                 {
+                    InperLogExtentHelper.DeviceModuleUseCountSet();
                     if (NoteSettingViewModel.NotesCache.Count > 0)
                     {
                         NoteSettingViewModel.NotesCache.ForEach(x =>
@@ -412,13 +418,18 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             finally
             {
                 InperGlobalClass.IsRecord = false;
                 InperGlobalClass.IsPreview = false;
                 InperGlobalClass.IsStop = true;
+                if (isrecord)
+                {
+                    InperLogExtentHelper.DeviceUseMonitorRecodSet(endTime.Subtract(startTime).TotalMinutes);
+                }
+                startTime = endTime = DateTime.Now;
             }
 
         }
@@ -428,6 +439,10 @@ namespace InperStudio.ViewModels
             return Task.Factory.StartNew(() =>
              {
                  TimeSpan time = new TimeSpan(0);
+                 if (InperDeviceHelper.Instance.CameraChannels.Count == 0)
+                 {
+                     return;
+                 }
                  if (InperDeviceHelper.Instance.CameraChannels[0].RenderableSeries.First().DataSeries.XValues.Count > 0)
                  {
                      time = typeEnum == ChannelTypeEnum.Start

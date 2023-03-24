@@ -77,7 +77,7 @@ namespace InperStudio.Lib.Bean
         {
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                using (MemoryStream memoryStream = e.Context.MatFrame.ToMemoryStream(".bmp"))
+                using (MemoryStream memoryStream = e.Context.MatFrame.FrameMat.ToMemoryStream(".bmp"))
                 {
                     WriteableBitmap = ToImageSource(memoryStream);
                 }

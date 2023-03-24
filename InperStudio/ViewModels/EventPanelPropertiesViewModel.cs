@@ -22,9 +22,16 @@ namespace InperStudio.ViewModels
 
                 view.heightAuto.Checked += (s, e) =>
                 {
-                    dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = dataShowControlView.dataList.ActualHeight / (dataShowControlView.dataList.Items.Count == 0 ? 1 : dataShowControlView.dataList.Items.Count);
-                    InperGlobalClass.EventPanelProperties.HeightAuto = true;
-                    InperGlobalClass.EventPanelProperties.HeightFixed = false;
+                    if (dataShowControlView.dataList.Items.Count != 0)
+                    {
+                        dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = (dataShowControlView.fixedBottom.Height + dataShowControlView.dataList.ActualHeight) / (dataShowControlView.dataList.Items.Count == 1 ? 2 : dataShowControlView.dataList.Items.Count);
+                        InperGlobalClass.EventPanelProperties.HeightAuto = true;
+                        InperGlobalClass.EventPanelProperties.HeightFixed = false;
+                    }
+                    else
+                    {
+                        dataShowControlView.relativeBottom.Height = dataShowControlView.fixedBottom.Height = 150;
+                    }
                 };
                 view.heightFixed.Checked += (s, e) =>
                 {
@@ -71,7 +78,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         protected override void OnClose()
@@ -83,7 +90,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
     }

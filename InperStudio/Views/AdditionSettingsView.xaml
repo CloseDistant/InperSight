@@ -34,7 +34,7 @@
                 <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" Margin="0 20 0 0" GroupName="start" x:Name="delay" IsChecked="{Binding Delay.IsActive,Mode=TwoWay}">
                     <WrapPanel IsEnabled="{Binding ElementName=delay,Path=IsChecked}">
                         <TextBlock Text="Delay after pressing button Start (s)" VerticalAlignment="Center" Margin="5 0 0 0"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Double" InperMaxValue="99999" InperMinValue="0.001" Width="40" HorizontalAlignment="Right" Margin="10 0 0 0" Text="{Binding Delay.Value,Mode=TwoWay}" />
+                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Double" InperMaxValue="99999" InperMinValue="1" Width="40" HorizontalAlignment="Right" Margin="10 0 0 0" Text="{Binding Delay.Value,Mode=TwoWay}" />
                     </WrapPanel>
                 </RadioButton>
                 <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" Margin="0 20 0 0" GroupName="start" x:Name="atTime" FontSize="{DynamicResource InperLargeFontSize}" IsChecked="{Binding AtTime.IsActive,Mode=TwoWay}">
@@ -102,7 +102,8 @@
                 <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" Margin="0 20 0 0" GroupName="stop" x:Name="delayStop" IsChecked="{Binding Delay.IsActive,Mode=TwoWay}">
                     <WrapPanel IsEnabled="{Binding ElementName=delayStop,Path=IsChecked}">
                         <TextBlock Text="Delay after pressing button Stop (s)" VerticalAlignment="Center" Margin="5 0 0 0"  FontSize="{DynamicResource InperLargeFontSize}"/>
-                        <hc:TextBox Width="40" HorizontalAlignment="Right" Margin="10 0 0 0" Text="{Binding Delay.Value,Mode=TwoWay}"/>
+                        <inper:InperTextBox Style="{StaticResource TextBoxBaseStyle}" InperVerify="True" InperTextType="Double" InperMaxValue="99999" InperMinValue="1" Width="40" HorizontalAlignment="Right" Margin="10 0 0 0" Text="{Binding Delay.Value,Mode=TwoWay}" />
+                        <!--<hc:TextBox Width="40" HorizontalAlignment="Right" Margin="10 0 0 0" Text="{Binding Delay.Value,Mode=TwoWay}"/>-->
                     </WrapPanel>
                 </RadioButton>
                 <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" Margin="0 20 0 0" GroupName="stop" x:Name="atTimeStop" IsChecked="{Binding AtTime.IsActive,Mode=TwoWay}" FontSize="{DynamicResource InperLargeFontSize}">

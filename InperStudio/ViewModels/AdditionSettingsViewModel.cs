@@ -148,7 +148,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             finally
             {
@@ -210,7 +210,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
             this.RequestClose();
         }
@@ -285,7 +285,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
 
@@ -312,7 +312,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Format_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -323,7 +323,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void FramerateChanged(object sender, SelectionChangedEventArgs e)
@@ -337,7 +337,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void ActiveVideo_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -373,7 +373,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void CameraMove(string moveType)
@@ -425,7 +425,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void CameraName_TextChanged(object sender, TextChangedEventArgs e)
@@ -433,7 +433,6 @@ namespace InperStudio.ViewModels
             try
             {
                 HandyControl.Controls.TextBox tb = sender as HandyControl.Controls.TextBox;
-
                 if (tb.Text.Length < 6 || !tb.Text.StartsWith("Video-"))
                 {
                     tb.Text = "Video-";
@@ -441,11 +440,16 @@ namespace InperStudio.ViewModels
                     //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                     return;
                 }
-
+                if (tb.Text.Length > 15)
+                {
+                    tb.Text=tb.Text.Substring(0, 15);
+                    tb.SelectionStart=tb.Text.Length;
+                    return;
+                }
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion
@@ -496,7 +500,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void TriggerStart_Checked(object sender, RoutedEventArgs e)
@@ -524,7 +528,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void TriggerStop_Checked(object sender, RoutedEventArgs e)
@@ -552,7 +556,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         #endregion

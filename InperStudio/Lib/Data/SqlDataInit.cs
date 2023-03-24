@@ -37,9 +37,9 @@ namespace InperStudio.Lib.Data
             },
             sqlSugar =>
             {
-                sqlSugar.Aop.OnError = (exp) =>
+                sqlSugar.Aop.OnError = (ex) =>
                 {
-                    App.Log.Error(exp);
+                    InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                 };
             });
 

@@ -1,5 +1,6 @@
 ﻿using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Stimulus;
+using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using Stylet;
 using System;
@@ -140,7 +141,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Duration_TextChanged(object sender, TextChangedEventArgs e)
@@ -173,7 +174,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Freq_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -185,7 +186,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                App.Log.Error(ex.ToString());
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
     }

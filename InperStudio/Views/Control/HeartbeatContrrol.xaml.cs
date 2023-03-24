@@ -1,4 +1,5 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper;
 using InperStudio.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace InperStudio.Views.Control
                 catch (Exception ex)
                 {
                     this.wavePB.WaveFill = Brushes.OrangeRed;
-                    App.Log.Error(ex.ToString());
+                    InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                     return;
                 }
 

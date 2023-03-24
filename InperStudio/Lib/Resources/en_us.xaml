@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="aa_en">mark</sys:String>
+
+    <sys:String x:Key="fontSetting">Arial</sys:String>
+
+    <!--设置-->
+    <sys:String x:Key="openConfigFile">Import Config</sys:String>
+    <sys:String x:Key="saveConfigFile">Save Config As</sys:String>
+    <sys:String x:Key="preferenceSetting">Preference</sys:String>
+    <sys:String x:Key="email">Feedback</sys:String>
+    <sys:String x:Key="web">Web</sys:String>
+    <sys:String x:Key="aboutInperSignal">About Inper Signal</sys:String>
+</ResourceDictionary>

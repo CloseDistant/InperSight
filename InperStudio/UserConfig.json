@@ -46,8 +46,8 @@
     }
   },
   "eventPanelProperties": {
-    "heightAuto": true,
-    "heightFixed": false,
+    "heightAuto": false,
+    "heightFixed": true,
     "heightFixedValue": 150,
     "displayLockedBottom": true,
     "displayNameVisible": true
