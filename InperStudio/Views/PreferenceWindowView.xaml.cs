@@ -22,7 +22,7 @@ namespace InperStudio.Views
         public PreferenceWindowView()
         {
             InitializeComponent();
-        } 
-        
+        }
+       
     }
 }

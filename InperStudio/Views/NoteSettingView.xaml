@@ -10,8 +10,8 @@
         xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:NoteSettingViewModel}"
-        Title="Note" Height="300" Width="375" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:NoteSettingViewModel}" FontFamily="{DynamicResource InperFontFamily}"
+        Title="Note" Height="300" Width="375" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False" >
     <Grid>
         <Border x:Name="RichBorder" Grid.Row="1" CornerRadius="0" Background="{DynamicResource InperMainPageColor}">
             <Grid Margin="8">

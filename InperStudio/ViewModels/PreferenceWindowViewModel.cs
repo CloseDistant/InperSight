@@ -1,4 +1,5 @@
-﻿using InperStudio.Lib.Helper;
+﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
 using Stylet;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Media;
 
@@ -32,6 +34,18 @@ namespace InperStudio.ViewModels
                 view.custom.IsChecked = true;
                 view.AnalogColorList.SelectedIndex = SkinColorList.IndexOf(InperConfig.Instance.ThemeColor);
             }
+            if (InperConfig.Instance.Language == "en_us")
+            {
+                view.en_us.IsChecked = true;
+            }
+            else
+            {
+                view.zh_cn.IsChecked = true;
+            }
+            view.analog.IsChecked = InperGlobalClass.IsDisplayAnalog;
+            view.trigger.IsChecked = InperGlobalClass.IsDisplayTrigger;
+            view.note.IsChecked = InperGlobalClass.IsDisplayNote;
+
             view.ConfirmClickEvent += View_ConfirmClickEvent;
         }
 
@@ -85,9 +99,11 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
-                Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/en_us.xaml", UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources["InperFontFamily"] = "Arial";
+                //Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
+                //Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/en_us.xaml", UriKind.Relative)) as ResourceDictionary);
+                //Application.Current.Resources["InperFontFamily"] = "Arial";
+                InperConfig.Instance.Language = "en-US";
+                InperClassHelper.SetLanguage(InperConfig.Instance.Language);
             }
             catch (Exception ex)
             {
@@ -98,9 +114,69 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
-                Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/zh_cn.xaml", UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources["InperFontFamily"] = "微软雅黑";
+                //Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
+                //Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/zh_cn.xaml", UriKind.Relative)) as ResourceDictionary);
+                //Application.Current.Resources["InperFontFamily"] = "微软雅黑";
+                InperConfig.Instance.Language = "zh_cn";
+                InperClassHelper.SetLanguage(InperConfig.Instance.Language);
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        public void Display_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var cb = sender as System.Windows.Controls.CheckBox;
+                if (cb != null)
+                {
+                    if (cb.Name == "analog")
+                    {
+                        InperGlobalClass.IsDisplayAnalog = true;
+                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Analog, true);
+                    }
+                    if (cb.Name == "trigger")
+                    {
+                        InperGlobalClass.IsDisplayTrigger = true;
+                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Trigger, true);
+                    }
+                    if (cb.Name == "note")
+                    {
+                        InperGlobalClass.IsDisplayNote = true;
+                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Note, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        public void Display_Unchecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var cb = sender as System.Windows.Controls.CheckBox;
+                if (cb != null)
+                {
+                    if (cb.Name == "analog")
+                    {
+                        InperGlobalClass.IsDisplayAnalog = false;
+                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Analog, false);
+                    }
+                    if (cb.Name == "trigger")
+                    {
+                        InperGlobalClass.IsDisplayTrigger = false;
+                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Trigger, false);
+                    }
+                    if (cb.Name == "note")
+                    {
+                        InperGlobalClass.IsDisplayNote = false;
+                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Note, false);
+                    }
+                }
             }
             catch (Exception ex)
             {

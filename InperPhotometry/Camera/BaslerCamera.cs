@@ -1,6 +1,7 @@
 ﻿using Basler.Pylon;
 using OpenCvSharp;
 using System;
+using System.Runtime.InteropServices;
 
 namespace InperDeviceManagement
 {
@@ -187,10 +188,16 @@ namespace InperDeviceManagement
 
 
                     // Set pixel format to Mono12 if available.
+
                     if (_Camera.Parameters[PLCamera.PixelFormat].TrySetValue(PLCamera.PixelFormat.Mono12))
                     {
                         System.Diagnostics.Debug.WriteLine("New PixelFormat  : " + _Camera.Parameters[PLCamera.PixelFormat].GetValue());
                     }
+                    //if (_Camera.Parameters[PLCamera.PixelFormat].CanSetValue(PLCamera.PixelFormat.BayerGR8))
+                    //{
+                    //    _Camera.Parameters[PLCamera.PixelFormat].TrySetValue(PLCamera.PixelFormat.BayerGR8);
+                    //}
+
                     System.Diagnostics.Debug.WriteLine("=================================");
                     // Some camera models may have auto functions enabled. To set the gain value to a specific value,
                     // the Gain Auto function must be disabled first (if gain auto is available).
@@ -226,6 +233,17 @@ namespace InperDeviceManagement
             {
                 Mat mat = new Mat(grabResult.Height, grabResult.Width, MatType.CV_16U, grabResult.PixelData as byte[]);
                 mat.ConvertTo(mat, MatType.CV_16U, 16);
+
+                //Mat mat = new Mat();
+                //byte[] buffer = grabResult.PixelData as byte[];
+                //if (buffer != null)
+                //{
+                //    Mat rawImage = new Mat(grabResult.Height, grabResult.Width, MatType.CV_8UC1, buffer);
+
+                //    Cv2.CvtColor(rawImage, mat, ColorConversionCodes.BayerRG2BGR);
+
+                //    // 处理或显示 rgbImage
+                //}
 
                 int frame_group = 0;
                 long timestamp = 0;

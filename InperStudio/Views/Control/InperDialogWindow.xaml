@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InperStudio.Views.Control"
-        mc:Ignorable="d"
-        Title="Tips" Height="215" Width="380" WindowStyle="None" AllowsTransparency="True" Topmost="True" WindowStartupLocation="CenterScreen">
+        mc:Ignorable="d" FontFamily="{DynamicResource InperFontFamily}"
+        Title="{DynamicResource tips_title}" Height="215" Width="380" WindowStyle="None" AllowsTransparency="True" Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Background>
         <SolidColorBrush Color="Transparent"/>
     </Window.Background>
@@ -19,7 +19,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Border Grid.Row="0" BorderThickness="0 0 0 1" BorderBrush="#BDBDBD" Background="#FAFAFA">
-                <TextBlock Text="Tips" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16" FontFamily="Arial" Margin="20 0 0 0" Foreground="#333333"/>
+                <TextBlock Text="{DynamicResource tips_title}" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" Margin="20 0 0 0" Foreground="#333333"/>
             </Border>
             <Grid Grid.Row="1" Background="#FFFFFF">
                 <Grid.RowDefinitions>
@@ -27,13 +27,13 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <TextBlock Name="tipsContent" VerticalAlignment="Center" Foreground="#333333" HorizontalAlignment="Center" FontSize="14" FontFamily="Arial" TextWrapping="WrapWithOverflow" Margin="20 0"/>
+                    <TextBlock Name="tipsContent" VerticalAlignment="Center" Foreground="#333333" HorizontalAlignment="Center" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" TextWrapping="WrapWithOverflow" Margin="20 0"/>
                 </Grid>
                 <Grid Grid.Row="1">
                     <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="yes" Click="Yes_Click" IsHitTestVisible="True"  ContentStringFormat="Yes" Width="76" Height="28" />
-                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="no" Click="No_Click" IsHitTestVisible="True"  ContentStringFormat="No" Width="76" Height="28" Margin="30 0 0 0" Cursor="Hand" />
-                        <Button  Style="{StaticResource InperBottomButtonStyle}" Name="cancel" Click="Cancle_Click" IsHitTestVisible="True"  ContentStringFormat="Cancel" Width="76" Height="28" Margin="30 0 0 0" />
+                        <Button  Style="{StaticResource InperBottomButtonStyle}" FontFamily="{DynamicResource InperFontFamily}" Name="yes" Click="Yes_Click" IsHitTestVisible="True"  ContentStringFormat="{DynamicResource tips_yes}" Width="76" Height="28" />
+                        <Button  Style="{StaticResource InperBottomButtonStyle}" FontFamily="{DynamicResource InperFontFamily}" Name="no" Click="No_Click" IsHitTestVisible="True"  ContentStringFormat="{DynamicResource tips_no}" Width="76" Height="28" Margin="30 0 0 0" Cursor="Hand" />
+                        <Button  Style="{StaticResource InperBottomButtonStyle}" FontFamily="{DynamicResource InperFontFamily}" Name="cancel" Click="Cancle_Click" IsHitTestVisible="True"  ContentStringFormat="{DynamicResource tips_cancel}" Width="76" Height="28" Margin="30 0 0 0" />
                     </WrapPanel>
                 </Grid>
             </Grid>

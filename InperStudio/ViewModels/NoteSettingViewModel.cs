@@ -32,6 +32,7 @@ namespace InperStudio.ViewModels
                     (View as NoteSettingView).TagListValue.Children.Add(tb);
                 });
             }
+           (View as NoteSettingView).Owner = Application.Current.MainWindow;
         }
 
         private void NoteSettingViewModel_ConfirmClickEvent(object arg1, ExecutedRoutedEventArgs arg2)

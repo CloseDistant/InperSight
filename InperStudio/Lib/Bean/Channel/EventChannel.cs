@@ -4,10 +4,33 @@ using SciChart.Charting.Visuals.Axes;
 using SciChart.Data.Model;
 using Stylet;
 using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Bean.Channel
 {
+    public class VideoZone
+    {
+        public string Name { get; set; }
+        public List<ZoneConditions> AllZoneConditions { get; set; } = new List<ZoneConditions>();
+    }
+    public class ZoneConditions
+    {
+        public string ZoneName { get; set; }
+        public bool IsImmediately { get; set; }
+        public bool IsDelay { get; set; }
+        public int DelaySeconds { get; set; } = 3;
+        public int Duration { get; set; } = 3;
+        public double ShapeLeft { get; set; }
+        public double ShapeTop { get; set; }
+        public double ShapeWidth { get; set; }
+        public double ShapeHeight { get; set; }
+        public string ShapeType { get; set; }
+        public string ShapeName { get; set; }
+        public string Type { get; set; }
+        public string Color { get; set; }
+
+    }
     public class EventChannel : ChannelBase
     {
         private bool isActive = false;
@@ -23,12 +46,11 @@ namespace InperStudio.Lib.Bean.Channel
         public double Tau1 { get; set; }
         public double Tau2 { get; set; }
         public double Tau3 { get; set; }
-
+        public VideoZone VideoZone { get; set; }
         public EventChannelJson Condition { get; set; }
     }
     public class EventChannelChart : PropertyChangedBase
     {
-        //public ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>> EventQs { get; set; } = new ConcurrentDictionary<int, Queue<KeyValuePair<long, double>>>();
         private TimeSpanAxis timeSpanAxis;
         public TimeSpanAxis TimeSpanAxis { get => timeSpanAxis; set => SetAndNotify(ref timeSpanAxis, value); }
         private TimeSpanAxis eventtimeSpanAxis;

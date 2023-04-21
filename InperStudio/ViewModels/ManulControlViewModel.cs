@@ -212,9 +212,9 @@ namespace InperStudio.ViewModels
                 return;
             }
 
+            await StartAndStopShowMarker(ChannelTypeEnum.Start);
             InperDeviceHelper.Instance.StartCollect();
             InperDeviceHelper.Instance.device.Start();
-            await StartAndStopShowMarker(ChannelTypeEnum.Start);
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
@@ -233,21 +233,22 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.ShowReminderInfo("Currently on measure mode, please switch to the experiment mode");
                     return;
                 }
-                if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
-                {
-                    var obj = InperJsonHelper.GetAdditionRecordJson("stop");
-                    TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
-                    TimeSpan nowTime = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-                    if (time <= nowTime)
-                    {
-                        InperGlobalClass.ShowReminderInfo("Trigger-AtTime模式参数设置错误");
-                        return;
-                    }
-                }
+                //if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.AtTime)
+                //{
+                //    var obj = InperJsonHelper.GetAdditionRecordJson("stop");
+                //    TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
+                //    TimeSpan nowTime = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                //    if (time <= nowTime)
+                //    {
+                //        InperGlobalClass.ShowReminderInfo("Trigger-AtTime模式参数设置错误");
+                //        return;
+                //    }
+                //}
                 if (InperGlobalClass.IsPreview)
                 {
                     StopRecord(1);
                 }
+                 
                 InperDeviceHelper.Instance.EventChannelChart.RenderableSeries.Clear();
                 InperDeviceHelper.Instance.EventChannelChart.Annotations.Clear();
                 if (!InperDeviceHelper.Instance.AllLightOpen())
@@ -272,6 +273,10 @@ namespace InperStudio.ViewModels
                 }
                 File.Create(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, "inper.ipd")).Close();
 
+                //这里start
+                //InperDeviceHelper.Instance.device.Start();
+                InperDeviceHelper.Instance.StartCollect();
+
                 Task task = StartTriggerStrategy();
                 if (task != null)
                 {
@@ -288,9 +293,6 @@ namespace InperStudio.ViewModels
                         App.SqlDataInit.sqlSugar.Insertable(x).ExecuteCommand();
                     });
                 }
-
-                InperDeviceHelper.Instance.StartCollect();
-
                 InperDeviceHelper.Instance.device.Start();
                 foreach (var item in InperGlobalClass.ActiveVideos)
                 {
@@ -299,8 +301,6 @@ namespace InperStudio.ViewModels
                         item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item.CustomName));
                     }
                 }
-                //Thread.Sleep(200);
-
                 InperGlobalClass.IsRecord = true;
                 InperGlobalClass.IsPreview = true;
                 InperGlobalClass.IsStop = false;
@@ -315,6 +315,10 @@ namespace InperStudio.ViewModels
                     var obj = InperJsonHelper.GetAdditionRecordJson("stop");
                     _ = Task.Factory.StartNew(async () =>
                       {
+                          if (DateTime.Now.Hour > obj.AtTime.Hours)
+                          {
+                              obj.AtTime.Hours += 24 - DateTime.Now.Hour;
+                          }
                           TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
                           while (true)
                           {
@@ -484,6 +488,7 @@ namespace InperStudio.ViewModels
                  }
              });
         }
+        private bool triggerStart = false, triggerStop = false;
         private Task StartTriggerStrategy()
         {
             (this.View as ManulControlView).Root_Gird.IsEnabled = false;
@@ -511,6 +516,10 @@ namespace InperStudio.ViewModels
                 return Task.Factory.StartNew(() =>
                 {
                     InperDeviceHelper.Instance.AllLightClose();
+                    if (DateTime.Now.Hour > obj.AtTime.Hours)
+                    {
+                        obj.AtTime.Hours += 24 - DateTime.Now.Hour;
+                    }
                     TimeSpan time = new TimeSpan(obj.AtTime.Hours, obj.AtTime.Minutes, obj.AtTime.Seconds);
                     while (true)
                     {
@@ -526,13 +535,21 @@ namespace InperStudio.ViewModels
             }
             if (InperGlobalClass.AdditionRecordConditionsStart == AdditionRecordConditionsTypeEnum.Trigger)
             {
+                InperDeviceHelper.Instance.TriggerSignalEvent += (stat) =>
+                {
+                    if (stat == 0)
+                    {
+                        triggerStart = true;
+                    }
+                    
+                };
                 return Task.Factory.StartNew(() =>
                 {
                     InperDeviceHelper.Instance.AllLightClose();
 
-                    if (obj.Trigger.Mode.Equals("Edge"))
+                    while (!triggerStart)
                     {
-
+                        Task.Delay(100);
                     }
 
                     InperDeviceHelper.Instance.AllLightOpen();
@@ -556,8 +573,27 @@ namespace InperStudio.ViewModels
                         {
                             break;
                         }
-                        _ = Task.Delay(10);
+                        _ = Task.Delay(100);
                     }
+                });
+            }
+            if (InperGlobalClass.AdditionRecordConditionsStop == AdditionRecordConditionsTypeEnum.Trigger)
+            {
+                InperDeviceHelper.Instance.TriggerSignalEvent += (stat) =>
+                {
+                    if (stat == 1)
+                    {
+                        triggerStop = true;
+                    }
+
+                };
+                return Task.Factory.StartNew(() =>
+                {
+                    while (!triggerStop)
+                    {
+                        Task.Delay(100);
+                    }
+                    triggerStart = false; triggerStop = false;
                 });
             }
 

@@ -9,24 +9,24 @@
         xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels"
-        mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
-        Title="Waveform" Height="330" Width="290" d:DataContext="{d:DesignInstance vm:WaveformSettingViewModel}">
+        mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False" 
+        Title="{DynamicResource addWaveform_title}"  FontFamily="{DynamicResource InperFontFamily}" Height="330" Width="290" d:DataContext="{d:DesignInstance vm:WaveformSettingViewModel}">
     <Grid>
         <StackPanel Margin="20 20 20 10">
             <WrapPanel>
-                <TextBlock Text="Waveform Setting" Foreground="{StaticResource InperTheme}" FontFamily="{StaticResource InperFontFamily}"/>
+                <TextBlock Text="{DynamicResource addWaveform_waveform_setting}" Foreground="{StaticResource InperTheme}" FontFamily="{StaticResource InperFontFamily}"/>
                 <Border Width="88" Height="1" Background="{StaticResource InperTheme}" Margin="20 0 0 0"/>
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
-                <TextBlock Text="Pulse (ms)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <TextBlock Text="{DynamicResource addWaveform_pulse}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
                 <TextBox Width="120" Height="20" Margin="35 0 0 0" Name="pluse" TextChanged="{s:Action Pulse_TextChanged}"/>
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
-                <TextBlock Text="Freq (Hz)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <TextBlock Text="{DynamicResource addWaveform_freq}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
                 <ComboBox Width="120" Height="20" Margin="43 0 0 0" Name="freq" ItemsSource="{Binding Freqs,UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" /> <!--SelectionChanged="{s:Action Freq_SelectionChanged}"-->
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
-                <TextBlock Text="Duration (s)" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                <TextBlock Text="{DynamicResource addWaveform_duration}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
                 <TextBox Width="120" Height="20" Margin="30 0 0 0" Name="duration" TextChanged="{s:Action Duration_TextChanged}"/>
             </WrapPanel>
             <Grid Background="#FACD91" HorizontalAlignment="Left" Margin="0 20 0 0">

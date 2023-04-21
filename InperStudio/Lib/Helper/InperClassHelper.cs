@@ -1,9 +1,11 @@
-﻿using System;
+﻿using InperStudioControlLib.Lib.Config;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Helper
@@ -88,6 +90,21 @@ namespace InperStudio.Lib.Helper
             catch (Exception e)
             {
                 throw;
+            }
+        }
+        public static void SetLanguage(string language)
+        {
+            if (language == "zh_cn")
+            {
+                Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
+                Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/zh_cn.xaml", UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources["InperFontFamily"] =  new FontFamily("微软雅黑");
+            }
+            else
+            {
+                Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
+                Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/en_us.xaml", UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources["InperFontFamily"] = new FontFamily("Arial");
             }
         }
     }

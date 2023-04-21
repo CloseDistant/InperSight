@@ -2,6 +2,7 @@
 using InperStudioControlLib.Lib.Config;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace InperStudio.Lib.Helper
 {
@@ -47,24 +48,47 @@ namespace InperStudio.Lib.Helper
         {
             SetResByT(stimulusSettings, type);
         }
+        public static string GetDataPathSetting(string type = "dataPath")
+        {
+            return GetResByT<string>(type) ?? default;
+        }
+        public static void SetDataPathSetting(string dataPath, string type = "dataPath")
+        {
+            SetResByT<string>(dataPath, type);
+        }
         private static T GetResByT<T>(string type)
         {
-            JObject res = InperJsonConfig.Instance.Readjson();
-            return JsonConvert.DeserializeObject<T>(res[type].ToString());
+            try
+            {
+                JObject res = InperJsonConfig.Instance.Readjson();
+                return JsonConvert.DeserializeObject<T>(res[type].ToString());
+            }
+            catch (Exception e)
+            {
+                InperLogExtentHelper.LogExtent(e, "InperJsonHelper");
+            }
+            return default;
         }
         private static void SetResByT<T>(T t, string type)
         {
-            if (t != null)
+            try
             {
-                string res = JsonConvert.SerializeObject(t);
-                JObject jo = InperJsonConfig.Instance.Readjson();
-                jo[type] = res;
+                if (t != null)
+                {
+                    string res = JsonConvert.SerializeObject(t);
+                    JObject jo = InperJsonConfig.Instance.Readjson();
+                    jo[type] = res;
 
-                InperJsonConfig.Instance.Writejson(jo);
+                    InperJsonConfig.Instance.Writejson(jo);
+                }
+                else
+                {
+                    App.Log.Error("配置文件记录失败：" + t);
+                }
             }
-            else
+            catch (Exception e)
             {
-                App.Log.Error("配置文件记录失败：" + t);
+                InperLogExtentHelper.LogExtent(e, "InperJsonHelper");
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using InperStudio.Lib.Bean.Channel;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Helper.JsonBean
@@ -39,9 +40,11 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double Tau2 { get; set; }
         public double Tau3 { get; set; }
         public EventChannelJson Condition { get; set; }
+        public VideoZone VideoZone { get; set; }
         /// <summary>
         /// 通道类型
         /// </summary>
         public string Type { get; set; }
+
     }
 }

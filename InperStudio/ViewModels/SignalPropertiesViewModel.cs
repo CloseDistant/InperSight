@@ -7,9 +7,11 @@ using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
+using InperStudioControlLib.Lib.Config;
 using SciChart.Charting.Visuals.Axes;
 using Stylet;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -50,7 +52,7 @@ namespace InperStudio.ViewModels
                         break;
                     case SignalPropertiesTypeEnum.Analog:
                         this.view.analog.Visibility = Visibility.Visible;
-                        this.view.ai_sampling.Visibility = Visibility.Visible;
+                        //this.view.ai_sampling.Visibility = Visibility.Visible;
                         CameraInit();
                         break;
                     default:
@@ -91,7 +93,7 @@ namespace InperStudio.ViewModels
             //view.heightChannel.SelectedItem = view.rangeChannel.SelectedItem = view.offsetChannel.SelectedItem = view.filtersChannel.SelectedItem = chn;
             view.cancle.IsEnabled = (bool)(channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset);
             view.offset.IsEnabled = (bool)!channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset;
-            view.offsetChannel.SelectionChanged += (s, e) =>
+            view.selectChannel.SelectionChanged += (s, e) =>
             {
                 var channel = (s as System.Windows.Controls.ComboBox).SelectedItem as Channel;
                 view.offset.IsEnabled = !channel.Offset;
@@ -160,7 +162,7 @@ namespace InperStudio.ViewModels
             try
             {
                 var rb = sender as RadioButton;
-                Channel item = view.rangeChannel.SelectedItem as Channel;
+                Channel item = view.selectChannel.SelectedItem as Channel;
                 bool isFixed = false;
                 if (rb.Name.Equals("autoRange"))
                 {
@@ -175,7 +177,7 @@ namespace InperStudio.ViewModels
                     CameraSignalSettings.CameraChannels.ForEach(x =>
                     {
                         x.AutoRange = isFixed;
-                       
+
                     });
                     InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(chn =>
                     {
@@ -246,7 +248,7 @@ namespace InperStudio.ViewModels
             try
             {
                 var rb = sender as RadioButton;
-                Channel item = view.heightChannel.SelectedItem as Channel;
+                Channel item = view.selectChannel.SelectedItem as Channel;
                 if (rb.Name.Equals("heightAuto"))
                 {
                     if (item.ChannelId == _ChannleId)
@@ -326,7 +328,7 @@ namespace InperStudio.ViewModels
                     Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
                     if (rx.IsMatch(tb.Text))
                     {
-                        Channel item = view.heightChannel.SelectedItem as Channel;
+                        Channel item = view.selectChannel.SelectedItem as Channel;
                         double value = double.Parse(tb.Text);
                         if (value > 999)
                         {
@@ -370,7 +372,7 @@ namespace InperStudio.ViewModels
             try
             {
                 int value = int.Parse((sender as HandyControl.Controls.TextBox).Text);
-                Channel item = view.offsetChannel.SelectedItem as Channel;
+                Channel item = view.selectChannel.SelectedItem as Channel;
                 if (item.ChannelId == _ChannleId)
                 {
                     CameraSignalSettings.CameraChannels.ForEach(x =>
@@ -405,7 +407,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var item = this.view.rangeChannel.SelectedItem as Channel;
+                var item = this.view.selectChannel.SelectedItem as Channel;
 
                 var textbox = sender as System.Windows.Controls.TextBox;
                 double value = double.Parse(textbox.Text);
@@ -502,7 +504,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var item = this.view.rangeChannel.SelectedItem as Channel;
+                var item = this.view.selectChannel.SelectedItem as Channel;
 
                 var textbox = sender as System.Windows.Controls.TextBox;
                 if (!textbox.IsFocused) return;
@@ -588,7 +590,7 @@ namespace InperStudio.ViewModels
             try
             {
                 var chb = sender as CheckBox;
-                var item = this.view.filtersChannel.SelectedItem as Channel;
+                var item = this.view.selectChannel.SelectedItem as Channel;
                 if (item.ChannelId == _ChannleId)
                 {
                     CameraSignalSettings.CameraChannels.ForEach(x =>
@@ -688,7 +690,7 @@ namespace InperStudio.ViewModels
             try
             {
                 var chb = sender as CheckBox;
-                var item = this.view.filtersChannel.SelectedItem as Channel;
+                var item = this.view.selectChannel.SelectedItem as Channel;
                 if (item.ChannelId == _ChannleId)
                 {
                     CameraSignalSettings.CameraChannels.ForEach(x =>
@@ -786,7 +788,7 @@ namespace InperStudio.ViewModels
             {
                 if ((sender as System.Windows.Controls.TextBox).IsFocused)
                 {
-                    var item = this.view.filtersChannel.SelectedItem as Channel;
+                    var item = this.view.selectChannel.SelectedItem as Channel;
                     double valueHigh = view.high.InperMaxValue;
                     double valueLow = view.low.InperMinValue;
 
@@ -855,7 +857,7 @@ namespace InperStudio.ViewModels
             {
                 if ((sender as System.Windows.Controls.TextBox).IsFocused)
                 {
-                    var item = this.view.filtersChannel.SelectedItem as Channel;
+                    var item = this.view.selectChannel.SelectedItem as Channel;
                     double valueHigh = view.stopHigh.InperMaxValue;
                     double valueLow = view.stopLow.InperMinValue;
 
@@ -907,7 +909,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var item = this.view.filtersChannel.SelectedItem as Channel;
+                var item = this.view.selectChannel.SelectedItem as Channel;
 
                 var textbox = sender as HandyControl.Controls.TextBox;
                 double value = double.Parse(textbox.Text);
@@ -959,7 +961,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                var item = this.view.offsetChannel.SelectedItem as Channel;
+                var item = this.view.selectChannel.SelectedItem as Channel;
                 if (type == "Cancle")
                 {
                     if (item.ChannelId == _ChannleId)
@@ -1034,6 +1036,51 @@ namespace InperStudio.ViewModels
                     view.cancle.IsEnabled = true;
                     view.offset.IsEnabled = false;
                 }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        private int duplicateCount = 0;
+        public void DuplicateOffset()
+        {
+            try
+            {
+                // 清空内部字典中的队列
+                foreach (var outerKeyValuePair in InperDeviceHelper.Instance.OffsetData)
+                {
+                    foreach (var innerKeyValuePair in outerKeyValuePair.Value)
+                    {
+                        innerKeyValuePair.Value.Clear();
+                    }
+                }
+                //设置
+                var item = this.view.selectChannel.SelectedItem as Channel;
+                if (item.ChannelId == _ChannleId)
+                {
+                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                    {
+                        x.Offset = true;
+                    });
+                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                    {
+                        chn.Offset = true;
+                    });
+                    CameraSignalSettings.AllChannelConfig.Offset = true;
+                }
+                else
+                {
+                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = true;
+                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                    {
+                        if (chn.ChannelId == item.ChannelId)
+                        {
+                            chn.Offset = true;
+                        }
+                    });
+                }
+                item.Offset = true;                 
             }
             catch (Exception ex)
             {

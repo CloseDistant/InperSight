@@ -56,7 +56,7 @@ namespace InperStudio.ViewModels
             }
             if (string.IsNullOrEmpty(view.fileName.Text))
             {
-                view.fileName.Text = DateTime.Now.ToString("yyyyMMddHHmmss"); 
+                view.fileName.Text = DateTime.Now.ToString("yyyyMMddHHmmss");
             }
         }
         public void AddItemCmd()
@@ -89,10 +89,7 @@ namespace InperStudio.ViewModels
                 if (type == DataConfigPathTypeEnum.Load.ToString())
                 {
                     System.Windows.Window window = InperClassHelper.GetWindowByNameChar("Camera Signal");
-                    if (window != null)
-                    {
-                        window.Close();
-                    }
+                    window?.Close();
                 }
             }
             catch (Exception ex)
@@ -141,8 +138,8 @@ namespace InperStudio.ViewModels
                         InperGlobalClass.DataFolderName = newName;
                         Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
                     }
-
                 }
+                InperJsonHelper.SetDataPathSetting(InperGlobalClass.DataPath);
                 RequestClose();
             }
             catch (Exception ex)

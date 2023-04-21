@@ -1,13 +1,21 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
+using InperStudio.Lib.Chart;
+using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudio.Views.Control;
+using InperStudioControlLib.Lib.Config;
 using Stylet;
 using System;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -76,6 +84,34 @@ namespace InperStudio.ViewModels
                     bottomControl.no_record.Visibility = System.Windows.Visibility.Collapsed;
                     bottomControl.record.Visibility = System.Windows.Visibility.Visible;
                 };
+                this.view.Owner = Application.Current.MainWindow;
+
+                if (InperGlobalClass.EventSettings.Channels.Count > 0)
+                {
+                    InperGlobalClass.EventSettings.Channels.ForEach(channel =>
+                    {
+                        if (channel.Type == ChannelTypeEnum.Zone.ToString() && channel.VideoZone.Name== BehaviorRecorderKit.Name)
+                        {
+                            var condition = channel.VideoZone.AllZoneConditions.First();
+              
+                            var rect = new System.Windows.Shapes.Rectangle()
+                            {
+                                Width = condition.ShapeWidth,
+                                Height = condition.ShapeHeight,
+                                //Name = condition.ZoneName,
+                                StrokeThickness = 1,
+                                Fill = System.Windows.Media.Brushes.Transparent,
+                                Stroke = System.Windows.Media.Brushes.Red
+                            };
+                            Canvas.SetLeft(rect, condition.ShapeLeft);
+                            Canvas.SetTop(rect, condition.ShapeTop);
+                            view.drawCanvas.Children.Add(rect);
+                            var layer = AdornerLayer.GetAdornerLayer(rect);
+                            var color = System.Windows.Media.Brushes.Red;
+                            layer.Add(new InperAdorner(rect, condition.ZoneName, color, 0, -15, false));
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -83,23 +119,28 @@ namespace InperStudio.ViewModels
             }
         }
         #region 加锁解锁
-        public void LockEvent()
-        {
-            this.view.Topmost = true;
-            view.unLock.Visibility = Visibility.Visible;
-            view._lock.Visibility = Visibility.Collapsed;
-        }
-        public void UnLockEvent()
-        {
-            this.view.Topmost = false;
-            view.unLock.Visibility = Visibility.Collapsed;
-            view._lock.Visibility = Visibility.Visible;
-        }
+        //public void LockEvent()
+        //{
+        //    this.view.Topmost = true;
+        //    view.unLock.Visibility = Visibility.Visible;
+        //    view._lock.Visibility = Visibility.Collapsed;
+        //}
+        //public void UnLockEvent()
+        //{
+        //    this.view.Topmost = false;
+        //    view.unLock.Visibility = Visibility.Collapsed;
+        //    view._lock.Visibility = Visibility.Visible;
+        //}
         #endregion
 
         public void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            InperDialogWindow inperDialogWindow = new InperDialogWindow("This will stop video recording,are you sure to close?");
+            string text = "This will stop video recording,are you sure to close?";
+            if (InperConfig.Instance.Language != "en_us")
+            {
+                text = "这将会使视频停止录制，确定要关闭吗？";
+            }
+            InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
             inperDialogWindow.HideCancleButton();
             inperDialogWindow.ClickEvent += (s, statu) =>
             {

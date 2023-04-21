@@ -52,11 +52,18 @@
         DIO,
         Output,
         Input,
+        TriggerStart,
+        TriggerStop,
         Start,
         Stop,
         Manual,
         AfterExcitation,
-        Light
+        Light,
+        Zone,
+        Stay,
+        Enter,
+        Leave,
+        EnterOrLeave
     }
     public enum TimerError
     {

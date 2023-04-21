@@ -11,4 +11,180 @@
     <sys:String x:Key="email">反馈</sys:String>
     <sys:String x:Key="web">网站</sys:String>
     <sys:String x:Key="aboutInperSignal">关于Inper Signal</sys:String>
+
+    <!--主界面-->
+    <sys:String x:Key="main_fibers">光纤采集</sys:String>
+    <sys:String x:Key="main_analog">模拟信号输入</sys:String>
+    <sys:String x:Key="main_video">视频</sys:String>
+    <sys:String x:Key="main_marker">打标</sys:String>
+    <sys:String x:Key="main_output">输出</sys:String>
+    <sys:String x:Key="main_stimiulus">同步</sys:String>
+    <sys:String x:Key="main_trigger">触发</sys:String>
+    <sys:String x:Key="main_preview">预览</sys:String>
+    <sys:String x:Key="main_start">开始</sys:String>
+    <sys:String x:Key="main_stop">停止</sys:String>
+    <sys:String x:Key="main_note">备忘</sys:String>
+
+    <!--侧边栏-->
+    <sys:String x:Key="left_name">命名</sys:String>
+    <sys:String x:Key="left_camera_settings">记录相机设置</sys:String>
+    <sys:String x:Key="left_exposure">曝光 (ms)</sys:String>
+    <sys:String x:Key="left_sampling">采样率 (fps)</sys:String>
+    <sys:String x:Key="left_gain">增益</sys:String>
+    <sys:String x:Key="left_record_mode">记录模式</sys:String>
+    <sys:String x:Key="left_continuous">连续模式</sys:String>
+    <sys:String x:Key="left_interval">间隔记录 (s)</sys:String>
+    <sys:String x:Key="left_interval_time">间隔时长</sys:String>
+    <sys:String x:Key="left_duration">给光时长</sys:String>
+    <sys:String x:Key="left_excitaion_light">激发光设置</sys:String>
+    <sys:String x:Key="left_light_intensity_measure">光功率测量</sys:String>
+    <sys:String x:Key="left_channel">通道</sys:String>
+    <sys:String x:Key="left_color">颜色</sys:String>
+    <sys:String x:Key="left_add">添加</sys:String>
+    <sys:String x:Key="left_active_channels">已添加通道</sys:String>
+    <sys:String x:Key="left_analog_sampling">采样率</sys:String>
+
+    <!--外置相机设置-->
+    <sys:String x:Key="video_setting_title">视频设置</sys:String>
+    <sys:String x:Key="video_setting_settings">摄像头设置</sys:String>
+    <sys:String x:Key="video_setting_video">摄像头选择</sys:String>
+    <sys:String x:Key="video_setting_format">格式</sys:String>
+    <sys:String x:Key="video_setting_frame_rate">分辨率&amp;帧率</sys:String>
+    <sys:String x:Key="video_setting_remainder">切换分辨率将清除已添加的所有图形区域</sys:String>
+    <sys:String x:Key="video_setting_add_zone">添加Zone</sys:String>
+    <sys:String x:Key="video_setting_animal_tracking">轨迹追踪</sys:String>
+    <sys:String x:Key="video_setting_darker_background">动物比背景更暗</sys:String>
+    <sys:String x:Key="video_setting_lighter_background">动物比背景更亮</sys:String>
+    <sys:String x:Key="video_setting_name">命名</sys:String>
+    <sys:String x:Key="video_setting_active_videos">激活的摄像头</sys:String>
+
+    <!--视频设置-->
+    <sys:String x:Key="video_record">录制</sys:String>
+    <sys:String x:Key="video_photo">拍照</sys:String>
+
+    <!--偏好项设置-->
+    <sys:String x:Key="preference_title">偏好项</sys:String>
+    <sys:String x:Key="preference_language">语言</sys:String>
+    <sys:String x:Key="preference_interface">界面</sys:String>
+    <sys:String x:Key="preference_display_analog">展示模拟信号采集</sys:String>
+    <sys:String x:Key="preference_display_trigger">展示触发（开始与结束设置）</sys:String>
+    <sys:String x:Key="preference_display_note">展示快捷备忘</sys:String>
+    <sys:String x:Key="preference_theme">主题</sys:String>
+    <sys:String x:Key="preference_default">默认主题</sys:String>
+    <sys:String x:Key="preference_customization">其他主题色</sys:String>
+
+    <!--关于荧博-->
+    <sys:String x:Key="about_title">关于Inper Signal</sys:String>
+    <sys:String x:Key="about_software_infomation">软件信息</sys:String>
+    <sys:String x:Key="about_release_date">发布时间:</sys:String>
+    <sys:String x:Key="about_version">版本:</sys:String>
+    <sys:String x:Key="about_device_specification">设备信息</sys:String>
+    <sys:String x:Key="about_latest_version">已是最新版本</sys:String>
+    <sys:String x:Key="about_light">光源:</sys:String>
+    <sys:String x:Key="about_model">编号:</sys:String>
+    <sys:String x:Key="about_sn">SN号:</sys:String>
+
+    <!--文件-->
+    <sys:String x:Key="file_config">配置</sys:String>
+    <sys:String x:Key="file_name">文件名</sys:String>
+    <sys:String x:Key="file_where">路径</sys:String>
+    <sys:String x:Key="file_tag">标签</sys:String>
+
+    <!--触发-->
+    <sys:String x:Key="trigger_title">触发</sys:String>
+    <sys:String x:Key="trigger_start">开始设置</sys:String>
+    <sys:String x:Key="trigger_immediately">立即开始</sys:String>
+    <sys:String x:Key="trigger_delay">延迟开始 (s)</sys:String>
+    <sys:String x:Key="trigger_attime">在确定时间开始</sys:String>
+    <sys:String x:Key="trigger_trigger">触发开始</sys:String>
+    <sys:String x:Key="trigger_stop">停止设置</sys:String>
+    <sys:String x:Key="trigger_stop_immediately">立即停止</sys:String>
+    <sys:String x:Key="trigger_stop_delay">延迟停止 (s)</sys:String>
+    <sys:String x:Key="trigger_stop_attime">在确定时间停止</sys:String>
+    <sys:String x:Key="trigger_stop_trigger">触发停止</sys:String>
+
+    <!--打标-->
+    <sys:String x:Key="marker_title">打标</sys:String>
+    <sys:String x:Key="marker_channels_settings">配置项设置</sys:String>
+    <sys:String x:Key="marker_conditions">类型</sys:String>
+    <sys:String x:Key="marker_mode">模式</sys:String>
+    <sys:String x:Key="marker_channel">通道</sys:String>
+    <sys:String x:Key="marker_light">光源</sys:String>
+    <sys:String x:Key="marker_detail">场景</sys:String>
+    <sys:String x:Key="marker_immediately">立即</sys:String>
+    <sys:String x:Key="marker_dely">延迟 (s)</sys:String>
+    <sys:String x:Key="marker_threshold">阈值(s)</sys:String>
+    <sys:String x:Key="marker_name">命名</sys:String>
+    <sys:String x:Key="marker_color">颜色</sys:String>
+    <sys:String x:Key="marker_active_channels">激活的配置项</sys:String>
+    <sys:String x:Key="marker_hotkeys">热键</sys:String>
+
+    <!--stimulus-->
+    <sys:String x:Key="stimulus_title">同步</sys:String>
+    <sys:String x:Key="stimulus_waveform">基础波形</sys:String>
+    <sys:String x:Key="stimulus_sweep">波形组合</sys:String>
+    <sys:String x:Key="stimulus_item">编号</sys:String>
+    <sys:String x:Key="stimulus_pulse">脉宽(ms)</sys:String>
+    <sys:String x:Key="stimulus_freq">频率(Hz)</sys:String>
+    <sys:String x:Key="stimulus_duration">时长(s)</sys:String>
+    <sys:String x:Key="stimulus_waveform_number">波形编号</sys:String>
+    <sys:String x:Key="stimulus_trigger">触发开始</sys:String>
+    <sys:String x:Key="stimulus_output">输出口</sys:String>
+    <sys:String x:Key="stimulus_preview">预览</sys:String>
+    
+    <!--add sweep-->
+    <sys:String x:Key="addSweep_title">添加波形组合</sys:String>
+    <sys:String x:Key="addSweep_sweep_setting">设置</sys:String>
+    <sys:String x:Key="addSweep_selected">已选择</sys:String>
+    <sys:String x:Key="addSweep_duration">时长 (s)</sys:String>
+    <sys:String x:Key="addSweep_preview">预览</sys:String>
+    
+    <!--add waveform-->
+    <sys:String x:Key="addWaveform_title">添加波形</sys:String>
+    <sys:String x:Key="addWaveform_waveform_setting">波形设置</sys:String>
+    <sys:String x:Key="addWaveform_pulse">脉宽 (ms)</sys:String>
+    <sys:String x:Key="addWaveform_freq">频率 (Hz)</sys:String>
+    <sys:String x:Key="addWaveform_duration">时长 (s)</sys:String>
+
+    <!--tips-->
+    <sys:String x:Key="tips_title">提示</sys:String>
+    <sys:String x:Key="tips_content">检测到有配置未保存，是否要保存？</sys:String>
+    <sys:String x:Key="tips_video_content">这将会使视频停止录制，确定要关闭吗？</sys:String>
+    <sys:String x:Key="tips_yes">是</sys:String>
+    <sys:String x:Key="tips_no">否</sys:String>
+    <sys:String x:Key="tips_cancel">取消</sys:String>
+
+    <!--event panel properties-->
+    <sys:String x:Key="event_title">事件属性设置</sys:String>
+    <sys:String x:Key="event_height">组件高度 (Px)</sys:String>
+    <sys:String x:Key="event_auto">自适应</sys:String>
+    <sys:String x:Key="event_fixed">固定</sys:String>
+    <sys:String x:Key="event_display">展示</sys:String>
+    <sys:String x:Key="event_locked">固定在下方</sys:String>
+    <sys:String x:Key="event_name">显示名称</sys:String>
+
+    <!--startpage-->
+    <sys:String x:Key="startpage_remainder">正在初始化...</sys:String>
+    <sys:String x:Key="startpage_nodevice">未发现设备</sys:String>
+    <sys:String x:Key="startpage_check">请检查设备连接是否正常</sys:String>
+    <sys:String x:Key="startpage_retry">尝试连接</sys:String>
+
+    <!--properties-->
+    <sys:String x:Key="properties_title">属性设置</sys:String>
+    <sys:String x:Key="properties_channel">通道选择</sys:String>
+    <sys:String x:Key="properties_yrange">Y轴范围</sys:String>
+    <sys:String x:Key="properties_auto">自适应</sys:String>
+    <sys:String x:Key="properties_fixed">固定</sys:String>
+    <sys:String x:Key="properties_top">最大值</sys:String>
+    <sys:String x:Key="properties_bottom">最小值</sys:String>
+    <sys:String x:Key="properties_height">组件高度 (Px)</sys:String>
+    <sys:String x:Key="properties_filter">滤波</sys:String>
+    <sys:String x:Key="properties_bandpass">带通滤波 (Hz)</sys:String>
+    <sys:String x:Key="properties_bandstop">带阻滤波 (Hz)</sys:String>
+    <sys:String x:Key="properties_smooth">平滑 (Point)</sys:String>
+    <sys:String x:Key="properties_size">窗口 (Point)</sys:String>
+    <sys:String x:Key="properties_offset">偏置扣除</sys:String>
+    <sys:String x:Key="properties_inactive">取消激活</sys:String>
+    <sys:String x:Key="properties_active">激活</sys:String>
+    <sys:String x:Key="properties_duplicate">重复(0)</sys:String>
 </ResourceDictionary>

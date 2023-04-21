@@ -52,6 +52,7 @@ namespace InperPhotometry
             foreach (var ci in CameraFinder.Enumerate(DeviceType.Usb))
             {
                 if (ci[CameraInfoKey.ModelName] == "acA720-520um")
+                //if (ci[CameraInfoKey.ModelName] == "acA720-520uc")
                 {
                     cam_info_list.Add(ci);
                 }

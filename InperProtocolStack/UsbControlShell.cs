@@ -195,6 +195,7 @@ namespace InperProtocolStack
 
         public void SetFrameRate(double frame_rate)
         {
+            Console.WriteLine("frameRate:" + frame_rate);
             CmdSetFrameRate cmd = new CmdSetFrameRate();
             cmd.SetCmdParam((float)frame_rate);
             _TC.Transmit(cmd);

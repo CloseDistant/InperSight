@@ -11,12 +11,12 @@
         xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
-        Title="{Binding BehaviorRecorderKit.CustomName}" Height="395" Width="430" MinWidth="430" MinHeight="328" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}" Closing="{s:Action Window_Closing}">
+        Title="{Binding BehaviorRecorderKit.CustomName}" SizeToContent="WidthAndHeight" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}" Closing="{s:Action Window_Closing}">
     <inp:InperDialogWindow.Resources>
         <conv:VideoIntToTIme x:Key="VideoIntToTIme"/>
     </inp:InperDialogWindow.Resources>
     <Grid>
-        <Button x:Name="_lock" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action LockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -25 170 0" Cursor="Hand">
+        <!--<Button x:Name="_lock" Style="{StaticResource ButtonCustom}" Width="20" Height="20" Command="{s:Action LockEvent}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 -25 170 0" Cursor="Hand">
             <Grid>
                 <Image Source="/Lib/Images/New/unlock.png" Stretch="UniformToFill" />
             </Grid>
@@ -25,12 +25,13 @@
             <Grid>
                 <Image Source="/Lib/Images/New/lock.png" Stretch="UniformToFill" />
             </Grid>
-        </Button>
-        <Viewbox Stretch="Uniform">
-            <Grid Background="{DynamicResource InperTitlePageColor}">
-                <Image Grid.Row="0" Name="image" Stretch="UniformToFill" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
-                <TextBlock Visibility="Collapsed" Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
-            </Grid>
-        </Viewbox>
+        </Button>-->
+        <!--<Viewbox Stretch="Uniform">-->
+        <Grid Background="{DynamicResource InperTitlePageColor}" Width="480" Height="320">
+            <Canvas x:Name="drawCanvas" Panel.ZIndex="9"/>
+            <Image Grid.Row="0" Name="image" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
+            <TextBlock Visibility="Collapsed" Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
+        </Grid>
+        <!--</Viewbox>-->
     </Grid>
 </inp:InperDialogWindow>

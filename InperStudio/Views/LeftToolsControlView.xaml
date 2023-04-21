@@ -8,98 +8,363 @@
              xmlns:con="clr-namespace:InperStudio.Lib.Convert"
              xmlns:local="clr-namespace:InperStudio.Views"
              xmlns:s="https://github.com/canton7/Stylet"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:LeftToolsControlViewModel}">
+             xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
+             xmlns:inper="clr-namespace:InperStudioControlLib.Control.TextBox;assembly=InperStudioControlLib"
+             xmlns:global="clr-namespace:InperStudio.Lib.Bean" FontFamily="{DynamicResource InperFontFamily}"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:LeftToolsControlViewModel}"  Name="signal">
     <UserControl.Resources>
-        <con:ManualToMarkConverter x:Key="ManualToMarkConverter"/>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+        <convert:TestModeConvert x:Key="TestModeConvert" />
+        <Style TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontFamily" Value="{DynamicResource InperFontFamily}"/>
+                <Setter Property="Foreground" Value="{DynamicResource InperTitleTextColor}"/>
+            </Style.Setters>
+        </Style>
+        
+        <SolidColorBrush x:Key="bd1">#ED8F26</SolidColorBrush>
+        <SolidColorBrush x:Key="bd2">Transparent</SolidColorBrush>
+        <SolidColorBrush x:Key="color1">#B0B0B0</SolidColorBrush>
+        <SolidColorBrush x:Key="color2">white</SolidColorBrush>
+        <SolidColorBrush x:Key="color3">#D7D7D7</SolidColorBrush>
+        <SolidColorBrush x:Key="color4">#333333</SolidColorBrush>
+        <Visibility x:Key="vis">Visible</Visibility>
+        <Visibility x:Key="colla">Collapsed</Visibility>
     </UserControl.Resources>
-    <Grid Background="{StaticResource InperTitlePageColor}" Name="main">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Border HorizontalAlignment="Stretch" Margin="10" Grid.Row="0" Effect="{DynamicResource EffectShadow1}">
-            <Grid Name="GridMain" MinHeight="160" MaxHeight="360" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+    <Grid>
+        <Grid Background="{DynamicResource InperDialogContentColor}" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.RowSpan="2" BorderThickness="0 1 1 0" BorderBrush="{StaticResource BorderBrush}"/>
+            <!--标头-->
+            <Grid Grid.Row="0">
+                <Grid Height="28" Background="#E7E7E7" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Style="{StaticResource InperFreeButton}" Command="{s:Action CameraShow}" >
+                        <Border x:Name="bd1" Background="{StaticResource bd1}" Padding="5 0">
+                            <TextBlock Style="{x:Null}" FontSize="14" Text="{DynamicResource main_fibers}" Name="fibers" Foreground="{StaticResource color2}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="fibers" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color2}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="_analog" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color1}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="bd1" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bd1}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="bd2" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bd2}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button Style="{StaticResource InperFreeButton}" Grid.Column="1" Margin="5 0" Command="{s:Action AnalogShow}" Visibility="{Binding Source={StaticResource InperGlobalClass},Path=IsDisplayAnalog,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <Border x:Name="bd2" Background="{StaticResource bd2}">
+                            <TextBlock Text="{DynamicResource main_analog}" Style="{x:Null}" FontSize="14"  Name="_analog" Foreground="{StaticResource color1}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="fibers" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color1}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="_analog" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color2}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="bd1" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bd2}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="bd2" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bd1}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </Grid>
+            </Grid>
+            <!--内容-->
+            <Grid Grid.Row="1" Margin="10 0" Visibility="Collapsed"  x:Name="camera">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="255"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Border Height="30" Name="BorderTitle" Grid.Row="0" CornerRadius="10 10 0 0" Background="#EEEEEE" Style="{StaticResource BorderClip}">
-                    <TextBlock Style="{DynamicResource TextBlockDefault}" FontSize="{DynamicResource InperNormalFontSize}" HorizontalAlignment="Left" Margin="10 0">Note</TextBlock>
-                </Border>
-                <Border x:Name="RichBorder" Grid.Row="1" CornerRadius="0 0 10 10" Background="{DynamicResource InperMainPageColor}">
-                    <Grid Margin="8">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <ScrollViewer x:Name="TagScroll" HorizontalAlignment="Left" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                            <StackPanel x:Name="TagListValue"/>
-                        </ScrollViewer>
-                        <RichTextBox MinWidth="120" Grid.Row="1" x:Name="NoteContent" PreviewKeyUp="{s:Action NoteContent_KeyDown}" s:View.ActionTarget="{Binding DataContext,ElementName=main}"  Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource InperTitlePageColor}"/>
+                <!--图像区域-->
+                <Grid Grid.Row="0" Background="#E8E8E8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="225"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <!--300*225-->
+                    <Grid Grid.Row="0">
+                        <Canvas IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="999999" x:Name="ellipseCanvas" Margin="1 0" Width="300" Height="225"  MouseMove="{s:Action Grid_MouseMove}" MouseLeave="{s:Action EllipseCanvas_MouseLeave}" VerticalAlignment="Top"></Canvas>
+                        <Image IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Stretch="Uniform" Name="image" Width="300" Height="225" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                     </Grid>
-                </Border>
-            </Grid>
-        </Border>
-        <Border  Effect="{DynamicResource EffectShadow1}" Margin="10" Grid.Row="1" Visibility="Collapsed">
-            <Grid MinHeight="80" MinWidth="200" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Border Height="30" Grid.Row="0" CornerRadius="10,10,0,0" Background="#EEEEEE">
-                    <TextBlock Style="{DynamicResource TextBlockDefault}" FontSize="{DynamicResource InperNormalFontSize}" HorizontalAlignment="Left" Margin="10 0">Tags</TextBlock>
-                </Border>
-                <Border Grid.Row="1" ClipToBounds="True" CornerRadius="0 0 10 10" Background="{DynamicResource InperMainPageColor}">
-                    <ContentPresenter   Margin="10" />
-                </Border>
-            </Grid>
-        </Border>
-        <Border  Effect="{DynamicResource EffectShadow1}" Margin="10" Grid.Row="2">
-            <Grid MinHeight="80" MinWidth="200" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Border Height="30" Grid.Row="0" CornerRadius="10,10,0,0" Background="#EEEEEE" >
-                    <TextBlock Style="{DynamicResource TextBlockDefault}" FontSize="{DynamicResource InperNormalFontSize}" HorizontalAlignment="Left" Margin="10 0">Manual Events</TextBlock>
-                </Border>
-                <Border Grid.Row="1" ClipToBounds="True" CornerRadius="0 0 10 10" Background="{DynamicResource InperMainPageColor}">
-                    <ListBox Margin="10" ScrollViewer.VerticalScrollBarVisibility="Auto" BorderThickness="0" ItemsSource="{Binding ManulEvents,UpdateSourceTrigger=PropertyChanged}">
-                        <ListBox.Style>
-                            <Style BasedOn="{StaticResource ListBoxBaseStyle}" TargetType="ListBox">
-                                <Style.Setters>
-                                    <Setter Property="ItemContainerStyle">
+                    <Grid Grid.Row="1">
+                        <Grid VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                            <WrapPanel>
+                                <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="0" Padding="5 0" Margin="3 0 0 0" Width="75" Height="20" FontSize="{DynamicResource InperSmallFontSize}" />
+                            </WrapPanel>
+                        </Grid>
+                        <Button Margin="0 0 90 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="50" Height="20" x:Name="reset" Command="{s:Action AutoFindFiberRest}" >
+                            <Border Background="#F6F6F6" CornerRadius="2">
+                                <Grid>
+                                    <TextBlock Text="Reset" HorizontalAlignment="Center" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="0"/>
+                                </Grid>
+                            </Border>
+                        </Button>
+                        <Button Margin="0 0 10 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="70" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
+                            <Border Background="#F6F6F6" CornerRadius="2">
+                                <Grid>
+                                    <TextBlock Text="Capture" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                                    <Ellipse Fill="#E0A22A" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>
+                                </Grid>
+                            </Border>
+                        </Button>
+                    </Grid>
+                </Grid>
+                <!--配置参数-->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <WrapPanel>
+                            <WrapPanel VerticalAlignment="Center" Margin="0 0 0 0">
+                                <TextBlock Text="ROI(px)" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
+                                <inper:InperTextBox Style="{StaticResource BaseStyle}" HorizontalContentAlignment="Center" InperVerify="True" InperTextType="Double" InperMaxValue="150" InperMinValue="1" Width="36" Height="20" Margin="5 0 0 0" x:Name="channelRoi" Text="{Binding Diameter,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action ChannelRoi_TextChanged}"/>
+                            </WrapPanel>
+                            <TextBlock Text="{DynamicResource left_name}" Margin="10 0 0 0" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
+                            <hc:TextBox Margin="10 0 0 0" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center"  TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="0" Width="102"  Height="20"  />
+                            <Button Margin="4 0 0 0" Style="{StaticResource InperFreeButton}" Click="{s:Action AddCircle}" Width="20" Height="20" >
+                                <Path Fill="#0B8800" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
+                            </Button>
+                            <Button Margin="4 0 0 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Click="{s:Action ReduceCircle}" Width="20" Height="20" >
+                                <Path Fill="#D9001B" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
+                            </Button>
+                        </WrapPanel>
+                    </Grid>
+                    <StackPanel Grid.Row="1" Margin="0 0 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <Grid HorizontalAlignment="Center" Margin="0 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                            <TextBlock Grid.Column="1" Text="{DynamicResource left_excitaion_light}" Foreground="{DynamicResource InperTheme}" FontSize="14" Margin="10 0"/>
+                            <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                        </Grid>
+                        <WrapPanel Margin="15" HorizontalAlignment="Right">
+                            <TextBlock Text="{DynamicResource left_light_intensity_measure}" VerticalAlignment="Center" />
+                            <ToggleButton Margin="20 0 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter}}" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
+                        </WrapPanel>
+                        <ListBox x:Name="lightMode"  Style="{x:Null}" HorizontalAlignment="Center" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Template">
                                         <Setter.Value>
-                                            <Style BasedOn="{StaticResource ListBoxItemBaseStyle}" TargetType="ListBoxItem">
-                                                <Setter Property="Padding" Value="0,5"/>
-                                                <Setter Property="Margin" Value="0,1"/>
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="ListBoxItem">
-                                                            <Grid x:Name="test" Background="{Binding BgColor}" Visibility="{Binding IsActive,Converter={StaticResource Boolean2VisibilityConverter},UpdateSourceTrigger=PropertyChanged}" >
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="2*"/>
-                                                                    <ColumnDefinition Width="2*"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb1" Margin="5 0 0 0" Grid.Column="0" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Hotkeys}" />
-                                                                <TextBlock Margin="3 0" hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb"  Grid.Column="1" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}"  TextWrapping="NoWrap" Text="{Binding Name}" />
-                                                                <TextBlock hc:TextBlockAttach.AutoTooltip="True" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" x:Name="tb2" Margin="0 0 5 0" Grid.Column="2" Foreground="White" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" TextWrapping="NoWrap" Text="{Binding Type,Converter={StaticResource ManualToMarkConverter}}" />
-                                                                <Border Grid.ColumnSpan="3" Margin="10 0" CornerRadius="{StaticResource InperDefaultCornerRadius}" VerticalAlignment="Bottom"  BorderBrush="{Binding BgColor}" BorderThickness="1" Opacity=".2"/>
-                                                            </Grid>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
+                                            <ControlTemplate>
+                                                <WrapPanel Margin="0 8">
+                                                    <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
+                                                    <CheckBox  Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}"  IsChecked="{Binding IsChecked ,UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="10 0 0 0" FontSize="{StaticResource InperNormalFontSize}"/>
+                                                    <inper:InperTextBox IsEnabled="True" Style="{StaticResource BaseStyle}" Height="22" InperVerify="False" InperTextType="Int" InperMaxValue="100" InperMinValue="0" InperTextChanged="{s:Action LightMode_TextChanged}" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="60 0 0 0"  Padding="0"  Width="120" />
+                                                </WrapPanel>
+                                            </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
-                                </Style.Setters>
-                            </Style>
-                        </ListBox.Style>
-                    </ListBox>
-                </Border>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                        <Grid HorizontalAlignment="Center" Margin="0 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                            <TextBlock Grid.Column="1" Text="{DynamicResource left_camera_settings}" Foreground="{DynamicResource InperTheme}" FontSize="14" Margin="10 0"/>
+                            <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                        </Grid>
+                        <WrapPanel Margin="0 10 0 0"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <TextBlock Text="{DynamicResource left_exposure}" VerticalAlignment="Center" Width="90"/>
+                            <ComboBox TextBoxBase.TextChanged="{s:Action Exposure_TextChanged}" Margin="50 0 0 0" IsEditable="True" x:Name="Exposure" Text="{Binding Expourse,UpdateSourceTrigger=PropertyChanged}" Padding="4 0" MinHeight="20" Width="120" FontSize="{DynamicResource InperNormalFontSize}"/>
+                        </WrapPanel>
+                        <WrapPanel Margin="0 10 0 0"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <TextBlock Text="{DynamicResource left_sampling}" VerticalAlignment="Center" Width="90" />
+                            <ComboBox TextBoxBase.TextChanged="{s:Action Sampling_TextChanged}" x:Name="Sampling" Text="{Binding Sampling,UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource ComboBoxBaseStyle}" Padding="4 0" Margin="50 0 0 0" MinHeight="20" MinWidth="120" FontSize="{DynamicResource InperNormalFontSize}"/>
+                        </WrapPanel>
+                        <WrapPanel Margin="0 10"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <TextBlock Text="{DynamicResource left_gain}" VerticalAlignment="Center" Width="90" />
+                            <inper:InperTextBox InperVerify="True" InperTextType="Int" InperMaxValue="24" InperMinValue="0" Style="{StaticResource TextBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action Gain_TextChanged}"  Padding="4 0 0 0"  hc:BorderElement.CornerRadius="0"  MinHeight="20" MinWidth="120"  Margin="50 0 0 0" />
+                        </WrapPanel>
+                        <Grid HorizontalAlignment="Center" Margin="0 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                            <TextBlock Grid.Column="1" Text="{DynamicResource left_record_mode}" Foreground="{DynamicResource InperTheme}" FontSize="14" Margin="10 0"/>
+                            <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                        </Grid>
+                        <RadioButton Checked="{s:Action Continus_Checked}" FontSize="14" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" Margin="20 10" GroupName="mode" x:Name="continuous" Content="{DynamicResource left_continuous}" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                        <WrapPanel Margin="20 10 0 0" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <RadioButton GroupName="mode" FontSize="14" x:Name="interval" Content="{DynamicResource left_interval}" Checked="{s:Action Interval_Checked}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        </WrapPanel>
+                        <WrapPanel Margin="44 10 0 10" IsEnabled="{Binding ElementName=interval,Path=IsChecked}">
+                            <WrapPanel Margin="0 2">
+                                <TextBlock Text="{DynamicResource left_duration}"  VerticalAlignment="Center" FontSize="14" />
+                                <inper:InperTextBox Name="_duration" Margin="5 0 0 0" Style="{StaticResource BaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Duration,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Padding="0"    Width="48" Height="20" />
+                            </WrapPanel>
+                            <WrapPanel Margin="12 2 0 2">
+                                <TextBlock Text="{DynamicResource left_interval_time}"  VerticalAlignment="Center" FontSize="14" />
+                                <inper:InperTextBox Name="_interval" Margin="5 0 0 0" Style="{StaticResource BaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Interval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Padding="0"  Width="48" Height="20" />
+                            </WrapPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </Grid>
             </Grid>
-        </Border>
+            <!--analog-->
+            <Grid x:Name="analog" Grid.Row="1" Visibility="Collapsed" Margin="10 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <Grid Margin="30 15" >
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource left_channel}"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <ComboBox Margin="40 0 0 0"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding AnalogChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="NickName" MinWidth="160" MinHeight="22" x:Name="AnalogChannelCombox" SelectionChanged="{s:Action AnalogChannelCombox_SelectionChanged}"/>
+                    </Grid>
+                    <Grid Margin="30 15" >
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource left_name}"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <TextBox Margin="40 0 0 0" Style="{DynamicResource TextBoxBaseStyle}"  HorizontalAlignment="Right"  Height="25" MinWidth="160" TextChanged="{s:Action AnalogName_TextChanged}"  Text="{Binding ElementName=AnalogChannelCombox,Path=SelectedValue.Name,UpdateSourceTrigger=PropertyChanged}" x:Name="AnalogName"></TextBox>
+                    </Grid>
+                    <Grid Margin="30 15" >
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource left_color}"  FontSize="{DynamicResource InperLargeFontSize}"/>
+                        <Button x:Name="PopButton" Cursor="Hand" Margin="20 0 0 0" HorizontalAlignment="Right" MinWidth="160" Height="25" Click="{s:Action PopButton_Click}" />
+                        <Popup x:Name="pop" PopupAnimation="Slide" PlacementTarget="{Binding ElementName=PopButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Effect="{DynamicResource EffectShadow4}">
+                            <ListBox x:Name="AnalogColorList" SelectionChanged="{s:Action AnalogColorList_Selected}"  Background="Transparent" BorderThickness="0" Margin="0 20" HorizontalAlignment="Stretch" Width="{Binding ElementName=PopButton,Path=ActualWidth}"  Style="{StaticResource WrapPanelHorizontalListBox}" ItemsSource="{Binding AnalogColorList,UpdateSourceTrigger=PropertyChanged}" >
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Height="20" Margin="2 5" Background="{Binding}" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Popup>
+                    </Grid>
+                    <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action AnalogMover}" CommandParameter="rightMove" Width="50" HorizontalAlignment="Right" Margin="0 0 30 0" Style="{StaticResource InperFreeButton}" Background="#D7D7D7" Foreground="#333333" FontSize="14" FontFamily="{DynamicResource InperFontFamily}">
+                        <Border BorderBrush="#D9D9D9" BorderThickness="1" CornerRadius="2" Height="30" Background="#D7D7D7" Name="rightbd">
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Name="righttb" Text="{DynamicResource left_add}"></TextBlock>
+                        </Border>
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="rightbd" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource bd1}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="righttb" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color2}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="rightbd" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color3}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="righttb" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource color4}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+                <!--<Grid Grid.Column="1" Margin="30 0 20 0">
+                    <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action AnalogMover}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="40" Margin="0 0 0 50" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
+                    <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action AnalogMover}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="40"  Margin="0 50 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
+                </Grid>-->
+                <StackPanel Grid.Row="1" Margin="20 0 0 0">
+                    <Grid HorizontalAlignment="Center" Margin="0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                        <TextBlock Grid.Column="1" Text="{DynamicResource left_active_channels}" Foreground="{DynamicResource InperTheme}" FontSize="14" Margin="10 0"/>
+                        <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
+                    </Grid>
+                    
+                    <ListBox Margin="0 20" Height="200" ScrollViewer.VerticalScrollBarVisibility="Visible" x:Name="analogActiveChannel" ItemsSource="{Binding AnalogActiveChannels}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="3 5" Background="Transparent">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Height="20" Margin="2 5" Grid.Column="0" Background="{Binding BgColor}" Cursor="Hand"/>
+                                    <TextBlock Grid.Column="1" Style="{DynamicResource TextBlockBaseStyle}" FontSize="{DynamicResource InperLargeFontSize}" Margin="0 0 0 0" TextWrapping="NoWrap" Text="{Binding Name}" />
+                                    <Grid Grid.Column="2">
+                                        <Button VerticalAlignment="Center" Cursor="Hand" x:Name="leftMove" Visibility="Collapsed" Command="{s:Action AnalogMover}" CommandParameter="leftMove" Width="40" Style="{StaticResource InperFreeButton}" Background="#D7D7D7" Foreground="#C9C9C9" FontSize="16" FontFamily="{DynamicResource InperFontFamily}">X</Button>
+                                    </Grid>
+                                    <Border Grid.ColumnSpan="3" Opacity=".4" Margin="0 0 0 -5" Width="{Binding ElementName= analogActiveChannel,Path= ActualWidth}" BorderBrush="{Binding ElementName= analogActiveChannel,Path=BorderBrush}" BorderThickness="0 0 0 1"/>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="leftMove" Storyboard.TargetProperty="Visibility">
+                                                        <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource vis}"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ObjectAnimationUsingKeyFrames  BeginTime="0:0:0" Storyboard.TargetName="leftMove" Storyboard.TargetProperty="Visibility">
+                                                        <DiscreteObjectKeyFrame  KeyTime="0:0:0.1" Value="{StaticResource colla}"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <WrapPanel HorizontalAlignment="Stretch" Margin="0 10 0 0" x:Name="ai_sampling" Visibility="Visible" >
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource left_analog_sampling}"> </TextBlock>
+                        <inper:InperTextBox Name="_sampling" Style="{StaticResource InperTextBoxBaseStyle}" Text="{Binding Source={StaticResource InperGlobalClass}, Path=CameraSignalSettings.AiSampling,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" Margin="15 0 0 0" HorizontalAlignment="Stretch" InperTextType="Double" InperVerify="True" InperMaxValue="30000" InperMinValue="1" Width="175" Height="32"  InperTextChanged="{s:Action AInperTextBox_InperTextChanged}" />
+                    </WrapPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
     </Grid>
 </UserControl>

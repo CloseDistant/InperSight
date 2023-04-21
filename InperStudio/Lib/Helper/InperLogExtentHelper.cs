@@ -69,105 +69,110 @@ namespace InperStudio.Lib.Helper
             }
             return ip;
         }
-        public static void InitLogDatabase()
+        public static async void InitLogDatabase()
         {
             try
             {
-                if (InperGlobalClass.isNoNetwork || string.IsNullOrEmpty(InperDeviceHelper.Instance.device.PhotometryInfo.SN))
-                {
-                    return;
-                }
-                var apires = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                if (apires != null && apires.Success)
-                {
-                    token = apires.Data.ToString();
+                await Task.Run(() =>
+                  {
+                      if (InperGlobalClass.isNoNetwork || string.IsNullOrEmpty(InperDeviceHelper.Instance.device.PhotometryInfo.SN))
+                      {
+                          return;
+                      }
+                      var apires = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString() + "&type=0");
+                      if (apires != null && apires.Success)
+                      {
+                          token = apires.Data.ToString();
 
-                    var api_res = HttpClientHelper.Get("DeviceStatu/getOne?snumber=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString(), token);
-                    if (api_res != null)
-                    {
-                        if (api_res.Data != null)
-                        {
-                            @device_Statu = JsonConvert.DeserializeObject<Device_Statu>(api_res.Data.ToString());
-                        }
-                        else
-                        {
-                            @device_Statu = new Device_Statu();
-                        }
+                          var api_res = HttpClientHelper.Get("DeviceStatu/getOne?snumber=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString(), token);
+                          if (api_res != null)
+                          {
+                              if (api_res.Data != null)
+                              {
+                                  @device_Statu = JsonConvert.DeserializeObject<Device_Statu>(api_res.Data.ToString());
+                              }
+                              else
+                              {
+                                  @device_Statu = new Device_Statu();
+                              }
 
-                        var t2_html = HttpGetPageHtml("http://www.net.cn/static/customercare/yourip.asp", "gbk");
-                        var t2_ip = GetIPFromHtml(t2_html);
-                        @device_Statu.Ip = t2_ip;
-                        //Task.Factory.StartNew(() =>
-                        //{
-                        //    bool istrue = false;
-                        //    int count = 0;
-                        //    while (!istrue)
-                        //    {
-                        //        count++;
-                        //        GeoCoordinateWatcher watcher = new GeoCoordinateWatcher();
-                        //        watcher.TryStart(false, TimeSpan.FromMilliseconds(1000));
-                        //        GeoCoordinate coord = watcher.Position.Location;
-                        //        Console.WriteLine("Latitude: " + coord.Latitude.ToString());
-                        //        Console.WriteLine("Longitude: " + coord.Longitude.ToString());
-                        //        if (coord.Latitude.ToString() != "NaN")
-                        //        {
-                        //            @device_Statu.Latitude = coord.Latitude.ToString();
-                        //            @device_Statu.Longitude = coord.Longitude.ToString();
-                        //            istrue = true;
-                        //        }
-                        //        Task.Delay(100);
-                        //        if (count > 100)
-                        //        {
-                        //            istrue = true;
-                        //        }
-                        //    }
-                        //});
-                    }
+                              var t2_html = HttpGetPageHtml("http://www.net.cn/static/customercare/yourip.asp", "gbk");
+                              var t2_ip = GetIPFromHtml(t2_html);
+                              @device_Statu.Ip = t2_ip;
+                              //Task.Factory.StartNew(() =>
+                              //{
+                              //    bool istrue = false;
+                              //    int count = 0;
+                              //    while (!istrue)
+                              //    {
+                              //        count++;
+                              //        GeoCoordinateWatcher watcher = new GeoCoordinateWatcher();
+                              //        watcher.TryStart(false, TimeSpan.FromMilliseconds(1000));
+                              //        GeoCoordinate coord = watcher.Position.Location;
+                              //        Console.WriteLine("Latitude: " + coord.Latitude.ToString());
+                              //        Console.WriteLine("Longitude: " + coord.Longitude.ToString());
+                              //        if (coord.Latitude.ToString() != "NaN")
+                              //        {
+                              //            @device_Statu.Latitude = coord.Latitude.ToString();
+                              //            @device_Statu.Longitude = coord.Longitude.ToString();
+                              //            istrue = true;
+                              //        }
+                              //        Task.Delay(100);
+                              //        if (count > 100)
+                              //        {
+                              //            istrue = true;
+                              //        }
+                              //    }
+                              //});
+                          }
 
-                    var api_res_use = HttpClientHelper.Get("DeviceUseMonitor/getOne?snumber=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString(), token);
-                    if (api_res_use != null)
-                    {
-                        if (api_res_use.Data != null && api_res_use.Data.ToString() != "null")
-                        {
-                            @device_Use_Monitor = JsonConvert.DeserializeObject<Device_Use_Monitor>(api_res_use.Data.ToString());
-                        }
-                        else
-                        {
-                            @device_Use_Monitor = new Device_Use_Monitor();
-                        }
-                    }
-                    var api_res_module = HttpClientHelper.Get("InpersignalModuleUse/getOne?snumber=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString(), token);
-                    if (api_res_module != null)
-                    {
-                        if (api_res_module.Data != null && api_res_module.Data.ToString() != "null")
-                        {
-                            @inpersignal_module_Use = JsonConvert.DeserializeObject<Inpersignal_module_use>(api_res_module.Data.ToString());
-                        }
-                        else
-                        {
-                            @inpersignal_module_Use = new Inpersignal_module_use();
-                        }
-                    }
-                    DeviceStatuSet(0);
-                }
+                          var api_res_use = HttpClientHelper.Get("DeviceUseMonitor/getOne?snumber=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString(), token);
+                          if (api_res_use != null)
+                          {
+                              if (api_res_use.Data != null && api_res_use.Data.ToString() != "null")
+                              {
+                                  @device_Use_Monitor = JsonConvert.DeserializeObject<Device_Use_Monitor>(api_res_use.Data.ToString());
+                              }
+                              else
+                              {
+                                  @device_Use_Monitor = new Device_Use_Monitor();
+                              }
+                          }
+                          var api_res_module = HttpClientHelper.Get("InpersignalModuleUse/getOne?snumber=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString(), token);
+                          if (api_res_module != null)
+                          {
+                              if (api_res_module.Data != null && api_res_module.Data.ToString() != "null")
+                              {
+                                  @inpersignal_module_Use = JsonConvert.DeserializeObject<Inpersignal_module_use>(api_res_module.Data.ToString());
+                              }
+                              else
+                              {
+                                  @inpersignal_module_Use = new Inpersignal_module_use();
+                              }
+                          }
+                          DeviceStatuSet(0);
+                      }
+                  });
             }
             catch (Exception ex)
             {
                 App.Log.Info(ex);
             }
         }
-        public static void LogExtent(Exception ex, string errorPage, [CallerLineNumber] int lineNumber = 0)
+        public async static void LogExtent(Exception ex, string errorPage, [CallerLineNumber] int lineNumber = 0)
         {
             App.Log.Info(ex.ToString());
             try
             {
-                if (InperGlobalClass.isNoNetwork)
+                await Task.Run(() =>
                 {
-                    return;
-                }
-                if (!string.IsNullOrEmpty(token))
-                {
-                    Dictionary<string, object> dict = new Dictionary<string, object>
+                    if (InperGlobalClass.isNoNetwork)
+                    {
+                        return;
+                    }
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        Dictionary<string, object> dict = new Dictionary<string, object>
                     {
                         { "createtime", DateTime.Now },
                         { "error_level",0},
@@ -176,17 +181,18 @@ namespace InperStudio.Lib.Helper
                         { "is_dispose",1 },
                         { "type",0}
                     };
-                    var apires = HttpClientHelper.Post("DeviceLog/insert", dict, token);
-                    if (apires != null && apires.Code == 401)
-                    {
-                        var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                        if (res != null && res.Success)
+                        var apires = HttpClientHelper.Post("DeviceLog/insert", dict, token);
+                        if (apires != null && apires.Code == 401)
                         {
-                            token = res.Data.ToString();
-                            LogExtent(ex, errorPage, lineNumber);
+                            var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
+                            if (res != null && res.Success)
+                            {
+                                token = res.Data.ToString();
+                                LogExtent(ex, errorPage, lineNumber);
+                            }
                         }
                     }
-                }
+                });
             }
             catch (Exception ex2)
             {
@@ -194,28 +200,30 @@ namespace InperStudio.Lib.Helper
             }
 
         }
-        public static void DeviceStatuSet(int statu)
+        public async static void DeviceStatuSet(int statu)
         {
             try
             {
-                if (InperGlobalClass.isNoNetwork)
+                await Task.Run(() =>
                 {
-                    return;
-                }
-                if (!string.IsNullOrEmpty(token))
-                {
-                    @device_Statu.Status = statu;
-                    bool isFirstUpload = false;
-                    if (string.IsNullOrEmpty(@device_Statu.Snumber))
+                    if (InperGlobalClass.isNoNetwork)
                     {
-                        isFirstUpload = true;
-                        @device_Statu.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
-                        @device_Statu.Createtime = DateTime.Now;
-                        @device_Statu.Type = 0;
+                        return;
                     }
-                    @device_Statu.Updatetime = DateTime.Now;
-                    @device_Statu.Updatetime = DateTime.Now;
-                    Dictionary<string, object> dict = new Dictionary<string, object>
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        @device_Statu.Status = statu;
+                        bool isFirstUpload = false;
+                        if (string.IsNullOrEmpty(@device_Statu.Snumber))
+                        {
+                            isFirstUpload = true;
+                            @device_Statu.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
+                            @device_Statu.Createtime = DateTime.Now;
+                            @device_Statu.Type = 0;
+                        }
+                        @device_Statu.Updatetime = DateTime.Now;
+                        @device_Statu.Updatetime = DateTime.Now;
+                        Dictionary<string, object> dict = new Dictionary<string, object>
                     {
                         { "snumber", @device_Statu.Snumber},
                         { "latitude", @device_Statu.Latitude},
@@ -226,48 +234,51 @@ namespace InperStudio.Lib.Helper
                         { "createtime", @device_Statu.Createtime},
                         { "status", @device_Statu.Status},
                     };
-                    if (!isFirstUpload)
-                    {
-                        dict.Add("id", @device_Statu.Id);
-                    }
-                    var apires = HttpClientHelper.Post("DeviceStatu/insert", dict, token);
-                    if (apires != null && apires.Code == 401)
-                    {
-                        var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                        if (res != null && res.Success)
+                        if (!isFirstUpload)
                         {
-                            token = res.Data.ToString();
-                            DeviceStatuSet(statu);
+                            dict.Add("id", @device_Statu.Id);
+                        }
+                        var apires = HttpClientHelper.Post("DeviceStatu/insert", dict, token);
+                        if (apires != null && apires.Code == 401)
+                        {
+                            var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
+                            if (res != null && res.Success)
+                            {
+                                token = res.Data.ToString();
+                                DeviceStatuSet(statu);
+                            }
                         }
                     }
-                }
+                });
             }
             catch (Exception ex)
             {
                 LogExtent(ex, "InperLogExtentHelper");
             }
         }
-        public static void DeviceUseMonitorRecodSet(double recordTime)
+        public async static void DeviceUseMonitorRecodSet(double recordTime)
         {
             try
             {
-                if (InperGlobalClass.isNoNetwork)
+                await Task.Run(() =>
                 {
-                    return;
-                }
-                if (!string.IsNullOrEmpty(token))
-                {
-                    bool isFirstUpload = false;
-                    if (string.IsNullOrEmpty(@device_Use_Monitor.Snumber))
+                    if (InperGlobalClass.isNoNetwork)
                     {
-                        isFirstUpload = true;
-                        @device_Use_Monitor.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
-                        @device_Use_Monitor.Createtime = DateTime.Now;
+                        return;
                     }
-                    @device_Use_Monitor.Updatetime = DateTime.Now;
-                    @device_Use_Monitor.Last_Record_Time = DateTime.Now;
-                    @device_Use_Monitor.Total_Record_Time += recordTime;
-                    Dictionary<string, object> dict = new Dictionary<string, object>
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        bool isFirstUpload = false;
+                        if (string.IsNullOrEmpty(@device_Use_Monitor.Snumber))
+                        {
+                            isFirstUpload = true;
+                            @device_Use_Monitor.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
+                            @device_Use_Monitor.Createtime = DateTime.Now;
+                        }
+                        @device_Use_Monitor.Updatetime = DateTime.Now;
+                        @device_Use_Monitor.Last_Record_Time = DateTime.Now;
+                        @device_Use_Monitor.Total_Record_Time += recordTime;
+                        Dictionary<string, object> dict = new Dictionary<string, object>
                     {
                         { "snumber", @device_Use_Monitor.Snumber},
                         { "updatetime", @device_Use_Monitor.Updatetime},
@@ -280,48 +291,51 @@ namespace InperStudio.Lib.Helper
                         { "record_count", ++@device_Use_Monitor.Record_Count},
                         { "open_count", @device_Use_Monitor.Open_Count},
                     };
-                    if (!isFirstUpload)
-                    {
-                        dict.Add("id", @device_Use_Monitor.Id);
-                    }
-                    var apires = HttpClientHelper.Post("DeviceUseMonitor/insert", dict, token);
-                    if (apires != null && apires.Code == 401)
-                    {
-                        var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                        if (res != null && res.Success)
+                        if (!isFirstUpload)
                         {
-                            token = res.Data.ToString();
-                            DeviceUseMonitorRecodSet(recordTime);
+                            dict.Add("id", @device_Use_Monitor.Id);
+                        }
+                        var apires = HttpClientHelper.Post("DeviceUseMonitor/insert", dict, token);
+                        if (apires != null && apires.Code == 401)
+                        {
+                            var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
+                            if (res != null && res.Success)
+                            {
+                                token = res.Data.ToString();
+                                DeviceUseMonitorRecodSet(recordTime);
+                            }
                         }
                     }
-                }
+                });
             }
             catch (Exception ex)
             {
                 LogExtent(ex, "InperLogExtentHelper");
             }
         }
-        public static void DeviceUseMonitorOpenCountSet()
+        public async static void DeviceUseMonitorOpenCountSet()
         {
             try
             {
-                if (InperGlobalClass.isNoNetwork)
+                await Task.Run(() =>
                 {
-                    return;
-                }
-                if (!string.IsNullOrEmpty(token))
-                {
-                    bool isFirstUpload = false;
-                    if (string.IsNullOrEmpty(@device_Use_Monitor.Snumber))
+                    if (InperGlobalClass.isNoNetwork)
                     {
-                        isFirstUpload = true;
-                        @device_Use_Monitor.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
-                        @device_Use_Monitor.Createtime = DateTime.Now;
+                        return;
                     }
-                    @device_Use_Monitor.Updatetime = DateTime.Now;
-                    @device_Use_Monitor.Type = 0;
-                    @device_Use_Monitor.Last_Open_Time = DateTime.Now;
-                    Dictionary<string, object> dict = new Dictionary<string, object>
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        bool isFirstUpload = false;
+                        if (string.IsNullOrEmpty(@device_Use_Monitor.Snumber))
+                        {
+                            isFirstUpload = true;
+                            @device_Use_Monitor.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
+                            @device_Use_Monitor.Createtime = DateTime.Now;
+                        }
+                        @device_Use_Monitor.Updatetime = DateTime.Now;
+                        @device_Use_Monitor.Type = 0;
+                        @device_Use_Monitor.Last_Open_Time = DateTime.Now;
+                        Dictionary<string, object> dict = new Dictionary<string, object>
                     {
                         { "snumber", @device_Use_Monitor.Snumber},
                         { "updatetime", @device_Use_Monitor.Updatetime},
@@ -334,21 +348,22 @@ namespace InperStudio.Lib.Helper
                         { "record_count", @device_Use_Monitor.Record_Count},
                         { "open_count", ++@device_Use_Monitor.Open_Count},
                     };
-                    if (!isFirstUpload)
-                    {
-                        dict.Add("id", @device_Use_Monitor.Id);
-                    }
-                    var apires = HttpClientHelper.Post("DeviceUseMonitor/insert", dict, token);
-                    if (apires != null && apires.Code == 401)
-                    {
-                        var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                        if (res != null && res.Success)
+                        if (!isFirstUpload)
                         {
-                            token = res.Data.ToString();
-                            DeviceUseMonitorOpenCountSet();
+                            dict.Add("id", @device_Use_Monitor.Id);
+                        }
+                        var apires = HttpClientHelper.Post("DeviceUseMonitor/insert", dict, token);
+                        if (apires != null && apires.Code == 401)
+                        {
+                            var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
+                            if (res != null && res.Success)
+                            {
+                                token = res.Data.ToString();
+                                DeviceUseMonitorOpenCountSet();
+                            }
                         }
                     }
-                }
+                });
             }
             catch (Exception ex)
             {
@@ -358,53 +373,55 @@ namespace InperStudio.Lib.Helper
         /// <summary>
         /// 模块使用
         /// </summary>
-        public static void DeviceModuleUseCountSet()
+        public async static void DeviceModuleUseCountSet()
         {
             try
             {
-                if (InperGlobalClass.isNoNetwork)
+                await Task.Run(() =>
                 {
-                    return;
-                }
-                if (!string.IsNullOrEmpty(token))
-                {
-                    bool isFirstUpload = false;
-                    if (string.IsNullOrEmpty(@inpersignal_module_Use.Snumber))
+                    if (InperGlobalClass.isNoNetwork)
                     {
-                        isFirstUpload = true;
-                        @inpersignal_module_Use.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
-                        @inpersignal_module_Use.Createtime = DateTime.Now;
+                        return;
                     }
-                    @inpersignal_module_Use.Updatetime = DateTime.Now;
-                    if(InperGlobalClass.AdditionRecordConditionsStart!= AdditionRecordConditionsTypeEnum.Immediately || InperGlobalClass.AdditionRecordConditionsStop != AdditionRecordConditionsTypeEnum.Immediately)
+                    if (!string.IsNullOrEmpty(token))
                     {
-                        inpersignal_module_Use.Trigger_count += 1;
-                    }
-                    if (InperGlobalClass.ActiveVideos.Count > 0)
-                    {
-                        inpersignal_module_Use.Video_count += 1;
-                    }
-                    if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString()) > 0)
-                    {
-                        inpersignal_module_Use.Output_count += 1;
-                    }
-                    if(InperGlobalClass.EventSettings.Channels.Count(x => x.Type != ChannelTypeEnum.Output.ToString()) > 0)
-                    {
-                        inpersignal_module_Use.Marker_count += 1;
-                    }
-                    if (InperGlobalClass.StimulusSettings.IsConfigSweep)
-                    {
-                        inpersignal_module_Use.Stimulus_count += 1;
-                    }
-                    if (NoteSettingViewModel.NotesCache.Count > 0)
-                    {
-                        inpersignal_module_Use.Note_count += 1;
-                    }
-                    if (InperGlobalClass.CameraSignalSettings.CameraChannels.Count(x => x.Type == ChannelTypeEnum.Analog.ToString()) > 0)
-                    {
-                        inpersignal_module_Use.Analog_count += 1;
-                    }
-                    Dictionary<string, object> dict = new Dictionary<string, object>
+                        bool isFirstUpload = false;
+                        if (string.IsNullOrEmpty(@inpersignal_module_Use.Snumber))
+                        {
+                            isFirstUpload = true;
+                            @inpersignal_module_Use.Snumber = InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString();
+                            @inpersignal_module_Use.Createtime = DateTime.Now;
+                        }
+                        @inpersignal_module_Use.Updatetime = DateTime.Now;
+                        if (InperGlobalClass.AdditionRecordConditionsStart != AdditionRecordConditionsTypeEnum.Immediately || InperGlobalClass.AdditionRecordConditionsStop != AdditionRecordConditionsTypeEnum.Immediately)
+                        {
+                            inpersignal_module_Use.Trigger_count += 1;
+                        }
+                        if (InperGlobalClass.ActiveVideos.Count > 0)
+                        {
+                            inpersignal_module_Use.Video_count += 1;
+                        }
+                        if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString()) > 0)
+                        {
+                            inpersignal_module_Use.Output_count += 1;
+                        }
+                        if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type != ChannelTypeEnum.Output.ToString()) > 0)
+                        {
+                            inpersignal_module_Use.Marker_count += 1;
+                        }
+                        if (InperGlobalClass.StimulusSettings.IsConfigSweep)
+                        {
+                            inpersignal_module_Use.Stimulus_count += 1;
+                        }
+                        if (NoteSettingViewModel.NotesCache.Count > 0)
+                        {
+                            inpersignal_module_Use.Note_count += 1;
+                        }
+                        if (InperGlobalClass.CameraSignalSettings.CameraChannels.Count(x => x.Type == ChannelTypeEnum.Analog.ToString()) > 0)
+                        {
+                            inpersignal_module_Use.Analog_count += 1;
+                        }
+                        Dictionary<string, object> dict = new Dictionary<string, object>
                     {
                         { "snumber", @inpersignal_module_Use.Snumber},
                         { "updatetime", @inpersignal_module_Use.Updatetime},
@@ -417,21 +434,22 @@ namespace InperStudio.Lib.Helper
                         { "note_count", @inpersignal_module_Use.Note_count},
                         { "video_count", @inpersignal_module_Use.Video_count}
                     };
-                    if (!isFirstUpload)
-                    {
-                        dict.Add("id", @inpersignal_module_Use.Id);
-                    }
-                    var apires = HttpClientHelper.Post("InpersignalModuleUse/insert", dict, token);
-                    if (apires != null && apires.Code == 401)
-                    {
-                        var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                        if (res != null && res.Success)
+                        if (!isFirstUpload)
                         {
-                            token = res.Data.ToString();
-                            DeviceModuleUseCountSet();
+                            dict.Add("id", @inpersignal_module_Use.Id);
+                        }
+                        var apires = HttpClientHelper.Post("InpersignalModuleUse/insert", dict, token);
+                        if (apires != null && apires.Code == 401)
+                        {
+                            var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
+                            if (res != null && res.Success)
+                            {
+                                token = res.Data.ToString();
+                                DeviceModuleUseCountSet();
+                            }
                         }
                     }
-                }
+                });
             }
             catch (Exception ex)
             {

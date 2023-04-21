@@ -17,7 +17,7 @@
         NonClientAreaBackground="{DynamicResource InperTheme}"
         NonClientAreaForeground="White"
         Icon="../InperSignal.ico"
-        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" PreviewKeyUp="{s:Action MainWindow_KeyUp}"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}" PreviewKeyUp="{s:Action MainWindow_KeyUp}" FontFamily="{DynamicResource InperFontFamily}" 
         Title="inper" ShowTitle="False"  hc:Dialog.Token="MainDialog" MinWidth="1000" MinHeight="660" x:Name="MainWindow" Closing="{s:Action MainWindow_Closing}">
     <Grid Background="{StaticResource InperMainPageColor}">
         <Grid.RowDefinitions>
@@ -27,26 +27,26 @@
         <hc:TransitioningContentControl Grid.Row="0" TransitionMode="Top2Bottom">
             <Grid Margin="0 5 0 0" Background="{StaticResource InperTitlePageColor}">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".1*"/>
                     <ColumnDefinition/>
-                    <ColumnDefinition Width=".3*"/>
                 </Grid.ColumnDefinitions>
-                <ContentControl Grid.Column="0" x:Name="manulControl" s:View.Model="{Binding ManulControlViewModel}"/>
-                <ToggleButton Grid.Column="1" Visibility="Collapsed" Style="{StaticResource ToggleButtonSwitch}" Checked="{s:Action ButtonVisibilitySwitch_Checked}" Unchecked="{s:Action ButtonVisibilitySwitch_Unchecked}" Name="buttonVisibilitySwitch" IsChecked="True"/>
+                <ToggleButton Grid.Column="0" Visibility="Visible" Style="{StaticResource ToggleButtonSwitch}" Checked="{s:Action ButtonVisibilitySwitch_Checked}" Unchecked="{s:Action ButtonVisibilitySwitch_Unchecked}" Name="buttonVisibilitySwitch" IsChecked="True"/>
+                <ContentControl Grid.Column="1" x:Name="manulControl" s:View.Model="{Binding ManulControlViewModel}"/>
             </Grid>
         </hc:TransitioningContentControl>
         <Border VerticalAlignment="Bottom" BorderBrush="#eee" BorderThickness="1"/>
         <Grid Grid.Row="1" Name="main">
-            <!--<Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width=".2*" />
-            </Grid.ColumnDefinitions>-->
-            <hc:TransitioningContentControl TransitionMode="Left2Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <hc:TransitioningContentControl TransitionMode="Right2Left">
+                <local:LeftToolsControlView x:Name="RightToolsView" s:View.Model="{Binding LeftToolsControlViewModel}"/>
+            </hc:TransitioningContentControl>
+            <hc:TransitioningContentControl Grid.Column="1" TransitionMode="Left2Right">
                 <ContentControl s:View.Model="{Binding ActiveItem}"/>
             </hc:TransitioningContentControl>
-            <!--<hc:TransitioningContentControl Grid.Column="1" TransitionMode="Right2Left">
-                <local:LeftToolsControlView x:Name="RightToolsView" DataContext="{Binding LeftToolsControlViewModel}" />
-            </hc:TransitioningContentControl>
-            <GridSplitter Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="1" Opacity=".2"  />-->
+            <!--<GridSplitter Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="1" Opacity=".2"  />-->
         </Grid>
         <ResizeGrip Width="10" Height="10" x:Name="ResizeGrip" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="1" IsTabStop="False" Visibility="Visible" WindowChrome.ResizeGripDirection="BottomRight" />
         <ScrollViewer Grid.RowSpan="2" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right" Panel.ZIndex="9999">

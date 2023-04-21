@@ -8,51 +8,55 @@
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:PreferenceWindowViewModel}"
-        Title="Preference" Height="450" Width="360" WindowStartupLocation="CenterScreen" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False">
+        xmlns:global="clr-namespace:InperStudio.Lib.Bean"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:PreferenceWindowViewModel}" FontFamily="{DynamicResource InperFontFamily}" 
+        Title="{DynamicResource preference_title}" Height="450" Width="360" WindowStartupLocation="CenterScreen" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False">
+    <inp:InperDialogWindow.Resources>
+        <global:InperGlobalClass x:Key="InperGlobalClass" />
+    </inp:InperDialogWindow.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="1.6*"/>
+            <RowDefinition Height="1.5*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel>
                 <Grid>
-                    <TextBlock Text="Language" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
+                    <TextBlock Text="{DynamicResource preference_language}" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
                     <Border Height="1" Background="{StaticResource InperTheme}" Margin="80 0 0 0" VerticalAlignment="Center"/>
                 </Grid>
                 <UniformGrid Columns="2" Rows="1" Margin="0 16 0 0">
-                    <RadioButton Checked="{s:Action English_Checked}" GroupName="language" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">English</RadioButton>
-                    <RadioButton Checked="{s:Action Chinese_Checked}" GroupName="language" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">中文</RadioButton>
+                    <RadioButton Checked="{s:Action English_Checked}" GroupName="language" Name="en_us" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">English</RadioButton>
+                    <RadioButton Checked="{s:Action Chinese_Checked}" GroupName="language" Name="zh_cn" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">中文</RadioButton>
                 </UniformGrid>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
             <StackPanel>
                 <Grid>
-                    <TextBlock Text="Interface" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
+                    <TextBlock Text="{DynamicResource preference_interface}" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
                     <Border Height="1" Background="{StaticResource InperTheme}" Margin="80 0 0 0" VerticalAlignment="Center"/>
                 </Grid>
                 <UniformGrid Columns="1" Rows="3" Margin="0 16 0 0">
-                    <CheckBox HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">Display Analog</CheckBox>
-                    <CheckBox Margin="0 10" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">Display Trigger</CheckBox>
-                    <CheckBox HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">Display Note</CheckBox>
+                    <CheckBox x:Name="analog" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_analog}"></CheckBox>
+                    <CheckBox x:Name="trigger" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" Margin="0 10" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_trigger}"></CheckBox>
+                    <CheckBox x:Name="note" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_note}"></CheckBox>
                 </UniformGrid>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
             <StackPanel>
                 <Grid Margin="0 10 0 0">
-                    <TextBlock Text="Theme" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
+                    <TextBlock Text="{DynamicResource preference_theme}" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
                     <Border Height="1" Background="{StaticResource InperTheme}" Margin="80 0 0 0" VerticalAlignment="Center"/>
                 </Grid>
                 <UniformGrid Columns="1" Rows="2" Margin="0 5 0 0">
-                    <RadioButton GroupName="theme" Name="_default" HorizontalAlignment="Left" Checked="{s:Action Default_Checked}" FontSize="14" FontFamily="{StaticResource InperFontFamily}">Default</RadioButton>
+                    <RadioButton GroupName="theme" Name="_default" HorizontalAlignment="Left" Checked="{s:Action Default_Checked}" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_default}"></RadioButton>
                     <WrapPanel>
-                        <RadioButton Margin="0 10 0 0" x:Name="custom" GroupName="theme" Checked="{s:Action Custom_Checked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}">Customization</RadioButton>
+                        <RadioButton Margin="0 10 0 0" x:Name="custom" GroupName="theme" Checked="{s:Action Custom_Checked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_customization}"></RadioButton>
                         <Grid VerticalAlignment="Bottom" Margin="20 5 0 0" IsEnabled="{Binding ElementName=custom,Path=IsChecked}">
-                            <Button x:Name="PopButton" Cursor="Hand" Background="{Binding ElementName=AnalogColorList,Path=SelectedItem}" Click="{s:Action PopButton_Click}" HorizontalAlignment="Right" MinWidth="160" Height="25"/>
+                            <Button x:Name="PopButton" Cursor="Hand" Background="{Binding ElementName=AnalogColorList,Path=SelectedItem}" Click="{s:Action PopButton_Click}" HorizontalAlignment="Right" MinWidth="150" Height="25"/>
                             <Popup x:Name="pop" PopupAnimation="Slide" PlacementTarget="{Binding ElementName=PopButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Effect="{DynamicResource EffectShadow4}">
                                 <ListBox x:Name="AnalogColorList" SelectionChanged="{s:Action AnalogColorList_Selected}" Background="Transparent" BorderThickness="0" Margin="0 20" HorizontalAlignment="Stretch" Width="{Binding ElementName=PopButton,Path=ActualWidth}"  Style="{StaticResource WrapPanelHorizontalListBox}" ItemsSource="{Binding SkinColorList,UpdateSourceTrigger=PropertyChanged}" >
                                     <ListBox.ItemTemplate>

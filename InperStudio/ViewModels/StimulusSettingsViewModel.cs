@@ -7,6 +7,7 @@ using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudio.Views.Control;
+using InperStudioControlLib.Lib.Config;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Data.Model;
 using Stylet;
@@ -166,7 +167,12 @@ namespace InperStudio.ViewModels
                     MessageBox.Show("This kind of Waveform has been selected in Sweep!");
                     return;
                 }
-                InperDialogWindow inperDialogWindow = new InperDialogWindow("IsDelete?");
+                string text = "IsDelete?";
+                if (InperConfig.Instance.Language != "en_us")
+                {
+                    text = "是否删除?";
+                }
+                    InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
                 inperDialogWindow.HideCancleButton();
                 inperDialogWindow.ClickEvent += (s, statu) =>
                 {
@@ -217,7 +223,12 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                InperDialogWindow inperDialogWindow = new InperDialogWindow("IsDelete?");
+                string text = "IsDelete?";
+                if (InperConfig.Instance.Language != "en_us")
+                {
+                    text = "是否删除?";
+                }
+                InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
                 inperDialogWindow.HideCancleButton();
                 inperDialogWindow.ClickEvent += (s, statu) =>
                 {

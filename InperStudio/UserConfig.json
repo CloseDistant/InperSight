@@ -80,5 +80,6 @@
     "seconds": 0,
     "waveforms": [],
     "sweeps": []
-  }
+  },
+  "dataPath": ""
 }

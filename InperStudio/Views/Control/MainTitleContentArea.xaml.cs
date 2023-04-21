@@ -56,16 +56,21 @@ namespace InperStudio.Views.Control
                 };
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (InperClassHelper.GetWindowByNameChar("Camera Signal") != null)
-                    {
-                        InperClassHelper.GetWindowByNameChar("Camera Signal").Close();
-                    }
+                    //if (InperClassHelper.GetWindowByNameChar("Camera Signal") != null)
+                    //{
+                    //    InperClassHelper.GetWindowByNameChar("Camera Signal").Close();
+                    //}
                     //view.loadPath.Text = openFileDialog.FileName;
                     InperJsonConfig.filepath = openFileDialog.FileName;
                     InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
                     InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                     InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
                     InperGlobalClass.StimulusSettings = InperJsonHelper.GetStimulusSettings() ?? new Lib.Helper.JsonBean.StimulusSettings();
+                    if (!string.IsNullOrEmpty(InperJsonHelper.GetDataPathSetting()))
+                    {
+                        InperGlobalClass.DataPath = InperJsonHelper.GetDataPathSetting() ?? InperGlobalClass.DataPath;
+                        Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                    }
 
                     if (InperGlobalClass.StimulusSettings.Sweeps.Count > 0)
                     {
@@ -111,7 +116,7 @@ namespace InperStudio.Views.Control
                         }
                     }
 
-                    if (InperGlobalClass.EventSettings.Channels.Count > 0)
+                    if (InperGlobalClass.EventSettings.Channels.Count(x => x.Type != ChannelTypeEnum.TriggerStart.ToString() && x.Type != ChannelTypeEnum.TriggerStop.ToString()) > 0)
                     {
                         InperGlobalClass.IsExistEvent = true;
                     }
@@ -154,13 +159,14 @@ namespace InperStudio.Views.Control
                     {
                         if (window.Name.Contains("MainWindow"))
                         {
-                            SignalSettingsViewModel _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera);
-                            (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
-                            _window.RequestClose();
+                            (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.InitConfig(true);
+                            //SignalSettingsViewModel _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera);
+                            //(window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
+                            //_window.RequestClose();
 
-                            _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog);
-                            (window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
-                            _window.RequestClose();
+                            //_window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog);
+                            //(window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
+                            //_window.RequestClose();
                         }
                     }
                 }
@@ -188,9 +194,13 @@ namespace InperStudio.Views.Control
                     return false;
                 }
                 string fname = dlg.FileName;
-                File.Copy(InperJsonConfig.filepath, fname, true);
+                if (InperJsonConfig.filepath != fname)
+                {
+                    File.Copy(InperJsonConfig.filepath, fname, true);
+                }
                 InperJsonConfig.filepath = fname;
                 InperGlobalClass.IsImportConfig = true;
+
             }
             catch (Exception ex)
             {

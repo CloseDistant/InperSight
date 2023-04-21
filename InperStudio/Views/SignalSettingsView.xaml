@@ -11,7 +11,7 @@
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
-        mc:Ignorable="d" Title="Camera Signal" IsShowTopAllButton="False" ResizeMode="NoResize"
+        mc:Ignorable="d" FontFamily="{DynamicResource InperFontFamily}" Title="Camera Signal" IsShowTopAllButton="False" ResizeMode="NoResize" 
         Width="620" Height="484"  d:DataContext="{d:DesignInstance vm:SignalSettingsViewModel}" Name="signal" IsShowCancleButton="False" IsShowOtherButton="False">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
@@ -59,14 +59,14 @@
                         <Button Margin="0 0 90 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="50" Height="20" x:Name="reset" Command="{s:Action AutoFindFiberRest}" >
                             <Border Background="#F6F6F6" CornerRadius="2">
                                 <Grid>
-                                    <TextBlock Text="Reset" HorizontalAlignment="Center" FontFamily="{StaticResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="0"/>
+                                    <TextBlock Text="Reset" HorizontalAlignment="Center" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="0"/>
                                 </Grid>
                             </Border>
                         </Button>
                         <Button Margin="0 0 10 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="70" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
                             <Border Background="#F6F6F6" CornerRadius="2">
                                 <Grid>
-                                    <TextBlock Text="Capture" FontFamily="{StaticResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                                    <TextBlock Text="Capture" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
                                     <Ellipse Fill="#E0A22A" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>
                                 </Grid>
                             </Border>
@@ -75,10 +75,10 @@
                 </Grid>
                 <Grid Grid.Row="1" Margin="15 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                     <WrapPanel VerticalAlignment="Center" Margin="0 0 0 10">
-                        <TextBlock Text="Name" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Name" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
                         <hc:TextBox Margin="10 0 0 0" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center"  TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="0" Width="140"  Height="20"  />
                         <WrapPanel VerticalAlignment="Center" Margin="10 0 0 0">
-                            <TextBlock Text="ROI(px)" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
+                            <TextBlock Text="ROI(px)" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
                             <inper:InperTextBox Style="{StaticResource   BaseStyle}"  HorizontalContentAlignment="Center" InperVerify="True" InperTextType="Double" InperMaxValue="150" InperMinValue="1" Width="40" Margin="5 0 0 0" x:Name="channelRoi" Text="{Binding Diameter,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action ChannelRoi_TextChanged}"/>
                         </WrapPanel>
                         <Button Margin="10 0 0 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Click="{s:Action ReduceCircle}" Width="20" Height="20" >

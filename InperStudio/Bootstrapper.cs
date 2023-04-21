@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace InperStudio
 {
@@ -21,16 +23,11 @@ namespace InperStudio
         {
             // Configure the IoC container in here
         }
-
         //After-excitation
-        protected override void Configure()
+        protected async override void Configure()
         {
             try
             {
-                //if(!File.Exists(Path.Combine(Environment.CurrentDirectory, "hash.txt")))
-                //{
-                //    File.Create(Path.Combine(Environment.CurrentDirectory, "hash.txt"));
-                //}
                 if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup")))
                 {
                     Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
@@ -49,59 +46,62 @@ namespace InperStudio
                         File.Delete(x.FullName);
                     });
                 }
-                SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
+                await Task.Run(() =>
                 {
-                    ConnectionString = InperConfig.Instance.ConStr + MySqlSslMode.None,//连接符字串
-                    DbType = DbType.MySql,
-                    IsAutoCloseConnection = true //不设成true要手动close
-                });
-                List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
-
-                if (list != null && list.Count() > 0)
-                {
-                    InperGlobalClass.latestVersion = list.Last().Version_Number;
-                    Tb_Version ver = list.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Version);
-                    if (ver != null)
+                    SqlSugarClient db = new SqlSugarClient(new ConnectionConfig()
                     {
-                        Tb_Version _new = list.FirstOrDefault(x => x.Id > ver.Id);
+                        ConnectionString = InperConfig.Instance.ConStr + MySqlSslMode.None,//连接符字串
+                        DbType = DbType.MySql,
+                        IsAutoCloseConnection = true //不设成true要手动close
+                    });
+                    List<Tb_Version> list = db.Queryable<Tb_Version>().OrderBy(x => x.Id, OrderByType.Asc).ToList();
 
-                        if (_new != null)
+                    if (list != null && list.Count() > 0)
+                    {
+                        InperGlobalClass.latestVersion = list.Last().Version_Number;
+                        Tb_Version ver = list.FirstOrDefault(x => x.Version_Number == InperConfig.Instance.Version);
+                        if (ver != null)
                         {
-                            if (!InperConfig.Instance.IsSkip)
+                            Tb_Version _new = list.FirstOrDefault(x => x.Id > ver.Id);
+
+                            if (_new != null)
                             {
-                                string content = InperConfig.Instance.Version + "," + Environment.CurrentDirectory + "/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe");
-                                if (content.Split(',').Length == 3)
+                                if (!InperConfig.Instance.IsSkip)
                                 {
-                                    _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
-                                    Environment.Exit(0);
+                                    string content = InperConfig.Instance.Version + "," + Environment.CurrentDirectory + "/" + "," + Path.Combine(Environment.CurrentDirectory, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".exe");
+                                    if (content.Split(',').Length == 3)
+                                    {
+                                        _ = Process.Start(Environment.CurrentDirectory + @"\UpgradeClient.exe", content);
+                                        Environment.Exit(0);
+                                    }
                                 }
                             }
                         }
-                    }
-                    InperConfig.Instance.ReleaseData = list.Last(x => x.Version_Number == InperConfig.Instance.Version).UploadTime.ToString("yyyy-MM-dd");
-                    if (!string.IsNullOrEmpty(list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc))
-                    {
-                        InperConfig.Instance.VersionDesc = string.Empty;
-                        if (list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc.Contains('@'))
+                        InperConfig.Instance.ReleaseData = list.Last(x => x.Version_Number == InperConfig.Instance.Version).UploadTime.ToString("yyyy-MM-dd");
+                        if (!string.IsNullOrEmpty(list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc))
                         {
-                            list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc.Split('@').ToList().ForEach(desc =>
+                            InperConfig.Instance.VersionDesc = string.Empty;
+                            if (list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc.Contains('@'))
                             {
-                                InperConfig.Instance.VersionDesc += desc + Environment.NewLine;
-                            });
-                        }
-                        else
-                        {
-                            InperConfig.Instance.VersionDesc = list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc;
+                                list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc.Split('@').ToList().ForEach(desc =>
+                                {
+                                    InperConfig.Instance.VersionDesc += desc + Environment.NewLine;
+                                });
+                            }
+                            else
+                            {
+                                InperConfig.Instance.VersionDesc = list.Last(x => x.Version_Number == InperConfig.Instance.Version).Desc;
+                            }
                         }
                     }
-                }
-                else
-                {
+                    else
+                    {
 
-                }
-                InperConfig.Instance.IsSkip = false;
-                db.Close();
-                db.Dispose();
+                    }
+                    InperConfig.Instance.IsSkip = false;
+                    db.Close();
+                    db.Dispose();
+                });
             }
             catch (Exception ex)
             {

@@ -12,4 +12,180 @@
     <sys:String x:Key="email">Feedback</sys:String>
     <sys:String x:Key="web">Web</sys:String>
     <sys:String x:Key="aboutInperSignal">About Inper Signal</sys:String>
+
+    <!--主界面-->
+    <sys:String x:Key="main_fibers">Fibers</sys:String>
+    <sys:String x:Key="main_analog">Analog</sys:String>
+    <sys:String x:Key="main_video">Video</sys:String>
+    <sys:String x:Key="main_marker">Marker</sys:String>
+    <sys:String x:Key="main_output">Output</sys:String>
+    <sys:String x:Key="main_stimiulus">Stimulus</sys:String>
+    <sys:String x:Key="main_trigger">Trigger</sys:String>
+    <sys:String x:Key="main_preview">Preview</sys:String>
+    <sys:String x:Key="main_start">Start</sys:String>
+    <sys:String x:Key="main_stop">Stop</sys:String>
+    <sys:String x:Key="main_note">Note</sys:String>
+    
+    <!--侧边栏-->
+    <sys:String x:Key="left_name">Name</sys:String>
+    <sys:String x:Key="left_camera_settings">Camera settings</sys:String>
+    <sys:String x:Key="left_exposure">Exposure (ms)</sys:String>
+    <sys:String x:Key="left_sampling">Sampling (fps)</sys:String>
+    <sys:String x:Key="left_gain">Gain</sys:String>
+    <sys:String x:Key="left_record_mode">Record mode</sys:String>
+    <sys:String x:Key="left_continuous">Continuous</sys:String>
+    <sys:String x:Key="left_interval">Interval (s)</sys:String>
+    <sys:String x:Key="left_interval_time">Interval</sys:String>
+    <sys:String x:Key="left_duration">Duration</sys:String>
+    <sys:String x:Key="left_excitaion_light">Excitation light</sys:String>
+    <sys:String x:Key="left_light_intensity_measure">Light Intensity Measure</sys:String>
+    <sys:String x:Key="left_channel">Channel</sys:String>
+    <sys:String x:Key="left_color">Color</sys:String>
+    <sys:String x:Key="left_add">Add</sys:String>
+    <sys:String x:Key="left_active_channels">Active Channels</sys:String>
+    <sys:String x:Key="left_analog_sampling">Sampling (Hz)</sys:String>
+    
+    <!--外置相机设置-->
+    <sys:String x:Key="video_setting_title">Video Settings</sys:String>
+    <sys:String x:Key="video_setting_settings">Video Settings</sys:String>
+    <sys:String x:Key="video_setting_video">Video</sys:String>
+    <sys:String x:Key="video_setting_format">Format</sys:String>
+    <sys:String x:Key="video_setting_frame_rate">Frame rate</sys:String>
+    <sys:String x:Key="video_setting_remainder">Apparatus and Zones would be cleared after frame rate changing</sys:String>
+    <sys:String x:Key="video_setting_add_zone">Add Zone</sys:String>
+    <sys:String x:Key="video_setting_animal_tracking">Animal tracking</sys:String>
+    <sys:String x:Key="video_setting_darker_background">The animal is darker than the background</sys:String>
+    <sys:String x:Key="video_setting_lighter_background">The animal is lighter than the background</sys:String>
+    <sys:String x:Key="video_setting_name">Name</sys:String>
+    <sys:String x:Key="video_setting_active_videos">Active Videos</sys:String>
+    
+    <!--视频设置-->
+    <sys:String x:Key="video_record">Record</sys:String>
+    <sys:String x:Key="video_photo">Photo</sys:String>
+    
+    <!--偏好项设置-->
+    <sys:String x:Key="preference_title">Preference</sys:String>
+    <sys:String x:Key="preference_language">Language</sys:String>
+    <sys:String x:Key="preference_interface">Interface</sys:String>
+    <sys:String x:Key="preference_display_analog">Display Analog</sys:String>
+    <sys:String x:Key="preference_display_trigger">Display Trigger</sys:String>
+    <sys:String x:Key="preference_display_note">Display Note</sys:String>
+    <sys:String x:Key="preference_theme">Theme</sys:String>
+    <sys:String x:Key="preference_default">Default</sys:String>
+    <sys:String x:Key="preference_customization">Customization</sys:String>
+    
+    <!--关于荧博-->
+    <sys:String x:Key="about_title">About Inper Signal</sys:String>
+    <sys:String x:Key="about_software_infomation">Software Inofrmation</sys:String>
+    <sys:String x:Key="about_release_date">Release Date:</sys:String>
+    <sys:String x:Key="about_version">Version:</sys:String>
+    <sys:String x:Key="about_device_specification">Device Specification</sys:String>
+    <sys:String x:Key="about_latest_version">Latest Version</sys:String>
+    <sys:String x:Key="about_light">Light:</sys:String>
+    <sys:String x:Key="about_model">Model:</sys:String>
+    <sys:String x:Key="about_sn">SN:</sys:String>
+    
+    <!--文件-->
+    <sys:String x:Key="file_config">Config</sys:String>
+    <sys:String x:Key="file_name">Name</sys:String>
+    <sys:String x:Key="file_where">Where</sys:String>
+    <sys:String x:Key="file_tag">Tag</sys:String>
+    
+    <!--触发-->
+    <sys:String x:Key="trigger_title">Trigger</sys:String>
+    <sys:String x:Key="trigger_start">Start</sys:String>
+    <sys:String x:Key="trigger_immediately">Immediately after pressing button Start</sys:String>
+    <sys:String x:Key="trigger_delay">Delay after pressing button Start (s)</sys:String>
+    <sys:String x:Key="trigger_attime">At time</sys:String>
+    <sys:String x:Key="trigger_trigger">Trigger</sys:String>
+    <sys:String x:Key="trigger_stop">Stop</sys:String>
+    <sys:String x:Key="trigger_stop_immediately">Immediately after pressing button Stop</sys:String>
+    <sys:String x:Key="trigger_stop_delay">Delay after pressing button Stop (s)</sys:String>
+    <sys:String x:Key="trigger_stop_attime">At time</sys:String>
+    <sys:String x:Key="trigger_stop_trigger">Trigger</sys:String>
+    
+    <!--打标-->
+    <sys:String x:Key="marker_title">Marker</sys:String>
+    <sys:String x:Key="marker_channels_settings">Channels Settings</sys:String>
+    <sys:String x:Key="marker_conditions">Conditions</sys:String>
+    <sys:String x:Key="marker_mode">Mode</sys:String>
+    <sys:String x:Key="marker_channel">Channel</sys:String>
+    <sys:String x:Key="marker_light">Light</sys:String>
+    <sys:String x:Key="marker_detail">Detail</sys:String>
+    <sys:String x:Key="marker_immediately">Immediately</sys:String>
+    <sys:String x:Key="marker_dely">Delay (s)</sys:String>
+    <sys:String x:Key="marker_threshold">Threshold (s)</sys:String>
+    <sys:String x:Key="marker_name">Name</sys:String>
+    <sys:String x:Key="marker_color">Color</sys:String>
+    <sys:String x:Key="marker_active_channels">Active Channels</sys:String>
+    <sys:String x:Key="marker_hotkeys">Hotkeys</sys:String>
+    
+    <!--stimulus-->
+    <sys:String x:Key="stimulus_title">Stimulus</sys:String>
+    <sys:String x:Key="stimulus_waveform">Waveform</sys:String>
+    <sys:String x:Key="stimulus_sweep">Sweep</sys:String>
+    <sys:String x:Key="stimulus_item">Item</sys:String>
+    <sys:String x:Key="stimulus_pulse">Pulse(ms)</sys:String>
+    <sys:String x:Key="stimulus_freq">Freq(Hz)</sys:String>
+    <sys:String x:Key="stimulus_duration">Duration (s)</sys:String>
+    <sys:String x:Key="stimulus_waveform_number">Waveform</sys:String>
+    <sys:String x:Key="stimulus_trigger">Trigger</sys:String>
+    <sys:String x:Key="stimulus_output">Output</sys:String>
+    <sys:String x:Key="stimulus_preview">Preview</sys:String>
+    
+    <!--add sweep-->
+    <sys:String x:Key="addSweep_title">Add Sweep</sys:String>
+    <sys:String x:Key="addSweep_sweep_setting">Sweep Setting</sys:String>
+    <sys:String x:Key="addSweep_selected">Selected</sys:String>
+    <sys:String x:Key="addSweep_duration">Duration (s)</sys:String>
+    <sys:String x:Key="addSweep_preview">Sweep Preview</sys:String>
+    
+    <!--add waveform-->
+    <sys:String x:Key="addWaveform_title">Add Waveform</sys:String>
+    <sys:String x:Key="addWaveform_waveform_setting">Waveform Setting</sys:String>
+    <sys:String x:Key="addWaveform_pulse">Pulse (ms)</sys:String>
+    <sys:String x:Key="addWaveform_freq">Freq (Hz)</sys:String>
+    <sys:String x:Key="addWaveform_duration">Duration (s)</sys:String>
+
+    <!--tips-->
+    <sys:String x:Key="tips_title">Tips</sys:String>
+    <sys:String x:Key="tips_content">Unsaved configuration has been detected.Do you want to save it?</sys:String>
+    <sys:String x:Key="tips_video_content">This will stop video recording, are you sure to close?</sys:String>
+    <sys:String x:Key="tips_yes">Yes</sys:String>
+    <sys:String x:Key="tips_no">No</sys:String>
+    <sys:String x:Key="tips_cancel">Cancel</sys:String>
+    
+    <!--event panel properties-->
+    <sys:String x:Key="event_title">Event Panel Properties</sys:String>
+    <sys:String x:Key="event_height">Height (px)</sys:String>
+    <sys:String x:Key="event_auto">Auto</sys:String>
+    <sys:String x:Key="event_fixed">Fixed</sys:String>
+    <sys:String x:Key="event_display">Display</sys:String>
+    <sys:String x:Key="event_locked">Locked to bottom</sys:String>
+    <sys:String x:Key="event_name">Name Visible</sys:String>
+    
+    <!--startpage-->
+    <sys:String x:Key="startpage_remainder">The device is being initialized...</sys:String>
+    <sys:String x:Key="startpage_nodevice">No Device was Found</sys:String>
+    <sys:String x:Key="startpage_check">Please check the connection</sys:String>
+    <sys:String x:Key="startpage_retry">Retry</sys:String>
+    
+    <!--properties-->
+    <sys:String x:Key="properties_title">Properties</sys:String>
+    <sys:String x:Key="properties_channel">Channel</sys:String>
+    <sys:String x:Key="properties_yrange">Y Range</sys:String>
+    <sys:String x:Key="properties_auto">Auto</sys:String>
+    <sys:String x:Key="properties_fixed">Fixed</sys:String>
+    <sys:String x:Key="properties_top">Top</sys:String>
+    <sys:String x:Key="properties_bottom">Bottom</sys:String>
+    <sys:String x:Key="properties_height">Height (Px)</sys:String>
+    <sys:String x:Key="properties_filter">Filter</sys:String>
+    <sys:String x:Key="properties_bandpass">Bandpass (Hz)</sys:String>
+    <sys:String x:Key="properties_bandstop">Bandstop (Hz)</sys:String>
+    <sys:String x:Key="properties_smooth">Smooth (Point)</sys:String>
+    <sys:String x:Key="properties_size">Window Size</sys:String>
+    <sys:String x:Key="properties_offset">Offset</sys:String>
+    <sys:String x:Key="properties_inactive">Inactive</sys:String>
+    <sys:String x:Key="properties_active">Active</sys:String>
+    <sys:String x:Key="properties_duplicate">Duplicate(0)</sys:String>
 </ResourceDictionary>

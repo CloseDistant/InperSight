@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
@@ -60,11 +61,38 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                InperLogExtentHelper.LogExtent(ex,this.GetType().Name);
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         protected override void OnClose()
         {
+            try
+            {
+                InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous = leftToolsControlViewModel.IsContinuous;
+                InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval = leftToolsControlViewModel.IsInterval;
+
+                InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
+                {
+                    if (x.Name.EndsWith("-"))
+                    {
+                        x.Name = x.Name.Substring(0, x.Name.Length - 1);
+                    }
+                });
+
+                InperDeviceHelper.Instance.CameraChannels.ToList().ForEach(x =>
+                {
+                    if (x.Name.EndsWith("-"))
+                    {
+                        x.Name = x.Name.Substring(0, x.Name.Length - 1);
+                    }
+                });
+
+                InperJsonHelper.SetCameraSignalSettings(InperGlobalClass.CameraSignalSettings);
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
             RequestClose();
             string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             string[] exeArray = exeName.Split('\\');
@@ -180,7 +208,12 @@ namespace InperStudio.ViewModels
                 bool isCancle = false;
                 if (!InperGlobalClass.IsImportConfig)
                 {
-                    InperDialogWindow inperDialogWindow = new InperDialogWindow("Unsaved configuration has been detected.Do you want to save it?");
+                    string text = "Unsaved configuration has been detected.Do you want to save it?";
+                    if (InperConfig.Instance.Language != "en_us")
+                    {
+                        text = "检测到有配置未保存，是否要保存？";
+                    }
+                    InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
                     inperDialogWindow.ClickEvent += (s, statu) =>
                     {
                         if (statu == 0)
@@ -252,10 +285,29 @@ namespace InperStudio.ViewModels
         {
             if ((sender as ToggleButton).IsFocused)
             {
-                this.windowView.main.ColumnDefinitions[0].Width = GridLength.Auto;
+                this.windowView.main.ColumnDefinitions[0].Width = new GridLength(320);
             }
         }
 
+        #endregion
+
+        #region left
+        public void AInperTextBox_InperTextChanged(object arg1, TextChangedEventArgs arg2)
+        {
+            leftToolsControlViewModel.AInperTextBox_InperTextChanged(arg1, arg2);
+        }
+        public void ChannelRoi_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            leftToolsControlViewModel.ChannelRoi_TextChanged(sender, e);
+        }
+        public void LightMode_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            leftToolsControlViewModel.LightMode_TextChanged(sender, e);
+        }
+        public void Gain_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            leftToolsControlViewModel.Gain_TextChanged(sender, e);
+        }
         #endregion
     }
 }

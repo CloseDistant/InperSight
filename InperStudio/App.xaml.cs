@@ -4,6 +4,7 @@ using InperStudio.Lib.Helper;
 using InperStudioControlLib.Lib.Config;
 using InperStudioControlLib.Lib.Helper;
 using log4net;
+using Newtonsoft.Json.Linq;
 using OpenCvSharp;
 using SciChart.Charting.Visuals;
 using System;
@@ -12,6 +13,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Mail;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -31,22 +35,20 @@ namespace InperStudio
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
         [DllImport("user32.dll")]
         private static extern bool IsIconic(IntPtr hWnd);
-        private const int SW_RESTORE = 9;
 
-        public static ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static SqlDataInit SqlDataInit;
         private static System.Threading.Mutex mutex;
 
+        //string apiKey = "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";
         protected override void OnStartup(StartupEventArgs e)
         {
-            //var a= GetstringIpAddress("183.128.136.161");
-            if (System.Diagnostics.Process.GetProcessesByName("UpgradeClient").ToList().Count > 0)
+            if (Process.GetProcessesByName("UpgradeClient").ToList().Count > 0)
             {
                 //MessageBox.Show("正在运行中");
                 Environment.Exit(0);
                 return;
             }
-
             mutex = new System.Threading.Mutex(true, "OnlyRun_CRNS");
             if (!mutex.WaitOne(0, false))
             {

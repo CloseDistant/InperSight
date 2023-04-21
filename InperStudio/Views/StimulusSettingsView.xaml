@@ -11,8 +11,8 @@
         xmlns:sci="http://schemas.abtsoftware.co.uk/scichart"
         xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
-        xmlns:vm="clr-namespace:InperStudio.ViewModels"
-        mc:Ignorable="d" Title="Stimulus" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
+        xmlns:vm="clr-namespace:InperStudio.ViewModels" 
+        mc:Ignorable="d"  FontFamily="{DynamicResource InperFontFamily}" Title="{DynamicResource stimulus_title}" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
         Width="700" Height="500" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
@@ -77,7 +77,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <WrapPanel Grid.Row="0" VerticalAlignment="Center">
-                    <TextBlock Text="Waveform" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}"/>
+                    <TextBlock Text="{DynamicResource stimulus_waveform}" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}"/>
                     <Button Style="{StaticResource InperFreeButton}" Width="26" Height="20" Margin="10 0 0 0" Command="{s:Action AddWaveformEvent}">
                         <Image Source="/Lib/Images/New/Stimulus_Add.png" Stretch="UniformToFill" />
                     </Button>
@@ -85,10 +85,10 @@
                 <Grid Grid.Row="1">
                     <DataGrid Margin="0" Height="225" ScrollViewer.CanContentScroll="True" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible" VerticalAlignment="Top" FontSize="12" ItemsSource="{Binding WaveForms}" CanUserSortColumns="False" AutoGenerateColumns="False" HorizontalContentAlignment="Center">
                         <DataGrid.Columns>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="50" Binding="{Binding Index}" Header="Item"/>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Pulse}" Header="Pulse(ms)"/>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Frequence}" Header="Freq(Hz)"/>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="60" Binding="{Binding Duration}" Header="Duration(s)"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="50" Binding="{Binding Index}" Header="{DynamicResource stimulus_item}"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Pulse}" Header="{DynamicResource stimulus_pulse}"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Frequence}" Header="{DynamicResource stimulus_freq}"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="60" Binding="{Binding Duration}" Header="{DynamicResource stimulus_duration}"/>
                             <DataGridTemplateColumn Width="80" CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -146,7 +146,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <WrapPanel Grid.Row="0" VerticalAlignment="Center">
-                    <TextBlock Text="Sweep" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}"/>
+                    <TextBlock Text="{DynamicResource stimulus_sweep}" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}"/>
                     <Button Style="{StaticResource InperFreeButton}" Width="26" Height="20" Margin="10 0 0 0" Command="{s:Action AddSweepEvent}">
                         <Image Source="/Lib/Images/New/Stimulus_Add.png" Stretch="UniformToFill" />
                     </Button>
@@ -161,9 +161,9 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="40" Binding="{Binding Index}" Header="Item"/>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="80" Binding="{Binding WaveForm}" Header="Waveform"/>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="70" Binding="{Binding Duration}" Header="Duration(s)"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="40" Binding="{Binding Index}" Header="{DynamicResource stimulus_item}"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="80" Binding="{Binding WaveForm}" Header="{DynamicResource stimulus_waveform_number}"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="70" Binding="{Binding Duration}" Header="{DynamicResource stimulus_duration}"/>
                             <DataGridTemplateColumn Width="40" CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -222,8 +222,8 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
-                <TextBlock Text="Preview" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}" />
-                <TextBlock Text="Output" VerticalAlignment="Center" Margin="240 0 0 0"/>
+                <TextBlock Text="{DynamicResource stimulus_preview}" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}" />
+                <TextBlock Text="{DynamicResource stimulus_output}" VerticalAlignment="Center" Margin="240 0 0 0"/>
                 <ComboBox ItemsSource="{Binding EventChannels}" Name="dio" DisplayMemberPath="Name" Width="120" Height="20" HorizontalAlignment="Left" Margin="300 0 0 0"/>
                 <TextBlock Text="hh:mm:ss" VerticalAlignment="Center" Margin="450 0 0 0"/>
                 <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="440 0 0 0" Name="hour" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>

@@ -27,6 +27,8 @@ namespace InperStudio.Lib.Helper.JsonBean
         public int PriTrigger { get; set; }
         public int RefractoryPeriod { get; set; }
         public int Duration { get; set; }
+        public int DioId { get; set; }
+        public string Name { get; set; }
         public double ThreshodMin { get; set; }
         public double ThreshodMax { get; set; }
     }

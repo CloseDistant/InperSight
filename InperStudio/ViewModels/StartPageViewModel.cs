@@ -1,5 +1,6 @@
 ﻿using InperPhotometry;
 using InperProtocolStack.UnderUpgrade;
+using InperStudio.Lib.Bean;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
@@ -22,7 +23,11 @@ namespace InperStudio.ViewModels
         public StartPageViewModel(IWindowManager windowManager)
         {
             this.windowManager = windowManager;
-            System.Windows.Application.Current.Resources["InperTheme"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperConfig.Instance.ThemeColor));
+            Application.Current.Resources["InperTheme"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperConfig.Instance.ThemeColor));
+            InperClassHelper.SetLanguage(InperConfig.Instance.Language);
+            InperGlobalClass.IsDisplayAnalog = InperProductConfig.DisplayNodeRead(DisplayEnum.Analog);
+            InperGlobalClass.IsDisplayTrigger = InperProductConfig.DisplayNodeRead(DisplayEnum.Trigger);
+            InperGlobalClass.IsDisplayNote = InperProductConfig.DisplayNodeRead(DisplayEnum.Note);
         }
         async Task TaskExecute(CancellationToken token)
         {
@@ -38,7 +43,6 @@ namespace InperStudio.ViewModels
         public async void SearchAgain()
         {
             (View as StartPageView).loading.Visibility = Visibility.Visible;
-            (View as StartPageView).remainder.Text = "The device is being initialized...";
             await Task.Delay(1000);
             SearchDevice();
         }
@@ -48,7 +52,7 @@ namespace InperStudio.ViewModels
             try
             {
                 Version = InperConfig.Instance.Version;
-                
+
                 DirectoryInfo root = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "UnderBinBackup"));
                 FileInfo[] files = root.GetFiles();
                 UnderUpgradeFunc under = new UnderUpgradeFunc();
@@ -87,7 +91,14 @@ namespace InperStudio.ViewModels
                     {
                         await Task.Delay(1000);
                         (View as StartPageView).loading.Visibility = Visibility.Collapsed;
-                        (View as StartPageView).remainder.Text = "Initialization completed";
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            (View as StartPageView).remainder.Text = "Initialization completed";
+                        }
+                        else
+                        {
+                            (View as StartPageView).remainder.Text = "初始化成功";
+                        }
                         InperDeviceHelper.Instance.DeviceSet(DeviceHeuristic.Instance.DeviceList.First());
                         InperDeviceHelper.Instance.DeviceInit();
 
@@ -108,7 +119,7 @@ namespace InperStudio.ViewModels
             }
             catch (Exception ex)
             {
-                InperLogExtentHelper.LogExtent(ex,this.GetType().Name);
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
         public void Close()

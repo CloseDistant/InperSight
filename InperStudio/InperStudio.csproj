@@ -257,8 +257,10 @@
     <Compile Include="Lib\Bean\Tb_Version.cs" />
     <Compile Include="Lib\Bean\VideoFrame.cs" />
     <Compile Include="Lib\Bean\VideoRecordBean.cs" />
+    <Compile Include="Lib\Bean\ZoneVideo.cs" />
     <Compile Include="Lib\Chart\CustomTimeSpanLableProvider.cs" />
     <Compile Include="Lib\Chart\CustomZoomExtentsModifier.cs" />
+    <Compile Include="Lib\Chart\InperAdorner.cs" />
     <Compile Include="Lib\Chart\TextBoxAdorner.cs" />
     <Compile Include="Lib\Convert\BoolToDoubleHeightConvert.cs" />
     <Compile Include="Lib\Convert\BoolToImageUrlConverter.cs" />
@@ -279,6 +281,8 @@
     <Compile Include="Lib\Convert\TriggeString2VisibilityConverter.cs" />
     <Compile Include="Lib\Convert\VideoIntToTIme.cs" />
     <Compile Include="Lib\Convert\VisibilityToVisibilityReConverter.cs" />
+    <Compile Include="Lib\Convert\ZoneConditionVisibilityConverter.cs" />
+    <Compile Include="Lib\Convert\ZoneVisibilityConverter.cs" />
     <Compile Include="Lib\Data\Model\AnalogRecord.cs" />
     <Compile Include="Lib\Data\Model\BaseMarker.cs" />
     <Compile Include="Lib\Data\Model\ChannelConfig.cs" />
@@ -314,7 +318,7 @@
     <Compile Include="Lib\Helper\InperDeviceHelper.cs" />
     <Compile Include="Lib\Helper\InperJsonHelper.cs" />
     <Compile Include="Lib\Helper\InperLogExtentHelper.cs" />
-    <Compile Include="Lib\Helper\InpertProductConfig.cs" />
+    <Compile Include="Lib\Helper\InperProductConfig.cs" />
     <Compile Include="Lib\Helper\JsonBean\AdditionRecordConditions.cs" />
     <Compile Include="Lib\Helper\JsonBean\CameraSignalSettings.cs" />
     <Compile Include="Lib\Helper\JsonBean\EventPanelProperties.cs" />
@@ -584,6 +588,9 @@
     <Resource Include="Lib\Images\InperSignal.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Lib\Images\New\preference.png" />
+    <Resource Include="Lib\Images\New\plaint.png" />
+    <Resource Include="Lib\Images\New\remove.png" />
     <Resource Include="InperSignal.ico" />
     <Content Include="Lib\DLL\Stateless.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
