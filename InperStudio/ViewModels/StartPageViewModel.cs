@@ -109,6 +109,7 @@ namespace InperStudio.ViewModels
                         await Task.Delay(500);
                         InperDeviceHelper.Instance.device.GetDeviceInfo(DEVICE_INFO_PUB);
                         await Task.Delay(500);
+                        InperDeviceHelper.Instance.device.InqID();
                         InperLogExtentHelper.InitLogDatabase();
 
                         windowManager.ShowWindow(new MainWindowViewModel(windowManager));

@@ -90,25 +90,26 @@ namespace InperStudio.ViewModels
                 {
                     InperGlobalClass.EventSettings.Channels.ForEach(channel =>
                     {
-                        if (channel.Type == ChannelTypeEnum.Zone.ToString() && channel.VideoZone.Name== BehaviorRecorderKit.Name)
+                        if (channel.Type == ChannelTypeEnum.Zone.ToString() && channel.VideoZone.Name == BehaviorRecorderKit.Name)
                         {
-                            var condition = channel.VideoZone.AllZoneConditions.First();
-              
-                            var rect = new System.Windows.Shapes.Rectangle()
+                            channel.VideoZone.AllZoneConditions.ForEach(condition =>
                             {
-                                Width = condition.ShapeWidth,
-                                Height = condition.ShapeHeight,
-                                //Name = condition.ZoneName,
-                                StrokeThickness = 1,
-                                Fill = System.Windows.Media.Brushes.Transparent,
-                                Stroke = System.Windows.Media.Brushes.Red
-                            };
-                            Canvas.SetLeft(rect, condition.ShapeLeft);
-                            Canvas.SetTop(rect, condition.ShapeTop);
-                            view.drawCanvas.Children.Add(rect);
-                            var layer = AdornerLayer.GetAdornerLayer(rect);
-                            var color = System.Windows.Media.Brushes.Red;
-                            layer.Add(new InperAdorner(rect, condition.ZoneName, color, 0, -15, false));
+                                var rect = new System.Windows.Shapes.Rectangle()
+                                {
+                                    Width = condition.ShapeWidth,
+                                    Height = condition.ShapeHeight,
+                                    //Name = condition.ZoneName,
+                                    StrokeThickness = 1,
+                                    Fill = System.Windows.Media.Brushes.Transparent,
+                                    Stroke = System.Windows.Media.Brushes.Black
+                                };
+                                Canvas.SetLeft(rect, condition.ShapeLeft);
+                                Canvas.SetTop(rect, condition.ShapeTop);
+                                view.drawCanvas.Children.Add(rect);
+                                var layer = AdornerLayer.GetAdornerLayer(rect);
+                                var color = System.Windows.Media.Brushes.Black;
+                                layer.Add(new InperAdorner(rect, condition.ZoneName, color, 0, -15, false));
+                            });
                         }
                     });
                 }

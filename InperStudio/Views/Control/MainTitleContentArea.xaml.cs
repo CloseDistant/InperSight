@@ -182,10 +182,12 @@ namespace InperStudio.Views.Control
         {
             try
             {
-                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.Filter = "Json|*.inper";
-                // 设置默认的文件名。注意！文件扩展名须与Filter匹配
-                dlg.FileName = "UserConfig";
+                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog
+                {
+                    Filter = "Json|*.inper",
+                    // 设置默认的文件名。注意！文件扩展名须与Filter匹配
+                    FileName = "UserConfig"
+                };
                 // 显示对话框
                 DialogResult r = dlg.ShowDialog();
 

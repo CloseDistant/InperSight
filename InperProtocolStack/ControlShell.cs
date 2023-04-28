@@ -144,6 +144,9 @@ namespace InperProtocolStack
         {
             switch (e.Intent)
             {
+                case ProtocolIntent.INTENT_INQ_ID:
+                    Console.WriteLine(e.Data.Length);
+                    break;
                 case ProtocolIntent.INTENT_RETURN_ID:
                     UpdateID(e.Data);
                     OnDevInfoUpdated?.Invoke(this, new DevInfoUpdatedEventArgs());

@@ -896,8 +896,8 @@ namespace InperStudio.ViewModels
             {
                 var rect = new Rectangle()
                 {
-                    Width = 100,
-                    Height = 100,
+                    Width = 10,
+                    Height = 10,
                     StrokeThickness = 1,
                     Fill = Brushes.Transparent,
                     Cursor = Cursors.Hand,
