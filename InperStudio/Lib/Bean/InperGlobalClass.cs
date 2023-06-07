@@ -23,6 +23,7 @@ namespace InperStudio.Lib.Bean
         private static bool isDisplayAnalog = false;
         private static bool isDisplayTrigger = false;
         private static bool isDisplayNote = false;
+        private static bool isDisplaySprit = false;
         private static bool isExistEvent = false;
         private static bool isOpenLightMeasureMode = false;
         private static bool isAllowDragScroll = false;
@@ -57,7 +58,7 @@ namespace InperStudio.Lib.Bean
         }
         public static bool IsDisplayTrigger
         {
-            get=> isDisplayTrigger;
+            get => isDisplayTrigger;
             set
             {
                 isDisplayTrigger = value;
@@ -66,11 +67,20 @@ namespace InperStudio.Lib.Bean
         }
         public static bool IsDisplayNote
         {
-            get=> isDisplayNote;
+            get => isDisplayNote;
             set
             {
                 isDisplayNote = value;
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(IsDisplayNote)));
+            }
+        }
+        public static bool IsDisplaySprit
+        {
+            get => isDisplaySprit;
+            set
+            {
+                isDisplaySprit = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(IsDisplaySprit)));
             }
         }
         public static DateTime RunTime

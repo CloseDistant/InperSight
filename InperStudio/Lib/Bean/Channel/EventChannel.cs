@@ -16,8 +16,16 @@ namespace InperStudio.Lib.Bean.Channel
     }
     public class ZoneConditions
     {
+        public ZoneConditions()
+        {
+            Timer.Elapsed += (s, e) =>
+            {
+                IsTimerSignal = true;
+                Timer.Stop();
+            };
+        }
         public string ZoneName { get; set; }
-        public bool IsImmediately { get; set; }
+        public bool IsImmediately { get; set; } = true;
         public bool IsDelay { get; set; }
         public int DelaySeconds { get; set; } = 3;
         public int Duration { get; set; } = 3;
@@ -29,6 +37,8 @@ namespace InperStudio.Lib.Bean.Channel
         public string ShapeName { get; set; }
         public string Type { get; set; }
         public string Color { get; set; }
+        public bool IsTimerSignal { get; set; } = false;
+        public System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
 
     }
     public class EventChannel : ChannelBase

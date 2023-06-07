@@ -305,5 +305,9 @@ namespace InperDeviceManagement
             _CS.FileUpload(bytes);
             return;
         }
+        public int GetCommandCount()
+        {
+            return _CS.CommandCount();
+        }
     }
 }

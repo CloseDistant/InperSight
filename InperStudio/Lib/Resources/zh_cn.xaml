@@ -66,9 +66,10 @@
     <sys:String x:Key="preference_title">偏好项</sys:String>
     <sys:String x:Key="preference_language">语言</sys:String>
     <sys:String x:Key="preference_interface">界面</sys:String>
-    <sys:String x:Key="preference_display_analog">展示模拟信号采集</sys:String>
-    <sys:String x:Key="preference_display_trigger">展示触发（开始与结束设置）</sys:String>
-    <sys:String x:Key="preference_display_note">展示快捷备忘</sys:String>
+    <sys:String x:Key="preference_display_analog">显示并使用模拟信号采集</sys:String>
+    <sys:String x:Key="preference_display_trigger">显示并使用触发（开始与结束设置）</sys:String>
+    <sys:String x:Key="preference_display_note">显示并使用快捷备忘</sys:String>
+    <sys:String x:Key="preference_display_timer">显示并使用心跳精灵</sys:String>
     <sys:String x:Key="preference_theme">主题</sys:String>
     <sys:String x:Key="preference_default">默认主题</sys:String>
     <sys:String x:Key="preference_customization">其他主题色</sys:String>
@@ -85,7 +86,7 @@
     <sys:String x:Key="about_sn">SN号:</sys:String>
 
     <!--文件-->
-    <sys:String x:Key="file_config">配置</sys:String>
+    <sys:String x:Key="file_config">文件</sys:String>
     <sys:String x:Key="file_name">文件名</sys:String>
     <sys:String x:Key="file_where">路径</sys:String>
     <sys:String x:Key="file_tag">标签</sys:String>
@@ -118,6 +119,8 @@
     <sys:String x:Key="marker_color">颜色</sys:String>
     <sys:String x:Key="marker_active_channels">激活的配置项</sys:String>
     <sys:String x:Key="marker_hotkeys">热键</sys:String>
+    <sys:String x:Key="marker_windowsize">窗口</sys:String>
+    <sys:String x:Key="marker_rp">不应期 (s)</sys:String>
 
     <!--stimulus-->
     <sys:String x:Key="stimulus_title">同步</sys:String>
@@ -131,6 +134,9 @@
     <sys:String x:Key="stimulus_trigger">触发开始</sys:String>
     <sys:String x:Key="stimulus_output">输出口</sys:String>
     <sys:String x:Key="stimulus_preview">预览</sys:String>
+    <sys:String x:Key="stimulus_time">时:分:秒</sys:String>
+    <sys:String x:Key="stimulus_use">激活</sys:String>
+    <sys:String x:Key="stimulus_nouse">不激活</sys:String>
     
     <!--add sweep-->
     <sys:String x:Key="addSweep_title">添加波形组合</sys:String>
@@ -186,5 +192,5 @@
     <sys:String x:Key="properties_offset">偏置扣除</sys:String>
     <sys:String x:Key="properties_inactive">取消激活</sys:String>
     <sys:String x:Key="properties_active">激活</sys:String>
-    <sys:String x:Key="properties_duplicate">重复(0)</sys:String>
+    <sys:String x:Key="properties_duplicate">重复</sys:String>
 </ResourceDictionary>

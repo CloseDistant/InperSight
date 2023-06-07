@@ -38,7 +38,10 @@ namespace InperProtocolStack
             _TC.OnInputUpdated += _TC_OnInputUpdated;
             InqID();
         }
-
+        public int CommandCount()
+        {
+            return _TC._CommandCache.Count;
+        }
         private void _TC_OnInputUpdated(object sender, byte[] e)
         {
             List<DevInputNotificationEventArgs> items = DeviceInputUpdated(e);

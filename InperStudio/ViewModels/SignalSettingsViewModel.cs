@@ -1374,7 +1374,10 @@ namespace InperStudio.ViewModels
 
                         InperDeviceHelper.Instance.CameraChannels.Add(item);
                         InperDeviceHelper.Instance.aiChannels.Add(item);
-                        InperDeviceHelper.Instance._adPreTime.Add(item.ChannelId, InperDeviceHelper.Instance._adPreTime.Count == 0 ? 0 : InperDeviceHelper.Instance._adPreTime.First().Value);
+                        if (!InperDeviceHelper.Instance._adPreTime.ContainsKey(item.ChannelId))
+                        {
+                            InperDeviceHelper.Instance._adPreTime.Add(item.ChannelId, InperDeviceHelper.Instance._adPreTime.Count == 0 ? 0 : InperDeviceHelper.Instance._adPreTime.First().Value);
+                        }
                         InperDeviceHelper.Instance.AiSettingFunc(item.ChannelId, 1);
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
                         if (channel == null)

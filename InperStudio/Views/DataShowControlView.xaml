@@ -281,7 +281,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <ComboBox Height="24" Width="102" Grid.Row="0" MinHeight="24" Padding="3 0"  SelectionChanged="{s:Action TextFormat_SelectionChanged}" ItemsSource="{Binding TextLableFormatting}" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <ComboBox Height="24" Width="102" Grid.Row="0" hc:BorderElement.CornerRadius="2" MinHeight="24" Padding="3 0"  SelectionChanged="{s:Action TextFormat_SelectionChanged}" ItemsSource="{Binding TextLableFormatting}" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <WrapPanel VerticalAlignment="Center" Grid.Row="1" HorizontalAlignment="Center">
                         <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Add">
                             <Path Fill="#0B8800" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
@@ -290,7 +290,7 @@
                         <Border CornerRadius="0 2 2 0" BorderThickness="0 1 1 1" BorderBrush="#bdbdbd" Opacity=".5" Padding="2 0">
                             <TextBlock VerticalAlignment="Center" Text="s" Foreground="#333333" FontSize="12" Margin="0 0 0 2" />
                         </Border>
-                        <Button  Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Reduce" Margin="5 0 0 0">
+                        <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Command="{s:Action TextFormatChanged}" CommandParameter="Reduce" Margin="5 0 0 0">
                             <Path Fill="#D9001B" Stretch="Uniform" Data="{StaticResource InperReduce}"/>
                         </Button>
                     </WrapPanel>

@@ -67,16 +67,17 @@
     <sys:String x:Key="preference_title">Preference</sys:String>
     <sys:String x:Key="preference_language">Language</sys:String>
     <sys:String x:Key="preference_interface">Interface</sys:String>
-    <sys:String x:Key="preference_display_analog">Display Analog</sys:String>
-    <sys:String x:Key="preference_display_trigger">Display Trigger</sys:String>
-    <sys:String x:Key="preference_display_note">Display Note</sys:String>
+    <sys:String x:Key="preference_display_analog">Display and use Analog</sys:String>
+    <sys:String x:Key="preference_display_trigger">Display and use Trigger</sys:String>
+    <sys:String x:Key="preference_display_note">Display and use Note</sys:String>
+    <sys:String x:Key="preference_display_timer">Display and use Timer ball</sys:String>
     <sys:String x:Key="preference_theme">Theme</sys:String>
     <sys:String x:Key="preference_default">Default</sys:String>
     <sys:String x:Key="preference_customization">Customization</sys:String>
     
     <!--关于荧博-->
     <sys:String x:Key="about_title">About Inper Signal</sys:String>
-    <sys:String x:Key="about_software_infomation">Software Inofrmation</sys:String>
+    <sys:String x:Key="about_software_infomation">Software Information</sys:String>
     <sys:String x:Key="about_release_date">Release Date:</sys:String>
     <sys:String x:Key="about_version">Version:</sys:String>
     <sys:String x:Key="about_device_specification">Device Specification</sys:String>
@@ -86,7 +87,7 @@
     <sys:String x:Key="about_sn">SN:</sys:String>
     
     <!--文件-->
-    <sys:String x:Key="file_config">Config</sys:String>
+    <sys:String x:Key="file_config">File</sys:String>
     <sys:String x:Key="file_name">Name</sys:String>
     <sys:String x:Key="file_where">Where</sys:String>
     <sys:String x:Key="file_tag">Tag</sys:String>
@@ -119,6 +120,8 @@
     <sys:String x:Key="marker_color">Color</sys:String>
     <sys:String x:Key="marker_active_channels">Active Channels</sys:String>
     <sys:String x:Key="marker_hotkeys">Hotkeys</sys:String>
+    <sys:String x:Key="marker_windowsize">WindowSize(point)</sys:String>
+    <sys:String x:Key="marker_rp">RP (s)</sys:String>
     
     <!--stimulus-->
     <sys:String x:Key="stimulus_title">Stimulus</sys:String>
@@ -132,7 +135,9 @@
     <sys:String x:Key="stimulus_trigger">Trigger</sys:String>
     <sys:String x:Key="stimulus_output">Output</sys:String>
     <sys:String x:Key="stimulus_preview">Preview</sys:String>
-    
+    <sys:String x:Key="stimulus_time">hh:mm:ss</sys:String>
+    <sys:String x:Key="stimulus_use">Active</sys:String>
+    <sys:String x:Key="stimulus_nouse">Inactive</sys:String>
     <!--add sweep-->
     <sys:String x:Key="addSweep_title">Add Sweep</sys:String>
     <sys:String x:Key="addSweep_sweep_setting">Sweep Setting</sys:String>
@@ -187,5 +192,5 @@
     <sys:String x:Key="properties_offset">Offset</sys:String>
     <sys:String x:Key="properties_inactive">Inactive</sys:String>
     <sys:String x:Key="properties_active">Active</sys:String>
-    <sys:String x:Key="properties_duplicate">Duplicate(0)</sys:String>
+    <sys:String x:Key="properties_duplicate">Duplicate</sys:String>
 </ResourceDictionary>

@@ -1,7 +1,9 @@
 ﻿using InperStudio.Lib.Bean;
+using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
+using SciChart.Core.Extensions;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -31,10 +33,10 @@ namespace InperStudio.ViewModels
             }
             else
             {
-                view.custom.IsChecked = true;
                 view.AnalogColorList.SelectedIndex = SkinColorList.IndexOf(InperConfig.Instance.ThemeColor);
+                view.custom.IsChecked = true;
             }
-            if (InperConfig.Instance.Language == "en_us")
+            if (InperConfig.Instance.Language.ToLower() == "en_us")
             {
                 view.en_us.IsChecked = true;
             }
@@ -45,6 +47,7 @@ namespace InperStudio.ViewModels
             view.analog.IsChecked = InperGlobalClass.IsDisplayAnalog;
             view.trigger.IsChecked = InperGlobalClass.IsDisplayTrigger;
             view.note.IsChecked = InperGlobalClass.IsDisplayNote;
+            view.sprit.IsChecked = InperGlobalClass.IsDisplaySprit;
 
             view.ConfirmClickEvent += View_ConfirmClickEvent;
         }
@@ -87,7 +90,10 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                view.AnalogColorList.SelectedIndex = 0;
+                if (InperConfig.Instance.ThemeColor == "#6523A5")
+                {
+                    view.AnalogColorList.SelectedIndex = 0;
+                }
                 Application.Current.Resources["InperTheme"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(view.AnalogColorList.SelectedItem.ToString()));
             }
             catch (Exception ex)
@@ -99,10 +105,7 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                //Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
-                //Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/en_us.xaml", UriKind.Relative)) as ResourceDictionary);
-                //Application.Current.Resources["InperFontFamily"] = "Arial";
-                InperConfig.Instance.Language = "en-US";
+                InperConfig.Instance.Language = "en_us";
                 InperClassHelper.SetLanguage(InperConfig.Instance.Language);
             }
             catch (Exception ex)
@@ -114,9 +117,6 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                //Application.Current.Resources.MergedDictionaries.RemoveAt(Application.Current.Resources.MergedDictionaries.Count - 1);
-                //Application.Current.Resources.MergedDictionaries.Add(Application.LoadComponent(new Uri("/InperStudio;component/Lib/Resources/zh_cn.xaml", UriKind.Relative)) as ResourceDictionary);
-                //Application.Current.Resources["InperFontFamily"] = "微软雅黑";
                 InperConfig.Instance.Language = "zh_cn";
                 InperClassHelper.SetLanguage(InperConfig.Instance.Language);
             }
@@ -135,17 +135,31 @@ namespace InperStudio.ViewModels
                     if (cb.Name == "analog")
                     {
                         InperGlobalClass.IsDisplayAnalog = true;
-                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Analog, true);
+                        InperJsonHelper.SetDisplaySetting("true", "analog");
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Analog, true);
+                        var window = InperClassHelper.GetWindowByNameChar("inper");
+                        if (window != null)
+                        {
+                            (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.InitConfig();
+                        }
                     }
                     if (cb.Name == "trigger")
                     {
                         InperGlobalClass.IsDisplayTrigger = true;
-                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Trigger, true);
+                        InperJsonHelper.SetDisplaySetting("true", "trigger");
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Trigger, true);
                     }
                     if (cb.Name == "note")
                     {
                         InperGlobalClass.IsDisplayNote = true;
-                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Note, true);
+                        InperJsonHelper.SetDisplaySetting("true", "note");
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Note, true);
+                    }
+                    if (cb.Name == "sprit")
+                    {
+                        InperGlobalClass.IsDisplaySprit = true;
+                        InperJsonHelper.SetDisplaySetting("true", "sprit");
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Sprit, true);
                     }
                 }
             }
@@ -164,17 +178,38 @@ namespace InperStudio.ViewModels
                     if (cb.Name == "analog")
                     {
                         InperGlobalClass.IsDisplayAnalog = false;
-                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Analog, false);
+                        InperJsonHelper.SetDisplaySetting("false", "analog");
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Analog, false);
+
+                        var window = InperClassHelper.GetWindowByNameChar("inper");
+                        if (window != null)
+                        {
+                            RoutedEventArgs eventArgs = new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent, (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.view.bd1);
+                            (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.view.bd1.RaiseEvent(eventArgs);
+                            (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.CameraShow();
+                            InperDeviceHelper.Instance.CameraChannels.RemoveWhere(x => x.Type == ChannelTypeEnum.Analog.ToString());
+                        }
                     }
                     if (cb.Name == "trigger")
                     {
                         InperGlobalClass.IsDisplayTrigger = false;
-                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Trigger, false);
+                        InperJsonHelper.SetDisplaySetting("false", "trigger");
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Trigger, false);
+                        InperGlobalClass.AdditionRecordConditionsStart = AdditionRecordConditionsTypeEnum.Immediately;
+                        InperGlobalClass.AdditionRecordConditionsStop = AdditionRecordConditionsTypeEnum.Immediately;
+                        InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.Type == ChannelTypeEnum.TriggerStart.ToString() || x.Type == ChannelTypeEnum.TriggerStop.ToString());
                     }
                     if (cb.Name == "note")
                     {
                         InperGlobalClass.IsDisplayNote = false;
-                        InperProductConfig.DisplayNodeWrite(DisplayEnum.Note, false);
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Note, false);
+                        InperJsonHelper.SetDisplaySetting("false", "note");
+                    }
+                    if (cb.Name == "sprit")
+                    {
+                        InperGlobalClass.IsDisplaySprit = false;
+                        //InperProductConfig.DisplayNodeWrite(DisplayEnum.Sprit, false);
+                        InperJsonHelper.SetDisplaySetting("false", "sprit");
                     }
                 }
             }

@@ -1,8 +1,10 @@
-﻿using InperStudio.Lib.Helper.JsonBean;
+﻿using HandyControl.Controls;
+using InperStudio.Lib.Helper.JsonBean;
 using InperStudioControlLib.Lib.Config;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 
 namespace InperStudio.Lib.Helper
 {
@@ -55,6 +57,14 @@ namespace InperStudio.Lib.Helper
         public static void SetDataPathSetting(string dataPath, string type = "dataPath")
         {
             SetResByT<string>(dataPath, type);
+        }
+        public static string GetDisplaySetting(string type)
+        {
+            return GetResByT<string>(type) ?? "true";
+        }
+        public static void SetDisplaySetting(string value, string tyep)
+        {
+            SetResByT<string>(value, tyep);
         }
         private static T GetResByT<T>(string type)
         {

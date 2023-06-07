@@ -2,6 +2,7 @@
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
+using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Lib.Chart;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
@@ -108,7 +109,7 @@ namespace InperStudio.ViewModels
 
                 if (@enum == AdditionSettingsTypeEnum.Video)
                 {
-                    if (InperConfig.Instance.Language == "en_us")
+                    if (InperConfig.Instance.Language.ToLower() == "en_us")
                     {
                         view.Title = "Video Settings";//"Start/Stop Conditions";
                     }
@@ -136,12 +137,12 @@ namespace InperStudio.ViewModels
                                 if (it == null)
                                 {
                                     var item = new VideoRecordBean(i, c.FriendlyName, new CameraParamSet(c.CapabilyItems.FirstOrDefault().Size, c.CapabilyItems.FirstOrDefault().FrameRate, c.CapabilyItems.FirstOrDefault().Format));
-                                    var formats = c.CapabilyItems.OrderBy(f => f.Format).GroupBy(ca => ca.Format);
+                                    var formats = c.CapabilyItems.OrderBy(s => s.Size.Width).OrderBy(f => f.Format).GroupBy(ca => ca.Format);
                                     foreach (var format in formats)
                                     {
                                         if (!format.Key.Equals("RGB24"))
                                         {
-                                            item.CapabilyItems.Add(format.Key, format.OrderBy(x => x.FrameRate));
+                                            item.CapabilyItems.Add(format.Key, format.OrderBy(x => x.Size.Width));
                                         }
                                     }
                                     UnusedKits.Add(item);
@@ -152,7 +153,7 @@ namespace InperStudio.ViewModels
                                     {
                                         it.IsActive = true;
                                     }
-                                }
+                                } 
                             }
                             i++;
                         }
@@ -170,7 +171,7 @@ namespace InperStudio.ViewModels
                 else
                 {
                     view.trigger.Visibility = Visibility.Visible;
-                    if (InperConfig.Instance.Language == "en_us")
+                    if (InperConfig.Instance.Language.ToLower() == "en_us")
                     {
                         view.Title = "Trigger";//"Start/Stop Conditions";
                     }
@@ -185,18 +186,27 @@ namespace InperStudio.ViewModels
                     //view.source_comb.SelectionChanged += Source_comb_SelectionChanged;
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
-                        EventChannelsStart.Add(new EventChannelJson()
+                        if (item.Value != StimulusBeans.Instance.DioID)
                         {
-                            ChannelId = (int)item.Value,
-                            SymbolName = item.Key.ToString(),
-                            Name = item.Key.ToString(),
-                        });
-                        EventChannelsStop.Add(new EventChannelJson()
-                        {
-                            ChannelId = (int)item.Value,
-                            SymbolName = item.Key.ToString(),
-                            Name = item.Key.ToString(),
-                        });
+                            if (!EventChannelsStart.Any(x => x.ChannelId == item.Value))
+                            {
+                                EventChannelsStart.Add(new EventChannelJson()
+                                {
+                                    ChannelId = (int)item.Value,
+                                    SymbolName = item.Key.ToString(),
+                                    Name = item.Key.ToString(),
+                                });
+                            }
+                            if (!EventChannelsStop.Any(x => x.ChannelId == item.Value))
+                            {
+                                EventChannelsStop.Add(new EventChannelJson()
+                                {
+                                    ChannelId = (int)item.Value,
+                                    SymbolName = item.Key.ToString(),
+                                    Name = item.Key.ToString(),
+                                });
+                            }
+                        }
                     }
 
                     foreach (EventChannelJson item in InperGlobalClass.EventSettings.Channels)
@@ -205,24 +215,35 @@ namespace InperStudio.ViewModels
                         var chn1 = EventChannelsStop.FirstOrDefault(x => x.ChannelId == item.ChannelId && item.SymbolName.StartsWith("DIO") && (item.Type != ChannelTypeEnum.TriggerStart.ToString() && item.Type != ChannelTypeEnum.TriggerStop.ToString()));
                         EventChannelsStart.Remove(chn);
                         EventChannelsStop.Remove(chn1);
+
                         if (item.Type == ChannelTypeEnum.TriggerStart.ToString())
                         {
-                            view.start_trigger.SelectedIndex = item.ChannelId;
+                            //view.start_trigger.SelectedIndex = item.ChannelId;
                             EventChannelsStart.FirstOrDefault(x => x.ChannelId == item.ChannelId && item.Type == ChannelTypeEnum.TriggerStart.ToString()).IsActive = true;
+                            EventChannelsStop.Remove(EventChannelsStop.First(x => x.ChannelId == item.ChannelId));
                         }
                         if (item.Type == ChannelTypeEnum.TriggerStop.ToString())
                         {
-                            view.stop_trigger.SelectedIndex = item.ChannelId;
+                            //view.stop_trigger.SelectedIndex = item.ChannelId;
                             EventChannelsStop.FirstOrDefault(x => x.ChannelId == item.ChannelId && item.Type == ChannelTypeEnum.TriggerStop.ToString()).IsActive = true;
+                            EventChannelsStart.Remove(EventChannelsStart.First(x => x.ChannelId == item.ChannelId));
                         }
                     }
                     //不能合并上下两个for循环的原因
                     view.start_trigger.ItemsSource = EventChannelsStart;
                     view.stop_trigger.ItemsSource = EventChannelsStop;
 
+                    if (!InperGlobalClass.EventSettings.Channels.Any(x => x.Type == ChannelTypeEnum.TriggerStart.ToString()))
+                    {
+                        additionRecordStart.Trigger.Name = EventChannelsStart.First().Name;
+                    }
+
+                    if (!InperGlobalClass.EventSettings.Channels.Any(x => x.Type == ChannelTypeEnum.TriggerStop.ToString()) && EventChannelsStop.Count > 1)
+                    {
+                        additionRecordStop.Trigger.Name = EventChannelsStop.OrderBy(x => x.ChannelId).First(n => n.Name != additionRecordStart.Trigger.Name).Name;
+                    }
                     view.start_trigger.SelectionChanged += (s, e) =>
                     {
-
                         if ((s as System.Windows.Controls.ComboBox).SelectedValue is EventChannelJson comb)
                         {
                             if (InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.Type == ChannelTypeEnum.TriggerStart.ToString()) is EventChannelJson eventChannelJson)
@@ -230,25 +251,30 @@ namespace InperStudio.ViewModels
                                 eventChannelJson.IsActive = false;
                                 InperGlobalClass.EventSettings.Channels.Remove(eventChannelJson);
                                 EventChannelsStop.Add(eventChannelJson);
-                                EventChannelsStart.FirstOrDefault(x => x.ChannelId == eventChannelJson.ChannelId).IsActive = false;
+                                if (EventChannelsStart.Any(x => x.ChannelId == eventChannelJson.ChannelId))
+                                {
+                                    EventChannelsStart.FirstOrDefault(x => x.ChannelId == eventChannelJson.ChannelId).IsActive = false;
+                                }
                             }
                             comb.IsActive = true;
                             comb.Type = ChannelTypeEnum.TriggerStart.ToString();
                             InperGlobalClass.EventSettings.Channels.Add(comb);
                             additionRecordStart.Trigger.DioId = comb.ChannelId;
-                            additionRecordStart.Trigger.IsActive = true;
+                            //additionRecordStart.Trigger.IsActive = true;
                             additionRecordStart.Trigger.Name = comb.Name;
                             //消去stop中的该选项，设置为激活状态
                             if (EventChannelsStop.FirstOrDefault(x => x.ChannelId == comb.ChannelId) is EventChannelJson json)
                             {
-                                EventChannelsStop.Remove(json);
-                                view.stop_trigger.ItemsSource = EventChannelsStop = new ObservableCollection<EventChannelJson>(EventChannelsStop.OrderBy(x => x.ChannelId));
+                                if ((bool)view.triggerRad.IsChecked)
+                                {
+                                    EventChannelsStop.Remove(json);
+                                }
+                                view.stop_trigger.ItemsSource = EventChannelsStop = new ObservableCollection<EventChannelJson>(EventChannelsStop.GroupBy(x => x.ChannelId).Select(g => g.First()).OrderBy(d => d.ChannelId));
                             }
                         }
                     };
                     view.stop_trigger.SelectionChanged += (s, e) =>
                     {
-
                         if ((s as System.Windows.Controls.ComboBox).SelectedValue is EventChannelJson comb)
                         {
                             if (InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.Type == ChannelTypeEnum.TriggerStop.ToString()) is EventChannelJson eventChannelJson)
@@ -256,19 +282,25 @@ namespace InperStudio.ViewModels
                                 eventChannelJson.IsActive = false;
                                 InperGlobalClass.EventSettings.Channels.Remove(eventChannelJson);
                                 EventChannelsStart.Add(eventChannelJson);
-                                EventChannelsStop.FirstOrDefault(x => x.ChannelId == eventChannelJson.ChannelId).IsActive = false;
+                                if (EventChannelsStop.Any(x => x.ChannelId == eventChannelJson.ChannelId))
+                                {
+                                    EventChannelsStop.FirstOrDefault(x => x.ChannelId == eventChannelJson.ChannelId).IsActive = false;
+                                }
                             }
                             comb.IsActive = true;
                             comb.Type = ChannelTypeEnum.TriggerStop.ToString();
                             InperGlobalClass.EventSettings.Channels.Add(comb);
                             additionRecordStop.Trigger.DioId = comb.ChannelId;
-                            additionRecordStop.Trigger.IsActive = true;
+                            //additionRecordStop.Trigger.IsActive = true;
                             additionRecordStop.Trigger.Name = comb.Name;
                             //消去start中的该选项，设置为激活状态
                             if (EventChannelsStart.FirstOrDefault(x => x.ChannelId == comb.ChannelId) is EventChannelJson json)
                             {
-                                EventChannelsStart.Remove(json);
-                                view.start_trigger.ItemsSource = EventChannelsStart = new ObservableCollection<EventChannelJson>(EventChannelsStart.OrderBy(x => x.ChannelId));
+                                if ((bool)view.triggerRadStop.IsChecked)
+                                {
+                                    EventChannelsStart.Remove(json);
+                                }
+                                view.start_trigger.ItemsSource = EventChannelsStart = new ObservableCollection<EventChannelJson>(EventChannelsStart.GroupBy(x => x.ChannelId).Select(g => g.First()).OrderBy(d => d.ChannelId));
                             }
                         }
                     };
@@ -338,7 +370,6 @@ namespace InperStudio.ViewModels
                 }
             }
         }
-
         private void View_OtherClickEvent(object obj)
         {
             try
@@ -440,6 +471,14 @@ namespace InperStudio.ViewModels
             {
                 if (@enum == AdditionSettingsTypeEnum.Trigger)
                 {
+                    if (!(bool)view.triggerRad.IsChecked)
+                    {
+                        InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.Type == ChannelTypeEnum.TriggerStart.ToString());
+                    }
+                    if (!(bool)view.triggerRadStop.IsChecked)
+                    {
+                        InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.Type == ChannelTypeEnum.TriggerStop.ToString());
+                    }
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStart);
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStop, "stop");
                     InperJsonHelper.SetEventSettings(InperGlobalClass.EventSettings);
@@ -474,9 +513,9 @@ namespace InperStudio.ViewModels
                                             ZoneName = item2.Name + "-" + item2.DisplayName,
                                             ShapeLeft = Canvas.GetLeft(item2.Shape),
                                             ShapeTop = Canvas.GetTop(item2.Shape),
-                                            ShapeHeight=item2.Shape.Height,
-                                            ShapeWidth=item2.Shape.Width,
-                                            ShapeName=item2.Name
+                                            ShapeHeight = item2.Shape.Height,
+                                            ShapeWidth = item2.Shape.Width,
+                                            ShapeName = item2.Name
                                         });
                                     }
                                 }
@@ -522,32 +561,36 @@ namespace InperStudio.ViewModels
             try
             {
                 selectCameraItem?.StopPreview();
-                selectCameraItem = view.CameraCombox.SelectedItem as VideoRecordBean;
-                //Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
-                //await Task.Factory.StartNew(() =>
-                //{
-                selectCameraItem?.StartCapture();
-                //d.Close();
-                view.format.SelectedIndex = 0;
+                if (view.CameraCombox.SelectedItem != null)
+                {
+                    selectCameraItem = view.CameraCombox.SelectedItem as VideoRecordBean;
+                    selectCameraItem.Reset(new CameraParamSet((view.CameraCombox.SelectedItem as VideoRecordBean).CapabilyItems.First().Value.First().Size, (view.CameraCombox.SelectedItem as VideoRecordBean).CapabilyItems.First().Value.First().FrameRate, (view.CameraCombox.SelectedItem as VideoRecordBean).CapabilyItems.First().Value.First().Format));
+                    //Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
+                    //await Task.Factory.StartNew(() =>
+                    //{
+                    selectCameraItem?.StartCapture();
+                    //d.Close();
+                    view.format.SelectedIndex = 0;
+                }
 
                 //清除并重新渲染zone
                 ClearZone();
 
-                if (zoneVideos.Count > 0)
-                {
-                    zoneVideos.ForEachDo(zone =>
-                    {
-                        if (zone.VideoName == selectCameraItem.Name)
-                        {
-                            zone.IsActive = true;
-                            zone.Shape.Fill = Brushes.Transparent;
-                            view.drawAreaCanvas.Children.Add(zone.Shape);
-                            var layer = AdornerLayer.GetAdornerLayer(zone.Shape);
-                            var color = Brushes.Black;
-                            layer.Add(new InperAdorner(zone.Shape, zone.Shape.Name, color, 0, -15, false));
-                        }
-                    });
-                }
+                //if (zoneVideos.Count > 0)
+                //{
+                //    zoneVideos.ForEachDo(zone =>
+                //    {
+                //        if (zone.VideoName == selectCameraItem.Name)
+                //        {
+                //            zone.IsActive = true;
+                //            zone.Shape.Fill = Brushes.Transparent;
+                //            view.drawAreaCanvas.Children.Add(zone.Shape);
+                //            var layer = AdornerLayer.GetAdornerLayer(zone.Shape);
+                //            var color = Brushes.Black;
+                //            layer.Add(new InperAdorner(zone.Shape, zone.Shape.Name, color, 0, -15, false));
+                //        }
+                //    });
+                //}
 
             }
             catch (Exception ex)
@@ -559,7 +602,23 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                view.framrate.SelectedIndex = 0;
+                System.Windows.Controls.ComboBox item = sender as System.Windows.Controls.ComboBox;
+                if (item == null)
+                {
+                    view.framrate.SelectedIndex = UnusedKits.First().CapabilyItems.Values.First().Count() / 2;
+                }
+                else
+                {
+                    if (item.SelectedValue != null)
+                    {
+                        var content = (KeyValuePair<string, IEnumerable<ICameraCapabilyItem>>)item.SelectedValue;
+                        view.framrate.SelectedIndex = content.Value.Count() / 2;
+                    }
+                    else
+                    {
+                        view.framrate.SelectedIndex = 0;
+                    }
+                }
                 ClearZone();
             }
             catch (Exception ex)
@@ -631,6 +690,9 @@ namespace InperStudio.ViewModels
                             InperGlobalClass.ShowReminderInfo("The camera is running!");
                             return;
                         }
+                        //对应zone取消激活
+                        zoneVideos.Clear();
+
                         camera_active.IsActive = false;
                         //camera_active.StartCapture();
                         _ = UsedKits.Remove(camera_active);
@@ -638,18 +700,6 @@ namespace InperStudio.ViewModels
                         if (UnusedKits.Count <= 1)
                         {
                             view.CameraCombox.SelectedIndex = 0;
-                        }
-                        //对应zone取消激活
-                        if (zoneVideos.Count(x => x.VideoName == camera_active.Name) > 0)
-                        {
-                            zoneVideos.ForEachDo(x =>
-                            {
-                                if (x.VideoName == camera_active.Name)
-                                {
-                                    x.IsActive = false;
-                                    x.IsActiveVideo = false;
-                                }
-                            });
                         }
                     }
                 }
@@ -667,17 +717,10 @@ namespace InperStudio.ViewModels
                             Growl.Warning(new GrowlInfo() { Message = "This name already exists!", Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
-                        camera.AutoRecord = true; camera.IsActive = true;
-                        _ = UnusedKits.Remove(camera);
-                        UsedKits.Add(camera);
-                        camera.StopPreview();
-                        //view.PopButton.Background = MarkerChannels.First().BgColor;
-                        view.CameraCombox.SelectedIndex = 0;
-                        view.CameraName.Text = "Video-";
-
                         //对应zone激活
                         if (zoneVideos.Count(x => x.VideoName == camera.Name) > 0)
                         {
+                            camera.IsTracking = true;
                             zoneVideos.ForEachDo(x =>
                             {
                                 if (x.VideoName == camera.Name)
@@ -688,6 +731,15 @@ namespace InperStudio.ViewModels
                                 }
                             });
                         }
+
+                        camera.AutoRecord = true; camera.IsActive = true;
+                        _ = UnusedKits.Remove(camera);
+                        UsedKits.Add(camera);
+                        camera.StopPreview();
+                        //view.PopButton.Background = MarkerChannels.First().BgColor;
+                        view.CameraCombox.SelectedIndex = 0;
+                        view.CameraName.Text = "Video-";
+
                     }
                 }
             }
@@ -741,10 +793,10 @@ namespace InperStudio.ViewModels
             _shapeDashEnum = ShapeDashEnum.None;
             _shapeEnum = ShapeEnum.None;
             view.drawAreaCanvas.Children.Clear();
-            //if (zoneVideos.Count(x => x.IsActive == false) > 0)
-            //{
-            //    zoneVideos.RemoveWhere(x => x.IsActive == false);
-            //}
+            if (zoneVideos.Count(x => x.IsActive == false) > 0)
+            {
+                zoneVideos.RemoveWhere(x => x.IsActive == false);
+            }
         }
         public void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -986,6 +1038,7 @@ namespace InperStudio.ViewModels
                         {
                             mouseDownShape = null;
                         }
+                        ZoneVideos.RemoveWhere(x => x.Name == shape1.Name);
                     }
                     //这里要清除marker配置时的zone
                     if (InperGlobalClass.EventSettings.Channels.Count(x => x.VideoZone.Name == selectCameraItem.Name) > 0)

@@ -1,6 +1,7 @@
 ﻿using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
+using InperStudioControlLib.Lib.Config;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Data.Model;
 using Stylet;
@@ -74,7 +75,12 @@ namespace InperStudio.ViewModels
                 {
                     if (sweep.Duration <= 0 || string.IsNullOrEmpty(sweep.WaveForm))
                     {
-                        view.remainder.Text = "The value cannot be empty";
+                        this.view.remainder.Text = "The value cannot be empty";
+                        if (InperConfig.Instance.Language == "zh_cn")
+                        {
+                            this.view.remainder.Text = "值不能为空";
+                        }
+                        //view.remainder.Text = "The value cannot be empty";
                         view.remainder.Visibility = Visibility.Visible;
                         return;
                     }
@@ -260,12 +266,20 @@ namespace InperStudio.ViewModels
                     else
                     {
                         this.view.remainder.Text = "The value input is not valid";
+                        if (InperConfig.Instance.Language == "zh_cn")
+                        {
+                            this.view.remainder.Text = "输入的值无效";
+                        }
                         this.view.remainder.Visibility = Visibility.Visible;
                     }
                 }
                 else
                 {
                     this.view.remainder.Text = "The value input is not valid";
+                    if (InperConfig.Instance.Language == "zh_cn")
+                    {
+                        this.view.remainder.Text = "输入的值无效";
+                    }
                     this.view.remainder.Visibility = Visibility.Visible;
                 }
             }

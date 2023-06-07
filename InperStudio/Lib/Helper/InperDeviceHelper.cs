@@ -10,7 +10,7 @@ using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper.JsonBean;
 using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
+//using OpenCvSharp.WpfExtensions;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Annotations;
@@ -260,6 +260,7 @@ namespace InperStudio.Lib.Helper
 
         private long synTime = 0;
         public event Action<int> TriggerSignalEvent;
+        public System.Timers.Timer _InputTimer { get; set; } = new System.Timers.Timer();
         private void Device_OnDevNotification(object sender, DevNotificationEventArgs e)
         {
             try
@@ -270,11 +271,11 @@ namespace InperStudio.Lib.Helper
                     {
                         if (json.Type == ChannelTypeEnum.TriggerStart.ToString())
                         {
-                            TriggerSignalEvent.Invoke(0);
+                            TriggerSignalEvent?.Invoke(0);
                         }
                         if (json.Type == ChannelTypeEnum.TriggerStop.ToString())
                         {
-                            TriggerSignalEvent.Invoke(1);
+                            TriggerSignalEvent?.Invoke(1);
                         }
                     }
                     else
@@ -292,17 +293,20 @@ namespace InperStudio.Lib.Helper
 
                             if (InperGlobalClass.IsRecord)
                             {
+                                Monitor.Enter(_InputLocked);
                                 SaveInputDatas.Enqueue(input);
+                                Monitor.Exit(_InputLocked);
                             }
 
                             _ = Task.Run(() =>
                             {
                                 InputDataUpdateProc();
 
-                                if (InperGlobalClass.IsRecord)
-                                {
-                                    SaveEventData();
-                                }
+                                //新开线程去处理
+                                //if (InperGlobalClass.IsRecord)
+                                //{
+                                //    SaveEventData();
+                                //}
                             });
                         }
                     }
@@ -311,6 +315,50 @@ namespace InperStudio.Lib.Helper
             catch (Exception ex)
             {
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        public void InitSignalProperties()
+        {
+            foreach (var item in CameraChannels)
+            {
+                _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+
+                if (item.LightModes.Count > 0)
+                {
+                    if (item.Filters.IsBandpass)
+                    {
+                        double high = item.Filters.Bandpass2 < item.Filters.Bandpass1 ? item.Filters.Bandpass1 : item.Filters.Bandpass2;
+                        double low = item.Filters.Bandpass1 > item.Filters.Bandpass2 ? item.Filters.Bandpass2 : item.Filters.Bandpass1;
+                        item.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, low, high);
+                    }
+                    if (item.Filters.IsBandstop)
+                    {
+                        double high = item.Filters.Bandstop2 < item.Filters.Bandstop1 ? item.Filters.Bandstop1 : item.Filters.Bandstop2;
+                        double low = item.Filters.Bandstop1 > item.Filters.Bandstop2 ? item.Filters.Bandstop2 : item.Filters.Bandstop1;
+                        item.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, item.Filters.Bandstop1, item.Filters.Bandstop2);
+                    }
+                    item.LightModes.ForEach(x =>
+                    {
+                        x.OffsetValue = 0;
+
+                        if (!FilterData[item.ChannelId].ContainsKey(x.LightType))
+                        {
+                            FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                        }
+
+                        if (!OffsetData[item.ChannelId].ContainsKey(x.LightType))
+                        {
+                            OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                        }
+                        if (!DeltaFData[item.ChannelId].ContainsKey(x.LightType))
+                        {
+                            DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                        }
+                    });
+                }
+
             }
         }
         public bool InitDataStruct()
@@ -326,48 +374,8 @@ namespace InperStudio.Lib.Helper
                 FilterData.Clear();
                 OffsetData.Clear();
                 DeltaFData.Clear();
-                foreach (var item in CameraChannels)
-                {
-                    _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
-                    _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
-                    _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
 
-                    if (item.LightModes.Count > 0)
-                    {
-                        if (item.Filters.IsBandpass)
-                        {
-                            double high = item.Filters.Bandpass2 < item.Filters.Bandpass1 ? item.Filters.Bandpass1 : item.Filters.Bandpass2;
-                            double low = item.Filters.Bandpass1 > item.Filters.Bandpass2 ? item.Filters.Bandpass2 : item.Filters.Bandpass1;
-                            item.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, low, high);
-                        }
-                        if (item.Filters.IsBandstop)
-                        {
-                            double high = item.Filters.Bandstop2 < item.Filters.Bandstop1 ? item.Filters.Bandstop1 : item.Filters.Bandstop2;
-                            double low = item.Filters.Bandstop1 > item.Filters.Bandstop2 ? item.Filters.Bandstop2 : item.Filters.Bandstop1;
-                            item.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, item.Filters.Bandstop1, item.Filters.Bandstop2);
-                        }
-                        item.LightModes.ForEach(x =>
-                        {
-                            x.OffsetValue = 0;
-
-                            if (!FilterData[item.ChannelId].ContainsKey(x.LightType))
-                            {
-                                FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                            }
-
-                            if (!OffsetData[item.ChannelId].ContainsKey(x.LightType))
-                            {
-                                OffsetData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                            }
-                            if (!DeltaFData[item.ChannelId].ContainsKey(x.LightType))
-                            {
-                                DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
-                            }
-                        });
-                    }
-
-                }
-
+                InitSignalProperties();
 
                 if (InperGlobalClass.EventSettings.Channels.Count > 0)
                 {
@@ -375,7 +383,14 @@ namespace InperStudio.Lib.Helper
                     {
                         if (x.Type == ChannelTypeEnum.Input.ToString())//x.Type == EventSettingsTypeEnum.Marker.ToString() || 
                         {
-                            EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = x.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>() { FifoCapacity = 5000 }, Stroke = (Color)ColorConverter.ConvertFromString(x.BgColor) });
+                            if (!_InputTimer.Enabled)
+                            {
+                                _InputTimer.Enabled = true;
+                                _InputTimer.Interval = 3000;
+                                _InputTimer.Elapsed += InputTimer_Elapsed;
+                                _InputTimer.Start();
+                            }
+                            EventChannelChart.RenderableSeries.Add(new LineRenderableSeriesViewModel() { Tag = x.ChannelId, IsDigitalLine = true, DataSeries = new XyDataSeries<TimeSpan, double>() { FifoCapacity = 200 }, Stroke = (Color)ColorConverter.ConvertFromString(x.BgColor) });
                         }
                     });
                 }
@@ -402,7 +417,7 @@ namespace InperStudio.Lib.Helper
                     if (e.Group > -1 && _LoopCannels.Count > 0)
                     {
                         _MatQ.Enqueue(e);
-                        _ = Task.Run(() => { FrameProc(); });
+                        //_ = Task.Run(() => { FrameProc(); });
                     }
                 }
 
@@ -466,78 +481,84 @@ namespace InperStudio.Lib.Helper
         private int[] _cameraSkipCountArray = new int[4];
         private int _cameraSkipCount = 0;
         private int _FrameProcLock = 0;
-        public void FrameProc()
+        private ConcurrentDictionary<int, double[]> _defectValues;
+        public async void FrameProc()
         {
-            if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
+            //if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
             {
-                while (_MatQ.TryDequeue(out MarkedMat m))
+                while (!_frameProcTaskTokenSource.Token.IsCancellationRequested)
                 {
-                    long ts = m.Timestamp - _PlottingStartTime;
-                    time = ts;
-                    ConcurrentBag<string> values = new ConcurrentBag<string>();
-                    ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
-                    foreach (var mask in _LoopCannels)
+                    _MatQ.TryDequeue(out MarkedMat m);
+                    if (m != null)
                     {
-                        double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
-                        if (mask.Offset)
+                        long ts = m.Timestamp - _PlottingStartTime;
+                        time = ts;
+                        ConcurrentBag<string> values = new ConcurrentBag<string>();
+                        ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
+                        foreach (var mask in _LoopCannels)
                         {
-                            var res = Offset(mask, m.Group, r);
-                            if (res.Item1)
+                            double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
+
+                            if (mask.Offset)
                             {
-                                r -= res.Item2;
+                                var res = Offset(mask, m.Group, r);
+                                if (res.Item1)
+                                {
+                                    r -= res.Item2;
+                                }
                             }
-                        }
-
-                        if (mask.Filters.IsSmooth)
-                        {
-                            r = Smooth(mask, m.Group, r);
-                        }
-
-                        if (mask.IsDeltaFCalculate)
-                        {
-                            Task.Run(() =>
+                            if (mask.Filters.IsSmooth)
                             {
-                                DeltaFCalculate(mask.ChannelId, m.Group, r, ts / 100);
-                            });
+                                r = Smooth(mask, m.Group, r);
+                            }
+                            if (mask.IsDeltaFCalculate)
+                            {
+                                _ = Task.Run(() =>
+                                {
+                                    DeltaFCalculate(mask.ChannelId, m.Group, r, ts / 100);
+                                });
+                            }
+                            if (mask.Filters.IsBandpass)
+                            {
+                                r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
+                            }
+                            if (mask.Filters.IsBandstop)
+                            {
+                                r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
+                            }
+                            values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
+                            _poltValues.TryAdd(mask.ChannelId, r);
+
+                        }
+                        if (_cameraSkipCountArray[m.Group] >= _cameraSkipCount)
+                        {
+                            _CameraDataPlot.Enqueue(new PlotData(m.Group, _poltValues, ts));
+                            _ = Task.Run(() => { CameraDataUpdateProc(); });
+                            _cameraSkipCountArray[m.Group] = 0;
+                        }
+                        else
+                        {
+                            _cameraSkipCountArray[m.Group]++;
                         }
 
-                        if (mask.Filters.IsBandpass)
+                        AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
+                        if (InperGlobalClass.IsRecord)
                         {
-                            r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
+                            InperGlobalClass.RunTime = new DateTime(ts / 100, DateTimeKind.Unspecified);
+                            SaveDatas.Enqueue(allChannelRecord); //mask.ChannelId, m.Group, r, ts, mask.Type
+                            _ = Task.Run(() => { SaveImageData(); });
                         }
-                        if (mask.Filters.IsBandstop)
-                        {
-                            r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
-                        }
-                        values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
-                        _poltValues.TryAdd(mask.ChannelId, r);
-
-                    }
-                    if (_cameraSkipCountArray[m.Group] >= _cameraSkipCount)
-                    {
-                        _CameraDataPlot.Enqueue(new PlotData(m.Group, _poltValues, ts));
-                        Task.Run(() => { CameraDataUpdateProc(); });
-                        _cameraSkipCountArray[m.Group] = 0;
                     }
                     else
                     {
-                        _cameraSkipCountArray[m.Group]++;
-                    }
-
-                    AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
-                    if (InperGlobalClass.IsRecord)
-                    {
-                        InperGlobalClass.RunTime = new DateTime(ts / 100, DateTimeKind.Unspecified);
-                        SaveDatas.Enqueue(allChannelRecord); //mask.ChannelId, m.Group, r, ts, mask.Type
-                        _ = Task.Run(async () => { await SaveImageData(); });
+                        await Task.Delay(1);
                     }
                 }
-                _ = Interlocked.Exchange(ref _FrameProcLock, 0);
-                if (!_MatQ.IsEmpty)
-                {
-                    Task.Run(() => { FrameProc(); });
-                }
+                //_ = Interlocked.Exchange(ref _FrameProcLock, 0);
+                //if (!_MatQ.IsEmpty)
+                //{
+                //    Task.Run(() => { FrameProc(); });
+                //}
             }
         }
 
@@ -556,9 +577,12 @@ namespace InperStudio.Lib.Helper
                     {
                         if (device._CS._UARTA.ADPtrQueues.TryDequeue(out byte[] e))
                         {
-                            fixed (byte* pb = &e[0])
+                            if (InperGlobalClass.IsPreview || InperGlobalClass.IsRecord)
                             {
-                                AdSamplingConv(InperGlobalClass.CameraSignalSettings.AiSampling, (IntPtr)pb);
+                                fixed (byte* pb = &e[0])
+                                {
+                                    AdSamplingConv(InperGlobalClass.CameraSignalSettings.AiSampling, (IntPtr)pb);
+                                }
                             }
                         }
                         Interlocked.Exchange(ref _adConvLock, 0);
@@ -656,6 +680,10 @@ namespace InperStudio.Lib.Helper
                 if (ccn1 != null)
                 {
                     double v1 = (values[i] * 2.95 * 24.3520 / 4096) - 5.1;
+                    if (v1 > 30)
+                    {
+                        v1 = (v1 - 51.87525) / 2.53763 - 0.12;
+                    }
                     TimeSpan ts1 = new TimeSpan(_adPreTime[(int)(channel * 2 - 1) + 100] + (long)(adFsTimeInterval * count * Math.Pow(10, 7)));
                     v1 = Math.Round(GetAiFilterValue(ccn1, v1, ts1.Ticks), 5);
                     usbAdData.Values1.Add(v1);
@@ -664,6 +692,10 @@ namespace InperStudio.Lib.Helper
                 if (ccn2 != null)
                 {
                     double v2 = (values[i + 1] * 2.95 * 24.3520 / 4096) - 5.1;
+                    if (v2 > 30)
+                    {
+                        v2 = (v2 - 51.87525) / 2.53763 - 0.12;
+                    }
                     TimeSpan ts2 = new TimeSpan(_adPreTime[(int)(channel * 2) + 100] + (long)(adFsTimeInterval * count * Math.Pow(10, 7)));
                     v2 = Math.Round(GetAiFilterValue(ccn2, v2, ts2.Ticks), 5);
                     usbAdData.Values2.Add(v2);
@@ -881,45 +913,7 @@ namespace InperStudio.Lib.Helper
         private ConcurrentQueue<AllChannelRecord> SaveDatas = new ConcurrentQueue<AllChannelRecord>();
         private List<AllChannelRecord> _SaveCameraCache = new List<AllChannelRecord>();
         private int _ImageDataLock = 0;
-        //private void SaveImageData()
-        //{
-        //    if (Interlocked.Exchange(ref _ImageDataLock, 1) == 0)
-        //    {
-        //        while (SaveDatas.TryDequeue(out AllChannelRecord data))
-        //        {
-        //            _SaveCameraCache.Add(data);
-        //            if (_SaveCameraCache.Count > InperGlobalClass.CameraSignalSettings.Sampling * 10)
-        //            {
-        //                AllChannelRecord[] datas = new AllChannelRecord[_SaveCameraCache.Count];
-        //                _SaveCameraCache.CopyTo(datas);
-        //                _SaveCameraCache.Clear();
-        //                ImageDataCloneToSave(datas);
-        //            }
-        //        }
-        //        _ = Interlocked.Exchange(ref _ImageDataLock, 0);
-        //        if (!SaveDatas.IsEmpty)
-        //        {
-        //            Task.Run(() => { SaveImageData(); });
-        //        }
-        //    }
-        //}
-        //private void ImageDataCloneToSave(AllChannelRecord[] datas)
-        //{
-        //    _ = Task.Factory.StartNew(() =>
-        //    {
-        //        IEnumerable<IGrouping<int, AllChannelRecord>> res = datas.GroupBy(x => x.Type);
-
-        //        Parallel.ForEach(res, data =>
-        //        {
-        //            _ = App.SqlDataInit.sqlSugar.UseTran(() =>
-        //            {
-        //                //_ = App.SqlDataInit.sqlSugar.Insertable(datas).ExecuteCommand();
-        //                _ = App.SqlDataInit.sqlSugar.Storageable(data.ToList()).As(nameof(AllChannelRecord) + data.Key).ToStorage().BulkCopy();
-        //            });
-        //        });
-        //    });
-        //}
-        private async Task SaveImageData()
+        private async void SaveImageData()
         {
             if (Interlocked.Exchange(ref _ImageDataLock, 1) == 0)
             {
@@ -945,7 +939,7 @@ namespace InperStudio.Lib.Helper
 
                 if (!SaveDatas.IsEmpty)
                 {
-                    await Task.Run(() => SaveImageData());
+                    _ = Task.Run(() => SaveImageData());
                 }
             }
         }
@@ -967,32 +961,45 @@ namespace InperStudio.Lib.Helper
         #endregion
 
         #region input 数据存储
-        private ConcurrentQueue<Input> SaveInputDatas = new ConcurrentQueue<Input>();
-        private List<Input> _SaveInputCache = new List<Input>();
-        private int _InputLocked = 0;
-        private void SaveEventData()
+        private Queue<Input> SaveInputDatas = new Queue<Input>();
+        private readonly object _InputLocked = new object();
+        private void InputTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (Interlocked.Exchange(ref _InputLocked, 1) == 0)
+            if (Monitor.TryEnter(_InputLocked))
             {
-                while (SaveInputDatas.TryDequeue(out Input data))
+                List<Input> outputs = new List<Input>(SaveInputDatas);
+                SaveInputDatas.Clear();
+                Monitor.Exit(_InputLocked);
+                if (outputs.Count > 0)
                 {
-                    _SaveInputCache.Add(data);
-                    if (_SaveInputCache.Count > 1000)
-                    {
-                        Input[] inputs = new Input[_SaveInputCache.Count];
-                        _SaveInputCache.CopyTo(inputs);
-                        _SaveInputCache.Clear();
-                        InputDataCloneToSave(inputs);
-                    }
-                }
-                _ = Interlocked.Exchange(ref _InputLocked, 0);
-                if (!SaveInputDatas.IsEmpty)
-                {
-                    _ = Task.Run(() => { SaveEventData(); });
+                    InputDataCloneToSave(outputs);
                 }
             }
         }
-        private void InputDataCloneToSave(Input[] datas)
+        private void SaveEventData()
+        {
+            //if (Interlocked.Exchange(ref _InputLocked, 1) == 0)
+            //{
+            //while (SaveInputDatas.TryDequeue(out Input data))
+            //{
+            //    _SaveInputCache.Add(data);
+            //    //运行时间短，电脑异常断电input数据未保存 存储个数改成5的原因   频率高的情况下会造成卡顿
+            //    if (_SaveInputCache.Count > 50)
+            //    {
+            //        Input[] inputs = new Input[_SaveInputCache.Count];
+            //        _SaveInputCache.CopyTo(inputs);
+            //        _SaveInputCache.Clear();
+            //        InputDataCloneToSave(inputs);
+            //    }
+            //}
+            //_ = Interlocked.Exchange(ref _InputLocked, 0);
+            //if (!SaveInputDatas.IsEmpty)
+            //{
+            //    _ = Task.Run(() => { SaveEventData(); });
+            //}
+            //}
+        }
+        private void InputDataCloneToSave(List<Input> datas)
         {
             Task.Factory.StartNew(() =>
             {
@@ -1246,6 +1253,11 @@ namespace InperStudio.Lib.Helper
                 time = 0;
                 _frameProcTaskTokenSource.Cancel();
                 _updateTaskTokenSource.Cancel();
+                if (_InputTimer.Enabled)
+                {
+                    _InputTimer.Elapsed -= InputTimer_Elapsed;
+                    _InputTimer.Stop();
+                }
             }
             catch (Exception ex)
             {
@@ -1317,8 +1329,8 @@ namespace InperStudio.Lib.Helper
                 {
                     if (SaveInputDatas.Count > 0)
                     {
-                        IEnumerable<Input> items = _SaveInputCache.Concat(SaveInputDatas.ToList());
-                        SaveInputDatas = new ConcurrentQueue<Input>();
+                        IEnumerable<Input> items = SaveInputDatas.ToList();
+                        SaveInputDatas = new Queue<Input>();
                         Parallel.ForEach(items.GroupBy(x => x.ChannelId), data =>
                           {
                               _ = App.SqlDataInit.sqlSugar.UseTran(() =>
@@ -1327,18 +1339,7 @@ namespace InperStudio.Lib.Helper
                               });
                           });
                     }
-                    else if (_SaveInputCache.Count > 0)
-                    {
-                        IEnumerable<IGrouping<int, Input>> res = _SaveInputCache.GroupBy(x => x.ChannelId);
-                        Parallel.ForEach(res, data =>
-                        {
-                            _ = App.SqlDataInit.sqlSugar.UseTran(() =>
-                            {
-                                _ = App.SqlDataInit.sqlSugar.Storageable(data.ToList()).As("Input" + data.Key).ToStorage().BulkCopy();
-                            });
-                        });
-                    }
-                    _SaveInputCache.Clear();
+
                     _InputDataPlot = new ConcurrentQueue<Input>();
                 }
                 _saveDataTaskTokenSource = new CancellationTokenSource();
@@ -1460,7 +1461,7 @@ namespace InperStudio.Lib.Helper
                     _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                     _Metronome.Start();
                 }
-
+                _defectValues = new ConcurrentDictionary<int, double[]>();
                 _eventIsFirst = true; isFirstRecordTiem = true; isLoop = true;
                 _updateTaskTokenSource = new CancellationTokenSource();
                 _frameProcTaskTokenSource = new CancellationTokenSource();
@@ -1492,9 +1493,10 @@ namespace InperStudio.Lib.Helper
                     {
                         device.SwitchLight((uint)json.Condition.ChannelId, true);
                     }
-                    List<byte> bindDios = new List<byte>();
-
-                    bindDios.Add((byte)json.Condition.ChannelId);
+                    List<byte> bindDios = new List<byte>
+                    {
+                        (byte)json.Condition.ChannelId
+                    };
                     string ob = "00000000";
                     ob = ob.Insert(7 - json.ChannelId, "1").Remove(8, 1);
                     bindDios.Add(System.Convert.ToByte(ob, 2));

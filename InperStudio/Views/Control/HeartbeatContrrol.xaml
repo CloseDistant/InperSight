@@ -10,11 +10,17 @@
     <UserControl.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
     </UserControl.Resources>
-    <hc:TransitioningContentControl MouseDoubleClick="TransitioningContentControl_MouseDoubleClick">
+    <!--MouseDoubleClick="TransitioningContentControl_MouseDoubleClick"-->
+    <hc:TransitioningContentControl Visibility="{Binding Source={StaticResource InperGlobalClass},Path= IsDisplaySprit,Converter={StaticResource Boolean2VisibilityConverter}}">
         <Grid>
             <hc:WaveProgressBar Name="wavePB" Value="90" WaveFill="LightSeaGreen" Text="123" ShowText="False"/>
             <TextBlock x:Name="fileSize" Text="0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" FontSize="14" Margin="0 0 0 10" FontWeight="Bold"/>
             <TextBlock x:Name="time"  Text="{Binding Source={StaticResource InperGlobalClass},Path= RunTime,StringFormat='HH:mm:ss:ff',UpdateSourceTrigger=PropertyChanged}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Heavy" FontSize="12" Margin="0 40 0 0"/>
         </Grid>
+        <hc:TransitioningContentControl.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="隐藏" Click="MenuItem_Click"></MenuItem>
+            </ContextMenu>
+        </hc:TransitioningContentControl.ContextMenu>
     </hc:TransitioningContentControl>
 </UserControl>

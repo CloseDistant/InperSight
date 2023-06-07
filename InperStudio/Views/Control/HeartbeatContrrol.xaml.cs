@@ -72,5 +72,10 @@ namespace InperStudio.Views.Control
         {
             ManulControlViewModel.sprite.Close();
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            InperGlobalClass.IsDisplaySprit = false;
+        }
     }
 }

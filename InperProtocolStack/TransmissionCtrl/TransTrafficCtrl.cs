@@ -192,7 +192,7 @@ namespace InperProtocolStack.TransmissionCtrl
 
 
         private uint _SendingSequence = 0;
-        private ConcurrentQueue<Command> _CommandCache = new ConcurrentQueue<Command>();
+        public ConcurrentQueue<Command> _CommandCache = new ConcurrentQueue<Command>();
         private AutoResetEvent _AREvent = new AutoResetEvent(false);
         private CancellationTokenSource tokenSource = new CancellationTokenSource();
 

@@ -66,6 +66,15 @@ namespace InperStudio.ViewModels
         }
         protected override void OnClose()
         {
+            SaveCameraConfig();
+            RequestClose();
+            string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            string[] exeArray = exeName.Split('\\');
+            KillProcess(exeArray.Last().Split('.').First());
+            System.Environment.Exit(0);
+        }
+        public void SaveCameraConfig()
+        {
             try
             {
                 InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous = leftToolsControlViewModel.IsContinuous;
@@ -93,11 +102,6 @@ namespace InperStudio.ViewModels
             {
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
-            RequestClose();
-            string exeName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-            string[] exeArray = exeName.Split('\\');
-            KillProcess(exeArray.Last().Split('.').First());
-            System.Environment.Exit(0);
         }
         private void KillProcess(string processName)
         {
@@ -209,7 +213,7 @@ namespace InperStudio.ViewModels
                 if (!InperGlobalClass.IsImportConfig)
                 {
                     string text = "Unsaved configuration has been detected.Do you want to save it?";
-                    if (InperConfig.Instance.Language != "en_us")
+                    if (InperConfig.Instance.Language.ToLower() != "en_us")
                     {
                         text = "检测到有配置未保存，是否要保存？";
                     }

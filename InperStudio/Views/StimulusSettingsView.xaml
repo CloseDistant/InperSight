@@ -12,8 +12,8 @@
         xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels" 
-        mc:Ignorable="d"  FontFamily="{DynamicResource InperFontFamily}" Title="{DynamicResource stimulus_title}" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False"
-        Width="700" Height="500" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
+        mc:Ignorable="d"  FontFamily="{DynamicResource InperFontFamily}" Title="{DynamicResource stimulus_title}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="False"
+        Width="700" Height="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <chart:CustomTimeSpanLableProvider x:Key="customTimeSpanLableProvider"/>
@@ -62,10 +62,17 @@
     </inp:InperDialogWindow.Resources>
     <Grid Margin="25 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
         <Grid.RowDefinitions>
+            <RowDefinition Height=".2*"/>
             <RowDefinition Height="1.8*"/>
+            <RowDefinition Height="0"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 5 0 0">
+            <TextBlock Text="{DynamicResource stimulus_use}" Width="50" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" Visibility="{Binding ElementName=isUse,Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter}}"/>
+            <TextBlock Text="{DynamicResource stimulus_nouse}" Width="50" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" Visibility="{Binding ElementName=isUse,Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}"/>
+            <ToggleButton Effect="{StaticResource EffectShadow5}" Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Margin="0 0 0 0" Height="18" Cursor="Hand" Name="isUse" IsChecked="True"/>
+        </WrapPanel>
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.2*"/>
                 <ColumnDefinition Width="10"/>
@@ -88,7 +95,7 @@
                             <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="50" Binding="{Binding Index}" Header="{DynamicResource stimulus_item}"/>
                             <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Pulse}" Header="{DynamicResource stimulus_pulse}"/>
                             <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="65" Binding="{Binding Frequence}" Header="{DynamicResource stimulus_freq}"/>
-                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="60" Binding="{Binding Duration}" Header="{DynamicResource stimulus_duration}"/>
+                            <DataGridTextColumn CellStyle="{StaticResource CellStyle}" Width="62" Binding="{Binding Duration}" Header="{DynamicResource stimulus_duration}"/>
                             <DataGridTemplateColumn Width="80" CellStyle="{StaticResource CellStyle}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -216,7 +223,19 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2" Visibility="Collapsed">
+            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 5 0 0">
+                <TextBlock Text="Trigger" Width="50" VerticalAlignment="Center"/>
+                <ToggleButton Effect="{StaticResource EffectShadow5}" x:Name="_triggerToggle" Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Margin="0 0 0 0" Height="18" Cursor="Hand" />
+                <ComboBox Style="{StaticResource InperComboBoxBaseStyle}" hc:BorderElement.CornerRadius="2" ItemsSource="{Binding EventChannels}" SelectedIndex="1" IsEnabled="{Binding ElementName=_triggerToggle,Path=IsChecked}" Name="_triggerdio" DisplayMemberPath="Name" Width="100" Height="25" HorizontalAlignment="Left" Margin="10 0 0 0"/>
+                <TextBlock Text="Mode" Width="50" Margin="44 0 0 0" VerticalAlignment="Center"/>
+                <ComboBox Style="{StaticResource InperComboBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Name="_triggerMode" DisplayMemberPath="" Width="100" Height="25" IsEnabled="{Binding ElementName=_triggerToggle,Path=IsChecked}" HorizontalAlignment="Left" Margin="10 0 0 0">
+                    <ComboBoxItem>Gate</ComboBoxItem>
+                    <ComboBoxItem>Realtime</ComboBoxItem>
+                </ComboBox>
+            </WrapPanel>
+        </Grid>
+        <Grid Grid.Row="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="*"/>
@@ -224,8 +243,8 @@
             <Grid Grid.Row="0">
                 <TextBlock Text="{DynamicResource stimulus_preview}" VerticalAlignment="Center" Foreground="{StaticResource InperTheme}" />
                 <TextBlock Text="{DynamicResource stimulus_output}" VerticalAlignment="Center" Margin="240 0 0 0"/>
-                <ComboBox ItemsSource="{Binding EventChannels}" Name="dio" DisplayMemberPath="Name" Width="120" Height="20" HorizontalAlignment="Left" Margin="300 0 0 0"/>
-                <TextBlock Text="hh:mm:ss" VerticalAlignment="Center" Margin="450 0 0 0"/>
+                <ComboBox Style="{StaticResource InperComboBoxBaseStyle}" ItemsSource="{Binding EventChannels}" SelectedIndex="0" Padding="3 0 0 0" hc:BorderElement.CornerRadius="2" Name="dio" DisplayMemberPath="Name" Width="100" Height="25" HorizontalAlignment="Left" Margin="300 0 0 0"/>
+                <TextBlock Text="{DynamicResource stimulus_time}" VerticalAlignment="Center" Margin="450 0 0 0"/>
                 <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="440 0 0 0" Name="hour" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
                 <TextBlock Text=":" VerticalAlignment="Center" Margin="550 0 0 0"/>
                 <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="520 0 0 0" Name="minute" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>

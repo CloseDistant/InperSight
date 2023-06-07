@@ -10,9 +10,5 @@
             InitializeComponent();
         }
 
-        private void markerMode_Selected(object sender, System.Windows.RoutedEventArgs e)
-        {
-
-        }
     }
 }

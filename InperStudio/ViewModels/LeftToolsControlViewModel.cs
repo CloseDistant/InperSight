@@ -28,13 +28,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using InperStudioControlLib.Lib.Config;
+using SciChart.Core.Extensions;
+using SqlSugar;
 
 namespace InperStudio.ViewModels
 {
     public class LeftToolsControlViewModel : Screen
     {
         #region properties
-        private LeftToolsControlView view;
+        public LeftToolsControlView view;
         private IWindowManager windowManager;
         public List<Grid> EllipseBorder = new List<Grid>();
         private System.Windows.Point startPoint;
@@ -86,7 +89,15 @@ namespace InperStudio.ViewModels
             }
             if (isImport)
             {
+                foreach (var item in AnalogActiveChannels)
+                {
+                    AnalogChannels.Insert(item.ChannelId - 101, item);
+                }
+                AnalogActiveChannels.Clear();
                 this.view.ellipseCanvas.Children.Clear();
+                EllipseBorder.Clear();
+                CameraShow();
+
                 //InperDeviceHelper.Instance.CameraChannels.Clear();
                 view.Exposure.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                 view.Sampling.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
@@ -99,59 +110,62 @@ namespace InperStudio.ViewModels
             Init(isImport);
             InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
             {
-                if (x.Type == ChannelTypeEnum.Analog.ToString())
+                if (AnalogActiveChannels.Count(c => c.ChannelId == x.ChannelId) == 0)
                 {
-                    _ = AnalogChannels.Remove(AnalogChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId));
-                    var an = new SignalCameraChannel()
+                    if (x.Type == ChannelTypeEnum.Analog.ToString() && InperGlobalClass.IsDisplayAnalog)
                     {
-                        ChannelId = x.ChannelId,
-                        ChannelType = x.Type,
-                        Name = x.Name,
-                        YaxisDoubleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
-                        BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color))
-                    };
-                    AnalogActiveChannels.Add(an);
-                    if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId && c.Type == x.Type) == null)
-                    {
-                        CameraChannel item = new CameraChannel()
+                        _ = AnalogChannels.Remove(AnalogChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId));
+                        var an = new SignalCameraChannel()
                         {
                             ChannelId = x.ChannelId,
+                            ChannelType = x.Type,
                             Name = x.Name,
-                            YVisibleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
-                            Type = ChannelTypeEnum.Analog.ToString()
+                            YaxisDoubleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
+                            BgColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(x.Color))
                         };
-                        item.TimeSpanAxis = new TimeSpanAxis()
-                        {
-                            DrawMajorBands = false,
-                            DrawMajorGridLines = false,
-                            DrawMinorGridLines = false,
-                            VisibleRange = item.XVisibleRange,
-                            Visibility = Visibility.Collapsed
-                        };
-                        item.Offset = x.Offset;
-                        item.OffsetWindowSize = x.OffsetWindowSize;
 
-                        item.Filters = new Lib.Bean.Channel.Filters()
+                        if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId && c.Type == x.Type) == null)
                         {
-                            HighPass = x.Filters.HighPass,
-                            IsHighPass = x.Filters.IsHighPass,
-                            IsLowPass = x.Filters.IsLowPass,
-                            IsNotch = x.Filters.IsNotch,
-                            IsSmooth = x.Filters.IsSmooth,
-                            LowPass = x.Filters.LowPass,
-                            Notch = x.Filters.Notch,
-                            Smooth = x.Filters.Smooth
-                        };
-                        item.LightModes.Add(new LightMode<TimeSpan, double>()
-                        {
-                            LightType = -1
-                        });
-                        //item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
+                            CameraChannel item = new CameraChannel()
+                            {
+                                ChannelId = x.ChannelId,
+                                Name = x.Name,
+                                YVisibleRange = new SciChart.Data.Model.DoubleRange(x.YBottom, x.YTop),
+                                Type = ChannelTypeEnum.Analog.ToString()
+                            };
+                            item.TimeSpanAxis = new TimeSpanAxis()
+                            {
+                                DrawMajorBands = false,
+                                DrawMajorGridLines = false,
+                                DrawMinorGridLines = false,
+                                VisibleRange = item.XVisibleRange,
+                                Visibility = Visibility.Collapsed
+                            };
+                            item.Offset = x.Offset;
+                            item.OffsetWindowSize = x.OffsetWindowSize;
 
-                        LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", YAxisId = "Ch0", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color?)ColorConverter.ConvertFromString(x.Color) };
-                        item.RenderableSeries.Add(line);
+                            item.Filters = new Filters()
+                            {
+                                HighPass = x.Filters.HighPass,
+                                IsHighPass = x.Filters.IsHighPass,
+                                IsLowPass = x.Filters.IsLowPass,
+                                IsNotch = x.Filters.IsNotch,
+                                IsSmooth = x.Filters.IsSmooth,
+                                LowPass = x.Filters.LowPass,
+                                Notch = x.Filters.Notch,
+                                Smooth = x.Filters.Smooth
+                            };
+                            item.LightModes.Add(new LightMode<TimeSpan, double>()
+                            {
+                                LightType = -1
+                            });
+                            //item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
 
-                        InperDeviceHelper.Instance.CameraChannels.Add(item);
+                            LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", YAxisId = "Ch0", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = (Color?)ColorConverter.ConvertFromString(x.Color) };
+                            item.RenderableSeries.Add(line);
+
+                            InperDeviceHelper.Instance.CameraChannels.Add(item);
+                        }
                     }
                 }
             });
@@ -165,6 +179,9 @@ namespace InperStudio.ViewModels
         {
             view.camera.Visibility = Visibility.Visible;
             view.analog.Visibility = Visibility.Collapsed;
+            //状态切换
+            RoutedEventArgs eventArgs = new RoutedEventArgs(Button.ClickEvent, view._camera);
+            view._camera.RaiseEvent(eventArgs);
         }
         public void AnalogShow()
         {
@@ -203,13 +220,23 @@ namespace InperStudio.ViewModels
                 {
                     if (double.Parse(com.Text) < 0)
                     {
-                        Growl.Warning("不能小于0", "SuccessMsg");
+                        string text = "不能小于0";
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "Can't be less than 0";
+                        }
+                        Growl.Warning(text, "SuccessMsg");
                         com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                         return;
                     }
                     if (double.Parse(com.Text) > 100)
                     {
-                        Growl.Warning("不能大于100", "SuccessMsg");
+                        string text = "不能大于100";
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "Not more than 100";
+                        }
+                        Growl.Warning(text, "SuccessMsg");
                         com.Text = InperGlobalClass.CameraSignalSettings.Exposure.ToString();
                         return;
                     }
@@ -251,13 +278,23 @@ namespace InperStudio.ViewModels
                 {
                     if (double.Parse(com.Text) < 1)
                     {
-                        Growl.Warning("不能小于1", "SuccessMsg");
+                        string text = "不能小于1";
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "Can't be less than 1";
+                        }
+                        Growl.Warning(text, "SuccessMsg");
                         com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         return;
                     }
                     if (double.Parse(com.Text) > 300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count))
                     {
-                        Growl.Warning("不能大于 " + (300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count)), "SuccessMsg");
+                        string text = "不能大于 " + (300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "Can't be greater than " + (300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
+                        }
+                        Growl.Warning(text, "SuccessMsg");
                         com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
                         return;
                     }
@@ -292,7 +329,8 @@ namespace InperStudio.ViewModels
                     view.lightTestMode.IsChecked = true;
                     await SetExpourseAndGain();
                 }
-                view.camera.Visibility = Visibility.Visible;
+                //view.camera.Visibility = Visibility.Visible;
+                CameraShow();
                 view.channelRoi.IsEnabled = false;
                 view.waveView.IsEnabled = false;
                 InperDeviceHelper.Instance.SelectedWaveType = -1;
@@ -309,7 +347,10 @@ namespace InperStudio.ViewModels
                     if (x.Type == ChannelTypeEnum.Camera.ToString())
                     {
                         Grid grid = DrawCircle(x.ChannelId + 1, x.ROI, x.YTop, x.YBottom, x);
-                        _ = view.ellipseCanvas.Children.Add(grid);
+                        if (grid != null)
+                        {
+                            _ = view.ellipseCanvas.Children.Add(grid);
+                        }
                     }
                 });
                 if (InperGlobalClass.IsStop)
@@ -407,7 +448,10 @@ namespace InperStudio.ViewModels
                                 if (radius < 110)
                                 {
                                     Grid grid = DrawCircle(i + 1, radius, 10, 0, new Channel() { Offset = false, Top = centers[i].Center.Y * scaleY - radius / 2, Left = centers[i].Center.X * scaleY - radius / 2 });
-                                    this.view.ellipseCanvas.Children.Add(grid);
+                                    if (grid != null)
+                                    {
+                                        this.view.ellipseCanvas.Children.Add(grid);
+                                    }
                                 }
                             }
                             break;
@@ -433,22 +477,10 @@ namespace InperStudio.ViewModels
                 {
                     int index = EllipseBorder.Count == 0 ? 1 : int.Parse((EllipseBorder.Last().Children[0] as TextBlock).Text) + 1;
                     Grid grid = DrawCircle(index, Diameter, 10, 0);
-                    //if (EllipseBorder.Count > 3 && EllipseBorder.Count <= 6)
-                    //{
-                    //    grid.SetValue(Canvas.LeftProperty, 55.0);
-                    //    grid.SetValue(Canvas.TopProperty, (double)(EllipseBorder.Count - 3) * Diameter - 40);
-                    //}
-                    //else if (EllipseBorder.Count > 6)
-                    //{
-                    //    grid.SetValue(Canvas.LeftProperty, 105.0);
-                    //    grid.SetValue(Canvas.TopProperty, (double)(EllipseBorder.Count - 6) * Diameter - 40);
-                    //}
-                    //else
-                    //{
-                    //    grid.SetValue(Canvas.LeftProperty, 10.0);
-                    //    grid.SetValue(Canvas.TopProperty, (double)EllipseBorder.Count * Diameter - 40);
-                    //}
-                    this.view.ellipseCanvas.Children.Add(grid);
+                    if (grid != null)
+                    {
+                        this.view.ellipseCanvas.Children.Add(grid);
+                    }
                 }
                 else
                 {
@@ -471,6 +503,16 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                if (InperGlobalClass.IsPreview && EllipseBorder.Count == 1)
+                {
+                    string text = "至少存在一个ROI";
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "At least one ROI exists";
+                    }
+                    InperGlobalClass.ShowReminderInfo(text);
+                    return;
+                }
                 if (EllipseBorder.Count > 0)
                 {
                     if (moveGrid != null)
@@ -486,7 +528,7 @@ namespace InperStudio.ViewModels
                         {
                             _ = InperGlobalClass.CameraSignalSettings.CameraChannels.Remove(channel);
                         }
-                        view.channelName.Text = InperDeviceHelper.Instance.CameraChannels.Count > 0 ? InperDeviceHelper.Instance.CameraChannels.Last().Name : "";
+                        view.channelName.Text = InperDeviceHelper.Instance.CameraChannels.Count(x => x.Type == ChannelTypeEnum.Camera.ToString()) > 0 ? InperDeviceHelper.Instance.CameraChannels.Last(x => x.Type == ChannelTypeEnum.Camera.ToString()).Name : "";
                         if (EllipseBorder.Count > 0)
                         {
                             SetDefaultCircle(EllipseBorder.Last());
@@ -514,6 +556,13 @@ namespace InperStudio.ViewModels
                     Top = 0,
                     Offset = false,
                 };
+            }
+            foreach (var item in view.ellipseCanvas.Children)
+            {
+                if ((item as FrameworkElement).Name == ("ROI_" + index))
+                {
+                    return null;
+                }
             }
             Grid grid = new Grid() { Cursor = Cursors.Hand, Background = Brushes.Transparent, Name = "ROI_" + index };
             grid.SetValue(Canvas.LeftProperty, _channel.Left);
@@ -630,7 +679,8 @@ namespace InperStudio.ViewModels
                     InperGlobalClass.CameraSignalSettings.CameraChannels.Add(new Channel()
                     {
                         ChannelId = index - 1,
-                        Name = "ROI-" + index + "-",
+                        //Name = "ROI-" + index + "-",
+                        Name = "ROI-" + index,
                         Left = double.Parse(grid.GetValue(Canvas.LeftProperty).ToString()),
                         Top = double.Parse(grid.GetValue(Canvas.TopProperty).ToString()),
                         ROI = ellipse.Width,
@@ -782,7 +832,12 @@ namespace InperStudio.ViewModels
                         width = Math.Floor(view.image.ActualHeight);
                         moveGrid.SetValue(Canvas.LeftProperty, 10.0);
                         moveGrid.SetValue(Canvas.TopProperty, 0.0);
-                        InperGlobalClass.ShowReminderInfo("The value cannot exceed " + width);
+                        string text = "取值不能超过" + width;
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "The value cannot exceed " + width;
+                        }
+                        InperGlobalClass.ShowReminderInfo(text);
                     }
 
                     ellipse.Width = ellipse.Height = width;
@@ -905,12 +960,22 @@ namespace InperStudio.ViewModels
                     if (gain > (sender as InperTextBox).InperMaxValue)
                     {
                         (sender as InperTextBox).Text = (sender as InperTextBox).InperMaxValue.ToString();
-                        InperGlobalClass.ShowReminderInfo("The maximum value is" + (sender as InperTextBox).InperMaxValue);
+                        string text = "最大值是：" + (sender as InperTextBox).InperMaxValue;
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "The maximum value is" + (sender as InperTextBox).InperMaxValue;
+                        }
+                        InperGlobalClass.ShowReminderInfo(text);
                     }
                     if (gain < (sender as InperTextBox).InperMinValue)
                     {
                         (sender as InperTextBox).Text = (sender as InperTextBox).InperMinValue.ToString();
-                        InperGlobalClass.ShowReminderInfo("The minimum value is" + (sender as InperTextBox).InperMaxValue);
+                        string text = "最小值是：" + (sender as InperTextBox).InperMinValue;
+                        if (InperConfig.Instance.Language == "en_us")
+                        {
+                            text = "The minimum value is" + (sender as InperTextBox).InperMinValue;
+                        }
+                        InperGlobalClass.ShowReminderInfo(text);
                     }
                     InperGlobalClass.CameraSignalSettings.Gain = gain;
                     _ = InperDeviceHelper.Instance.device.SetGain(gain);
@@ -1147,12 +1212,22 @@ namespace InperStudio.ViewModels
                 WaveGroup sen = (sender as InperTextBox).DataContext as WaveGroup;
                 if (sen.LightPower > (sender as InperTextBox).InperMaxValue)
                 {
-                    InperGlobalClass.ShowReminderInfo("The maximum value is" + (sender as InperTextBox).InperMaxValue);
+                    string text = "最大值是：" + (sender as InperTextBox).InperMaxValue;
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "The maximum value is" + (sender as InperTextBox).InperMaxValue;
+                    }
+                    InperGlobalClass.ShowReminderInfo(text);
                     (sender as InperTextBox).Text = (sender as InperTextBox).InperMaxValue.ToString();
                 }
                 if (sen.LightPower < (sender as InperTextBox).InperMinValue)
                 {
-                    InperGlobalClass.ShowReminderInfo("The minimum value is" + (sender as InperTextBox).InperMinValue);
+                    string text = "最小值是：" + (sender as InperTextBox).InperMinValue;
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "The minimum value is" + (sender as InperTextBox).InperMinValue;
+                    }
+                    InperGlobalClass.ShowReminderInfo(text);
                     (sender as InperTextBox).Text = (sender as InperTextBox).InperMinValue.ToString();
                 }
                 //if (sen.IsChecked)
@@ -1186,6 +1261,8 @@ namespace InperStudio.ViewModels
         public void Interval_Checked(object sender, RoutedEventArgs e)
         {
             InperDeviceHelper.Instance._Metronome.Start();
+            InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous = false;
+            InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval = true;
         }
         public void Continus_Checked(object sender, RoutedEventArgs e)
         {
@@ -1195,9 +1272,11 @@ namespace InperStudio.ViewModels
                 if (x.IsChecked)
                 {
                     InperDeviceHelper.Instance.device.SetLightPower((uint)x.GroupId, x.LightPower);
-                    Thread.Sleep(50);
+                    //Thread.Sleep(50);
                 }
             });
+            InperGlobalClass.CameraSignalSettings.RecordMode.IsContinuous = true;
+            InperGlobalClass.CameraSignalSettings.RecordMode.IsInterval = false;
         }
         public void Screenshots()
         {
@@ -1225,7 +1304,12 @@ namespace InperStudio.ViewModels
                     int top = (int)ptLeftUp.Y + (int)(point.Y * y);
 
                     InperComputerInfoHelper.SaveScreenToImageByPoint(left, top, (int)(Math.Ceiling(view.image.ActualWidth) * x), (int)(Math.Ceiling(view.image.ActualHeight) * y), System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmssffff") + "CameraScreen.bmp"));
-                    Growl.Info(new GrowlInfo() { Message = "Saved successfully.", Token = "SuccessMsg", WaitTime = 1 });
+                    string text = "保存成功";
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "Saved successfully.";
+                    }
+                    Growl.Info(new GrowlInfo() { Message = text, Token = "SuccessMsg", WaitTime = 1 });
                 }));
             }
             catch (Exception ex)
@@ -1387,7 +1471,10 @@ namespace InperStudio.ViewModels
 
                         InperDeviceHelper.Instance.CameraChannels.Add(item);
                         InperDeviceHelper.Instance.aiChannels.Add(item);
-                        InperDeviceHelper.Instance._adPreTime.Add(item.ChannelId, InperDeviceHelper.Instance._adPreTime.Count == 0 ? 0 : InperDeviceHelper.Instance._adPreTime.First().Value);
+                        if (!InperDeviceHelper.Instance._adPreTime.ContainsKey(item.ChannelId))
+                        {
+                            InperDeviceHelper.Instance._adPreTime.Add(item.ChannelId, InperDeviceHelper.Instance._adPreTime.Count == 0 ? 0 : InperDeviceHelper.Instance._adPreTime.First().Value);
+                        }
                         InperDeviceHelper.Instance.AiSettingFunc(item.ChannelId, 1);
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
                         if (channel == null)
@@ -1417,7 +1504,6 @@ namespace InperStudio.ViewModels
             }
         }
         #endregion
-
         protected override void OnDeactivate()
         {
             try

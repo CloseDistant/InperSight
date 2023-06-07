@@ -63,7 +63,8 @@
         Stay,
         Enter,
         Leave,
-        EnterOrLeave
+        EnterOrLeave,
+        None
     }
     public enum TimerError
     {

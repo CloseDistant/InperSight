@@ -19,15 +19,16 @@
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
                 <TextBlock Text="{DynamicResource addWaveform_pulse}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
-                <TextBox Width="120" Height="20" Margin="35 0 0 0" Name="pluse" TextChanged="{s:Action Pulse_TextChanged}"/>
+                <TextBox hc:BorderElement.CornerRadius="2" Style="{StaticResource InperTextBoxBaseStyle}" Width="120" Height="25" Margin="35 0 0 0" Padding="3 0 0 0" VerticalContentAlignment="Center" Name="pluse" TextChanged="{s:Action Pulse_TextChanged}"/>
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
                 <TextBlock Text="{DynamicResource addWaveform_freq}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
-                <ComboBox Width="120" Height="20" Margin="43 0 0 0" Name="freq" ItemsSource="{Binding Freqs,UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" /> <!--SelectionChanged="{s:Action Freq_SelectionChanged}"-->
+                <ComboBox Style="{StaticResource InperComboBoxBaseStyle}" Width="120" Height="25" hc:BorderElement.CornerRadius="2" Margin="43 0 0 0" Name="freq" ItemsSource="{Binding Freqs,UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0" />
+                <!--SelectionChanged="{s:Action Freq_SelectionChanged}"-->
             </WrapPanel>
             <WrapPanel Margin="0 20 0 0">
                 <TextBlock Text="{DynamicResource addWaveform_duration}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
-                <TextBox Width="120" Height="20" Margin="30 0 0 0" Name="duration" TextChanged="{s:Action Duration_TextChanged}"/>
+                <TextBox Width="120" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" VerticalContentAlignment="Center" Margin="30 0 0 0" Style="{StaticResource InperTextBoxBaseStyle}" Height="25" Name="duration" TextChanged="{s:Action Duration_TextChanged}"/>
             </WrapPanel>
             <Grid Background="#FACD91" HorizontalAlignment="Left" Margin="0 20 0 0">
                 <TextBlock Text="The Value must be &lt;= 100" Name="remainder" Visibility="Collapsed" Foreground="#F50404" FontSize="10" FontFamily="{StaticResource InperFontFamily}" Padding="10 5"/>

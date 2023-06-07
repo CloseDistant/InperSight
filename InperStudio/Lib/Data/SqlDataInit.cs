@@ -59,6 +59,7 @@ namespace InperStudio.Lib.Data
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Marker));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.OutputMarker));
             sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.ChannelConfig));
+            sqlSugar.CodeFirst.SetStringDefaultLength(200).InitTables(typeof(Model.Tracking));
             sqlSugar.CodeFirst.InitTables(typeof(Model.IntervalScale));
             RecordInit();
         }

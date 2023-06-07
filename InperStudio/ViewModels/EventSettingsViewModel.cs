@@ -58,7 +58,7 @@ namespace InperStudio.ViewModels
                 switch (@enum)
                 {
                     case EventSettingsTypeEnum.Marker:
-                        if (InperConfig.Instance.Language == "en_us")
+                        if (InperConfig.Instance.Language.ToLower() == "en_us")
                         {
                             view.Title = "Marker";
                         }
@@ -68,7 +68,7 @@ namespace InperStudio.ViewModels
                         }
                         break;
                     case EventSettingsTypeEnum.Output:
-                        if (InperConfig.Instance.Language == "en_us")
+                        if (InperConfig.Instance.Language.ToLower() == "en_us")
                         {
                             view.Title = "Output";
                         }
@@ -86,7 +86,7 @@ namespace InperStudio.ViewModels
                 {
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
-                        if ((int)item.Value != StimulusBeans.Instance.DioID || !StimulusBeans.Instance.IsConfigSweep)
+                        if ((int)item.Value != StimulusBeans.Instance.DioID || (int)item.Value != StimulusBeans.Instance.TriggerId || !StimulusBeans.Instance.IsConfigSweep)
                         {
                             markerChannels.Add(new EventChannel()
                             {
@@ -257,17 +257,17 @@ namespace InperStudio.ViewModels
                                     };
                                     markerChannels.Add(_channel);
                                 }
-                                //else
-                                //{
-                                //    if (item.Type != ChannelTypeEnum.Zone.ToString())
-                                //    {
-                                //        EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
-                                //        if (chn != null)
-                                //        {
-                                //            chn.IsActive = item.IsActive; chn.BgColor = item.BgColor; chn.RefractoryPeriod = item.RefractoryPeriod;
-                                //        }
-                                //    }
-                                //}
+                                else
+                                {
+                                    if (item.Type != ChannelTypeEnum.Zone.ToString())
+                                    {
+                                        EventChannel chn = MarkerChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == item.Type);
+                                        if (chn != null)
+                                        {
+                                            chn.IsActive = item.IsActive; chn.BgColor = item.BgColor; chn.RefractoryPeriod = item.RefractoryPeriod;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -880,6 +880,15 @@ namespace InperStudio.ViewModels
                                 manualChannels.Add(chn);
                                 MarkerChannels.Add(chn);
                             }
+                            //output zone条件配置
+                            if (channle.Type == ChannelTypeEnum.Output.ToString())
+                            {
+                                if (channle.Condition != null && view.outputzoneVisibility.IsVisible)
+                                {
+                                    channle.Condition.SymbolName = view.outputMode.Text;
+                                    channle.Condition.Type = view.zoneConditions1.Text;
+                                }
+                            }
 
                             InperGlobalClass.EventSettings.Channels.Add(channle);
                             InperDeviceHelper.Instance.DeltaFCalculateList.Add(channle);
@@ -1015,6 +1024,26 @@ namespace InperStudio.ViewModels
                     {
                         (sender as Grid).ToolTip = new TextBlock() { Text = "hotkey:" + channel.Hotkeys };
                     }
+                    if (channel.Type == ChannelTypeEnum.Zone.ToString() || channel.Type == ChannelTypeEnum.Enter.ToString() || channel.Type == ChannelTypeEnum.Stay.ToString() || channel.Type == ChannelTypeEnum.Leave.ToString())
+                    {
+                        var chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.IsActive && x.SymbolName == channel.SymbolName);
+                        var zone = chn.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == channel.SymbolName);
+                        if (zone != null)
+                        {
+                            if (zone.IsImmediately)
+                            {
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Type:" + zone.Type };
+                            }
+                            if (zone.IsDelay)
+                            {
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Type:" + zone.Type + " Delay:" + zone.DelaySeconds };
+                            }
+                            if (zone.Type == ChannelTypeEnum.Stay.ToString())
+                            {
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Type:" + zone.Type + " Duration:" + zone.Duration };
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -1030,6 +1059,26 @@ namespace InperStudio.ViewModels
                     {
                         (sender as Grid).ToolTip = new TextBlock() { Text = "hotkey:" + channel.Condition.Hotkeys };
                     }
+                    if (channel.Condition.Type == ChannelTypeEnum.Leave.ToString() || channel.Condition.Type == ChannelTypeEnum.Enter.ToString() || channel.Condition.Type == ChannelTypeEnum.Stay.ToString())
+                    {
+                        var chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.IsActive && x.Condition != null && x.Condition.SymbolName == channel.Condition.SymbolName);
+                        var zone = chn.Condition.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == channel.Condition.SymbolName);
+                        if (zone != null)
+                        {
+                            if (zone.IsImmediately)
+                            {
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + zone.Type };
+                            }
+                            if (zone.IsDelay)
+                            {
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + zone.Type + " Delay:" + zone.DelaySeconds };
+                            }
+                            if (zone.Type == ChannelTypeEnum.Stay.ToString())
+                            {
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + zone.Type + " Duration:" + zone.Duration };
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -1040,7 +1089,7 @@ namespace InperStudio.ViewModels
         #endregion
         protected override void OnClose()
         {
-            int allCount = InperGlobalClass.EventSettings.Channels.Count(x => x.Type != ChannelTypeEnum.TriggerStart.ToString() && x.Type != ChannelTypeEnum.TriggerStop.ToString());
+            int allCount = InperGlobalClass.EventSettings.Channels.Count(x => x.Type != ChannelTypeEnum.TriggerStart.ToString() && x.Type != ChannelTypeEnum.TriggerStop.ToString() && x.IsActive);
             if (allCount > 0)
             {
                 int outputCount = InperGlobalClass.EventSettings.Channels.Count(x => x.Type == ChannelTypeEnum.Output.ToString());

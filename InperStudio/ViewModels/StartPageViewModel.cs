@@ -25,9 +25,16 @@ namespace InperStudio.ViewModels
             this.windowManager = windowManager;
             Application.Current.Resources["InperTheme"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(InperConfig.Instance.ThemeColor));
             InperClassHelper.SetLanguage(InperConfig.Instance.Language);
-            InperGlobalClass.IsDisplayAnalog = InperProductConfig.DisplayNodeRead(DisplayEnum.Analog);
-            InperGlobalClass.IsDisplayTrigger = InperProductConfig.DisplayNodeRead(DisplayEnum.Trigger);
-            InperGlobalClass.IsDisplayNote = InperProductConfig.DisplayNodeRead(DisplayEnum.Note);
+            //InperGlobalClass.IsDisplayAnalog = InperProductConfig.DisplayNodeRead(DisplayEnum.Analog);
+            //InperGlobalClass.IsDisplayTrigger = InperProductConfig.DisplayNodeRead(DisplayEnum.Trigger);
+            bool.TryParse(InperJsonHelper.GetDisplaySetting("analog"), out bool analog);
+            InperGlobalClass.IsDisplayAnalog = analog;
+            bool.TryParse(InperJsonHelper.GetDisplaySetting("trigger"), out bool trigger);
+            InperGlobalClass.IsDisplayTrigger = trigger;
+            bool.TryParse(InperJsonHelper.GetDisplaySetting("note"), out bool note);
+            InperGlobalClass.IsDisplayNote = note;
+            bool.TryParse(InperJsonHelper.GetDisplaySetting("sprit"), out bool sprit);
+            InperGlobalClass.IsDisplaySprit= sprit;
         }
         async Task TaskExecute(CancellationToken token)
         {
@@ -91,7 +98,7 @@ namespace InperStudio.ViewModels
                     {
                         await Task.Delay(1000);
                         (View as StartPageView).loading.Visibility = Visibility.Collapsed;
-                        if (InperConfig.Instance.Language == "en_us")
+                        if (InperConfig.Instance.Language.ToLower() == "en_us")
                         {
                             (View as StartPageView).remainder.Text = "Initialization completed";
                         }
@@ -111,7 +118,8 @@ namespace InperStudio.ViewModels
                         await Task.Delay(500);
                         InperDeviceHelper.Instance.device.InqID();
                         InperLogExtentHelper.InitLogDatabase();
-
+                        //加载模型
+                        InperTrackingDnnHelper.LoadNet();
                         windowManager.ShowWindow(new MainWindowViewModel(windowManager));
                         RequestClose();
                     }

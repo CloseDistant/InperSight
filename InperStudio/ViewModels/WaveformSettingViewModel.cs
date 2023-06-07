@@ -2,6 +2,7 @@
 using InperStudio.Lib.Bean.Stimulus;
 using InperStudio.Lib.Helper;
 using InperStudio.Views;
+using InperStudioControlLib.Lib.Config;
 using Stylet;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,10 @@ namespace InperStudio.ViewModels
                     if (waveForm.Pulse < 0 || waveForm.Duration <= 0 || waveForm.Frequence <= 0)
                     {
                         this.view.remainder.Text = "The value cannot be empty";
+                        if (InperConfig.Instance.Language == "zh_cn")
+                        {
+                            this.view.remainder.Text = "值不能为空";
+                        }
                         this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                         return;
                     }
@@ -120,6 +125,10 @@ namespace InperStudio.ViewModels
                         else
                         {
                             this.view.remainder.Text = "The Value must be < " + maxPulse.ToString("0.00");
+                            if (InperConfig.Instance.Language == "zh_cn")
+                            {
+                                this.view.remainder.Text = "最大值为："+ maxPulse.ToString("0.00");
+                            }
                             this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                             return;
                         }
@@ -135,6 +144,10 @@ namespace InperStudio.ViewModels
                     else
                     {
                         this.view.remainder.Text = "The value input is not valid";
+                        if (InperConfig.Instance.Language == "zh_cn")
+                        {
+                            this.view.remainder.Text = "输入的值无效";
+                        }
                         this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                     }
                 }
@@ -161,6 +174,10 @@ namespace InperStudio.ViewModels
                         else
                         {
                             this.view.remainder.Text = "The Value must be > 0";
+                            if (InperConfig.Instance.Language == "zh_cn")
+                            {
+                                this.view.remainder.Text = "值必须大于0";
+                            }
                             this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                             return;
                         }
@@ -168,6 +185,10 @@ namespace InperStudio.ViewModels
                     else
                     {
                         this.view.remainder.Text = "The value input is not valid";
+                        if (InperConfig.Instance.Language == "zh_cn")
+                        {
+                            this.view.remainder.Text = "输入的值无效";
+                        }
                         this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                     }
                 }

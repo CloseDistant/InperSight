@@ -13,7 +13,8 @@ namespace InperStudio.Lib.Helper
     {
         Analog,
         Trigger,
-        Note
+        Note,
+        Sprit
     }
     public class InperProductConfig
     {

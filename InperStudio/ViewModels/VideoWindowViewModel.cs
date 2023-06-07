@@ -72,19 +72,11 @@ namespace InperStudio.ViewModels
                         InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
                     }
                 };
-                bottomControl.record.Click += (s, e) =>
+
+                if (InperClassHelper.GetWindowByNameChar("inper") is System.Windows.Window window)
                 {
-                    BehaviorRecorderKit.AutoRecord = false;
-                    bottomControl.no_record.Visibility = System.Windows.Visibility.Visible;
-                    bottomControl.record.Visibility = System.Windows.Visibility.Collapsed;
-                };
-                bottomControl.no_record.Click += (s, e) =>
-                {
-                    BehaviorRecorderKit.AutoRecord = true;
-                    bottomControl.no_record.Visibility = System.Windows.Visibility.Collapsed;
-                    bottomControl.record.Visibility = System.Windows.Visibility.Visible;
-                };
-                this.view.Owner = Application.Current.MainWindow;
+                    this.view.Owner = window;
+                }
 
                 if (InperGlobalClass.EventSettings.Channels.Count > 0)
                 {
@@ -136,10 +128,22 @@ namespace InperStudio.ViewModels
 
         public void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            string text = "This will stop video recording,are you sure to close?";
-            if (InperConfig.Instance.Language != "en_us")
+            string text = string.Empty;
+            if (InperGlobalClass.IsRecord)
             {
-                text = "这将会使视频停止录制，确定要关闭吗？";
+                text = "This will stop video recording,are you sure to close it?";
+                if (InperConfig.Instance.Language != "en_us")
+                {
+                    text = "这将会使视频停止录制，确定要关闭吗？";
+                }
+            }
+            else
+            {
+                text = "The video will not be recorded while experiment running, are you sure to close it?";
+                if (InperConfig.Instance.Language != "en_us")
+                {
+                    text = "后续采集时将不会同步录制视频，确定要关闭吗？";
+                }
             }
             InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
             inperDialogWindow.HideCancleButton();

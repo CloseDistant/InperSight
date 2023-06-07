@@ -44,6 +44,15 @@ namespace InperStudio.Views.Control
         }
         private void SaveConfigAs_Click(object sender, RoutedEventArgs e)
         {
+            foreach (System.Windows.Window window in App.Current.Windows)
+            {
+                if (window.Name.Contains("MainWindow"))
+                {
+                    var main = window.DataContext as MainWindowViewModel;
+                    main.SaveCameraConfig();
+                    break;
+                }
+            }
             JsonConfigSaveAs();
         }
         private void DefalutFileLoad()
@@ -66,10 +75,25 @@ namespace InperStudio.Views.Control
                     InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                     InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
                     InperGlobalClass.StimulusSettings = InperJsonHelper.GetStimulusSettings() ?? new Lib.Helper.JsonBean.StimulusSettings();
+                    bool.TryParse(InperJsonHelper.GetDisplaySetting("analog"), out bool analog);
+                    InperGlobalClass.IsDisplayAnalog = analog;
+                    bool.TryParse(InperJsonHelper.GetDisplaySetting("trigger"), out bool trigger);
+                    InperGlobalClass.IsDisplayTrigger = trigger;
+                    bool.TryParse(InperJsonHelper.GetDisplaySetting("note"), out bool note);
+                    InperGlobalClass.IsDisplayNote = note;
+                    bool.TryParse(InperJsonHelper.GetDisplaySetting("sprit"), out bool sprit);
+                    InperGlobalClass.IsDisplaySprit = sprit;
                     if (!string.IsNullOrEmpty(InperJsonHelper.GetDataPathSetting()))
                     {
-                        InperGlobalClass.DataPath = InperJsonHelper.GetDataPathSetting() ?? InperGlobalClass.DataPath;
-                        Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                        try
+                        {
+                            InperGlobalClass.DataPath = InperJsonHelper.GetDataPathSetting() ?? InperGlobalClass.DataPath;
+                            Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
+                        }
+                        catch (Exception)
+                        {
+
+                        }
                     }
 
                     if (InperGlobalClass.StimulusSettings.Sweeps.Count > 0)
@@ -87,8 +111,14 @@ namespace InperStudio.Views.Control
                     StimulusBeans.Instance.Hour = InperGlobalClass.StimulusSettings.Hour;
                     StimulusBeans.Instance.Minute = InperGlobalClass.StimulusSettings.Minute;
                     StimulusBeans.Instance.Seconds = InperGlobalClass.StimulusSettings.Seconds;
+                    StimulusBeans.Instance.TriggerId = InperGlobalClass.StimulusSettings.TriggerId;
+                    StimulusBeans.Instance.TriggerMode = InperGlobalClass.StimulusSettings.TriggerMode;
+                    StimulusBeans.Instance.IsTrigger = InperGlobalClass.StimulusSettings.IsTrigger;
 
-                    StimulusBeans.Instance.StimulusCommandSend();
+                    if (StimulusBeans.Instance.IsConfigSweep)
+                    {
+                        StimulusBeans.Instance.StimulusCommandSend();
+                    }
 
                     InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
                     InperGlobalClass.SetSampling(InperGlobalClass.CameraSignalSettings.Sampling);
@@ -154,19 +184,15 @@ namespace InperStudio.Views.Control
                         CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
                         _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
                     });
-
+                    //if (InperClassHelper.GetWindowByNameChar("inper") is System.Windows.Window window)
+                    //{
+                    //    (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.InitConfig(true);
+                    //}
                     foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
                     {
                         if (window.Name.Contains("MainWindow"))
                         {
                             (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.InitConfig(true);
-                            //SignalSettingsViewModel _window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Camera);
-                            //(window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
-                            //_window.RequestClose();
-
-                            //_window = new SignalSettingsViewModel(SignalSettingsTypeEnum.Analog);
-                            //(window.DataContext as MainWindowViewModel).windowManager.ShowWindow(_window);
-                            //_window.RequestClose();
                         }
                     }
                 }

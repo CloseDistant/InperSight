@@ -56,37 +56,63 @@ namespace InperStudio.ViewModels
             base.OnViewLoaded();
 
             view = View as StimulusSettingsView;
-            view.CancelClickEvent += (e) =>
+            //view.CancelClickEvent += (e) =>
+            //{
+            //    if (!StimulusBeans.Instance.IsConfigSweep)
+            //    {
+            //        StimulusBeans.Instance.DioID = -1;
+            //    }
+            //};
+            view.isUse.Unchecked += (s, e) =>
             {
-                if (!StimulusBeans.Instance.IsConfigSweep)
-                {
-                    StimulusBeans.Instance.DioID = -1;
-                }
+                StimulusBeans.Instance.IsConfigSweep = false;
+                StimulusBeans.Instance.DioID = -1;
+                InperDeviceHelper.Instance.device.SetSweepState(0);
+            };
+            view.isUse.Checked += (s, e) =>
+            {
+                StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
             };
             view.ConfirmClickEvent += (s, e) =>
             {
+                StimulusBeans.Instance.TriggerMode = view._triggerMode.SelectedIndex;
+                StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
+                StimulusBeans.Instance.IsActiveStimulus = (bool)view.isUse.IsChecked;
                 if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
                 {
-                    if (StimulusBeans.Instance.DioID == -1)
-                    {
-                        InperGlobalClass.ShowReminderInfo("No available DIO");
-                        return;
-                    }
                     #region stimulus 设置下发
+                    if ((bool)view.isUse.IsChecked)
+                    {
+                        if (StimulusBeans.Instance.DioID == -1)
+                        {
+                            InperGlobalClass.ShowReminderInfo("No available DIO");
+                            return;
+                        }
+                        StimulusBeans.Instance.StimulusCommandSend();
+                        if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
+                    }
 
-                    StimulusBeans.Instance.StimulusCommandSend();
-
-                    if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
                     InperGlobalClass.StimulusSettings.IsConfigSweep = StimulusBeans.Instance.IsConfigSweep;
+                    InperGlobalClass.StimulusSettings.IsActiveStimulus = StimulusBeans.Instance.IsActiveStimulus;
                     InperGlobalClass.StimulusSettings.DioID = StimulusBeans.Instance.DioID;
                     InperGlobalClass.StimulusSettings.Hour = StimulusBeans.Instance.Hour;
                     InperGlobalClass.StimulusSettings.Minute = StimulusBeans.Instance.Minute;
                     InperGlobalClass.StimulusSettings.Seconds = StimulusBeans.Instance.Seconds;
+                    InperGlobalClass.StimulusSettings.IsTrigger = StimulusBeans.Instance.IsTrigger;
+                    if (InperGlobalClass.StimulusSettings.IsTrigger)
+                    {
+                        InperGlobalClass.StimulusSettings.TriggerId = StimulusBeans.Instance.TriggerId;
+                        InperGlobalClass.StimulusSettings.TriggerMode = StimulusBeans.Instance.TriggerMode;
+                    }
+
+
                     InperJsonHelper.SetStimulusSettings(InperGlobalClass.StimulusSettings);
                     #endregion
                 }
                 this.RequestClose();
             };
+
+
             foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
             {
                 EventChannels.Add(new EventChannel()
@@ -106,13 +132,43 @@ namespace InperStudio.ViewModels
                 view.dio.SelectionChanged += (s, e) =>
                 {
                     StimulusBeans.Instance.DioID = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
+                    if (StimulusBeans.Instance.DioID == StimulusBeans.Instance.TriggerId && (bool)view._triggerToggle.IsChecked)
+                    {
+                        //InperGlobalClass.ShowReminderInfo("无法重复使用");
+                        if (eventChannels.First(x => x.ChannelId != StimulusBeans.Instance.TriggerId) is EventChannel channel)
+                        {
+                            view._triggerdio.SelectedValue = channel;
+                        }
+                        else
+                        {
+                            view._triggerdio.SelectedIndex = -1;
+                        }
+                    }
                 };
                 StimulusBeans.Instance.DioID = (view.dio.SelectedItem as EventChannel).ChannelId;
+                var chn = EventChannels.FirstOrDefault(x => x.ChannelId == StimulusBeans.Instance.TriggerId) ?? EventChannels.FirstOrDefault();
+                view._triggerdio.SelectedItem = StimulusBeans.Instance.TriggerId > 0 ? chn : EventChannels.First(x => x.ChannelId != StimulusBeans.Instance.DioID);
+                view._triggerdio.SelectionChanged += (s, e) =>
+                {
+                    StimulusBeans.Instance.TriggerId = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
+                    if (StimulusBeans.Instance.TriggerId == StimulusBeans.Instance.DioID)
+                    {
+                        if (eventChannels.First(x => x.ChannelId != StimulusBeans.Instance.DioID) is EventChannel channel)
+                        {
+                            view.dio.SelectedValue = channel;
+                        }
+                        else
+                        {
+                            view.dio.SelectedIndex = -1;
+                        }
+                    }
+                };
+                StimulusBeans.Instance.TriggerId = (view._triggerdio.SelectedItem as EventChannel).ChannelId;
             }
-            //view.hour.Text = StimulusBeans.Instance.Hour.ToString();
-            //view.minute.Text = StimulusBeans.Instance.Minute.ToString();
-            //view.seconds.Text = StimulusBeans.Instance.Seconds.ToString();
-
+            view._triggerToggle.IsChecked = StimulusBeans.Instance.IsTrigger;
+            view._triggerMode.SelectedIndex = StimulusBeans.Instance.TriggerMode;
+            view.isUse.IsChecked = StimulusBeans.Instance.IsActiveStimulus;
+ 
             view.sweepsSource.ItemsSource = Sweeps;
         }
         public void AddWaveformEvent()
@@ -172,7 +228,7 @@ namespace InperStudio.ViewModels
                 {
                     text = "是否删除?";
                 }
-                    InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
+                InperDialogWindow inperDialogWindow = new InperDialogWindow(text);
                 inperDialogWindow.HideCancleButton();
                 inperDialogWindow.ClickEvent += (s, statu) =>
                 {
@@ -367,8 +423,12 @@ namespace InperStudio.ViewModels
                             {
                                 layer.Remove(BoxAdorner);
                             }
-
-                            BoxAdorner = new TextBoxAdorner(tb, "无效的值");
+                            string text = "无效的值";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "Invalid value";
+                            }
+                            BoxAdorner = new TextBoxAdorner(tb, text);
                             layer.Add(BoxAdorner);
                             return;
                         }
@@ -385,8 +445,12 @@ namespace InperStudio.ViewModels
                             {
                                 layer.Remove(BoxAdorner);
                             }
-
-                            BoxAdorner = new TextBoxAdorner(tb, "无效的值");
+                            string text = "无效的值";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "Invalid value";
+                            }
+                            BoxAdorner = new TextBoxAdorner(tb, text);
                             layer.Add(BoxAdorner);
                             return;
                         }
@@ -403,8 +467,12 @@ namespace InperStudio.ViewModels
                             {
                                 layer.Remove(BoxAdorner);
                             }
-
-                            BoxAdorner = new TextBoxAdorner(tb, "无效的值");
+                            string text = "无效的值";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "Invalid value";
+                            }
+                            BoxAdorner = new TextBoxAdorner(tb, text);
                             layer.Add(BoxAdorner);
                             return;
                         }
@@ -420,8 +488,12 @@ namespace InperStudio.ViewModels
                     {
                         layer.Remove(BoxAdorner);
                     }
-
-                    BoxAdorner = new TextBoxAdorner(tb, "无效的值");
+                    string text = "无效的值";
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "Invalid value";
+                    }
+                    BoxAdorner = new TextBoxAdorner(tb, text);
                     layer.Add(BoxAdorner);
                 }
                 DrawChart();

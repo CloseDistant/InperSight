@@ -62,11 +62,11 @@
                 <StackPanel Margin="0 0 0 0" Grid.Column="2">
                     <WrapPanel>
                         <TextBlock Text="{DynamicResource addSweep_selected}" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
-                        <hc:TextBox Width="100"  Margin="27 0 0 0" IsEnabled="False" Name="selected"/>
+                        <hc:TextBox Width="100"  Margin="27 0 0 0" Style="{StaticResource InperTextBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" IsEnabled="False" Name="selected"/>
                     </WrapPanel>
                     <WrapPanel Margin="0 20 0 0">
                         <TextBlock Text="{DynamicResource addSweep_duration}" VerticalAlignment="Center" FontFamily="{StaticResource InperFontFamily}"/>
-                        <TextBox Width="100" Margin="10 0 0 0" Name="duration" TextChanged="{s:Action Duration_Textchanged}" />
+                        <TextBox Width="100" Margin="10 0 0 0" Padding="3 0 0 0" VerticalContentAlignment="Center" Name="duration" Style="{StaticResource InperTextBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" TextChanged="{s:Action Duration_Textchanged}" />
                     </WrapPanel>
                     <Grid Background="#FACD91" HorizontalAlignment="Right" Margin="0 20 0 0">
                         <TextBlock Text="The Value must be &lt;= 100" Name="remainder" Visibility="Collapsed" Foreground="#F50404" FontSize="10" FontFamily="{StaticResource InperFontFamily}" Padding="10 5"/>
