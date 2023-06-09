@@ -75,7 +75,38 @@
                 <Grid Margin="0 20 0 0" x:Name="conditionGrid"  Visibility="Collapsed">
                     <TextBlock VerticalAlignment="Center" Text="{DynamicResource marker_channel}"  FontSize="{DynamicResource InperNormalFontSize}"/>
                     <!--aa-->
-                    <ComboBox Margin="20 0"  Height="25" hc:BorderElement.CornerRadius="2" Style="{StaticResource InperComboBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="SymbolName" Width="170" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}"/>
+                    <ComboBox Margin="20 0"  Height="25" hc:BorderElement.CornerRadius="2" FontSize="{DynamicResource InperNormalFontSize}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" Width="170" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="VirtualizingPanel.Visibility" Value="{Binding IsActive,Converter={StaticResource Boolean2VisibilityReConverter}}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ComboBoxItem">
+                                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="5">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="LightGray" />
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="#326CF3" />
+                                                    <Setter Property="Foreground" Value="#EEEEEE" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding SymbolName}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </Grid>
                 <Grid Margin="0 20 0 0" >
                     <TextBlock VerticalAlignment="Center" Text="{DynamicResource marker_conditions}"  FontSize="{DynamicResource InperNormalFontSize}"/>
@@ -209,7 +240,7 @@
                     <StackPanel Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
                         <Grid>
                             <TextBlock VerticalAlignment="Center" Text="δF/F (%)"  FontSize="{DynamicResource InperNormalFontSize}"/>
-                            <hc:TextBox VerticalContentAlignment="Center" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" MinHeight="25" TextType="Double" FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Width="170" Margin="20 0"/>
+                            <hc:TextBox VerticalContentAlignment="Center" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" MinHeight="25" FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.DeltaF,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Name="deltaValue" HorizontalAlignment="Right" Width="170" Margin="20 0"/>
                         </Grid>
                         <!--<WrapPanel HorizontalAlignment="Right" Margin="0 10 20 0">
                             <hc:TextBox Text="{Binding  ElementName=MarkerChannelCombox,Path=SelectedItem.Tau1,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />
@@ -230,7 +261,7 @@
                     <StackPanel Margin="0 20 0 0" Visibility="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.Name,Converter={StaticResource RoiAIVisibilityConverter}}" >
                         <Grid>
                             <TextBlock VerticalAlignment="Center" Text="δF/F (%)"  FontSize="{DynamicResource InperNormalFontSize}"/>
-                            <hc:TextBox VerticalContentAlignment="Center" MinHeight="25" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" TextType="Double" FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=ConditionsCombox,Path=SelectedItem.DeltaF,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Name="outputdeltaValue" HorizontalAlignment="Right" Width="170" Margin="20 0"/>
+                            <hc:TextBox VerticalContentAlignment="Center" MinHeight="25" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0"  FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=ConditionsCombox,Path=SelectedItem.DeltaF,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Name="outputdeltaValue" HorizontalAlignment="Right" Width="170" Margin="20 0"/>
                         </Grid>
                         <!--<WrapPanel HorizontalAlignment="Right" Margin="0 10 20 0">
                             <hc:TextBox FontFamily="雅黑" Text="{Binding  ElementName=ConditionChannelCombox,Path=SelectedItem.Tau1,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" Margin="0 0 10 0" Style="{StaticResource TextBoxExtend}" Width="60" hc:TitleElement.TitleWidth="25"  hc:TitleElement.TitlePlacement="Left"  hc:TitleElement.Title="t1" />

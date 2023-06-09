@@ -110,11 +110,23 @@ namespace InperStudio.ViewModels
             Init(isImport);
             InperGlobalClass.CameraSignalSettings.CameraChannels?.ForEach(x =>
             {
-                if (AnalogActiveChannels.Count(c => c.ChannelId == x.ChannelId) == 0)
+                //if (AnalogActiveChannels.Count(c => c.ChannelId == x.ChannelId) == 0)
                 {
                     if (x.Type == ChannelTypeEnum.Analog.ToString() && InperGlobalClass.IsDisplayAnalog)
                     {
-                        _ = AnalogChannels.Remove(AnalogChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId));
+                        var chn = AnalogChannels.FirstOrDefault(c => c.ChannelId == x.ChannelId);
+                        if (chn != null)
+                        {
+                            if (chn.Name.EndsWith("-"))
+                            {
+                                chn.Name = chn.Name.Substring(0, chn.Name.Length - 1);
+                            }
+                        }
+                        if (analogActiveChannels.Count(c => c.ChannelId == x.ChannelId) == 0)
+                        {
+                            AnalogActiveChannels.Add(chn);
+                        }
+                        _ = AnalogChannels.Remove(chn);
                         var an = new SignalCameraChannel()
                         {
                             ChannelId = x.ChannelId,

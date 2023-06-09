@@ -86,17 +86,20 @@ namespace InperStudio.ViewModels
                 {
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
-                        if ((int)item.Value != StimulusBeans.Instance.DioID || (int)item.Value != StimulusBeans.Instance.TriggerId || !StimulusBeans.Instance.IsConfigSweep)
+                        if ((int)item.Value != StimulusBeans.Instance.DioID || !StimulusBeans.Instance.IsConfigSweep)// 
                         {
-                            markerChannels.Add(new EventChannel()
+                            if ((int)item.Value != StimulusBeans.Instance.TriggerId || !InperGlobalClass.StimulusSettings.IsTrigger)
                             {
-                                IsActive = false,
-                                ChannelId = (int)item.Value,
-                                SymbolName = item.Key.ToString(),
-                                Name = item.Key.ToString(),
-                                BgColor = InperColorHelper.ColorPresetList[(int)item.Value],
-                                Type = ChannelTypeEnum.DIO.ToString()
-                            });
+                                markerChannels.Add(new EventChannel()
+                                {
+                                    IsActive = false,
+                                    ChannelId = (int)item.Value,
+                                    SymbolName = item.Key.ToString(),
+                                    Name = item.Key.ToString(),
+                                    BgColor = InperColorHelper.ColorPresetList[(int)item.Value],
+                                    Type = ChannelTypeEnum.DIO.ToString()
+                                });
+                            }
                         }
                     }
 
@@ -579,7 +582,7 @@ namespace InperStudio.ViewModels
 
                 if (item != null)
                 {
-                    view.MarkerName.Text = view.ConditionsCombox.Text + "-" + item.Name;
+                    view.MarkerName.Text = channel.Name + "-" + item.Name;
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         view.outputHotkeys.Content = item.Hotkeys = "F" + (channel.ChannelId + 1);

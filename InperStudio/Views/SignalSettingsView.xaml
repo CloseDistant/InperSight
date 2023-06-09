@@ -76,7 +76,7 @@
                 <Grid Grid.Row="1" Margin="15 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                     <WrapPanel VerticalAlignment="Center" Margin="0 0 0 10">
                         <TextBlock Text="Name" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
-                        <hc:TextBox Margin="10 0 0 0" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center"  TextType="Common" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="0" Width="140"  Height="20"  />
+                        <hc:TextBox Margin="10 0 0 0" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="0" Width="140"  Height="20"  />
                         <WrapPanel VerticalAlignment="Center" Margin="10 0 0 0">
                             <TextBlock Text="ROI(px)" FontSize="{StaticResource InperNormalFontSize}" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
                             <inper:InperTextBox Style="{StaticResource   BaseStyle}"  HorizontalContentAlignment="Center" InperVerify="True" InperTextType="Double" InperMaxValue="150" InperMinValue="1" Width="40" Margin="5 0 0 0" x:Name="channelRoi" Text="{Binding Diameter,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action ChannelRoi_TextChanged}"/>

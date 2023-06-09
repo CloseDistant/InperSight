@@ -1,10 +1,10 @@
-﻿using InperStudio.Lib.Bean.Channel;
+﻿using Accord.Video.DirectShow;
+using InperCameraSolution.AccordSolution;
+using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
-using InperVideo.Camera;
-using InperVideo.Interfaces;
 using log4net.Repository.Hierarchy;
 using OpenCvSharp;
 using Stylet;
@@ -14,13 +14,16 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using UnityEngine;
 
@@ -28,17 +31,13 @@ namespace InperStudio.Lib.Bean
 {
     public class VideoRecordBean : PropertyChangedBase
     {
-        // at class level
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
-        public int _CamIndex;
+        public string MonikerString { get; set; }
 
         public bool IsActive { get; set; }
         public string Name { get; set; }
         public string CustomName { get; set; }
-        private ImageSource _writeableBitmap;
-        public ImageSource WriteableBitmap
+        private BitmapSource _writeableBitmap;
+        public BitmapSource WriteableBitmap
         {
             get => _writeableBitmap;
             private set => SetAndNotify(ref _writeableBitmap, value);
@@ -61,8 +60,8 @@ namespace InperStudio.Lib.Bean
             get => _writeFps;
             set => SetAndNotify(ref _writeFps, value);
         }
-        private Dictionary<string, IEnumerable<ICameraCapabilyItem>> capabilyItems = new Dictionary<string, IEnumerable<ICameraCapabilyItem>>();
-        public Dictionary<string, IEnumerable<ICameraCapabilyItem>> CapabilyItems
+        private List<AccordResolutionInfo> capabilyItems = new List<AccordResolutionInfo>();
+        public List<AccordResolutionInfo> CapabilyItems
         {
             get => capabilyItems;
             set => SetAndNotify(ref capabilyItems, value);
@@ -70,19 +69,44 @@ namespace InperStudio.Lib.Bean
         public bool IsCanOpen { get; set; } = true;
         public bool IsTracking { get; set; } = false;
         #region private
-        private ICameraParamSet _cameraParamSet;
-        private IVideoAcquirer videoAcquirer;
+        private AccordCamraSetting accordCamraSetting;
         #endregion
 
         #region methods
-        public VideoRecordBean(int devIndex, string name, ICameraParamSet cameraParamSet)
+        public VideoRecordBean(FilterInfo filterInfo)
         {
-            _cameraParamSet = cameraParamSet;
-            _CamIndex = devIndex;
-            Name = name;
-            videoAcquirer = new VideoAcquirerFactory().CreateVideoCapturer(devIndex, cameraParamSet);
-            videoAcquirer.MatRtShowCreated += VideoAcquirer_MatRtShowCreated;
+            MonikerString = filterInfo.MonikerString;
+            Name = filterInfo.Name;
+            accordCamraSetting = new AccordCamraSetting(filterInfo);
+            accordCamraSetting.OnInfoReceived += AccordCamraSetting_OnInfoReceived;
+            CapabilyItems = accordCamraSetting.AccordResolutionInfos;
         }
+        private void AccordCamraSetting_OnInfoReceived(AccordImageInfo info)
+        {
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                //Create a Mat object with the correct size and data type
+                Mat mat = new Mat(info.Height, info.Width, info.CameraChannel == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1);  // Assuming a 3-channel color image (BGR)
+                // Copy the data into the Mat object
+                Marshal.Copy(info.Datas, 0, mat.Data, info.Datas.Length);
+
+                if (IsTracking)
+                {
+                    DrawTrackingRect(mat);
+                }
+                if (_DrawTracking != null)
+                {
+                    OpenCvSharp.Rect rect = new OpenCvSharp.Rect(_DrawTracking.Left, _DrawTracking.Top, _DrawTracking.Width, _DrawTracking.Height);
+                    // 绘制矩形
+                    Cv2.Rectangle(mat, rect, Scalar.Blue, 2); // 使用红色线条绘制矩形，线宽为2 // 绘制中心点 //画点和区域
+
+                    Cv2.Circle(mat, _DrawTracking.Left + _DrawTracking.Width / 2, _DrawTracking.Top + _DrawTracking.Height / 2, 2, Scalar.Blue, -1); // 使用蓝色填充圆形，半径为5  //存储轨迹数据
+                }
+                WriteableBitmap = BitmapSource.Create(info.Width, info.Height, 96, 96, info.CameraChannel == 3 ? PixelFormats.Bgr24 : PixelFormats.Gray8, null, info.Datas, info.CameraChannel == 3 ? info.Width * 3 : info.Width);
+
+            }));
+        }
+
         ///轨迹追踪数据
         private ConcurrentQueue<Tracking> trackingsQueue;
         private CancellationTokenSource _cts;
@@ -92,29 +116,6 @@ namespace InperStudio.Lib.Bean
         private Dictionary<string, ChannelTypeEnum> _trackingMarkerStatu = new Dictionary<string, ChannelTypeEnum>();
         private int _trackingLock = 0;
         private Tracking _DrawTracking;
-        private void VideoAcquirer_MatRtShowCreated(object sender, MatRtShowEventArgs e)
-        {
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (IsTracking)
-                {
-                    DrawTrackingRect(e.Context.MatFrame.FrameMat.Clone());
-                }
-                if (_DrawTracking != null)
-                {
-                    OpenCvSharp.Rect rect = new OpenCvSharp.Rect(_DrawTracking.Left, _DrawTracking.Top, _DrawTracking.Width, _DrawTracking.Height);
-                    // 绘制矩形
-                    Cv2.Rectangle(e.Context.MatFrame.FrameMat, rect, Scalar.Blue, 2); // 使用红色线条绘制矩形，线宽为2 // 绘制中心点 //画点和区域
-
-                    Cv2.Circle(e.Context.MatFrame.FrameMat, _DrawTracking.Left + _DrawTracking.Width / 2, _DrawTracking.Top + _DrawTracking.Height / 2, 2, Scalar.Blue, -1); // 使用蓝色填充圆形，半径为5  //存储轨迹数据
-                }
-                using (MemoryStream memoryStream = e.Context.MatFrame.FrameMat.ToMemoryStream(".bmp"))
-                {
-                    WriteableBitmap = ToImageSource(memoryStream);
-                }
-                e.Context.Callback();
-            }));
-        }
         private async void DrawTrackingRect(Mat mat)
         {
             try
@@ -365,62 +366,38 @@ namespace InperStudio.Lib.Bean
             }
             return false;
         }
-        private ImageSource ToImageSource(MemoryStream stream)
+        public void Reset(AccordResolutionInfo resolutionInfo)
         {
             try
             {
-                ImageSource source;
-                using (var bitmap = new Bitmap(stream))
-                {
-                    var hBitmap = bitmap.GetHbitmap();
-                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                    DeleteObject(hBitmap);
-                }
-                return source;
+                accordCamraSetting.Stop();
+                var resol = accordCamraSetting.VideoCapabilities.FirstOrDefault(x => x.FrameSize == resolutionInfo.FrameSize);
+                accordCamraSetting.SetResoulation(resol);
+                accordCamraSetting.Start();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-            return null;
-        }
-        public void Reset(ICameraParamSet cameraParamSet)
-        {
-            videoAcquirer.StopAcq();
-            videoAcquirer.RestParam(cameraParamSet);
         }
         public void StartCapture()
         {
-            videoAcquirer.StartAcq();
+            accordCamraSetting.Start();
         }
         public void StartRecording(string path = null)
         {
-            if (string.IsNullOrEmpty(path))
-            {
-                path = System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("yyyyMMddHHmmss"));
-            }
-            videoAcquirer.StartRecord(path);
+            accordCamraSetting.Stop();
+            accordCamraSetting.SetWritePath(path);
+            accordCamraSetting.Start();
+            accordCamraSetting.IsRecord = true;
+
             StartTracking();
         }
-        public void StopRecording()
+        public void Stop()
         {
-            videoAcquirer.StopAcq();
-            videoAcquirer.StartAcq();
+            accordCamraSetting.Stop();
+            accordCamraSetting.IsRecord = false;
             StopTracking();
-        }
-        public void StopPreview()
-        {
-            try
-            {
-                if (videoAcquirer != null)
-                {
-                    videoAcquirer.StopAcq();
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
         }
         #endregion
     }

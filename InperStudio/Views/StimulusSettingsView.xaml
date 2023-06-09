@@ -12,7 +12,7 @@
         xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         xmlns:vm="clr-namespace:InperStudio.ViewModels" 
-        mc:Ignorable="d"  FontFamily="{DynamicResource InperFontFamily}" Title="{DynamicResource stimulus_title}" IsShowTopAllButton="False"  IsShowCancleButton="False" IsShowOtherButton="False"
+        mc:Ignorable="d"  FontFamily="{DynamicResource InperFontFamily}" Title="{DynamicResource stimulus_title}" IsShowMaxButton="False" IsShowMiniButton="False" IsShowTopAllButton="True"  IsShowCancleButton="False" IsShowOtherButton="False"
         Width="700" Height="540" d:DataContext="{d:DesignInstance vm:AdditionSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />

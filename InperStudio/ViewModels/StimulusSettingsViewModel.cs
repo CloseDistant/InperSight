@@ -71,13 +71,25 @@ namespace InperStudio.ViewModels
             };
             view.isUse.Checked += (s, e) =>
             {
-                StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
+                try
+                {
+                    StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
+                }
+                catch (Exception ex)
+                {
+                    InperLogExtentHelper.LogExtent(ex, "StimulusSettingViewModel");
+                }
             };
             view.ConfirmClickEvent += (s, e) =>
             {
                 StimulusBeans.Instance.TriggerMode = view._triggerMode.SelectedIndex;
                 StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
                 StimulusBeans.Instance.IsActiveStimulus = (bool)view.isUse.IsChecked;
+                //zzz
+                if (view.dio.SelectedValue != null)
+                {
+                    StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
+                }
                 if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
                 {
                     #region stimulus 设置下发
@@ -104,8 +116,6 @@ namespace InperStudio.ViewModels
                         InperGlobalClass.StimulusSettings.TriggerId = StimulusBeans.Instance.TriggerId;
                         InperGlobalClass.StimulusSettings.TriggerMode = StimulusBeans.Instance.TriggerMode;
                     }
-
-
                     InperJsonHelper.SetStimulusSettings(InperGlobalClass.StimulusSettings);
                     #endregion
                 }
@@ -128,7 +138,11 @@ namespace InperStudio.ViewModels
             }
             if (EventChannels.Count > 0)
             {
-                view.dio.SelectedItem = StimulusBeans.Instance.DioID > 0 ? EventChannels.First(x => x.ChannelId == StimulusBeans.Instance.DioID) : EventChannels.First();
+                view.dio.SelectedItem = EventChannels.First();
+                if (EventChannels.Count(x => x.ChannelId == StimulusBeans.Instance.DioID) > 0)
+                {
+                    view.dio.SelectedItem = EventChannels.First(x => x.ChannelId == StimulusBeans.Instance.DioID);
+                }
                 view.dio.SelectionChanged += (s, e) =>
                 {
                     StimulusBeans.Instance.DioID = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
@@ -147,7 +161,7 @@ namespace InperStudio.ViewModels
                 };
                 StimulusBeans.Instance.DioID = (view.dio.SelectedItem as EventChannel).ChannelId;
                 var chn = EventChannels.FirstOrDefault(x => x.ChannelId == StimulusBeans.Instance.TriggerId) ?? EventChannels.FirstOrDefault();
-                view._triggerdio.SelectedItem = StimulusBeans.Instance.TriggerId > 0 ? chn : EventChannels.First(x => x.ChannelId != StimulusBeans.Instance.DioID);
+                view._triggerdio.SelectedItem = StimulusBeans.Instance.TriggerId > 0 ? chn : EventChannels.FirstOrDefault(x => x.ChannelId != StimulusBeans.Instance.DioID);
                 view._triggerdio.SelectionChanged += (s, e) =>
                 {
                     StimulusBeans.Instance.TriggerId = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
@@ -163,12 +177,15 @@ namespace InperStudio.ViewModels
                         }
                     }
                 };
-                StimulusBeans.Instance.TriggerId = (view._triggerdio.SelectedItem as EventChannel).ChannelId;
+                if (view._triggerdio.SelectedItem != null)
+                {
+                    StimulusBeans.Instance.TriggerId = (view._triggerdio.SelectedItem as EventChannel).ChannelId;
+                }
             }
             view._triggerToggle.IsChecked = StimulusBeans.Instance.IsTrigger;
             view._triggerMode.SelectedIndex = StimulusBeans.Instance.TriggerMode;
             view.isUse.IsChecked = StimulusBeans.Instance.IsActiveStimulus;
- 
+
             view.sweepsSource.ItemsSource = Sweeps;
         }
         public void AddWaveformEvent()

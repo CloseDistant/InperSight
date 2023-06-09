@@ -292,7 +292,7 @@ namespace InperStudio.ViewModels
                 {
                     if (item.IsActive && item.AutoRecord)
                     {
-                        item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item.CustomName));
+                        item.StartRecording(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName, DateTime.Now.ToString("HHmmss") + "_" + item.CustomName + ".avi"));
                     }
                 }
                 InperGlobalClass.IsRecord = true;
@@ -410,7 +410,8 @@ namespace InperStudio.ViewModels
                         {
                             if (item.IsActive && item.AutoRecord)
                             {
-                                item.StopRecording();
+                                item.Stop();
+                                item.StartCapture();
                             }
                         }
                     });
@@ -583,7 +584,6 @@ namespace InperStudio.ViewModels
                     }
 
                     InperDeviceHelper.Instance.AllLightOpen();
-                    Console.WriteLine(111111);
                 });
             }
             return null;

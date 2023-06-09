@@ -1,4 +1,5 @@
-﻿using InperStudio.Lib.Bean;
+﻿using HandyControl.Tools.Extension;
+using InperStudio.Lib.Bean;
 using InperStudio.Lib.Data.Model;
 using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
@@ -50,7 +51,7 @@ namespace InperStudio.ViewModels
             {
                 base.OnViewLoaded();
                 windowView = View as MainWindowView;
-
+                // 手动强制刷新界面
                 LeftToolsControlViewModel = new LeftToolsControlViewModel(windowManager);
                 ManulControlViewModel = new ManulControlViewModel(windowManager);
                 DataShowControlViewModel = new DataShowControlViewModel(windowManager);
@@ -58,6 +59,9 @@ namespace InperStudio.ViewModels
 
                 windowView.NonClientAreaContent = new MainTitleContentArea();
                 InperDeviceHelper.Instance.device.SetSweepState(0);
+
+                this.View.Hide();
+                this.View.Show();
             }
             catch (Exception ex)
             {

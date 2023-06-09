@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperPhotometry", "..\Inper
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperProtocolStack", "..\InperProtocolStack\InperProtocolStack.csproj", "{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InperCameraSolution", "..\..\..\InperCameraSolution\InperCameraSolution.csproj", "{D63B92E1-37F7-4AB8-B483-2882F67E08D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B94F9B2-A6C1-47BB-9C47-F4B6DF2BE4D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D63B92E1-37F7-4AB8-B483-2882F67E08D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D63B92E1-37F7-4AB8-B483-2882F67E08D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D63B92E1-37F7-4AB8-B483-2882F67E08D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D63B92E1-37F7-4AB8-B483-2882F67E08D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

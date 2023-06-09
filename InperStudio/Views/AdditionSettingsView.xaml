@@ -50,7 +50,7 @@
                         <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Width="40" Height="25" Padding="0" VerticalContentAlignment="Center" TextAlignment="Center" InperTextType="Double" InperVerify="True" InperMaxValue="59" InperMinValue="0" InperTextChanged="{s:Action AtTime_TextChanged}" Name="startSeconds" HorizontalContentAlignment="Center" Text="{Binding AtTime.Seconds,Mode=TwoWay}"/>
                     </WrapPanel>
                 </RadioButton>
-                <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" x:Name="triggerRad" Margin="0 20 0 0 " GroupName="start" IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}" >
+                <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStart_Checked}" IsEnabled="{Binding ElementName=start_trigger,Path=SelectedValue,Converter={StaticResource Object2BooleanConverter}}" x:Name="triggerRad" Margin="0 20 0 0 " GroupName="start" IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}" >
                     <WrapPanel>
                         <TextBlock Text="{DynamicResource trigger_trigger}" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Name="start_trigger" hc:BorderElement.CornerRadius="2" Height="25" Style="{StaticResource InperComboBoxBaseStyle}" IsEnabled="{Binding ElementName=triggerRad,Path=IsChecked}" DisplayMemberPath="Name" HorizontalAlignment="Left" Margin="20 0 0 0" Width="120" Text="{Binding Trigger.Name,Mode=TwoWay}"/>
@@ -126,7 +126,7 @@
                     </WrapPanel>
                 </RadioButton>
 
-                <RadioButton HorizontalAlignment="Left" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 20 0 0 " GroupName="stop"  IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
+                <RadioButton HorizontalAlignment="Left" IsEnabled="{Binding ElementName=start_trigger,Path=SelectedValue,Converter={StaticResource Object2BooleanConverter}}" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 20 0 0 " GroupName="stop"  IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
                     <WrapPanel>
                         <TextBlock Text="{DynamicResource trigger_stop_trigger}" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Name="stop_trigger" IsEnabled="{Binding ElementName=triggerRadStop,Path=IsChecked}" HorizontalAlignment="Left" Margin="20 0 0 0" Width="120" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" DisplayMemberPath="Name"  Text="{Binding Trigger.Name,Mode=TwoWay}"/>
@@ -191,12 +191,12 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{DynamicResource video_setting_video}"  FontSize="14"/>
-                                <ComboBox Grid.Column="1" Margin="20 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Left" SelectedIndex="0" ItemsSource="{Binding UnusedKits,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="180" x:Name="CameraCombox" SelectionChanged="{s:Action CameraCombox_SelectionChanged}"/>
+                                <ComboBox Grid.Column="1" Margin="20 0 0 0" Padding="3 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Left" SelectedIndex="0" ItemsSource="{Binding UnusedKits,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Width="180" x:Name="CameraCombox" SelectionChanged="{s:Action CameraCombox_SelectionChanged}"/>
                             </Grid>
-                            <WrapPanel VerticalAlignment="Center" Grid.Column="1" HorizontalAlignment="Left" Margin="5 0 0 0">
+                            <!--<WrapPanel VerticalAlignment="Center" Grid.Column="1" HorizontalAlignment="Left" Margin="5 0 0 0">
                                 <TextBlock VerticalAlignment="Center" Text="{DynamicResource video_setting_format}"  FontSize="14"/>
                                 <ComboBox Margin="20 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding ElementName=CameraCombox,Path=SelectedItem.CapabilyItems,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Key" Width="120" x:Name="format" SelectionChanged="{s:Action Format_SelectionChanged}"/>
-                            </WrapPanel>
+                            </WrapPanel>-->
                         </Grid>
                         <Grid Grid.Row="1" VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
@@ -205,8 +205,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{DynamicResource video_setting_frame_rate}"  FontSize="14"/>
                             <WrapPanel Grid.Column="1" HorizontalAlignment="Left" Margin="0 0 0 0">
-                                <ComboBox Margin="20 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2 0 0 2" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Left" Width="130" SelectedIndex="0" ItemsSource="{Binding ElementName=format,Path=SelectedItem.Value,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Size." x:Name="framrate" SelectionChanged="{s:Action FramerateChanged}" />
-                                <hc:TextBox Margin="0 0 0 0" hc:BorderElement.CornerRadius="0 2 2 0" IsEnabled="False" Text="{Binding ElementName=framrate,Path=SelectedItem.FrameRate,Mode=OneWay}" Style="{DynamicResource InperTextBoxBaseStyle}" TextAlignment="Center" Height="25" Padding="0" VerticalContentAlignment="Center" FontSize="{StaticResource InperNormalFontSize}" Width="50" HorizontalAlignment="Right"/>
+                                <ComboBox Margin="20 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2 0 0 2" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Left" Width="130" SelectedIndex="0" ItemsSource="{Binding ElementName=CameraCombox,Path=SelectedItem.CapabilyItems,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="FrameSizeStr" x:Name="framrate" SelectionChanged="{s:Action FramerateChanged}" />
+                                <hc:TextBox Margin="0 0 0 0" hc:BorderElement.CornerRadius="0 2 2 0" IsEnabled="False" Text="{Binding ElementName=framrate,Path=SelectedItem.AverageFrameRate,Mode=OneWay}" Style="{DynamicResource InperTextBoxBaseStyle}" TextAlignment="Center" Height="25" Padding="0" VerticalContentAlignment="Center" FontSize="{StaticResource InperNormalFontSize}" Width="50" HorizontalAlignment="Right"/>
                             </WrapPanel>
                         </Grid>
                     </Grid>

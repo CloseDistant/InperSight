@@ -1,4 +1,4 @@
-﻿using DirectShowLib;
+﻿//using DirectShowLib;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,7 +34,7 @@ namespace InperStudio.Lib.Helper
             LoginUserName = GetUserName();
             SystemType = GetSystemType();
             ComputerName = GetComputerName();
-            GetCameraList();
+            //GetCameraList();
         }
 
 
@@ -238,20 +238,20 @@ namespace InperStudio.Lib.Helper
             }
             return null;
         }
-        void GetCameraList()
-        {
-            ListCamerasData = new List<KeyValuePair<int, string>>();
+        //void GetCameraList()
+        //{
+        //    ListCamerasData = new List<KeyValuePair<int, string>>();
 
-            DsDevice[] _SystemCamereas = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+        //    DsDevice[] _SystemCamereas = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
-            int _DeviceIndex = 0;
-            foreach (DsDevice _Camera in _SystemCamereas)
-            {
-                ListCamerasData.Add(new KeyValuePair<int, string>(_DeviceIndex, _Camera.Name));
-                _DeviceIndex++;
-            }
-            return;
-        }
+        //    int _DeviceIndex = 0;
+        //    foreach (DsDevice _Camera in _SystemCamereas)
+        //    {
+        //        ListCamerasData.Add(new KeyValuePair<int, string>(_DeviceIndex, _Camera.Name));
+        //        _DeviceIndex++;
+        //    }
+        //    return;
+        //}
         public static void SaveFrameworkElementToImage(FrameworkElement ui, string filename, string path)
         {
             System.IO.FileStream ms = new System.IO.FileStream(filename, System.IO.FileMode.Create);

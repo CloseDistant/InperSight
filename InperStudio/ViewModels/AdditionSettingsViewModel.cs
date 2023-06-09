@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
+using InperCameraSolution.AccordSolution;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Bean.Stimulus;
@@ -10,8 +11,6 @@ using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
-using InperVideo.Camera;
-using InperVideo.Interfaces;
 using SciChart.Core.Extensions;
 using Stylet;
 using System;
@@ -120,31 +119,18 @@ namespace InperStudio.ViewModels
                     UsedKits = InperGlobalClass.ActiveVideos;
                     view.video.Visibility = Visibility.Visible;
                     UnusedKits = new ObservableCollection<VideoRecordBean>();
-
-                    IEnumerable<ICameraInfo> camerInfoList = new List<ICameraInfo>();
-
-                    camerInfoList = new CameraInfoesReader().GetCameraInfos();
-
-                    int i = 0;
-                    if (camerInfoList != null)
+                    #region accord
+                    var devices = new AccordGetCameraDevices().VideoDevices;
+                    if (devices.Count > 0)
                     {
-                        foreach (var c in camerInfoList)
+                        foreach (var device in devices)
                         {
-
-                            if (!c.FriendlyName.Contains("Basler"))
+                            if (!device.Name.Contains("Basler"))
                             {
-                                VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x._CamIndex == i || x.Name == c.FriendlyName);
+                                VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x.MonikerString == device.MonikerString);
                                 if (it == null)
                                 {
-                                    var item = new VideoRecordBean(i, c.FriendlyName, new CameraParamSet(c.CapabilyItems.FirstOrDefault().Size, c.CapabilyItems.FirstOrDefault().FrameRate, c.CapabilyItems.FirstOrDefault().Format));
-                                    var formats = c.CapabilyItems.OrderBy(s => s.Size.Width).OrderBy(f => f.Format).GroupBy(ca => ca.Format);
-                                    foreach (var format in formats)
-                                    {
-                                        if (!format.Key.Equals("RGB24"))
-                                        {
-                                            item.CapabilyItems.Add(format.Key, format.OrderBy(x => x.Size.Width));
-                                        }
-                                    }
+                                    var item = new VideoRecordBean(device);
                                     UnusedKits.Add(item);
                                 }
                                 else
@@ -153,12 +139,11 @@ namespace InperStudio.ViewModels
                                     {
                                         it.IsActive = true;
                                     }
-                                } 
+                                }
                             }
-                            i++;
                         }
                     }
-
+                    #endregion
                     if (unusedKits.Count > 0)
                     {
                         this.view.Dispatcher.Invoke(() =>
@@ -180,10 +165,7 @@ namespace InperStudio.ViewModels
                         view.Title = "触发";
                     }
                     view.IsShowOtherButton = false;
-                    //view.source_comb.ItemsSource = Source;
-                    //view.mode_comb.ItemsSource = Mode;
-                    //view.stop_source_comb.ItemsSource = Source;
-                    //view.source_comb.SelectionChanged += Source_comb_SelectionChanged;
+
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
                         if (item.Value != StimulusBeans.Instance.DioID)
@@ -414,7 +396,6 @@ namespace InperStudio.ViewModels
             }
             this.RequestClose();
         }
-
         private void View_ConfirmClickEvent(object arg1, System.Windows.Input.ExecutedRoutedEventArgs arg2)
         {
             this.RequestClose();
@@ -454,17 +435,12 @@ namespace InperStudio.ViewModels
             }
             if (unusedKits != null)
             {
-                //unusedKits.ToList().ForEach(x =>
-                //{
-                //    x.StopPreview();
-                //});
                 foreach (var item in unusedKits)
                 {
-                    item.StopPreview();
+                    item.Stop();
                 }
             }
         }
-
         protected override void OnClose()
         {
             try
@@ -487,7 +463,7 @@ namespace InperStudio.ViewModels
                 {
                     if (UnusedKits.Count > 0)
                     {
-                        UnusedKits.ToList().ForEach(x => { x.StopPreview(); });
+                        UnusedKits.ToList().ForEach(x => { x.Stop(); });
                     }
 
 
@@ -560,79 +536,63 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                selectCameraItem?.StopPreview();
+                selectCameraItem?.Stop();
                 if (view.CameraCombox.SelectedItem != null)
                 {
                     selectCameraItem = view.CameraCombox.SelectedItem as VideoRecordBean;
-                    selectCameraItem.Reset(new CameraParamSet((view.CameraCombox.SelectedItem as VideoRecordBean).CapabilyItems.First().Value.First().Size, (view.CameraCombox.SelectedItem as VideoRecordBean).CapabilyItems.First().Value.First().FrameRate, (view.CameraCombox.SelectedItem as VideoRecordBean).CapabilyItems.First().Value.First().Format));
-                    //Dialog d = Dialog.Show<ProgressDialog>("VideoDialog");
-                    //await Task.Factory.StartNew(() =>
-                    //{
-                    selectCameraItem?.StartCapture();
-                    //d.Close();
-                    view.format.SelectedIndex = 0;
+                    //selectCameraItem?.StartCapture();
+                    int index = selectCameraItem.CapabilyItems.Count / 2;
+                    if (selectCameraItem.CapabilyItems.FirstOrDefault(x => x.FrameSize.Width == 1280) is AccordResolutionInfo accordResolutionInfo)
+                    {
+                        index = selectCameraItem.CapabilyItems.IndexOf(accordResolutionInfo);
+                    }
+                    selectCameraItem.Reset(selectCameraItem.CapabilyItems[index]);
+                    view.framrate.SelectedIndex = index;
                 }
 
                 //清除并重新渲染zone
                 ClearZone();
-
-                //if (zoneVideos.Count > 0)
-                //{
-                //    zoneVideos.ForEachDo(zone =>
-                //    {
-                //        if (zone.VideoName == selectCameraItem.Name)
-                //        {
-                //            zone.IsActive = true;
-                //            zone.Shape.Fill = Brushes.Transparent;
-                //            view.drawAreaCanvas.Children.Add(zone.Shape);
-                //            var layer = AdornerLayer.GetAdornerLayer(zone.Shape);
-                //            var color = Brushes.Black;
-                //            layer.Add(new InperAdorner(zone.Shape, zone.Shape.Name, color, 0, -15, false));
-                //        }
-                //    });
-                //}
-
             }
             catch (Exception ex)
             {
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
-        public void Format_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                System.Windows.Controls.ComboBox item = sender as System.Windows.Controls.ComboBox;
-                if (item == null)
-                {
-                    view.framrate.SelectedIndex = UnusedKits.First().CapabilyItems.Values.First().Count() / 2;
-                }
-                else
-                {
-                    if (item.SelectedValue != null)
-                    {
-                        var content = (KeyValuePair<string, IEnumerable<ICameraCapabilyItem>>)item.SelectedValue;
-                        view.framrate.SelectedIndex = content.Value.Count() / 2;
-                    }
-                    else
-                    {
-                        view.framrate.SelectedIndex = 0;
-                    }
-                }
-                ClearZone();
-            }
-            catch (Exception ex)
-            {
-                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
-            }
-        }
+        //public void Format_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        System.Windows.Controls.ComboBox item = sender as System.Windows.Controls.ComboBox;
+        //        if (item == null)
+        //        {
+        //            view.framrate.SelectedIndex = UnusedKits.First().CapabilyItems.Count() / 2;
+        //        }
+        //        else
+        //        {
+        //            if (item.SelectedValue != null)
+        //            {
+        //                var content = (KeyValuePair<string, IEnumerable<ICameraCapabilyItem>>)item.SelectedValue;
+        //                view.framrate.SelectedIndex = content.Value.Count() / 2;
+        //            }
+        //            else
+        //            {
+        //                view.framrate.SelectedIndex = 0;
+        //            }
+        //        }
+        //        ClearZone();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+        //    }
+        //}
         public void FramerateChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
                 if (view.framrate.SelectedItem != null && selectCameraItem != null)
                 {
-                    selectCameraItem.Reset(new CameraParamSet((view.framrate.SelectedItem as CameraCapabilyItem).Size, (view.framrate.SelectedItem as CameraCapabilyItem).FrameRate, (view.framrate.SelectedItem as CameraCapabilyItem).Format));
+                    selectCameraItem.Reset(view.framrate.SelectedItem as AccordResolutionInfo);
                     ClearZone();
                 }
             }
@@ -735,7 +695,7 @@ namespace InperStudio.ViewModels
                         camera.AutoRecord = true; camera.IsActive = true;
                         _ = UnusedKits.Remove(camera);
                         UsedKits.Add(camera);
-                        camera.StopPreview();
+                        camera.Stop();
                         //view.PopButton.Background = MarkerChannels.First().BgColor;
                         view.CameraCombox.SelectedIndex = 0;
                         view.CameraName.Text = "Video-";
