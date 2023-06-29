@@ -30,6 +30,8 @@
                     <ColumnDefinition Width=".1*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                <Button Name="_focus1" Style="{StaticResource InperFreeButton}" Panel.ZIndex="-9" Width="5" Height="5"></Button>
+                <Button Name="_focus2" Style="{StaticResource InperFreeButton}" Panel.ZIndex="-9" Width="5" Height="5"></Button>
                 <ToggleButton Grid.Column="0" Width="28" Cursor="Hand" Height="28" Visibility="Visible" Style="{StaticResource ToggleButtonCustom}" Checked="{s:Action ButtonVisibilitySwitch_Checked}" Unchecked="{s:Action ButtonVisibilitySwitch_Unchecked}" Name="buttonVisibilitySwitch" IsChecked="True">
                     <Grid>
                         <Image Source="/Lib/Images/New/tg_open.png" Visibility="{Binding ElementName=buttonVisibilitySwitch,Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter}}" />

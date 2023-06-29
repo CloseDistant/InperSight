@@ -474,7 +474,7 @@ namespace InperStudio.ViewModels
                 {
                     EventChannel item = cb as EventChannel;
 
-                    view.MarkerName.Text = item.Name;
+                    view.MarkerName.Text = item.SymbolName;
 
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
@@ -582,7 +582,7 @@ namespace InperStudio.ViewModels
 
                 if (item != null)
                 {
-                    view.MarkerName.Text = channel.Name + "-" + item.Name;
+                    view.MarkerName.Text = channel.SymbolName + "-" + item.Name;
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         view.outputHotkeys.Content = item.Hotkeys = "F" + (channel.ChannelId + 1);
@@ -733,7 +733,12 @@ namespace InperStudio.ViewModels
                             {
                                 if (lightChannels.Count > 0)
                                 {
-                                    Growl.Warning("This condition already exists!", "SuccessMsg");
+                                    string text = "条件已存在!";
+                                    if (InperConfig.Instance.Language == "en_us")
+                                    {
+                                        text = "This condition already exists!";
+                                    }
+                                    Growl.Warning(text, "SuccessMsg");
                                     ch.IsActive = false;
                                     return;
                                 }
@@ -743,7 +748,12 @@ namespace InperStudio.ViewModels
 
                             if (output != null)
                             {
-                                Growl.Warning("This condition already exists!", "SuccessMsg");
+                                string text = "条件已存在!";
+                                if (InperConfig.Instance.Language == "en_us")
+                                {
+                                    text = "This condition already exists!";
+                                }
+                                Growl.Warning(text, "SuccessMsg");
                                 ch.IsActive = false;
                                 return;
                             }
@@ -795,7 +805,7 @@ namespace InperStudio.ViewModels
                                 {
                                     channle.IsRefractoryPeriod = true;
                                 }
-                                if (InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(l => l.ChannelId == channle.ChannelId && l.Type == channle.Type) is CameraChannel channel)
+                                if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(l => l.ChannelId == channle.ChannelId && l.Type == channle.Type) is CameraChannel channel)
                                 {
                                     channel.IsDeltaFCalculate = true;
                                 }
@@ -820,7 +830,12 @@ namespace InperStudio.ViewModels
                                         {
                                             if (x.Hotkeys == channle.Condition.Hotkeys || x.Name == channle.Condition.Name)
                                             {
-                                                Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
+                                                string text = "条件已存在!";
+                                                if (InperConfig.Instance.Language == "en_us")
+                                                {
+                                                    text = "This condition already exists!";
+                                                }
+                                                Growl.Warning(text, "SuccessMsg");
                                                 mc.IsActive = false;
                                                 return;
                                             }
@@ -831,7 +846,12 @@ namespace InperStudio.ViewModels
                                             {
                                                 if (x.Condition.Hotkeys == channle.Condition.Hotkeys || x.Name == channle.Name)
                                                 {
-                                                    Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
+                                                    string text = "条件已存在!";
+                                                    if (InperConfig.Instance.Language == "en_us")
+                                                    {
+                                                        text = "This condition already exists!";
+                                                    }
+                                                    Growl.Warning(text, "SuccessMsg");
                                                     mc.IsActive = false;
                                                 }
 
@@ -848,7 +868,7 @@ namespace InperStudio.ViewModels
                                 {
                                     channle.IsRefractoryPeriod = true;
                                 }
-                                if (InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(l => l.ChannelId == channle.Condition.ChannelId && l.Type == channle.Condition.Type) is CameraChannel channel)
+                                if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(l => l.ChannelId == channle.Condition.ChannelId && l.Type == channle.Condition.Type) is CameraChannel channel)
                                 {
                                     channel.IsDeltaFCalculate = true;
                                 }
@@ -861,10 +881,15 @@ namespace InperStudio.ViewModels
                                     EventChannel manual = manualChannels.FirstOrDefault(x => x.Hotkeys == ch.Hotkeys || x.Name == ch.Name);
                                     if (manual != null)
                                     {
-                                        Growl.Warning(new GrowlInfo() { Message = "热键或名称重复", Token = "SuccessMsg", WaitTime = 1 });
+                                        string text = "条件已存在!";
+                                        if (InperConfig.Instance.Language == "en_us")
+                                        {
+                                            text = "This condition already exists!";
+                                        }
+                                        Growl.Warning(text, "SuccessMsg");
                                         return;
                                     }
-                                }
+                                } 
                                 channle.IsActive = true;
                                 EventChannel chn = new EventChannel()
                                 {
@@ -921,7 +946,12 @@ namespace InperStudio.ViewModels
                                             ShapeName = zone.ShapeName,
                                         };
                                     }
-                                    Growl.Warning("This condition already exists!", "SuccessMsg");
+                                    string text = "条件已存在!";
+                                    if (InperConfig.Instance.Language == "en_us")
+                                    {
+                                        text = "This condition already exists!";
+                                    }
+                                    Growl.Warning(text, "SuccessMsg");
                                     return;
                                 }
                                 var chnjson = new EventChannel()

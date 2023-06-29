@@ -130,6 +130,7 @@ namespace InperStudio.ViewModels
                     if (hotkeys.Contains(e.Key.ToString()))
                     {
                         AddMarkers(hotkeys, x);
+                        e.Handled = true;
                     }
                 }
                 else if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
@@ -140,12 +141,25 @@ namespace InperStudio.ViewModels
                         if (hotkeys.Contains(e.Key.ToString()))
                         {
                             AddMarkers(hotkeys, x, 1);
+                            e.Handled = true;
                         }
                     }
                 }
-
             });
-            e.Handled = true;
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+                if (!windowView._focus1.IsFocused)
+                {
+                    windowView._focus1.Focus();
+                }
+                else
+                {
+                    windowView._focus2.Focus();
+                }
+            }
+
+            //e.Handled = true;
         }
         private void AddMarkers(string[] hotkeys, EventChannelJson x, int type = 0)
         {

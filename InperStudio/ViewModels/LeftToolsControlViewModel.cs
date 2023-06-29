@@ -169,7 +169,8 @@ namespace InperStudio.ViewModels
                             };
                             item.LightModes.Add(new LightMode<TimeSpan, double>()
                             {
-                                LightType = -1
+                                LightType = -1,
+                                OffsetValue = double.Parse(x.OffsetValue)
                             });
                             //item.TimeSpanAxis.VisibleRangeChanged += InperDeviceHelper.Instance.TimeSpanAxis_VisibleRangeChanged;
 
@@ -186,6 +187,7 @@ namespace InperStudio.ViewModels
                 view.PopButton.Background = AnalogChannels?.FirstOrDefault().BgColor;
                 view.AnalogChannelCombox.SelectedIndex = 0;
             }
+            InperGlobalClass.CameraSignalSettings.CameraChannels.OrderBy(x => x.ChannelId);
         }
         public void CameraShow()
         {
@@ -534,7 +536,7 @@ namespace InperStudio.ViewModels
 
                         CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
                         _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                        InperDeviceHelper.Instance._LoopCannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance._LoopCannels.Where(x => x.ChannelId != item.ChannelId));
+                        //InperDeviceHelper.Instance._LoopCannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance._LoopCannels.Where(x => x.ChannelId != item.ChannelId));
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Camera.ToString());
                         if (channel != null)
                         {
@@ -662,8 +664,25 @@ namespace InperStudio.ViewModels
                     item.XVisibleRange = new TimeSpanRange(new TimeSpan(0), new TimeSpan(0, 0, (int)DataShowControlViewModel.ShowVisibleValue));
                     item.ViewportManager = new ScrollingViewportManager(DataShowControlViewModel.ShowVisibleValue);
                 }
+                if (!string.IsNullOrEmpty(_channel.LightOffsetValue))
+                {
+                    var offsetValue = _channel.LightOffsetValue.Split(' ');
+                    offsetValue.ForEachDo(off =>
+                    {
+                        if (!string.IsNullOrEmpty(off))
+                        {
+                            if (item.LightModes.First(f => f.LightType == int.Parse(off.Split(',').First())) is var ltp)
+                            {
+                                if(double.TryParse(off.Split(',').Last(), out var d))
+                                {
+                                    ltp.OffsetValue = d;
+                                }
+                            }
+                        }
+                    });
+                }
                 InperDeviceHelper.Instance.CameraChannels.Add(item);
-                InperDeviceHelper.Instance._LoopCannels.Add(item);
+                //InperDeviceHelper.Instance._LoopCannels.Add(item);
                 Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
 
                 if (InperGlobalClass.IsPreview)
@@ -920,7 +939,7 @@ namespace InperStudio.ViewModels
                             {
                                 InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, true);
                                 InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, sen.LightPower);
-                                CameraChannel loopChn = InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
+                                CameraChannel loopChn = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
                                 LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = mode.LightType, DataSeries = mode.XyDataSeries, Stroke = mode.WaveColor.Color, YAxisId = "Ch" + sen.GroupId };
                                 line.DataSeries.FifoCapacity = 10 * 60 * (int)InperGlobalClass.CameraSignalSettings.Sampling;
                                 loopChn.RenderableSeries.Add(line);
@@ -998,12 +1017,28 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
+        public void CheckBox_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (InperGlobalClass.CameraSignalSettings.LightMode.Count < 2 && InperGlobalClass.IsPreview && (bool)((CheckBox)sender).IsChecked)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
         public void LightMode_UnChecked(object sender, RoutedEventArgs e)
         {
             try
             {
                 WaveGroup sen = (sender as CheckBox).DataContext as WaveGroup;
                 sen.IsChecked = false;
+
                 if (!sen.IsChecked)
                 {
                     //InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
@@ -1033,7 +1068,7 @@ namespace InperStudio.ViewModels
                             {
                                 InperDeviceHelper.Instance.device.SwitchLight((uint)sen.GroupId, false);
                                 InperDeviceHelper.Instance.device.SetLightPower((uint)sen.GroupId, 0);
-                                CameraChannel loopChn = InperDeviceHelper.Instance._LoopCannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
+                                CameraChannel loopChn = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId);
 
                                 if (loopChn.RenderableSeries.FirstOrDefault(x => (x as LineRenderableSeriesViewModel).Tag.ToString() == mode.LightType.ToString()) is LineRenderableSeriesViewModel line)
                                 {

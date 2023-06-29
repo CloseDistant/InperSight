@@ -41,7 +41,9 @@ namespace InperStudio.Lib.Helper.JsonBean
         public double Height { get; set; } = double.NaN;
         public double YBottom { get; set; } = 0;
         public bool Offset { get; set; }
-        public int OffsetWindowSize { get; set; } = 300;
+        public int OffsetWindowSize { get; set; } = 0;
+        public string OffsetValue { get; set; } = "0";
+        public string LightOffsetValue { get; set; }
         public bool AutoRange { get; set; } = true;
         public Filters Filters { get; set; } = new Filters();
     }

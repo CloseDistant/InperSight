@@ -100,7 +100,7 @@
             </Grid>
             <!--内容-->
             <ScrollViewer Grid.Row="1" Visibility="Collapsed"  x:Name="camera">
-                <Grid Margin="10 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                <Grid Margin="10 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="255"/>
                         <RowDefinition Height="*"/>
@@ -119,7 +119,7 @@
                         <Grid Grid.Row="1">
                             <Grid VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                                 <WrapPanel>
-                                    <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" Padding="5 0" Margin="3 0 0 0" Width="75" Height="20" FontSize="{DynamicResource InperSmallFontSize}" />
+                                    <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" Padding="5 0" Margin="3 0 0 0" Width="105" Height="25" FontSize="{DynamicResource InperSmallFontSize}" />
                                 </WrapPanel>
                             </Grid>
                             <Button Margin="0 0 40 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="reset" Command="{s:Action AutoFindFiberRest}" >
@@ -159,7 +159,7 @@
                                 </Button>
                             </WrapPanel>
                         </Grid>
-                        <StackPanel Grid.Row="1" Margin="0 0 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                        <StackPanel Grid.Row="1" Margin="0 0 0 0">
                             <Grid HorizontalAlignment="Center" Margin="0 5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -170,7 +170,7 @@
                                 <TextBlock Grid.Column="1" Text="{DynamicResource left_excitaion_light}" Foreground="{DynamicResource InperTheme}" FontSize="14" Margin="10 0"/>
                                 <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
                             </Grid>
-                            <WrapPanel Margin="15" HorizontalAlignment="Right">
+                            <WrapPanel Margin="15" HorizontalAlignment="Right"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                                 <TextBlock Text="{DynamicResource left_light_intensity_measure}" VerticalAlignment="Center" />
                                 <ToggleButton Margin="20 0 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter}}" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
                             </WrapPanel>
@@ -180,9 +180,9 @@
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate>
-                                                    <WrapPanel Margin="0 8">
+                                                    <WrapPanel Margin="0 8"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                                                         <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
-                                                        <CheckBox  Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}"  IsChecked="{Binding IsChecked ,UpdateSourceTrigger=PropertyChanged}"/>
+                                                        <CheckBox Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" PreviewMouseDown="{s:Action CheckBox_PreviewMouseDown}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" IsChecked="{Binding IsChecked ,UpdateSourceTrigger=PropertyChanged}"/>
                                                         <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="10 0 0 0" FontSize="{StaticResource InperNormalFontSize}"/>
                                                         <inper:InperTextBox  hc:BorderElement.CornerRadius="2" IsEnabled="True" Style="{StaticResource TextBoxBaseStyle}" MinHeight="25" InperVerify="False" InperTextType="Int" InperMaxValue="100" InperMinValue="0" InperTextChanged="{s:Action LightMode_TextChanged}" Text="{Binding LightPower,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="60 0 0 0"  Padding="4 0 0 0"  Width="120" TextAlignment="Left" />
                                                     </WrapPanel>
@@ -204,15 +204,15 @@
                             </Grid>
                             <WrapPanel Margin="0 10 0 0"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                                 <TextBlock Text="{DynamicResource left_exposure}" VerticalAlignment="Center" Width="90"/>
-                                <ComboBox hc:BorderElement.CornerRadius="2" TextBoxBase.TextChanged="{s:Action Exposure_TextChanged}" Margin="59 0 0 0" IsEditable="True" x:Name="Exposure" Text="{Binding Expourse,UpdateSourceTrigger=PropertyChanged}" Padding="4 0" MinHeight="25" Width="120" FontSize="{DynamicResource InperNormalFontSize}"/>
+                                <ComboBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" TextBoxBase.TextChanged="{s:Action Exposure_TextChanged}" Margin="59 0 0 0" IsEditable="True" x:Name="Exposure" Text="{Binding Expourse,UpdateSourceTrigger=PropertyChanged}" Padding="4 0" MinHeight="25" Width="120" FontSize="{DynamicResource InperNormalFontSize}"/>
                             </WrapPanel>
                             <WrapPanel Margin="0 15 0 0"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                                 <TextBlock Text="{DynamicResource left_sampling}" VerticalAlignment="Center" Width="90" />
-                                <ComboBox hc:BorderElement.CornerRadius="2" TextBoxBase.TextChanged="{s:Action Sampling_TextChanged}" x:Name="Sampling" Text="{Binding Sampling,UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource ComboBoxBaseStyle}" Padding="4 0" Margin="59 0 0 0" MinHeight="25" MinWidth="120" FontSize="{DynamicResource InperNormalFontSize}"/>
+                                <ComboBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" TextBoxBase.TextChanged="{s:Action Sampling_TextChanged}" x:Name="Sampling" Text="{Binding Sampling,UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource ComboBoxBaseStyle}" Padding="4 0" Margin="59 0 0 0" MinHeight="25" MinWidth="120" FontSize="{DynamicResource InperNormalFontSize}"/>
                             </WrapPanel>
                             <WrapPanel Margin="0 15"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                                 <TextBlock Text="{DynamicResource left_gain}" VerticalAlignment="Center" Width="90" />
-                                <inper:InperTextBox InperVerify="True" InperTextType="Int" InperMaxValue="24" InperMinValue="0" Style="{StaticResource TextBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action Gain_TextChanged}"  Padding="4 0 0 0"  hc:BorderElement.CornerRadius="2"  MinHeight="25" MinWidth="120"  Margin="59 0 0 0" />
+                                <inper:InperTextBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" InperVerify="True" InperTextType="Int" InperMaxValue="24" InperMinValue="0" Style="{StaticResource TextBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action Gain_TextChanged}"  Padding="4 0 0 0"  hc:BorderElement.CornerRadius="2"  MinHeight="25" MinWidth="120"  Margin="59 0 0 0" />
                             </WrapPanel>
                             <Grid HorizontalAlignment="Center" Margin="0 5">
                                 <Grid.ColumnDefinitions>
@@ -226,16 +226,16 @@
                             </Grid>
                             <RadioButton Checked="{s:Action Continus_Checked}" FontSize="14" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" Margin="20 10" GroupName="mode" x:Name="continuous" Content="{DynamicResource left_continuous}" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                             <WrapPanel Margin="20 10 0 0" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
-                                <RadioButton GroupName="mode" FontSize="14" x:Name="interval" Content="{DynamicResource left_interval}" Checked="{s:Action Interval_Checked}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                <RadioButton  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" GroupName="mode" FontSize="14" x:Name="interval" Content="{DynamicResource left_interval}" Checked="{s:Action Interval_Checked}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </WrapPanel>
                             <WrapPanel Margin="44 10 0 10" IsEnabled="{Binding ElementName=interval,Path=IsChecked}">
                                 <WrapPanel Margin="0 2">
                                     <TextBlock Text="{DynamicResource left_duration}"  VerticalAlignment="Center" FontSize="14" />
-                                    <inper:InperTextBox Name="_duration" hc:BorderElement.CornerRadius="2" Margin="5 0 0 0" Style="{StaticResource TextBoxBaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Duration,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="48" MinHeight="25" Padding="0"/>
+                                    <inper:InperTextBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Name="_duration" hc:BorderElement.CornerRadius="2" Margin="5 0 0 0" Style="{StaticResource TextBoxBaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Duration,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="48" MinHeight="25" Padding="0"/>
                                 </WrapPanel>
                                 <WrapPanel Margin="12 2 0 2">
                                     <TextBlock Text="{DynamicResource left_interval_time}"  VerticalAlignment="Center" FontSize="14" />
-                                    <inper:InperTextBox Name="_interval" hc:BorderElement.CornerRadius="2" Margin="5 0 0 0" Style="{StaticResource TextBoxBaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Interval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"  Width="48" MinHeight="25" />
+                                    <inper:InperTextBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Name="_interval" hc:BorderElement.CornerRadius="2" Margin="5 0 0 0" Style="{StaticResource TextBoxBaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Interval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"  Width="48" MinHeight="25" />
                                 </WrapPanel>
                             </WrapPanel>
                         </StackPanel>

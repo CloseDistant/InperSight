@@ -119,7 +119,7 @@ namespace InperStudio.ViewModels
                         InperDeviceHelper.Instance.device.InqID();
                         InperLogExtentHelper.InitLogDatabase();
                         //加载模型
-                        InperTrackingDnnHelper.LoadNet();
+                        //InperTrackingDnnHelper.LoadNet();
                         windowManager.ShowWindow(new MainWindowViewModel(windowManager));
                         RequestClose();
                     }

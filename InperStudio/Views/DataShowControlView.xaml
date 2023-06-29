@@ -34,11 +34,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{Binding S1Visible, Converter={StaticResource GridLengthConverter}}" />
                     <RowDefinition Height="0" />
-                    <RowDefinition Height="{Binding S0Visible, Converter={StaticResource GridLengthConverter}}"/>
-                    <RowDefinition Height="0" />
                     <RowDefinition Height="{Binding S2Visible, Converter={StaticResource GridLengthConverter}}"/>
                     <RowDefinition Height="0" />
                     <RowDefinition Height="{Binding S3Visible, Converter={StaticResource GridLengthConverter}}"/>
+                    <RowDefinition Height="0" />
+                    <RowDefinition Height="{Binding S0Visible, Converter={StaticResource GridLengthConverter}}"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -144,16 +144,16 @@
                 <Grid Grid.Column="2">
                     <sc:SciChartSurface Background="Transparent" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}" RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
                         <sc:SciChartSurface.YAxes>
-                            <sc:NumericAxis Id="Ch0" Margin="0 5 0 0" Visibility="{Binding S0Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="2" Grid.Column="0" Width="60" 
+                            <sc:NumericAxis Id="Ch0" Margin="0 5 0 0" Visibility="{Binding S0Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="6" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
                                 DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" VisibleRange="{Binding YVisibleRange,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <sc:NumericAxis Id="Ch1" Visibility="{Binding S1Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="0" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
                                 DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" VisibleRange="{Binding YVisibleRange1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                            <sc:NumericAxis Id="Ch2" Margin="0 5 0 0" Visibility="{Binding S2Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="4" Grid.Column="0" Width="60" 
+                            <sc:NumericAxis Id="Ch2" Margin="0 5 0 0" Visibility="{Binding S2Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="2" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
                                 DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" VisibleRange="{Binding YVisibleRange2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                            <sc:NumericAxis Id="Ch3" Margin="0 5 0 0" Visibility="{Binding S3Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="6" Grid.Column="0" Width="60" 
+                            <sc:NumericAxis Id="Ch3" Margin="0 5 0 0" Visibility="{Binding S3Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="4" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"  
                                 DrawMinorGridLines="False" MaxAutoTicks="6" TextFormatting="#0.000" HorizontalContentAlignment="Right"  BorderThickness="0 0 1 0" BorderBrush="Gray"  AxisAlignment="Left" AutoRange="{Binding AutoRange,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource BoolToStringConverter}}" VisibleRange="{Binding YVisibleRange3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                         </sc:SciChartSurface.YAxes>
@@ -176,7 +176,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <ListBox x:Name="dataList" Margin="-3 0 0 -3" ItemsSource="{Binding ChartDatas}" hc:ScrollViewerAttach.AutoHide="False"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="False" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
+                    <ListBox x:Name="dataList" Margin="-5 0 0 -4" ItemsSource="{Binding ChartDatas}" hc:ScrollViewerAttach.AutoHide="False"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="False" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
                      ItemTemplate="{StaticResource ListDataTemplate}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>

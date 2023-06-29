@@ -106,7 +106,7 @@ namespace InperStudioControlLib.Control.TextBox
                             Regex rx = new Regex(@"^[+-]?\d*[.]?\d*$");
                             if (rx.IsMatch(tbox.Text))
                             {
-                                double res = Math.Round(double.Parse(tbox.Text), 2);
+                                double res = Math.Round(double.Parse(tbox.Text), 3);
                                 if (tbox.Text.Split('.').Last().Length > 2)
                                 {
                                     this.Text = res.ToString();

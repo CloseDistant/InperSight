@@ -75,7 +75,7 @@
                 <Grid Margin="0 20 0 0" x:Name="conditionGrid"  Visibility="Collapsed">
                     <TextBlock VerticalAlignment="Center" Text="{DynamicResource marker_channel}"  FontSize="{DynamicResource InperNormalFontSize}"/>
                     <!--aa-->
-                    <ComboBox Margin="20 0"  Height="25" hc:BorderElement.CornerRadius="2" FontSize="{DynamicResource InperNormalFontSize}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" Width="170" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}">
+                    <ComboBox Margin="20 0" Style="{StaticResource InperComboBoxBaseStyle}"  Height="25" hc:BorderElement.CornerRadius="2" FontSize="{DynamicResource InperNormalFontSize}"  HorizontalAlignment="Right" SelectedIndex="0" ItemsSource="{Binding MarkerChannels,UpdateSourceTrigger=PropertyChanged}" Width="170" x:Name="ConditionsCombox" SelectionChanged="{s:Action MarkerChannelCombox_SelectionChanged}">
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="ComboBoxItem">
                                 <Setter Property="VirtualizingPanel.Visibility" Value="{Binding IsActive,Converter={StaticResource Boolean2VisibilityReConverter}}"/>
@@ -142,7 +142,7 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <ComboBox Height="25" hc:BorderElement.CornerRadius="2" Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" FontSize="{DynamicResource InperNormalFontSize}" Margin="20 0" Style="{StaticResource InperComboBoxBaseStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="SymbolName" Width="170" x:Name="ConditionChannelCombox" SelectionChanged="{s:Action ConditionsChannelCombox_SelectionChanged}"/>
+                    <ComboBox Height="25" hc:BorderElement.CornerRadius="2" Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}" FontSize="{DynamicResource InperNormalFontSize}" Margin="20 0" Style="{StaticResource InperComboBoxBaseStyle}"  HorizontalAlignment="Right"  ItemsSource="{Binding ConditionsChannels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="SymbolName" Width="170" x:Name="ConditionChannelCombox" SelectionChanged="{s:Action ConditionsChannelCombox_SelectionChanged}" Padding="5 0 0 0"/>
                 </Grid>
                 <!--outputzone-->
                 <Grid  Visibility="{Binding EventType,Converter={StaticResource EventOutputConverter}}">
@@ -315,8 +315,8 @@
                 </Grid>
             </StackPanel>
             <Grid Grid.Column="1" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-                <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action MarkerMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="36" Height="24" Margin="0 0 0 130" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
-                <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action MarkerMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="36" Height="24"   Margin="0 -30 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
+                <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action MarkerMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="36" Height="24" Margin="0 0 0 130" Style="{DynamicResource ButtonPrimary}" BorderThickness="0" Background="{DynamicResource InperTheme}" ></Button>
+                <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action MarkerMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="36" Height="24"   Margin="0 -30 0 0" Style="{DynamicResource ButtonPrimary}" BorderThickness="0" Background="{DynamicResource InperTheme}"></Button>
             </Grid>
             <StackPanel Grid.Column="2" Margin="20 0 0 0">
                 <Grid Margin="0 20 0 0">

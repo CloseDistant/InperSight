@@ -1,4 +1,5 @@
-﻿using HandyControl.Controls;
+﻿using Google.Protobuf.WellKnownTypes;
+using HandyControl.Controls;
 using HandyControl.Data;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
@@ -8,21 +9,79 @@ using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
 using InperStudioControlLib.Lib.Config;
-using MathNet.Numerics.Distributions;
-using SciChart.Charting.Visuals.Axes;
 using SciChart.Core.Extensions;
 using Stylet;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace InperStudio.ViewModels
 {
+    public class Light : PropertyChangedBase
+    {
+        public string LightName { get; set; }
+        public int LightId { get; set; }
+        public int ChannelId { get; set; } = -1;
+        private string offsetValue;
+        public string OffsetValue
+        {
+            get => offsetValue;
+            set
+            {
+                SetAndNotify(ref offsetValue, value);
+                if (InperDeviceHelper.Instance.CameraChannels.First(x => x.ChannelId == ChannelId) is var chn)
+                {
+                    if (double.TryParse(value.ToString(), out double num) && !LightName.IsNullOrEmpty())
+                    {
+                        chn.LightModes.First(f => f.LightType == LightId).OffsetValue = num;
+                    }
+                }
+                InperGlobalClass.CameraSignalSettings.CameraChannels.ForEachDo(ch =>
+                {
+                    if (ch.ChannelId == ChannelId && !LightName.IsNullOrEmpty())
+                    {
+                        if (ch.LightOffsetValue.IsNullOrEmpty())
+                        {
+                            ch.LightOffsetValue = LightId.ToString() + ',' + value.ToString() + ' ';
+                            return;
+                        }
+                        var res = ch.LightOffsetValue.Split(' ');
+                        bool isExist = false; string saveStr = string.Empty;
+                        res.ForEachDo(r =>
+                        {
+                            if (!r.IsNullOrEmpty())
+                            {
+                                if (r.Split(',')[0] == LightId.ToString())
+                                {
+                                    isExist = true;
+                                    saveStr = LightId.ToString() + ',' + value.ToString() + ' ';
+                                }
+                                else
+                                {
+                                    saveStr += r + ' ';
+                                }
+                            }
+                        });
+                        if (!isExist)
+                        {
+                            saveStr = LightId.ToString() + ',' + value.ToString() + ' ';
+                            ch.LightOffsetValue += saveStr;
+                        }
+                        else
+                        {
+                            ch.LightOffsetValue = saveStr;
+                        }
+                    }
+                });
+                Console.WriteLine(offsetValue);
+            }
+        }
+    }
     public class SignalPropertiesViewModel : Screen
     {
         #region filed
@@ -35,6 +94,8 @@ namespace InperStudio.ViewModels
         public BindableCollection<Channel> Channels { get => channels; set => SetAndNotify(ref channels, value); }
         private Channel activeChannel;
         public Channel ActiveChannel { get => activeChannel; set => SetAndNotify(ref activeChannel, value); }
+        private BindableCollection<Light> lights = new BindableCollection<Light>();
+        public BindableCollection<Light> Lights { get => lights; set => SetAndNotify(ref lights, value); }
         #endregion
         public SignalPropertiesViewModel(SignalPropertiesTypeEnum @enum, int ChannelId)
         {
@@ -60,14 +121,18 @@ namespace InperStudio.ViewModels
                     default:
                         break;
                 }
-                view.ConfirmClickEvent += (s, e) =>
-                {
-                    RequestClose();
-                };
             }
             catch (Exception ex)
             {
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+            finally
+            {
+                view.ConfirmClickEvent += (s, e) =>
+                {
+                    this.view.Hide();
+                    //RequestClose();
+                };
             }
             base.OnViewLoaded();
         }
@@ -90,23 +155,43 @@ namespace InperStudio.ViewModels
                 CameraSignalSettings.AllChannelConfig.ChannelId = _ChannleId;
                 CameraSignalSettings.AllChannelConfig.Name = "All";
                 Channels.Add(CameraSignalSettings.AllChannelConfig);
+                //if (@enum == SignalPropertiesTypeEnum.Camera)
+                if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.Type == ChannelTypeEnum.Camera.ToString() && x.ChannelId == currentId) is var chn)
+                {
+                    chn?.LightModes.ForEach(l =>
+                    {
+                        Light light = new Light()
+                        {
+                            LightId = l.LightType,
+                            //ChannelId = currentId,
+                            ChannelId = chn.ChannelId,
+                        };
+                        var lightWave = InperDeviceHelper.Instance.LightWaveLength.First(x => x.GroupId == l.LightType);
+                        light.LightName = lightWave.WaveType;
+                        light.OffsetValue = l.OffsetValue.ToString();
+                        Lights.Add(light);
+                    });
+                }
             }
+
             ActiveChannel = Channels.FirstOrDefault(x => x.ChannelId == currentId);
             //view.heightChannel.SelectedItem = view.rangeChannel.SelectedItem = view.offsetChannel.SelectedItem = view.filtersChannel.SelectedItem = chn;
-            view.cancle.IsEnabled = (bool)(channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset);
-            view.offset.IsEnabled = (bool)!channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset;
-            view.selectChannel.SelectionChanged += (s, e) =>
-            {
-                var channel = (s as System.Windows.Controls.ComboBox).SelectedItem as Channel;
-                view.offset.IsEnabled = !channel.Offset;
-                view.cancle.IsEnabled = channel.Offset;
-            };
+            //view.cancle.IsEnabled = (bool)(channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset);
+            //view.offset.IsEnabled = (bool)!channels.FirstOrDefault(x => x.ChannelId == currentId)?.Offset;
+            //view.selectChannel.SelectionChanged += (s, e) =>
+            //{
+            //    var channel = (s as System.Windows.Controls.ComboBox).SelectedItem as Channel;
+            //    //view.offset.IsEnabled = !channel.Offset;
+            //    //view.cancle.IsEnabled = channel.Offset;
+            //};
         }
         public void RangeChannel_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             try
             {
-                var svalue = (sender as System.Windows.Controls.ComboBox).SelectedValue as Channel;
+                var comb = sender as System.Windows.Controls.ComboBox;
+
+                var svalue = comb.SelectedValue as Channel;
 
                 if (svalue.AutoRange)
                 {
@@ -127,6 +212,63 @@ namespace InperStudio.ViewModels
                 {
                     this.view.heightAuto.IsChecked = false;
                     this.view.heightFixed.IsChecked = true;
+                }
+
+                if (svalue.ChannelId == _ChannleId)
+                {
+                    view._offsetTitle.Visibility = Visibility.Collapsed;
+                    view._offsetValue.Visibility = Visibility.Collapsed;
+                    view._offsetWindow.Visibility = Visibility.Collapsed;
+                    view.lightMode.Visibility = Visibility.Collapsed;
+                    view.aiOffsetValue.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    view._offsetTitle.Visibility = Visibility.Visible;
+                    view._offsetValue.Visibility = Visibility.Visible;
+                    view._offsetWindow.Visibility = Visibility.Visible;
+                    if (svalue.Type == ChannelTypeEnum.Camera.ToString())
+                    {
+                        view.lightMode.Visibility = Visibility.Visible;
+                        view.aiOffsetValue.Visibility = Visibility.Collapsed;
+
+                        if (Lights.Count == 0)
+                        {
+                            if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.Type == ChannelTypeEnum.Camera.ToString() && x.ChannelId == svalue.ChannelId) is var _chn)
+                            {
+                                _chn?.LightModes.ForEach(l =>
+                                {
+                                    Light light = new Light()
+                                    {
+                                        LightId = l.LightType,
+                                        //ChannelId = currentId,
+                                        ChannelId = _chn.ChannelId,
+                                    };
+                                    var lightWave = InperDeviceHelper.Instance.LightWaveLength.First(x => x.GroupId == l.LightType);
+                                    light.LightName = lightWave.WaveType;
+                                    light.OffsetValue = l.OffsetValue.ToString();
+                                    Lights.Add(light);
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        view.lightMode.Visibility = Visibility.Collapsed;
+                        view.aiOffsetValue.Visibility = Visibility.Visible;
+                    }
+                    var chn = InperDeviceHelper.Instance.CameraChannels.First(x => x.ChannelId == svalue.ChannelId);
+                    chn?.LightModes.ForEach(l =>
+                        {
+                            Lights.ForEachDo(x =>
+                            {
+                                if (x.LightId == l.LightType)
+                                {
+                                    x.ChannelId = svalue.ChannelId;
+                                    x.OffsetValue = Math.Round(l.OffsetValue, 3).ToString();
+                                }
+                            });
+                        });
                 }
             }
             catch (Exception ex)
@@ -161,14 +303,14 @@ namespace InperStudio.ViewModels
                         chn.AutoRange = isFixed;
                         if (!isFixed)
                         {
-                            chn.YVisibleRange.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange.Min = double.Parse(view.rangeBottom.Text);
-                            chn.YVisibleRange1.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange1.Min = double.Parse(view.rangeBottom.Text);
-                            chn.YVisibleRange2.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange2.Min = double.Parse(view.rangeBottom.Text);
-                            chn.YVisibleRange3.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange3.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange.Min = ConverterString2Double(view.rangeBottom.Text);
+                            chn.YVisibleRange1.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange1.Min = ConverterString2Double(view.rangeBottom.Text);
+                            chn.YVisibleRange2.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange2.Min = ConverterString2Double(view.rangeBottom.Text);
+                            chn.YVisibleRange3.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange3.Min = ConverterString2Double(view.rangeBottom.Text);
                         }
                     });
                     CameraSignalSettings.AllChannelConfig.AutoRange = isFixed;
@@ -181,14 +323,14 @@ namespace InperStudio.ViewModels
                         if (chn.ChannelId == item.ChannelId)
                         {
                             chn.AutoRange = isFixed;
-                            chn.YVisibleRange.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange.Min = double.Parse(view.rangeBottom.Text);
-                            chn.YVisibleRange1.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange1.Min = double.Parse(view.rangeBottom.Text);
-                            chn.YVisibleRange2.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange2.Min = double.Parse(view.rangeBottom.Text);
-                            chn.YVisibleRange3.Max = double.Parse(view.rangeTop.Text);
-                            chn.YVisibleRange3.Min = double.Parse(view.rangeBottom.Text);
+                            chn.YVisibleRange.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange.Min = ConverterString2Double(view.rangeBottom.Text);
+                            chn.YVisibleRange1.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange1.Min = ConverterString2Double(view.rangeBottom.Text);
+                            chn.YVisibleRange2.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange2.Min = ConverterString2Double(view.rangeBottom.Text);
+                            chn.YVisibleRange3.Max = ConverterString2Double(view.rangeTop.Text);
+                            chn.YVisibleRange3.Min = ConverterString2Double(view.rangeBottom.Text);
                         }
                     });
                 }
@@ -197,6 +339,12 @@ namespace InperStudio.ViewModels
             {
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
+        }
+        private double ConverterString2Double(string str)
+        {
+            if (str.IsNullOrEmpty()) return 0;
+            double.TryParse(str, out double result);
+            return result;
         }
         public void HeightChannel_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -630,24 +778,24 @@ namespace InperStudio.ViewModels
                             }
                         }));
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (chb.Name.Equals("smooth"))
-                            {
-                                chn.Filters.IsSmooth = true;
-                            }
-                            else if (chb.Name.Equals("bandpass"))
-                            {
-                                chn.Filters.IsBandpass = true;
-                            }
-                            else if (chb.Name.Equals("bandstop"))
-                            {
-                                chn.Filters.IsBandstop = true;
-                            }
-                        }));
-                    });
+                    //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                    //{
+                    //    view.Dispatcher.BeginInvoke(new Action(() =>
+                    //    {
+                    //        if (chb.Name.Equals("smooth"))
+                    //        {
+                    //            chn.Filters.IsSmooth = true;
+                    //        }
+                    //        else if (chb.Name.Equals("bandpass"))
+                    //        {
+                    //            chn.Filters.IsBandpass = true;
+                    //        }
+                    //        else if (chb.Name.Equals("bandstop"))
+                    //        {
+                    //            chn.Filters.IsBandstop = true;
+                    //        }
+                    //    }));
+                    //});
                     if (chb.Name.Equals("smooth"))
                     {
                         CameraSignalSettings.AllChannelConfig.Filters.IsSmooth = true;
@@ -698,27 +846,27 @@ namespace InperStudio.ViewModels
                             }
                         }));
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (chn.ChannelId == item.ChannelId)
-                            {
-                                if (chb.Name.Equals("smooth"))
-                                {
-                                    chn.Filters.IsSmooth = true;
-                                }
-                                else if (chb.Name.Equals("bandpass"))
-                                {
-                                    chn.Filters.IsBandpass = true;
-                                }
-                                else if (chb.Name.Equals("bandstop"))
-                                {
-                                    chn.Filters.IsBandstop = true;
-                                }
-                            }
-                        }));
-                    });
+                    //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                    //{
+                    //    view.Dispatcher.BeginInvoke(new Action(() =>
+                    //    {
+                    //        if (chn.ChannelId == item.ChannelId)
+                    //        {
+                    //            if (chb.Name.Equals("smooth"))
+                    //            {
+                    //                chn.Filters.IsSmooth = true;
+                    //            }
+                    //            else if (chb.Name.Equals("bandpass"))
+                    //            {
+                    //                chn.Filters.IsBandpass = true;
+                    //            }
+                    //            else if (chb.Name.Equals("bandstop"))
+                    //            {
+                    //                chn.Filters.IsBandstop = true;
+                    //            }
+                    //        }
+                    //    }));
+                    //});
                 }
 
             }
@@ -768,24 +916,24 @@ namespace InperStudio.ViewModels
                             }
                         }));
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (chb.Name.Equals("smooth"))
-                            {
-                                chn.Filters.IsSmooth = false;
-                            }
-                            else if (chb.Name.Equals("bandpass"))
-                            {
-                                chn.Filters.IsBandpass = false;
-                            }
-                            else if (chb.Name.Equals("bandstop"))
-                            {
-                                chn.Filters.IsBandstop = false;
-                            }
-                        }));
-                    });
+                    //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                    //{
+                    //    view.Dispatcher.BeginInvoke(new Action(() =>
+                    //    {
+                    //        if (chb.Name.Equals("smooth"))
+                    //        {
+                    //            chn.Filters.IsSmooth = false;
+                    //        }
+                    //        else if (chb.Name.Equals("bandpass"))
+                    //        {
+                    //            chn.Filters.IsBandpass = false;
+                    //        }
+                    //        else if (chb.Name.Equals("bandstop"))
+                    //        {
+                    //            chn.Filters.IsBandstop = false;
+                    //        }
+                    //    }));
+                    //});
                     if (chb.Name.Equals("smooth"))
                     {
                         CameraSignalSettings.AllChannelConfig.Filters.IsSmooth = false;
@@ -834,27 +982,27 @@ namespace InperStudio.ViewModels
                             }
                         }));
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (chn.ChannelId == item.ChannelId)
-                            {
-                                if (chb.Name.Equals("smooth"))
-                                {
-                                    chn.Filters.IsSmooth = false;
-                                }
-                                else if (chb.Name.Equals("bandpass"))
-                                {
-                                    chn.Filters.IsBandpass = false;
-                                }
-                                else if (chb.Name.Equals("bandstop"))
-                                {
-                                    chn.Filters.IsBandstop = false;
-                                }
-                            }
-                        }));
-                    });
+                    //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                    //{
+                    //    view.Dispatcher.BeginInvoke(new Action(() =>
+                    //    {
+                    //        if (chn.ChannelId == item.ChannelId)
+                    //        {
+                    //            if (chb.Name.Equals("smooth"))
+                    //            {
+                    //                chn.Filters.IsSmooth = false;
+                    //            }
+                    //            else if (chb.Name.Equals("bandpass"))
+                    //            {
+                    //                chn.Filters.IsBandpass = false;
+                    //            }
+                    //            else if (chb.Name.Equals("bandstop"))
+                    //            {
+                    //                chn.Filters.IsBandstop = false;
+                    //            }
+                    //        }
+                    //    }));
+                    //});
                 }
 
             }
@@ -893,12 +1041,12 @@ namespace InperStudio.ViewModels
                             channel.Filters.Bandpass1 = valueLow;
                             channel.Filters.Bandpass2 = valueHigh;
                         }
-                        foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                        {
-                            channel.Filters.Bandpass1 = valueLow;
-                            channel.Filters.Bandpass2 = valueHigh;
-                            channel.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
-                        }
+                        //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                        //{
+                        //    channel.Filters.Bandpass1 = valueLow;
+                        //    channel.Filters.Bandpass2 = valueHigh;
+                        //    channel.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
+                        //}
                         CameraSignalSettings.AllChannelConfig.Filters.Bandpass1 = valueLow;
                         CameraSignalSettings.AllChannelConfig.Filters.Bandpass2 = valueHigh;
 
@@ -915,15 +1063,15 @@ namespace InperStudio.ViewModels
                                 channel.Filters.Bandpass2 = valueHigh;
                             }
                         }
-                        foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                        {
-                            if (channel.ChannelId == item.ChannelId)
-                            {
-                                channel.Filters.Bandpass1 = valueLow;
-                                channel.Filters.Bandpass2 = valueHigh;
-                                channel.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
-                            }
-                        }
+                        //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                        //{
+                        //    if (channel.ChannelId == item.ChannelId)
+                        //    {
+                        //        channel.Filters.Bandpass1 = valueLow;
+                        //        channel.Filters.Bandpass2 = valueHigh;
+                        //        channel.Filters.OnlineFilter.Bandpass(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
+                        //    }
+                        //}
                     }
                 }
             }
@@ -962,12 +1110,12 @@ namespace InperStudio.ViewModels
                             channel.Filters.Bandstop1 = valueLow;
                             channel.Filters.Bandstop2 = valueHigh;
                         }
-                        foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                        {
-                            channel.Filters.Bandpass1 = valueLow;
-                            channel.Filters.Bandpass2 = valueHigh;
-                            channel.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
-                        }
+                        //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                        //{
+                        //    channel.Filters.Bandpass1 = valueLow;
+                        //    channel.Filters.Bandpass2 = valueHigh;
+                        //    channel.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
+                        //}
                         CameraSignalSettings.AllChannelConfig.Filters.Bandstop1 = valueLow;
                         CameraSignalSettings.AllChannelConfig.Filters.Bandstop2 = valueHigh;
 
@@ -984,15 +1132,15 @@ namespace InperStudio.ViewModels
                                 channel.Filters.Bandstop2 = valueHigh;
                             }
                         }
-                        foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                        {
-                            if (channel.ChannelId == item.ChannelId)
-                            {
-                                channel.Filters.Bandpass1 = valueLow;
-                                channel.Filters.Bandpass2 = valueHigh;
-                                channel.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
-                            }
-                        }
+                        //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                        //{
+                        //    if (channel.ChannelId == item.ChannelId)
+                        //    {
+                        //        channel.Filters.Bandpass1 = valueLow;
+                        //        channel.Filters.Bandpass2 = valueHigh;
+                        //        channel.Filters.OnlineFilter.Bandstop(InperGlobalClass.CameraSignalSettings.Sampling, valueLow, valueHigh);
+                        //    }
+                        //}
                     }
                 }
             }
@@ -1026,17 +1174,17 @@ namespace InperStudio.ViewModels
                             });
                         }
                     }
-                    foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                    {
-                        channel.Filters.Smooth = value;
-                        if (InperGlobalClass.IsPreview)
-                        {
-                            channel.LightModes.ForEach(x =>
-                            {
-                                InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
-                            });
-                        }
-                    }
+                    //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                    //{
+                    //    channel.Filters.Smooth = value;
+                    //    if (InperGlobalClass.IsPreview)
+                    //    {
+                    //        channel.LightModes.ForEach(x =>
+                    //        {
+                    //            InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
+                    //        });
+                    //    }
+                    //}
                     CameraSignalSettings.AllChannelConfig.Filters.Smooth = value;
 
                 }
@@ -1057,20 +1205,20 @@ namespace InperStudio.ViewModels
                             }
                         }
                     }
-                    foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                    {
-                        if (channel.ChannelId == item.ChannelId)
-                        {
-                            channel.Filters.Smooth = value;
-                            if (InperGlobalClass.IsPreview)
-                            {
-                                channel.LightModes.ForEach(x =>
-                                {
-                                    InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
-                                });
-                            }
-                        }
-                    }
+                    //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                    //{
+                    //    if (channel.ChannelId == item.ChannelId)
+                    //    {
+                    //        channel.Filters.Smooth = value;
+                    //        if (InperGlobalClass.IsPreview)
+                    //        {
+                    //            channel.LightModes.ForEach(x =>
+                    //            {
+                    //                InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
+                    //            });
+                    //        }
+                    //    }
+                    //}
                 }
             }
             catch (Exception ex)
@@ -1078,6 +1226,7 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
+        [Obsolete]
         public void CameraOffset(string type)
         {
             try
@@ -1103,18 +1252,18 @@ namespace InperStudio.ViewModels
                                 });
                             }
                         }
-                        foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
-                        {
-                            channel.Offset = false;
-                            if (InperGlobalClass.IsPreview)
-                            {
-                                channel.LightModes.ForEach(x =>
-                                {
-                                    InperDeviceHelper.Instance.OffsetData[channel.ChannelId][x.LightType].Clear();
-                                    x.OffsetValue = 0;
-                                });
-                            }
-                        }
+                        //foreach (var channel in InperDeviceHelper.Instance._LoopCannels)
+                        //{
+                        //    channel.Offset = false;
+                        //    if (InperGlobalClass.IsPreview)
+                        //    {
+                        //        channel.LightModes.ForEach(x =>
+                        //        {
+                        //            InperDeviceHelper.Instance.OffsetData[channel.ChannelId][x.LightType].Clear();
+                        //            x.OffsetValue = 0;
+                        //        });
+                        //    }
+                        //}
                         CameraSignalSettings.AllChannelConfig.Offset = false;
                     }
                     else
@@ -1137,8 +1286,8 @@ namespace InperStudio.ViewModels
                         });
                     }
                     item.Offset = false;
-                    view.offset.IsEnabled = true;
-                    view.cancle.IsEnabled = false;
+                    //view.offset.IsEnabled = true;
+                    //view.cancle.IsEnabled = false;
                 }
                 else
                 {
@@ -1166,8 +1315,8 @@ namespace InperStudio.ViewModels
                         });
                     }
                     item.Offset = true;
-                    view.cancle.IsEnabled = true;
-                    view.offset.IsEnabled = false;
+                    //view.cancle.IsEnabled = true;
+                    //view.offset.IsEnabled = false;
                 }
             }
             catch (Exception ex)
@@ -1206,11 +1355,11 @@ namespace InperStudio.ViewModels
                         chn.Offset = true;
                         chn.OffsetWindowSize = windowSize;
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        chn.Offset = true;
-                        chn.OffsetWindowSize = windowSize;
-                    });
+                    //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                    //{
+                    //    chn.Offset = true;
+                    //    chn.OffsetWindowSize = windowSize;
+                    //});
                     CameraSignalSettings.AllChannelConfig.Offset = true;
                     CameraSignalSettings.AllChannelConfig.OffsetWindowSize = windowSize;
                 }
@@ -1226,14 +1375,14 @@ namespace InperStudio.ViewModels
                             chn.OffsetWindowSize = windowSize;
                         }
                     });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        if (chn.ChannelId == item.ChannelId)
-                        {
-                            chn.Offset = true;
-                            chn.OffsetWindowSize = windowSize;
-                        }
-                    });
+                    //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                    //{
+                    //    if (chn.ChannelId == item.ChannelId)
+                    //    {
+                    //        chn.Offset = true;
+                    //        chn.OffsetWindowSize = windowSize;
+                    //    }
+                    //});
                 }
                 item.Offset = true;
                 item.OffsetWindowSize = windowSize;
@@ -1263,65 +1412,47 @@ namespace InperStudio.ViewModels
             {
                 var cb = sender as CheckBox;
                 if (!cb.IsFocused) return;
-                // 清空内部字典中的队列
-                foreach (var outerKeyValuePair in InperDeviceHelper.Instance.OffsetData)
-                {
-                    foreach (var innerKeyValuePair in outerKeyValuePair.Value)
-                    {
-                        innerKeyValuePair.Value.Clear();
-                    }
-                }
+                //// 清空内部字典中的队列
+                //foreach (var outerKeyValuePair in InperDeviceHelper.Instance.OffsetData)
+                //{
+                //    foreach (var innerKeyValuePair in outerKeyValuePair.Value)
+                //    {
+                //        innerKeyValuePair.Value.Clear();
+                //    }
+                //}
                 int windowSize = int.Parse(view._windowSize.Text);
                 var chb = sender as CheckBox;
                 var item = this.view.selectChannel.SelectedItem as Channel;
-                if (item.ChannelId == _ChannleId)
-                {
-                    CameraSignalSettings.CameraChannels.ForEach(x =>
-                    {
-                        x.Offset = true;
-                        x.OffsetWindowSize = windowSize;
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
-                    {
-                        chn.Offset = true;
-                        chn.OffsetWindowSize = windowSize;
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        chn.Offset = true;
-                        chn.OffsetWindowSize = windowSize;
-                    });
-                    CameraSignalSettings.AllChannelConfig.Offset = true;
-                    CameraSignalSettings.AllChannelConfig.OffsetWindowSize = windowSize;
-                }
-                else
-                {
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = true;
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).OffsetWindowSize = windowSize;
 
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = true;
+                //CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).OffsetWindowSize = windowSize;
+                //CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).OffsetValue = item.OffsetValue;
+
+                _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                {
+                    view.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
+                        if (chn.ChannelId == item.ChannelId)
                         {
-                            if (chn.ChannelId == item.ChannelId)
-                            {
-                                chn.Offset = true;
-                                chn.OffsetWindowSize = windowSize;
-                            }
-                        }));
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            if (chn.ChannelId == item.ChannelId)
-                            {
-                                chn.Offset = true;
-                                chn.OffsetWindowSize = windowSize;
-                            }
-                        }));
-                    });
-                }
+                            chn.Offset = true;
+                            //chn.OffsetWindowSize = windowSize;
+                            //chn.OffsetValue = item.OffsetValue;
+                        }
+                    }));
+                });
+                //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                //{
+                //    view.Dispatcher.BeginInvoke(new Action(() =>
+                //    {
+                //        if (chn.ChannelId == item.ChannelId)
+                //        {
+                //            chn.Offset = true;
+                //            //chn.OffsetWindowSize = windowSize;
+                //            //chn.OffsetValue = item.OffsetValue;
+                //        }
+                //    }));
+                //});
+
             }
             catch (Exception ex)
             {
@@ -1334,54 +1465,149 @@ namespace InperStudio.ViewModels
             {
                 var chb = sender as CheckBox;
                 var item = this.view.selectChannel.SelectedItem as Channel;
-                if (item.ChannelId == _ChannleId)
+
+                CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = false;
+                //InperDeviceHelper.Instance._LoopCannels.ForEachDo(x =>
+                //{
+                //    if (x.ChannelId == item.ChannelId)
+                //    {
+                //        x.Offset = false;
+                //    }
+                //});
+                _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
                 {
-                    CameraSignalSettings.CameraChannels.ForEach(x =>
+                    view.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        x.Offset = false;
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
-                    {
-                        chn.Offset = false;
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        chn.Offset = false;
-                    });
-                    InperDeviceHelper.Instance._LoopCannels.ForEachDo(x => x.LightModes.ForEach(n => n.OffsetValue = 0));
-                    CameraSignalSettings.AllChannelConfig.Offset = false;
-                }
-                else
-                {
-                    CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId).Offset = true;
-                    InperDeviceHelper.Instance._LoopCannels.ForEachDo(x =>
-                    {
-                        if (x.ChannelId == item.ChannelId)
+                        if (chn.ChannelId == item.ChannelId)
                         {
-                            x.LightModes.ForEach(n => n.OffsetValue = 0);
+                            chn.Offset = false;
                         }
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance.CameraChannels, chn =>
+                    }));
+                });
+                //_ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
+                //{
+                //    view.Dispatcher.BeginInvoke(new Action(() =>
+                //    {
+                //        if (chn.ChannelId == item.ChannelId)
+                //        {
+                //            chn.Offset = false;
+                //        }
+                //    }));
+                //});
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        public void OffsetValue_Refresh()
+        {
+            try
+            {
+                var item = this.view.selectChannel.SelectedItem as Channel;
+
+                if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId) is var chn)
+                {
+                    int size = int.Parse(view._windowSize.Text);
+                    if (size >= 0)
                     {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
+                        chn.OffsetWindowSize = item.OffsetWindowSize = size;
+                        if (chn.Type == ChannelTypeEnum.Camera.ToString())
                         {
-                            if (chn.ChannelId == item.ChannelId)
+                            chn.LightModes.ForEach(l =>
                             {
-                                chn.Offset = false;
-                            }
-                        }));
-                    });
-                    _ = Parallel.ForEach(InperDeviceHelper.Instance._LoopCannels, chn =>
-                    {
-                        view.Dispatcher.BeginInvoke(new Action(() =>
+                                if (l.XyDataSeries.YValues.Count() == 0)
+                                {
+                                    l.OffsetValue = 0;
+                                }
+                                else
+                                {
+                                    if (InperDeviceHelper.Instance.OffsetData.ContainsKey(item.ChannelId))
+                                    {
+                                        if (InperDeviceHelper.Instance.OffsetData[item.ChannelId].ContainsKey(l.LightType))
+                                        {
+                                            if (InperDeviceHelper.Instance.OffsetData[item.ChannelId][l.LightType].Count > 0)
+                                            {
+                                                l.OffsetValue = item.OffsetWindowSize == 0 ? 0 : InperDeviceHelper.Instance.OffsetData[item.ChannelId][l.LightType].Count < item.OffsetWindowSize ? InperDeviceHelper.Instance.OffsetData[item.ChannelId][l.LightType].Average() : InperDeviceHelper.Instance.OffsetData[item.ChannelId][l.LightType].Skip(InperDeviceHelper.Instance.OffsetData[item.ChannelId][l.LightType].Count - item.OffsetWindowSize).Average();
+                                            }
+                                            else
+                                            {
+                                                l.OffsetValue = item.OffsetWindowSize == 0 ? 0 : l.XyDataSeries.YValues.Count() < item.OffsetWindowSize ? (l.XyDataSeries.YValues.Average() + l.OffsetValue) : (l.XyDataSeries.YValues.Skip(l.XyDataSeries.Count - item.OffsetWindowSize).Average() + l.OffsetValue);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (InperGlobalClass.IsStop)
+                                {
+                                    l.OffsetValue = 0;
+                                }
+                                if (Lights.First(x => x.LightId == l.LightType) is var light)
+                                {
+                                    double value = Math.Round(l.OffsetValue, 3);
+                                    light.OffsetValue = value.ToString();
+                                    if (InperGlobalClass.IsStop)
+                                    {
+                                        light.OffsetValue = 0.ToString();
+                                    }
+                                }
+                            });
+                        }
+                        else
                         {
-                            if (chn.ChannelId == item.ChannelId)
+                            //double[] array = new double[chn.RenderableSeries.First().DataSeries.Count];
+                            double[] array = chn.RenderableSeries.First().DataSeries.YValues.Cast<double>().ToArray();
+                            if (array.Length > 0)
                             {
-                                chn.Offset = false;
+                                chn.LightModes.First().OffsetValue = item.OffsetWindowSize == 0 ? 0 : array.Length < item.OffsetWindowSize ? array.Average() + chn.LightModes.FirstOrDefault().OffsetValue : array.Skip(array.Length - item.OffsetWindowSize).Average() + chn.LightModes.FirstOrDefault().OffsetValue;
+                                item.OffsetValue = chn.LightModes.First().OffsetValue.ToString();
+                                view.offsetValue.Text = item.OffsetValue.ToString();
                             }
-                        }));
-                    });
+                            if (InperGlobalClass.IsStop)
+                            {
+                                item.OffsetValue = "0";
+                                chn.LightModes.First().OffsetValue = 0;
+                                view.offsetValue.Text = "0";
+                            }
+                        }
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        public void OffsetValue_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                if ((sender as System.Windows.Controls.TextBox).IsFocused)
+                {
+                    var item = this.view.selectChannel.SelectedItem as Channel;
+                    if (sender is System.Windows.Controls.TextBox tb)
+                    {
+                        if (item.Type == ChannelTypeEnum.Analog.ToString())
+                        {
+                            if (double.TryParse(tb.Text.ToString(), out double num))
+                            {
+                                item.OffsetValue = num.ToString();
+                            }
+                        }
+                        if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId) is var chn)
+                        {
+                            chn.LightModes.First().OffsetValue = ConverterString2Double(item.OffsetValue);
+                        }
+                        CameraSignalSettings.CameraChannels.ForEachDo(ch =>
+                        {
+                            if (item.ChannelId == ch.ChannelId)
+                            {
+                                ch.OffsetValue = item.OffsetValue;
+                            }
+                        });
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -1390,6 +1616,20 @@ namespace InperStudio.ViewModels
         }
         protected override void OnClose()
         {
+            //if (Lights.Count > 0)
+            //{
+            //    CameraSignalSettings.CameraChannels.ForEachDo(chn =>
+            //    {
+            //        chn.LightOffsetValue = string.Empty;
+            //        Lights.ForEachDo(l =>
+            //            {
+            //                if (l.ChannelId == chn.ChannelId)
+            //                {
+            //                    chn.LightOffsetValue += l.LightId.ToString() + ',' + l.OffsetValue + ' ';
+            //                }
+            //            });
+            //    });
+            //}
             InperJsonHelper.SetCameraSignalSettings(CameraSignalSettings);
         }
     }

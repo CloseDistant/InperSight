@@ -13,7 +13,6 @@ namespace InperStudio.Views
         {
             InitializeComponent();
         }
-
-      
+       
     }
 }

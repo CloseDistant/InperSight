@@ -56,8 +56,8 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
                 <Grid Margin="10 0" Grid.Column="1">
-                    <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action MarkerMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="30" Height="20" Margin="0 0 0 50" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>
-                    <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action MarkerMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="30" Height="20"   Margin="0 20 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}"></Button>
+                    <Button Cursor="Hand" x:Name="rightMove" Command="{s:Action MarkerMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="30" Height="20" Padding="0 4" Margin="0 0 0 50" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" BorderBrush="Transparent"></Button>
+                    <Button Cursor="Hand" x:Name="leftMove" Command="{s:Action MarkerMove}" CommandParameter="leftMove" hc:IconElement.Geometry="{DynamicResource LeftGeometry}" Width="30" Height="20"  Padding="0 4"  Margin="0 20 0 0" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" BorderBrush="Transparent"></Button>
                 </Grid>
                 <StackPanel Margin="0 0 0 0" Grid.Column="2">
                     <WrapPanel>
@@ -81,7 +81,7 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <TextBlock Text="{DynamicResource addSweep_preview}" Foreground="{StaticResource InperTheme}" FontFamily="{StaticResource InperFontFamily}" VerticalAlignment="Center"/>
-                <Border Height="1" Background="{StaticResource InperTheme}" Width="418" HorizontalAlignment="Right"/>
+                <Border Height="1" Background="{StaticResource InperTheme}" Width="332" HorizontalAlignment="Right"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Border BorderThickness="1" BorderBrush="#D1D1D1" Margin="0 0 0 15">

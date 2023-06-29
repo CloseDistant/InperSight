@@ -7,6 +7,7 @@ using InperStudio.Lib.Enum;
 using InperStudio.Lib.Helper;
 using InperStudio.ViewModels;
 using InperStudioControlLib.Lib.Config;
+using SciChart.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -174,6 +175,7 @@ namespace InperStudio.Views.Control
                     });
                     foreach (CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
                     {
+                        item.RenderableSeries.ForEachDo(x => x.DataSeries.Clear());
                         if (!cs.Contains(item.ChannelId))
                         {
                             _cs.Add(item.ChannelId);

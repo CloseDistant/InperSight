@@ -17,11 +17,13 @@ using SciChart.Charting.Visuals.Annotations;
 using SciChart.Charting.Visuals.Axes;
 using Stylet;
 using System;
+using System.CodeDom;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,7 +80,7 @@ namespace InperStudio.Lib.Helper
         private long _PlottingStartTime;
         private long _EventStartTime;
         private bool _eventIsFirst = true;
-        public ConcurrentBag<CameraChannel> _LoopCannels = new ConcurrentBag<CameraChannel>();
+        //public ConcurrentBag<CameraChannel> _LoopCannels = new ConcurrentBag<CameraChannel>();
         public uint[] AiChannelsConfig = new uint[4] { 0, 0, 0, 0 };
         private short[] _SwapBuffer;
         #region
@@ -267,6 +269,7 @@ namespace InperStudio.Lib.Helper
             {
                 if (e is DevInputNotificationEventArgs dev)
                 {
+                    Console.WriteLine(dev.IOID);
                     if (InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == dev.IOID && (x.Type == ChannelTypeEnum.TriggerStart.ToString() || x.Type == ChannelTypeEnum.TriggerStop.ToString())) is EventChannelJson json)
                     {
                         if (json.Type == ChannelTypeEnum.TriggerStart.ToString())
@@ -341,7 +344,7 @@ namespace InperStudio.Lib.Helper
                     }
                     item.LightModes.ForEach(x =>
                     {
-                        x.OffsetValue = 0;
+                        //x.OffsetValue = 0;
 
                         if (!FilterData[item.ChannelId].ContainsKey(x.LightType))
                         {
@@ -414,7 +417,7 @@ namespace InperStudio.Lib.Helper
 
                         isFirstRecordTiem = false;
                     }
-                    if (e.Group > -1 && _LoopCannels.Count > 0)
+                    if (e.Group > -1)
                     {
                         _MatQ.Enqueue(e);
                         //_ = Task.Run(() => { FrameProc(); });
@@ -480,13 +483,13 @@ namespace InperStudio.Lib.Helper
         }
         private int[] _cameraSkipCountArray = new int[4];
         private int _cameraSkipCount = 0;
-        private int _FrameProcLock = 0;
+        public int _FrameProcLock = 0;
         private ConcurrentDictionary<int, double[]> _defectValues;
         public async void FrameProc()
         {
-            //if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
+            while (!_frameProcTaskTokenSource.Token.IsCancellationRequested)
             {
-                while (!_frameProcTaskTokenSource.Token.IsCancellationRequested)
+                if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
                 {
                     _MatQ.TryDequeue(out MarkedMat m);
                     if (m != null)
@@ -495,40 +498,63 @@ namespace InperStudio.Lib.Helper
                         time = ts;
                         ConcurrentBag<string> values = new ConcurrentBag<string>();
                         ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
-                        foreach (var mask in _LoopCannels)
+                        foreach (var mask in CameraChannels)
                         {
-                            double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
-                            if (mask.Offset)
+                            if (mask.Type == ChannelTypeEnum.Camera.ToString())
                             {
-                                var res = Offset(mask, m.Group, r);
-                                if (res.Item1)
+                                double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
+
+                                if (mask.Offset)
                                 {
-                                    r -= res.Item2;
+                                    if (OffsetData.GetOrAdd(mask.ChannelId, new Dictionary<int, Queue<double>>()) is Dictionary<int, Queue<double>> res)
+                                    {
+                                        if (res.ContainsKey(m.Group))
+                                        {
+                                            if (res[m.Group].Count > 999)
+                                            {
+                                                res[m.Group].Dequeue();
+                                            }
+                                            res[m.Group].Enqueue(r);
+                                        }
+                                        else
+                                        {
+                                            res.Add(m.Group, new Queue<double>());
+                                        }
+                                    }
+
+                                    if (mask.LightModes.FirstOrDefault(x => x.LightType == m.Group) is var mode)
+                                    {
+                                        if (mode != null)
+                                        {
+                                            r -= mode.OffsetValue;
+                                        }
+                                    }
                                 }
-                            }
-                            if (mask.Filters.IsSmooth)
-                            {
-                                r = Smooth(mask, m.Group, r);
-                            }
-                            if (mask.IsDeltaFCalculate)
-                            {
-                                _ = Task.Run(() =>
-                                {
-                                    DeltaFCalculate(mask.ChannelId, m.Group, r, ts / 100);
-                                });
-                            }
-                            if (mask.Filters.IsBandpass)
-                            {
-                                r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
-                            }
-                            if (mask.Filters.IsBandstop)
-                            {
-                                r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
-                            }
-                            values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
-                            _poltValues.TryAdd(mask.ChannelId, r);
 
+                                if (mask.Filters.IsSmooth)
+                                {
+                                    r = Smooth(mask, m.Group, r);
+                                }
+                                if (mask.IsDeltaFCalculate)
+                                {
+                                    _ = Task.Run(() =>
+                                    {
+                                        DeltaFCalculate(mask.ChannelId, m.Group, r, ts / 100);
+                                    });
+                                }
+                                if (mask.Filters.IsBandpass)
+                                {
+                                    r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
+                                }
+                                if (mask.Filters.IsBandstop)
+                                {
+                                    r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
+                                }
+
+                                values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
+                                _poltValues.TryAdd(mask.ChannelId, r);
+
+                            }
                         }
                         if (_cameraSkipCountArray[m.Group] >= _cameraSkipCount)
                         {
@@ -540,7 +566,6 @@ namespace InperStudio.Lib.Helper
                         {
                             _cameraSkipCountArray[m.Group]++;
                         }
-
                         AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
                         if (InperGlobalClass.IsRecord)
                         {
@@ -553,8 +578,8 @@ namespace InperStudio.Lib.Helper
                     {
                         await Task.Delay(1);
                     }
+                    _ = Interlocked.Exchange(ref _FrameProcLock, 0);
                 }
-                //_ = Interlocked.Exchange(ref _FrameProcLock, 0);
                 //if (!_MatQ.IsEmpty)
                 //{
                 //    Task.Run(() => { FrameProc(); });
@@ -774,11 +799,12 @@ namespace InperStudio.Lib.Helper
         {
             if (channel.Offset)
             {
-                var res = Offset(channel, -1, value);
-                if (res.Item1)
-                {
-                    value -= res.Item2;
-                }
+                //var res = Offset(channel, -1, value);
+                //if (res.Item1)
+                //{
+                //    value -= res.Item2;
+                //}
+                value -= channel.LightModes.First().OffsetValue;
             }
             if (channel.Filters.IsSmooth)
             {
@@ -1074,7 +1100,7 @@ namespace InperStudio.Lib.Helper
                     {
                         try
                         {
-                            IRenderableSeriesViewModel render = _LoopCannels.First(x => x.ChannelId == val.Key).RenderableSeries.FirstOrDefault(r => (int)(r as LineRenderableSeriesViewModel).Tag == record.Group);
+                            IRenderableSeriesViewModel render = CameraChannels.First(x => x.ChannelId == val.Key).RenderableSeries.FirstOrDefault(r => (int)(r as LineRenderableSeriesViewModel).Tag == record.Group);
                             if (render != null)
                             {
                                 using (render.DataSeries.SuspendUpdates())
@@ -1083,7 +1109,7 @@ namespace InperStudio.Lib.Helper
                                 }
                             }
                         }
-                        catch
+                        catch (Exception ex)
                         {
 
                         }
@@ -1366,8 +1392,8 @@ namespace InperStudio.Lib.Helper
                 _adPreTime.Clear();
                 adFsTimeInterval = 1 / InperGlobalClass.CameraSignalSettings.AiSampling;
                 aiChannels = new ConcurrentBag<CameraChannel>(Instance.CameraChannels.ToList().FindAll(x => x.Type == ChannelTypeEnum.Analog.ToString()));
-                _LoopCannels = new ConcurrentBag<CameraChannel>();
-                Instance.CameraChannels.ToList().ForEach(x => { if (x.Type == ChannelTypeEnum.Camera.ToString()) { _LoopCannels.Add(x); } });
+                //_LoopCannels = new ConcurrentBag<CameraChannel>();
+                //Instance.CameraChannels.ToList().ForEach(x => { if (x.Type == ChannelTypeEnum.Camera.ToString()) { _LoopCannels.Add(x); } });
                 DeltaFCalculateList = new List<EventChannelJson>();
                 InperGlobalClass.EventSettings.Channels.ForEach(x =>
                 {

@@ -126,7 +126,7 @@
                     </WrapPanel>
                 </RadioButton>
 
-                <RadioButton HorizontalAlignment="Left" IsEnabled="{Binding ElementName=start_trigger,Path=SelectedValue,Converter={StaticResource Object2BooleanConverter}}" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 20 0 0 " GroupName="stop"  IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
+                <RadioButton HorizontalAlignment="Left" IsEnabled="{Binding ElementName=stop_trigger,Path=SelectedValue,Converter={StaticResource Object2BooleanConverter}}" Checked="{s:Action TriggerStop_Checked}" VerticalAlignment="Top" x:Name="triggerRadStop" Margin="0 20 0 0 " GroupName="stop"  IsChecked="{Binding Trigger.IsActive,Mode=TwoWay}">
                     <WrapPanel>
                         <TextBlock Text="{DynamicResource trigger_stop_trigger}" Margin="5 0 0 0" VerticalAlignment="Center"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Name="stop_trigger" IsEnabled="{Binding ElementName=triggerRadStop,Path=IsChecked}" HorizontalAlignment="Left" Margin="20 0 0 0" Width="120" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2" DisplayMemberPath="Name"  Text="{Binding Trigger.Name,Mode=TwoWay}"/>

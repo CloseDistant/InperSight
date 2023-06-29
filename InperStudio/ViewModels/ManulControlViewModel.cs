@@ -214,8 +214,7 @@ namespace InperStudio.ViewModels
             await StartAndStopShowMarker(ChannelTypeEnum.Start);
             InperDeviceHelper.Instance.StartCollect();
             InperDeviceHelper.Instance.device.Start();
-
-            WaitingCommandExcute();
+            await WaitingCommandExcute();
 
             InperGlobalClass.IsPreview = true;
             InperGlobalClass.IsRecord = false;
@@ -286,7 +285,7 @@ namespace InperStudio.ViewModels
                 }
                 InperDeviceHelper.Instance.device.Start();
 
-                WaitingCommandExcute();
+                await WaitingCommandExcute();
 
                 foreach (var item in InperGlobalClass.ActiveVideos)
                 {
@@ -458,7 +457,7 @@ namespace InperStudio.ViewModels
             }
 
         }
-        private async void WaitingCommandExcute()
+        private async Task WaitingCommandExcute()
         {
             Dialog d = Dialog.Show<ProgressDialog>("MainDialog");
             while (InperDeviceHelper.Instance.device.GetCommandCount() > 0)

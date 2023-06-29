@@ -97,7 +97,12 @@ namespace InperStudio.ViewModels
                     {
                         if (StimulusBeans.Instance.DioID == -1)
                         {
-                            InperGlobalClass.ShowReminderInfo("No available DIO");
+                            string text = "无效的DIO";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "No available DIO";
+                            }
+                            InperGlobalClass.ShowReminderInfo(text);
                             return;
                         }
                         StimulusBeans.Instance.StimulusCommandSend();

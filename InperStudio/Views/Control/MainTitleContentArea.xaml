@@ -73,7 +73,7 @@
             </Button.Template>
         </Button>
         <hc:SimplePanel Grid.Column="3"  MouseDown="Border_MouseDown" Name="move2"/>
-        <Button Grid.Column="4" Name="skin" Style="{StaticResource InperFreeButton}" Click="Skin_Click"  Margin="0 0 10 0" Width="16" Height="16" VerticalAlignment="Center">
+        <Button Grid.Column="4" Name="skin" Style="{StaticResource InperFreeButton}" Visibility="Collapsed" Click="Skin_Click"  Margin="0 0 10 0" Width="16" Height="16" VerticalAlignment="Center">
             <Image Source="/Lib/Images/New/skin.png" Stretch="Fill" />
         </Button>
         <Popup AllowsTransparency="True" Grid.Column="1" PlacementTarget="{Binding ElementName=skin}" HorizontalOffset="-80" Name="PopupConfig" VerticalOffset="15" StaysOpen="False">

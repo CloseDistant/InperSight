@@ -245,11 +245,11 @@
                 <TextBlock Text="{DynamicResource stimulus_output}" VerticalAlignment="Center" Margin="240 0 0 0"/>
                 <ComboBox Style="{StaticResource InperComboBoxBaseStyle}" ItemsSource="{Binding EventChannels}" SelectedIndex="0" Padding="3 0 0 0" hc:BorderElement.CornerRadius="2" Name="dio" DisplayMemberPath="Name" Width="100" Height="25" HorizontalAlignment="Left" Margin="300 0 0 0"/>
                 <TextBlock Text="{DynamicResource stimulus_time}" VerticalAlignment="Center" Margin="450 0 0 0"/>
-                <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="440 0 0 0" Name="hour" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
+                <TextBox Width="25" MinHeight="20" TextAlignment="Center" hc:BorderElement.CornerRadius="2" Padding="0" VerticalAlignment="Center" Margin="440 0 0 0" Name="hour" TextChanged="{s:Action Time_Changed}" Style="{StaticResource TextBoxBaseStyle}"/>
                 <TextBlock Text=":" VerticalAlignment="Center" Margin="550 0 0 0"/>
-                <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="520 0 0 0" Name="minute" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
+                <TextBox Width="25" MinHeight="20" TextAlignment="Center" hc:BorderElement.CornerRadius="2" Padding="0" VerticalAlignment="Center" Margin="520 0 0 0" Name="minute" TextChanged="{s:Action Time_Changed}" Style="{StaticResource TextBoxBaseStyle}"/>
                 <TextBlock Text=":" VerticalAlignment="Center" Margin="590 0 0 0"/>
-                <TextBox Width="25" Height="20" VerticalAlignment="Center" Margin="595 0 0 0" Name="seconds" TextChanged="{s:Action Time_Changed}" Style="{x:Null}"/>
+                <TextBox Width="25" MinHeight="20" TextAlignment="Center" hc:BorderElement.CornerRadius="2" Padding="0" VerticalAlignment="Center" Margin="595 0 0 0" Name="seconds" TextChanged="{s:Action Time_Changed}" Style="{StaticResource TextBoxBaseStyle}"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Border BorderThickness="1" BorderBrush="#D1D1D1" Margin="0 0 0 15">

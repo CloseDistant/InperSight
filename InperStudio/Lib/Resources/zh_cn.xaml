@@ -193,4 +193,6 @@
     <sys:String x:Key="properties_inactive">取消激活</sys:String>
     <sys:String x:Key="properties_active">激活</sys:String>
     <sys:String x:Key="properties_duplicate">重复</sys:String>
+    <sys:String x:Key="properties_offsetvalue">偏移量</sys:String>
+    <sys:String x:Key="properties_refresh">刷新</sys:String>
 </ResourceDictionary>

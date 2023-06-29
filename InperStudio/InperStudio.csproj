@@ -99,8 +99,8 @@
     <Reference Include="Google.Protobuf, Version=3.14.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>packages\Google.Protobuf.3.14.0\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
-    <Reference Include="HandyControl, Version=3.4.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
-      <HintPath>packages\HandyControl.3.4.0\lib\net472\HandyControl.dll</HintPath>
+    <Reference Include="HandyControl, Version=3.2.0.0, Culture=neutral, PublicKeyToken=45be8712787a1e5b, processorArchitecture=MSIL">
+      <HintPath>packages\HandyControl.3.2.0\lib\net472\HandyControl.dll</HintPath>
     </Reference>
     <Reference Include="InperPhotometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -590,6 +590,7 @@
     <Resource Include="Lib\Images\InperSignal.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Lib\Images\New\refresh.png" />
     <Resource Include="Lib\Images\New\tg_close.png" />
     <Resource Include="Lib\Images\New\tg_open.png" />
     <Resource Include="Lib\Images\New\video_cut.png" />

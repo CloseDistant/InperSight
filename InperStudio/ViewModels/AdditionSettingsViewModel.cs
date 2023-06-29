@@ -247,11 +247,33 @@ namespace InperStudio.ViewModels
                             //消去stop中的该选项，设置为激活状态
                             if (EventChannelsStop.FirstOrDefault(x => x.ChannelId == comb.ChannelId) is EventChannelJson json)
                             {
-                                if ((bool)view.triggerRad.IsChecked)
+                                if (view.stop_trigger.SelectedValue is EventChannelJson jsonb)
                                 {
-                                    EventChannelsStop.Remove(json);
+                                    if (jsonb.ChannelId == comb.ChannelId)
+                                    {
+                                        if (EventChannelsStop.FirstOrDefault(f => f.ChannelId != jsonb.ChannelId) is var chan)
+                                        {
+                                            view.stop_trigger.SelectedValue= chan;
+                                        }
+                                        else
+                                        {
+                                            view.stop_trigger.SelectedValue = null;
+                                        }
+                                    }
                                 }
+                                else
+                                {
+                                    if (EventChannelsStop.FirstOrDefault(f => f.ChannelId != comb.ChannelId) is var chan)
+                                    {
+                                        view.stop_trigger.SelectedValue = chan;
+                                    }
+                                }
+                                //if ((bool)view.triggerRad.IsChecked)
+                                //{
+                                //    EventChannelsStop.Remove(json);
+                                //}
                                 view.stop_trigger.ItemsSource = EventChannelsStop = new ObservableCollection<EventChannelJson>(EventChannelsStop.GroupBy(x => x.ChannelId).Select(g => g.First()).OrderBy(d => d.ChannelId));
+                                //view.stop_trigger.SelectedIndex = 0;
                             }
                         }
                     };
@@ -278,11 +300,33 @@ namespace InperStudio.ViewModels
                             //消去start中的该选项，设置为激活状态
                             if (EventChannelsStart.FirstOrDefault(x => x.ChannelId == comb.ChannelId) is EventChannelJson json)
                             {
-                                if ((bool)view.triggerRadStop.IsChecked)
+                                //if ((bool)view.triggerRadStop.IsChecked)
+                                //{
+                                //    EventChannelsStart.Remove(json);
+                                //}
+                                if (view.start_trigger.SelectedValue is EventChannelJson jsonb)
                                 {
-                                    EventChannelsStart.Remove(json);
+                                    if (jsonb.ChannelId == comb.ChannelId)
+                                    {
+                                        if (EventChannelsStart.FirstOrDefault(f => f.ChannelId != jsonb.ChannelId) is EventChannelJson jsonc)
+                                        {
+                                            view.start_trigger.SelectedValue = jsonc;
+                                        }
+                                        else
+                                        {
+                                            view.start_trigger.SelectedValue = null;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (EventChannelsStart.FirstOrDefault(f => f.ChannelId != comb.ChannelId) is var chan)
+                                    {
+                                        view.start_trigger.SelectedValue = chan;
+                                    }
                                 }
                                 view.start_trigger.ItemsSource = EventChannelsStart = new ObservableCollection<EventChannelJson>(EventChannelsStart.GroupBy(x => x.ChannelId).Select(g => g.First()).OrderBy(d => d.ChannelId));
+                                //view.start_trigger.SelectedIndex = 0;
                             }
                         }
                     };

@@ -27,7 +27,7 @@ namespace InperStudio.Lib.Bean.Channel
         public double ROI { get; set; }
         private double height = double.NaN;
         public double Height { get => height; set => SetAndNotify(ref height, value); }
-        public int OffsetWindowSize { get; set; } = 300;
+        public int OffsetWindowSize { get; set; } = 0;
         public bool Offset { get; set; }
         public bool IsDeltaFCalculate { get; set; }
         private bool autoRange = true;

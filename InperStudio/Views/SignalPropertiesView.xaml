@@ -29,7 +29,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
-                <WrapPanel Margin="20 10 0 0" >
+                <WrapPanel Margin="20 10 0 0"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <TextBlock VerticalAlignment="Center" Text="{DynamicResource properties_channel}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                     <ComboBox Style="{DynamicResource InperComboBoxBaseStyle}" Margin="74 0 0 0" HorizontalAlignment="Right" Name="selectChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectionChanged="{s:Action RangeChannel_SelectionChanged}" SelectedItem="{Binding ActiveChannel,UpdateSourceTrigger=PropertyChanged}" Width="130" Height="25" Padding="5 0" hc:BorderElement.CornerRadius="2" FontSize="12"/>
                 </WrapPanel>
@@ -39,7 +39,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Margin="20 10 0 10">
+                <StackPanel Grid.Column="0" Margin="20 10 0 10" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                     <Grid Margin="0 10 0 0" >
                         <TextBlock Text="{DynamicResource properties_yrange}" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                         <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
@@ -72,19 +72,19 @@
                         <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Margin="20 0" x:Name="heightChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" SelectionChanged="{s:Action HeightChannel_SelectionChanged}" DisplayMemberPath="Name" HorizontalAlignment="Right" SelectedItem="{Binding ActiveChannel,UpdateSourceTrigger=PropertyChanged}" MinWidth="130" />
                     </Grid>-->
-                    <Grid Margin="0 10 91 0" HorizontalAlignment="Left">
+                    <Grid Margin="0 10 91 0" HorizontalAlignment="Left" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <RadioButton x:Name="heightAuto" GroupName="height" HorizontalAlignment="Left" Checked="{s:Action HeightAuto_Checked}" >
                             <TextBlock Text="{DynamicResource properties_auto}" Margin="5 0"   FontSize="{DynamicResource InperLargeFontSize}"/>
                         </RadioButton>
                     </Grid>
-                    <Grid Margin="0 10 19 0" HorizontalAlignment="Left">
+                    <Grid Margin="0 10 19 0" HorizontalAlignment="Left" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <RadioButton GroupName="height" HorizontalAlignment="Left" x:Name="heightFixed" Checked="{s:Action HeightAuto_Checked}" >
                             <TextBlock Text="{DynamicResource properties_fixed}" Margin="5 0"   FontSize="{DynamicResource InperLargeFontSize}"/>
                         </RadioButton>
                         <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" InperVerify="False" InperTextType="Double" InperMinValue="10" InperMaxValue="1000" InperTextChanged="{s:Action FixedValue_InperTextChanged}" Name="fixedValue" IsEnabled="{Binding ElementName=heightFixed,Path=IsChecked}" HorizontalAlignment="Left" Margin="75 0 0 0" Width="60" Text="{Binding ElementName=selectChannel,Path=SelectedItem.Height,StringFormat={}{0:F0},UpdateSourceTrigger=PropertyChanged}" Height="25" Padding="3 0 0 0"  VerticalContentAlignment="Center"/>
                     </Grid>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Margin="20 10 0 10" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
+                <StackPanel Grid.Column="1" Margin="20 10 0 10">
                     <Grid Margin="0 10 0 0" >
                         <TextBlock Text="{DynamicResource properties_filter}" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                         <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
@@ -93,7 +93,7 @@
                         <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Margin="20 0" x:Name="filtersChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" HorizontalAlignment="Right"  SelectedItem="{Binding ActiveChannel,UpdateSourceTrigger=PropertyChanged}" MinWidth="130" />
                     </Grid>-->
-                    <Grid Margin="0 10 0 0">
+                    <Grid Margin="0 10 0 0"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <CheckBox VerticalAlignment="Center" Name="bandpass" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" HorizontalAlignment="Left" IsChecked="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandpass,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
                             <TextBlock Margin="10 0 0 0" Text="{DynamicResource properties_bandpass}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
@@ -102,7 +102,7 @@
                             <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0" Width="45" Margin="0 0 20 0" x:Name="high" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandpass_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandpass}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandpass2}"/>
                         </WrapPanel>
                     </Grid>
-                    <Grid Margin="0 10 0 0">
+                    <Grid Margin="0 10 0 0"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <CheckBox VerticalAlignment="Center" Name="bandstop" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" HorizontalAlignment="Left" IsChecked="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandstop,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
                             <TextBlock Margin="10 0 0 0" Text="{DynamicResource properties_bandstop}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
@@ -111,13 +111,13 @@
                             <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"  Width="45" Margin="0 0 20 0" x:Name="stopHigh" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandstop_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandstop}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandstop2}"/>
                         </WrapPanel>
                     </Grid>
-                    <Grid Margin="0 10 0 0" >
+                    <Grid Margin="0 10 0 0"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <CheckBox Name="smooth"  HorizontalAlignment="Left" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
                             <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="{DynamicResource properties_smooth}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
                         <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"   Width="110" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="1" InperTextType="Int" InperTextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=selectChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
                     </Grid>
-                    <Grid Margin="0 40 0 0" >
+                    <Grid Margin="0 40 0 0" Name="_offsetTitle">
                         <TextBlock Text="{DynamicResource properties_offset}" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />
                         <hc:Divider Width="140" VerticalAlignment="Center" HorizontalAlignment="Right"  Opacity=".4" LineStroke="{DynamicResource InperTheme}" Margin="0 0 20 0" />
                     </Grid>
@@ -125,17 +125,48 @@
                         <TextBlock VerticalAlignment="Center" Text="Channel"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         <ComboBox Margin="20 0" x:Name="offsetChannel" ItemsSource="{Binding Channels,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" HorizontalAlignment="Right"  SelectedItem="{Binding ActiveChannel,UpdateSourceTrigger=PropertyChanged}" MinWidth="130" />
                     </Grid>-->
-                    <WrapPanel Margin="0 10 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
-                        <CheckBox x:Name="_offset" Checked="{s:Action OffsetChecked}" Unchecked="{s:Action OffsetUnchecked}" IsChecked="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Offset}">
+                    <Grid Margin="0 10 0 0" Name="_offsetWindow" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
+                        <CheckBox x:Name="_offset" Checked="{s:Action OffsetChecked}" HorizontalAlignment="Left" Unchecked="{s:Action OffsetUnchecked}" IsChecked="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Offset}">
                             <TextBlock Text="{DynamicResource properties_size}" VerticalAlignment="Center"   FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
-                        <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" Height="25" Padding="3 0 0 0" VerticalContentAlignment="Center" hc:BorderElement.CornerRadius="2" Name="_windowSize" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Width="70" Margin="20 0 0 0" Text="{Binding ElementName=selectChannel,Path=SelectedItem.OffsetWindowSize,Mode=TwoWay}" />
-                        <Button IsEnabled="{Binding ElementName=_offset,Path=IsChecked}" hc:BorderElement.CornerRadius="2" Content="{DynamicResource properties_duplicate}" Command="{s:Action DuplicateOffset}" Name="duplicate" Margin="5 0 0 0"/>
-                    </WrapPanel>
-                    <WrapPanel Margin="0 10" Visibility="Collapsed" HorizontalAlignment="Right"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
+                        <inper:InperTextBox IsEnabled="{Binding ElementName=_offset,Path=IsChecked}" Style="{StaticResource InperTextBoxBaseStyle}" Height="25" HorizontalAlignment="Right" Padding="3 0 0 0" VerticalContentAlignment="Center" hc:BorderElement.CornerRadius="2" Name="_windowSize" InperVerify="True" InperTextType="Int" InperMaxValue="1000" InperMinValue="0" Width="110" Margin="0 0 20 0" Text="{Binding ElementName=selectChannel,Path=SelectedItem.OffsetWindowSize,Mode=TwoWay}" />
+                        <!--<Button IsEnabled="{Binding ElementName=_offset,Path=IsChecked}" hc:BorderElement.CornerRadius="2" Content="{DynamicResource properties_duplicate}" Command="{s:Action DuplicateOffset}" Name="duplicate" Margin="5 0 0 0"/>-->
+                    </Grid>
+                    <Grid Margin="0 10 0 0" Name="_offsetValue" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
+                        <!--<TextBlock Text="{StaticResource properties_offsetvalue}" VerticalAlignment="Center" Margin="60 0 0 0"/>-->
+                        <Button IsEnabled="{Binding ElementName=_offset,Path=IsChecked}" Content="{DynamicResource properties_refresh}" Width="50" Height="25" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 20 0" Cursor="Hand" Command="{s:Action OffsetValue_Refresh}">
+                            <!--<Image Stretch="UniformToFill" Source="/Lib/Images/New/refresh.png" />-->
+                        </Button>
+                    </Grid>
+                    <Grid Margin="0 5" Name="aiOffsetValue" IsEnabled="{Binding ElementName=_offset,Path=IsChecked}">
+                        <TextBlock Text="AI" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 100 0"/>
+                        <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" Height="25" HorizontalAlignment="Right" Padding="3 0 0 0" VerticalContentAlignment="Center" hc:BorderElement.CornerRadius="2" Name="offsetValue" InperVerify="True" InperTextType="Double" InperMaxValue="99999999" InperMinValue="-99999999" Width="60" Margin="0 0 20 0" TextChanged="{s:Action OffsetValue_TextChanged}" Text="{Binding ElementName=selectChannel,Path=SelectedItem.OffsetValue,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+                    <ListBox x:Name="lightMode"  Style="{x:Null}" ItemsSource="{Binding Lights,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="0 0 20 0" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Grid Margin="0 5"  IsEnabled="{Binding ElementName=_offset,Path=IsChecked}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="2*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding LightName}" Margin="0 0 45 0" VerticalAlignment="Center" FontSize="{StaticResource InperNormalFontSize}"/>
+                                                <inper:InperTextBox Grid.Column="1" Text="{Binding OffsetValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}" Style="{StaticResource TextBoxBaseStyle}" MinHeight="25" InperVerify="True" InperTextType="Double" InperMaxValue="999999999" InperMinValue="-999999999" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="0 0 0 0"  Padding="6 0 0 0"  Width="110" HorizontalAlignment="Right" TextAlignment="Left" />
+                                                <!--<TextBox Style="{StaticResource TextBoxBaseStyle}" Text="{Binding OffsetValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" MinHeight="25" hc:BorderElement.CornerRadius="2" Grid.Column="1" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="0 0 0 0"  Padding="6 0 0 0"  Width="110" HorizontalAlignment="Right" TextAlignment="Left" />-->
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <!--<WrapPanel Margin="0 10" Visibility="Collapsed" HorizontalAlignment="Right"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path=IsRecord,Converter={StaticResource Boolean2BooleanReConverter}}">
                         <Button Content="{DynamicResource properties_inactive}" Command="{s:Action CameraOffset}" Name="cancle" IsEnabled="False" CommandParameter="Cancle" />
                         <Button Content="{DynamicResource properties_active}" Command="{s:Action CameraOffset}" Name="offset" CommandParameter="Offset" Margin="20 0"/>
-                    </WrapPanel>
+                    </WrapPanel>-->
                 </StackPanel>
             </Grid>
         </Grid>
