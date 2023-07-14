@@ -70,8 +70,14 @@ namespace InperStudio.Lib.Helper
         {
             try
             {
+                //JObject res = InperJsonConfig.Instance.Readjson();
+                //return JsonConvert.DeserializeObject<T>(res[type].ToString());
                 JObject res = InperJsonConfig.Instance.Readjson();
-                return JsonConvert.DeserializeObject<T>(res[type].ToString());
+                if (res[type] != null)
+                {
+                    var _res = JsonConvert.DeserializeObject<T>(res[type].ToString());
+                    return _res;
+                }
             }
             catch (Exception e)
             {

@@ -10,17 +10,17 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:PreferenceWindowViewModel}" FontFamily="{DynamicResource InperFontFamily}" 
-        Title="{DynamicResource preference_title}" Height="480" Width="360" WindowStartupLocation="CenterScreen" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False">
+        Title="{DynamicResource preference_title}" Height="480" Width="360" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" IsShowCancleButton="False" IsShowOtherButton="False" IsShowTopAllButton="False">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
     </inp:InperDialogWindow.Resources>
-    <Grid Margin="20" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height=".8*"/>
             <RowDefinition Height="2.4*"/>
             <RowDefinition Height="1.5*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <StackPanel>
                 <Grid>
                     <TextBlock Text="{DynamicResource preference_language}" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>
@@ -39,14 +39,14 @@
                     <Border Height="1" Background="{StaticResource InperTheme}" Margin="80 0 0 0" VerticalAlignment="Center"/>
                 </Grid>
                 <UniformGrid Columns="1" Rows="4" Margin="0 16 0 0">
-                    <CheckBox x:Name="analog" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_analog}"></CheckBox>
-                    <CheckBox x:Name="trigger" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" Margin="0 10" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_trigger}"></CheckBox>
-                    <CheckBox x:Name="note" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_note}"></CheckBox>
+                    <CheckBox IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" x:Name="analog" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_analog}"></CheckBox>
+                    <CheckBox IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" x:Name="trigger" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" Margin="0 10" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_trigger}"></CheckBox>
+                    <CheckBox IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" x:Name="note" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_note}"></CheckBox>
                     <CheckBox x:Name="sprit" Checked="{s:Action Display_Checked}" Unchecked="{s:Action Display_Unchecked}" HorizontalAlignment="Left" FontSize="14" FontFamily="{StaticResource InperFontFamily}" Content="{DynamicResource preference_display_timer}"></CheckBox>
                 </UniformGrid>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
             <StackPanel>
                 <Grid Margin="0 10 0 0">
                     <TextBlock Text="{DynamicResource preference_theme}" Foreground="{StaticResource InperTheme}" FontSize="14" FontFamily="{StaticResource InperFontFamily}"/>

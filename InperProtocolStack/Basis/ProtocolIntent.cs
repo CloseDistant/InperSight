@@ -28,6 +28,7 @@
         public const byte INTENT_SET_GBL_WF = 0x50;
         public const byte INTENT_SET_CHN_SWEEP = 0x51;
         public const byte INTENT_SET_SWEEP_STATE = 0x52;
+        public const byte INTENT_SET_SWEEP_TRIGGER = 0x53;
         public const byte INTENT_MEASURE_MODE = 0x10;
         public const byte INTENT_LIGHT_HOLD_ON = 0x11;
         public const byte INTENT_INQ_INFO = 0x12;

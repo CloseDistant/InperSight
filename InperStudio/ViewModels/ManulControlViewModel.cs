@@ -162,7 +162,7 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
-        public void RecordSettingsShow(string type)
+        public async void RecordSettingsShow(string type)
         {
             try
             {
@@ -172,7 +172,7 @@ namespace InperStudio.ViewModels
                         PreviewRecord();
                         break;
                     case "Start":
-                        StartRecord();
+                        await StartRecord();
                         break;
                     case "Stop":
                         StopRecord();
@@ -225,7 +225,7 @@ namespace InperStudio.ViewModels
         }
         DateTime startTime, endTime;
         FileStream fs;
-        private async void StartRecord()
+        private async Task StartRecord()
         {
             try
             {

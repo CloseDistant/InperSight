@@ -29,6 +29,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Windows;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -99,9 +100,9 @@ namespace InperStudio.Lib.Helper
         public ConcurrentQueue<MarkedMat> _MatQ = new ConcurrentQueue<MarkedMat>();
         public Queue<MarkedMat> _DisplayMatQ = new Queue<MarkedMat>();
 
-        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> FilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, ConcurrentQueue<double>>> FilterData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, ConcurrentQueue<double>>>();
         public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> OffsetData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
-        public ConcurrentDictionary<int, Dictionary<int, Queue<double>>> DeltaFData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, Queue<double>>>();
+        public ConcurrentDictionary<int, Dictionary<int, ConcurrentQueue<double>>> DeltaFData { get; set; } = new ConcurrentDictionary<int, Dictionary<int, ConcurrentQueue<double>>>();
 
         public BindableCollection<CameraChannel> CameraChannels { get; set; } = new BindableCollection<CameraChannel>();
         public EventChannelChart EventChannelChart { get; set; } = new EventChannelChart();
@@ -269,7 +270,6 @@ namespace InperStudio.Lib.Helper
             {
                 if (e is DevInputNotificationEventArgs dev)
                 {
-                    Console.WriteLine(dev.IOID);
                     if (InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == dev.IOID && (x.Type == ChannelTypeEnum.TriggerStart.ToString() || x.Type == ChannelTypeEnum.TriggerStop.ToString())) is EventChannelJson json)
                     {
                         if (json.Type == ChannelTypeEnum.TriggerStart.ToString())
@@ -324,9 +324,9 @@ namespace InperStudio.Lib.Helper
         {
             foreach (var item in CameraChannels)
             {
-                _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                _ = FilterData.TryAdd(item.ChannelId, new Dictionary<int, ConcurrentQueue<double>>());
                 _ = OffsetData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
-                _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, Queue<double>>());
+                _ = DeltaFData.TryAdd(item.ChannelId, new Dictionary<int, ConcurrentQueue<double>>());
 
                 if (item.LightModes.Count > 0)
                 {
@@ -348,7 +348,7 @@ namespace InperStudio.Lib.Helper
 
                         if (!FilterData[item.ChannelId].ContainsKey(x.LightType))
                         {
-                            FilterData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                            FilterData[item.ChannelId].Add(x.LightType, new ConcurrentQueue<double>());
                         }
 
                         if (!OffsetData[item.ChannelId].ContainsKey(x.LightType))
@@ -357,7 +357,7 @@ namespace InperStudio.Lib.Helper
                         }
                         if (!DeltaFData[item.ChannelId].ContainsKey(x.LightType))
                         {
-                            DeltaFData[item.ChannelId].Add(x.LightType, new Queue<double>());
+                            DeltaFData[item.ChannelId].Add(x.LightType, new ConcurrentQueue<double>());
                         }
                     });
                 }
@@ -506,19 +506,22 @@ namespace InperStudio.Lib.Helper
 
                                 if (mask.Offset)
                                 {
-                                    if (OffsetData.GetOrAdd(mask.ChannelId, new Dictionary<int, Queue<double>>()) is Dictionary<int, Queue<double>> res)
+                                    if (InperGlobalClass.IsPreview)
                                     {
-                                        if (res.ContainsKey(m.Group))
+                                        if (OffsetData.GetOrAdd(mask.ChannelId, new Dictionary<int, Queue<double>>()) is Dictionary<int, Queue<double>> res)
                                         {
-                                            if (res[m.Group].Count > 999)
+                                            if (res.ContainsKey(m.Group))
                                             {
-                                                res[m.Group].Dequeue();
+                                                if (res[m.Group].Count > 999)
+                                                {
+                                                    res[m.Group].Dequeue();
+                                                }
+                                                res[m.Group].Enqueue(r);
                                             }
-                                            res[m.Group].Enqueue(r);
-                                        }
-                                        else
-                                        {
-                                            res.Add(m.Group, new Queue<double>());
+                                            else
+                                            {
+                                                res.Add(m.Group, new Queue<double>());
+                                            }
                                         }
                                     }
 
@@ -861,15 +864,37 @@ namespace InperStudio.Lib.Helper
             double val = r;
             if (Interlocked.Exchange(ref _InterSmooth, 1) == 0)
             {
-                if (FilterData.ContainsKey(cameraChannel.ChannelId))
+                if (FilterData.TryGetValue(cameraChannel.ChannelId, out var groupData))
                 {
-                    if (FilterData[cameraChannel.ChannelId].ContainsKey(group))
+                    if (groupData.TryGetValue(group, out var queue))
                     {
-                        FilterData[cameraChannel.ChannelId][group].Enqueue(r);
-                        if (FilterData[cameraChannel.ChannelId][group].Count > cameraChannel.Filters.Smooth)
+                        queue.Enqueue(r);
+                        if (queue.Count > cameraChannel.Filters.Smooth)
                         {
-                            _ = FilterData[cameraChannel.ChannelId][group].Dequeue();
-                            val = FilterData[cameraChannel.ChannelId][group].ToList().Average();
+                            _ = queue.TryDequeue(out _);
+                            val = queue.Average();
+
+                            //double stdDev = Math.Sqrt(queue.Sum(x => Math.Pow(x - val, 2)) / (queue.Count - 1));
+                            //double _values = 0;
+                            //bool isExistOutlier = false;
+                            //foreach (double value in queue)
+                            //{
+                            //    if (Math.Abs(value - val) > 3 * stdDev)
+                            //    {
+                            //        //Console.WriteLine($"Found an outlier: {value}");
+                            //        App.Log.Error($"Found an outlier: {value}");
+                            //        _values += val;
+                            //        isExistOutlier = true;
+                            //    }
+                            //    else
+                            //    {
+                            //        _values += value;
+                            //    }
+                            //}
+                            //if (isExistOutlier)
+                            //{
+                            //    val = _values / queue.Count;
+                            //}
                         }
                     }
                 }
@@ -909,26 +934,38 @@ namespace InperStudio.Lib.Helper
 
         private void ProcessDeltaFData(EventChannelJson cameraChannel, double r, long ts, int cid)
         {
-            DeltaFData[cid][cameraChannel.LightIndex].Enqueue(r);
-            if (DeltaFData[cid][cameraChannel.LightIndex].Count > cameraChannel.WindowSize)
+            if (DeltaFData.TryGetValue(cid, out var value))
             {
-                _ = DeltaFData[cid][cameraChannel.LightIndex].Dequeue();
-                double deltaF = Math.Abs(r - DeltaFData[cid][cameraChannel.LightIndex].ToList().Average()) / DeltaFData[cid][cameraChannel.LightIndex].ToList().Average() * 100;
-                if (deltaF >= cameraChannel.DeltaF)
+                if (value != null)
                 {
-                    SetMarkers(new BaseMarker()
+                    if (value.TryGetValue(cameraChannel.LightIndex, out var deltaFData))
                     {
-                        ChannelId = cameraChannel.ChannelId,
-                        Color = cameraChannel.BgColor,
-                        IsIgnore = cameraChannel.Type == ChannelTypeEnum.Output.ToString() ? false : true,
-                        RefractoryPeriod = cameraChannel.RefractoryPeriod,
-                        DeltaF = deltaF,
-                        CameraTime = ts,
-                        Name = cameraChannel.Name,
-                        Type = cameraChannel.Type == ChannelTypeEnum.Output.ToString() ? cameraChannel.Condition.Type : cameraChannel.Type,
-                        ConditionId = cid,
-                        CreateTime = DateTime.Now
-                    });
+                        deltaFData.Enqueue(r);
+                        if (deltaFData.Count > cameraChannel.WindowSize)
+                        {
+                            var deltaFDataCopy = deltaFData.ToList(); // 创建副本
+
+                            _ = deltaFData.TryDequeue(out _);
+
+                            double deltaF = Math.Abs(r - deltaFDataCopy.Average()) / deltaFDataCopy.Average() * 100;
+                            if (deltaF >= cameraChannel.DeltaF)
+                            {
+                                SetMarkers(new BaseMarker()
+                                {
+                                    ChannelId = cameraChannel.ChannelId,
+                                    Color = cameraChannel.BgColor,
+                                    IsIgnore = cameraChannel.Type == ChannelTypeEnum.Output.ToString() ? false : true,
+                                    RefractoryPeriod = cameraChannel.RefractoryPeriod,
+                                    DeltaF = deltaF,
+                                    CameraTime = ts,
+                                    Name = cameraChannel.Name,
+                                    Type = cameraChannel.Type == ChannelTypeEnum.Output.ToString() ? cameraChannel.Condition.Type : cameraChannel.Type,
+                                    ConditionId = cid,
+                                    CreateTime = DateTime.Now
+                                });
+                            }
+                        }
+                    }
                 }
             }
         }

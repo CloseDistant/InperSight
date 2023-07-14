@@ -11,7 +11,7 @@
         xmlns:conv="clr-namespace:InperStudio.Lib.Convert"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" IsShowBottomAllButton="False" FontFamily="{DynamicResource InperFontFamily}" 
-        Title="{Binding BehaviorRecorderKit.CustomName}" SizeToContent="WidthAndHeight" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}" Closing="{s:Action Window_Closing}">
+        Title="{Binding BehaviorRecorderKit.CustomName}" Width="670" Height="450" d:DataContext="{d:DesignInstance vm:VideoWindowViewModel}" Closing="{s:Action Window_Closing}">
     <inp:InperDialogWindow.Resources>
         <conv:VideoIntToTIme x:Key="VideoIntToTIme"/>
     </inp:InperDialogWindow.Resources>
@@ -27,9 +27,9 @@
             </Grid>
         </Button>-->
         <!--<Viewbox Stretch="Uniform">-->
-        <Grid Background="{DynamicResource InperTitlePageColor}" Width="480" Height="320">
+        <Grid Background="{DynamicResource InperTitlePageColor}">
             <Canvas x:Name="drawCanvas" Panel.ZIndex="9"/>
-            <Image Grid.Row="0" Name="image" Stretch="Fill" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
+            <Image Grid.Row="0" Name="image" Stretch="Uniform" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
             <TextBlock Visibility="Collapsed" Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
         </Grid>
         <!--</Viewbox>-->

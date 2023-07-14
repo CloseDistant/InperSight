@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:InperStudio.Views"
         xmlns:inp="clr-namespace:InperStudioControlLib.Control.Window;assembly=InperStudioControlLib"
         mc:Ignorable="d" FontFamily="{DynamicResource InperFontFamily}"
-        Title="{DynamicResource about_title}" IsShowBottomAllButton="False" Width="530" Height="440" IsShowMiniButton="False" IsShowMaxButton="False" IsShowBottom="False">
+        Title="{DynamicResource about_title}" IsShowBottomAllButton="False" ResizeMode="NoResize" Width="530" SizeToContent="Height" IsShowMiniButton="False" IsShowMaxButton="False" IsShowBottom="False">
     <inp:InperDialogWindow.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="#333333"/>
@@ -48,7 +48,7 @@
             <StackPanel Grid.Row="1">
                 <TextBlock Text="{DynamicResource about_device_specification}" FontSize="16" Margin="28 15 0 0"/>
                 <Border Background="#E2E2E2" Height="1" Width="267" Margin="28 15 0 0" HorizontalAlignment="Left"/>
-                <UniformGrid Rows="3" Columns="2" Margin="28 15 0 0">
+                <UniformGrid Rows="3" Columns="2" Margin="28 15 0 10">
                     <TextBlock Text="{DynamicResource about_light}"/>
                     <TextBlock x:Name="light"/>
                     <TextBlock Text="{DynamicResource about_model}" Margin="0 5 0 0"/>

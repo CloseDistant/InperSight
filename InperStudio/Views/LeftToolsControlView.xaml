@@ -99,46 +99,46 @@
                 </Grid>
             </Grid>
             <!--内容-->
-            <ScrollViewer Grid.Row="1" Visibility="Collapsed"  x:Name="camera">
-                <Grid Margin="10 0">
+            <Grid Margin="10 0" Grid.Row="1" x:Name="camera" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="255"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <!--图像区域-->
+                <Grid Grid.Row="0" Background="#E8E8E8">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="255"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="225"/>
+                        <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
-                    <!--图像区域-->
-                    <Grid Grid.Row="0" Background="#E8E8E8">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="225"/>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
-                        <!--300*225-->
-                        <Grid Grid.Row="0">
-                            <Canvas IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="999999" x:Name="ellipseCanvas" Margin="1 0" Width="300" Height="225"  MouseMove="{s:Action Grid_MouseMove}" MouseLeave="{s:Action EllipseCanvas_MouseLeave}" VerticalAlignment="Top"></Canvas>
-                            <Image IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Stretch="Uniform" Name="image" Width="300" Height="225" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <Grid VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
-                                <WrapPanel>
-                                    <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" Padding="5 0" Margin="3 0 0 0" Width="105" Height="25" FontSize="{DynamicResource InperSmallFontSize}" />
-                                </WrapPanel>
-                            </Grid>
-                            <Button Margin="0 0 40 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="reset" Command="{s:Action AutoFindFiberRest}" >
-                                <Grid>
-                                    <Image Source="/Lib/Images/New/reset.png" />
-                                    <!--<TextBlock Text="Reset" HorizontalAlignment="Center" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="0"/>-->
-                                </Grid>
-                            </Button>
-                            <Button Margin="0 0 10 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
-                                <Grid>
-                                    <Image Source="/Lib/Images/New/cut.png" />
-                                    <!--<TextBlock Text="Capture" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
-                                    <Ellipse Fill="#E0A22A" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>-->
-                                </Grid>
-                            </Button>
-                        </Grid>
+                    <!--300*225-->
+                    <Grid Grid.Row="0">
+                        <Canvas IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Panel.ZIndex="999999" x:Name="ellipseCanvas" Margin="1 0" Width="300" Height="225"  MouseMove="{s:Action Grid_MouseMove}" MouseLeave="{s:Action EllipseCanvas_MouseLeave}" VerticalAlignment="Top"></Canvas>
+                        <Image IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Stretch="Uniform" Name="image" Width="300" Height="225" Source="{Binding InperDeviceHelper.WBMPPreview,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
                     </Grid>
-                    <!--配置参数-->
                     <Grid Grid.Row="1">
+                        <Grid VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                            <WrapPanel>
+                                <ComboBox Name="waveView" Style="{DynamicResource InperComboBoxBaseStyle}"  SelectionChanged="{s:Action WaveView_Selected}" DisplayMemberPath="WaveType" ItemsSource="{Binding InperDeviceHelper.LightWaveLength,UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" Padding="5 0" Margin="3 0 0 0" Width="105" Height="25" FontSize="{DynamicResource InperSmallFontSize}" />
+                            </WrapPanel>
+                        </Grid>
+                        <Button Margin="0 0 40 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="reset" Command="{s:Action AutoFindFiberRest}" >
+                            <Grid>
+                                <Image Source="/Lib/Images/New/reset.png" />
+                                <!--<TextBlock Text="Reset" HorizontalAlignment="Center" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="0"/>-->
+                            </Grid>
+                        </Button>
+                        <Button Margin="0 0 10 0" HorizontalAlignment="Right" Style="{StaticResource InperFreeButton}" Width="20" Height="20" x:Name="screen" Command="{s:Action Screenshots}" >
+                            <Grid>
+                                <Image Source="/Lib/Images/New/cut.png" />
+                                <!--<TextBlock Text="Capture" FontFamily="{DynamicResource InperFontFamily}" FontSize="{StaticResource InperSmallFontSize}" Foreground="Black" VerticalAlignment="Center" Margin="8 0 0 0"/>
+                                    <Ellipse Fill="#E0A22A" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0"/>-->
+                            </Grid>
+                        </Button>
+                    </Grid>
+                </Grid>
+                <ScrollViewer Grid.Row="1">
+                    <!--配置参数-->
+                    <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="50"/>
                             <RowDefinition Height="*"/>
@@ -146,10 +146,10 @@
                         <Grid Grid.Row="0" VerticalAlignment="Center" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                             <WrapPanel>
                                 <WrapPanel VerticalAlignment="Center" Margin="0 0 0 0">
-                                    <TextBlock Text="ROI(px)" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="ROI (px)" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
                                     <inper:InperTextBox hc:BorderElement.CornerRadius="2" Style="{StaticResource TextBoxBaseStyle}" HorizontalContentAlignment="Center" InperVerify="True" InperTextType="Double" InperMaxValue="150" InperMinValue="1" Width="36"   MinHeight="25" Padding="4 0"  Margin="5 0 0 0" x:Name="channelRoi" VerticalContentAlignment="Center" Text="{Binding Diameter,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action ChannelRoi_TextChanged}"/>
                                 </WrapPanel>
-                                <TextBlock Text="{DynamicResource left_name}" Margin="10 0 0 0" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource left_name}" Margin="7 0 0 0" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" VerticalAlignment="Center"/>
                                 <inper:InperTextBox Margin="10 0 0 0"  Style="{StaticResource TextBoxBaseStyle}" VerticalAlignment="Center" VerticalContentAlignment="Center" TextChanged="{s:Action ChannelName_TextChanged}" MaxLength="21" x:Name="channelName"  hc:BorderElement.CornerRadius="2" Width="102"  MinHeight="25" Padding="4 0 0 0"  />
                                 <Button Margin="4 0 0 0" Style="{StaticResource InperFreeButton}" Click="{s:Action AddCircle}" Width="20" Height="20" >
                                     <Path Fill="#0B8800" Stretch="Uniform" Data="M118.75,81.25h-25v-25c0-3.44-2.81-6.25-6.25-6.25s-6.25,2.81-6.25,6.25v25h-25c-3.44,0-6.25,2.81-6.25,6.25  c0,3.44,2.81,6.25,6.25,6.25h25v25c0,3.44,2.81,6.25,6.25,6.25c3.44,0,6.25-2.81,6.25-6.25v-25h25c3.44,0,6.25-2.81,6.25-6.25  S122.19,81.25,118.75,81.25z M87.5,0C39.18,0,0,39.18,0,87.5S39.18,175,87.5,175S175,135.82,175,87.5S135.82,0,87.5,0z M140.53,140.53  c-6.89,6.89-14.92,12.3-23.85,16.07c-9.24,3.91-19.06,5.9-29.2,5.9s-19.96-1.97-29.2-5.9c-8.93-3.77-16.95-9.18-23.85-16.07  s-12.3-14.92-16.07-23.85c-3.91-9.24-5.9-19.06-5.9-29.2s1.97-19.96,5.9-29.2c3.77-8.93,9.18-16.95,16.07-23.85  s14.92-12.3,23.85-16.07c9.24-3.91,19.06-5.9,29.2-5.9s19.96,1.97,29.2,5.9c8.93,3.77,16.95,9.18,23.85,16.07  s12.3,14.92,16.07,23.85c3.91,9.24,5.9,19.06,5.9,29.2s-1.97,19.96-5.9,29.2C152.83,125.62,147.42,133.63,140.53,140.53z"/>
@@ -170,7 +170,7 @@
                                 <TextBlock Grid.Column="1" Text="{DynamicResource left_excitaion_light}" Foreground="{DynamicResource InperTheme}" FontSize="14" Margin="10 0"/>
                                 <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
                             </Grid>
-                            <WrapPanel Margin="15" HorizontalAlignment="Right"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                            <WrapPanel Margin="15 7" HorizontalAlignment="Right"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                                 <TextBlock Text="{DynamicResource left_light_intensity_measure}" VerticalAlignment="Center" />
                                 <ToggleButton Margin="20 0 0 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsPreview,Converter={StaticResource Boolean2BooleanReConverter}}" Style="{StaticResource ToggleButtonSwitch}" x:Name="lightTestMode" IsChecked="False" Checked="{s:Action LightTestMode_Checked}" Unchecked="{s:Action LightTestMode_Checked}" />
                             </WrapPanel>
@@ -180,7 +180,7 @@
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate>
-                                                    <WrapPanel Margin="0 8"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
+                                                    <WrapPanel Margin="0 4"  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">
                                                         <RadioButton Checked="{s:Action TestMode_rb_Checked}" GroupName="testMode" Name="testMode_rb" IsVisibleChanged="{s:Action TestMode_rb_IsVisibleChanged}" Visibility="{Binding Source={x:Reference Name= lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter} }" />
                                                         <CheckBox Visibility="{Binding Source={x:Reference Name=lightTestMode},Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}" PreviewMouseDown="{s:Action CheckBox_PreviewMouseDown}" Checked="{s:Action LightMode_Checked}" Unchecked="{s:Action LightMode_UnChecked}" IsChecked="{Binding IsChecked ,UpdateSourceTrigger=PropertyChanged}"/>
                                                         <TextBlock Text="{Binding WaveType,StringFormat={}{0} (%)}" VerticalAlignment="Center" Margin="10 0 0 0" FontSize="{StaticResource InperNormalFontSize}"/>
@@ -206,15 +206,15 @@
                                 <TextBlock Text="{DynamicResource left_exposure}" VerticalAlignment="Center" Width="90"/>
                                 <ComboBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" TextBoxBase.TextChanged="{s:Action Exposure_TextChanged}" Margin="59 0 0 0" IsEditable="True" x:Name="Exposure" Text="{Binding Expourse,UpdateSourceTrigger=PropertyChanged}" Padding="4 0" MinHeight="25" Width="120" FontSize="{DynamicResource InperNormalFontSize}"/>
                             </WrapPanel>
-                            <WrapPanel Margin="0 15 0 0"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <WrapPanel Margin="0 10 0 0"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                                 <TextBlock Text="{DynamicResource left_sampling}" VerticalAlignment="Center" Width="90" />
                                 <ComboBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" hc:BorderElement.CornerRadius="2" TextBoxBase.TextChanged="{s:Action Sampling_TextChanged}" x:Name="Sampling" Text="{Binding Sampling,UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Style="{StaticResource ComboBoxBaseStyle}" Padding="4 0" Margin="59 0 0 0" MinHeight="25" MinWidth="120" FontSize="{DynamicResource InperNormalFontSize}"/>
                             </WrapPanel>
-                            <WrapPanel Margin="0 15"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <WrapPanel Margin="0 10"  HorizontalAlignment="Center" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                                 <TextBlock Text="{DynamicResource left_gain}" VerticalAlignment="Center" Width="90" />
                                 <inper:InperTextBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" InperVerify="True" InperTextType="Int" InperMaxValue="24" InperMinValue="0" Style="{StaticResource TextBoxBaseStyle}" FontSize="{DynamicResource InperNormalFontSize}" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.Gain,UpdateSourceTrigger=PropertyChanged}"  InperTextChanged="{s:Action Gain_TextChanged}"  Padding="4 0 0 0"  hc:BorderElement.CornerRadius="2"  MinHeight="25" MinWidth="120"  Margin="59 0 0 0" />
                             </WrapPanel>
-                            <Grid HorizontalAlignment="Center" Margin="0 5">
+                            <Grid HorizontalAlignment="Center" Margin="0 3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="auto"/>
@@ -225,10 +225,10 @@
                                 <Border Grid.Column="2" BorderBrush="{DynamicResource InperTheme}" VerticalAlignment="Center" BorderThickness="1" Height="1" Width="1000"  />
                             </Grid>
                             <RadioButton Checked="{s:Action Continus_Checked}" FontSize="14" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}" Margin="20 10" GroupName="mode" x:Name="continuous" Content="{DynamicResource left_continuous}" HorizontalAlignment="Left" IsChecked="{Binding IsContinuous,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                            <WrapPanel Margin="20 10 0 0" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
+                            <WrapPanel Margin="20 5 0 0" IsEnabled="{Binding ElementName=lightTestMode,Path=IsChecked,Converter={StaticResource Boolean2BooleanReConverter}}">
                                 <RadioButton  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" GroupName="mode" FontSize="14" x:Name="interval" Content="{DynamicResource left_interval}" Checked="{s:Action Interval_Checked}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding IsInterval,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </WrapPanel>
-                            <WrapPanel Margin="44 10 0 10" IsEnabled="{Binding ElementName=interval,Path=IsChecked}">
+                            <WrapPanel Margin="44 3 0 10" IsEnabled="{Binding ElementName=interval,Path=IsChecked}">
                                 <WrapPanel Margin="0 2">
                                     <TextBlock Text="{DynamicResource left_duration}"  VerticalAlignment="Center" FontSize="14" />
                                     <inper:InperTextBox  IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}" Name="_duration" hc:BorderElement.CornerRadius="2" Margin="5 0 0 0" Style="{StaticResource TextBoxBaseStyle}" FontSize="14" InperVerify="True" InperTextType="Int" InperMaxValue="99999" InperMinValue="1" Text="{Binding Source={StaticResource InperGlobalClass},Path=CameraSignalSettings.RecordMode.Duration,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="48" MinHeight="25" Padding="0"/>
@@ -240,8 +240,8 @@
                             </WrapPanel>
                         </StackPanel>
                     </Grid>
-                </Grid>
-            </ScrollViewer>
+                </ScrollViewer>
+            </Grid>
             <!--analog-->
             <ScrollViewer Grid.Row="1" x:Name="analog" Visibility="Collapsed">
                 <Grid Margin="10 0" IsEnabled="{Binding Source={StaticResource InperGlobalClass},Path= IsRecord,Converter={StaticResource Boolean2BooleanReConverter},UpdateSourceTrigger=PropertyChanged}">

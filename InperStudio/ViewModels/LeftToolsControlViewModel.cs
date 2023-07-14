@@ -673,7 +673,7 @@ namespace InperStudio.ViewModels
                         {
                             if (item.LightModes.First(f => f.LightType == int.Parse(off.Split(',').First())) is var ltp)
                             {
-                                if(double.TryParse(off.Split(',').Last(), out var d))
+                                if (double.TryParse(off.Split(',').Last(), out var d))
                                 {
                                     ltp.OffsetValue = d;
                                 }
@@ -724,7 +724,7 @@ namespace InperStudio.ViewModels
                 Mat m = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
                 SetMat(m, grid);
             }
-
+            
             SetDefaultCircle(grid);
 
             return grid;

@@ -19,7 +19,7 @@
         </Grid>
         <hc:TransitioningContentControl.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="隐藏" Click="MenuItem_Click"></MenuItem>
+                <MenuItem Header="{DynamicResource heartbeat_hidden}" Click="MenuItem_Click"></MenuItem>
             </ContextMenu>
         </hc:TransitioningContentControl.ContextMenu>
     </hc:TransitioningContentControl>

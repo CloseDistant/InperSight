@@ -185,7 +185,7 @@ namespace InperStudio.Lib.Helper
                         if (apires != null && apires.Code == 401)
                         {
                             var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                            if (res != null && res.Success)
+                            if (res != null && res.Success && res.Data != null)
                             {
                                 token = res.Data.ToString();
                                 LogExtent(ex, errorPage, lineNumber);
@@ -242,7 +242,7 @@ namespace InperStudio.Lib.Helper
                         if (apires != null && apires.Code == 401)
                         {
                             var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                            if (res != null && res.Success)
+                            if (res != null && res.Success && res.Data != null)
                             {
                                 token = res.Data.ToString();
                                 DeviceStatuSet(statu);
@@ -299,7 +299,7 @@ namespace InperStudio.Lib.Helper
                         if (apires != null && apires.Code == 401)
                         {
                             var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                            if (res != null && res.Success)
+                            if (res != null && res.Success && res.Data != null)
                             {
                                 token = res.Data.ToString();
                                 DeviceUseMonitorRecodSet(recordTime);
@@ -336,18 +336,18 @@ namespace InperStudio.Lib.Helper
                         @device_Use_Monitor.Type = 0;
                         @device_Use_Monitor.Last_Open_Time = DateTime.Now;
                         Dictionary<string, object> dict = new Dictionary<string, object>
-                    {
-                        { "snumber", @device_Use_Monitor.Snumber},
-                        { "updatetime", @device_Use_Monitor.Updatetime},
-                        { "createtime", @device_Use_Monitor.Createtime},
-                        { "type", @device_Use_Monitor.Type},
-                        { "last_open_time", @device_Use_Monitor.Last_Open_Time},
-                        { "last_record_time", @device_Use_Monitor.Last_Record_Time},
-                        { "total_open_time", @device_Use_Monitor.Total_Open_Time},
-                        { "total_record_time", @device_Use_Monitor.Total_Record_Time},
-                        { "record_count", @device_Use_Monitor.Record_Count},
-                        { "open_count", ++@device_Use_Monitor.Open_Count},
-                    };
+                        {
+                            { "snumber", @device_Use_Monitor.Snumber},
+                            { "updatetime", @device_Use_Monitor.Updatetime},
+                            { "createtime", @device_Use_Monitor.Createtime},
+                            { "type", @device_Use_Monitor.Type},
+                            { "last_open_time", @device_Use_Monitor.Last_Open_Time},
+                            { "last_record_time", @device_Use_Monitor.Last_Record_Time},
+                            { "total_open_time", @device_Use_Monitor.Total_Open_Time},
+                            { "total_record_time", @device_Use_Monitor.Total_Record_Time},
+                            { "record_count", @device_Use_Monitor.Record_Count},
+                            { "open_count", ++@device_Use_Monitor.Open_Count},
+                        };
                         if (!isFirstUpload)
                         {
                             dict.Add("id", @device_Use_Monitor.Id);
@@ -356,7 +356,7 @@ namespace InperStudio.Lib.Helper
                         if (apires != null && apires.Code == 401)
                         {
                             var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                            if (res != null && res.Success)
+                            if (res != null && res.Success && res.Data != null)
                             {
                                 token = res.Data.ToString();
                                 DeviceUseMonitorOpenCountSet();
@@ -422,18 +422,18 @@ namespace InperStudio.Lib.Helper
                             inpersignal_module_Use.Analog_count += 1;
                         }
                         Dictionary<string, object> dict = new Dictionary<string, object>
-                    {
-                        { "snumber", @inpersignal_module_Use.Snumber},
-                        { "updatetime", @inpersignal_module_Use.Updatetime},
-                        { "createtime", @inpersignal_module_Use.Createtime},
-                        { "analog_count", @inpersignal_module_Use.Analog_count},
-                        { "marker_count", @inpersignal_module_Use.Marker_count},
-                        { "output_count", @inpersignal_module_Use.Output_count},
-                        { "stimulus_count", @inpersignal_module_Use.Stimulus_count},
-                        { "trigger_count", @inpersignal_module_Use.Trigger_count},
-                        { "note_count", @inpersignal_module_Use.Note_count},
-                        { "video_count", @inpersignal_module_Use.Video_count}
-                    };
+                        {
+                            { "snumber", @inpersignal_module_Use.Snumber},
+                            { "updatetime", @inpersignal_module_Use.Updatetime},
+                            { "createtime", @inpersignal_module_Use.Createtime},
+                            { "analog_count", @inpersignal_module_Use.Analog_count},
+                            { "marker_count", @inpersignal_module_Use.Marker_count},
+                            { "output_count", @inpersignal_module_Use.Output_count},
+                            { "stimulus_count", @inpersignal_module_Use.Stimulus_count},
+                            { "trigger_count", @inpersignal_module_Use.Trigger_count},
+                            { "note_count", @inpersignal_module_Use.Note_count},
+                            { "video_count", @inpersignal_module_Use.Video_count}
+                        };
                         if (!isFirstUpload)
                         {
                             dict.Add("id", @inpersignal_module_Use.Id);
@@ -442,7 +442,7 @@ namespace InperStudio.Lib.Helper
                         if (apires != null && apires.Code == 401)
                         {
                             var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                            if (res != null && res.Success)
+                            if (res != null && res.Success && res.Data!=null)
                             {
                                 token = res.Data.ToString();
                                 DeviceModuleUseCountSet();

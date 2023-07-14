@@ -9,6 +9,7 @@ using InperStudio.Views;
 using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Core.Extensions;
 using SciChart.Data.Model;
 using Stylet;
 using System;
@@ -63,11 +64,37 @@ namespace InperStudio.ViewModels
             //        StimulusBeans.Instance.DioID = -1;
             //    }
             //};
+            //StimulusBeans.Instance.Sweeps.OrderByDescending(x => x.IsChecked).ForEachDo(m =>
+            //{
+            //    Sweeps.Add(m);
+            //});
             view.isUse.Unchecked += (s, e) =>
             {
                 StimulusBeans.Instance.IsConfigSweep = false;
                 StimulusBeans.Instance.DioID = -1;
+                StimulusBeans.Instance.TriggerId = -1;
                 InperDeviceHelper.Instance.device.SetSweepState(0);
+                InperDeviceHelper.Instance.device.SetStimulusTrigger(0, 0, 0);
+            };
+            view._triggerToggle.Unchecked += (s, e) =>
+            {
+                InperDeviceHelper.Instance.device.SetStimulusTrigger(0, 0, 0);
+                view.edge.Visibility = Visibility.Visible;
+                view.realtime.Visibility = Visibility.Collapsed;
+            };
+            view._triggerToggle.Checked += (s, e) =>
+            {
+                var item = view._triggerMode.SelectedItem as ComboBoxItem;
+                if (item.Content.ToString() == "Edge" || item.Content.ToString() == "边沿")
+                {
+                    view.edge.Visibility = Visibility.Visible;
+                    view.realtime.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    view.edge.Visibility = Visibility.Collapsed;
+                    view.realtime.Visibility = Visibility.Visible;
+                }
             };
             view.isUse.Checked += (s, e) =>
             {
@@ -82,15 +109,21 @@ namespace InperStudio.ViewModels
             };
             view.ConfirmClickEvent += (s, e) =>
             {
+                if (InperGlobalClass.IsRecord)
+                {
+                    this.RequestClose();
+                    e.Handled = true;
+                    return;
+                }
                 StimulusBeans.Instance.TriggerMode = view._triggerMode.SelectedIndex;
                 StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
                 StimulusBeans.Instance.IsActiveStimulus = (bool)view.isUse.IsChecked;
                 //zzz
-                if (view.dio.SelectedValue != null)
+                if (view.dio.SelectedValue != null && (bool)view.isUse.IsChecked)
                 {
                     StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
                 }
-                if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
+                //if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
                 {
                     #region stimulus 设置下发
                     if ((bool)view.isUse.IsChecked)
@@ -106,7 +139,13 @@ namespace InperStudio.ViewModels
                             return;
                         }
                         StimulusBeans.Instance.StimulusCommandSend();
-                        if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
+                        if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.TriggerId = -1; StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
+
+                        if (StimulusBeans.Instance.IsTrigger)
+                        {
+                            InperDeviceHelper.Instance.device.SetStimulusTrigger(1, StimulusBeans.Instance.TriggerId, (byte)StimulusBeans.Instance.TriggerMode);
+                        }
+
                     }
 
                     InperGlobalClass.StimulusSettings.IsConfigSweep = StimulusBeans.Instance.IsConfigSweep;
@@ -151,7 +190,7 @@ namespace InperStudio.ViewModels
                 view.dio.SelectionChanged += (s, e) =>
                 {
                     StimulusBeans.Instance.DioID = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
-                    if (StimulusBeans.Instance.DioID == StimulusBeans.Instance.TriggerId && (bool)view._triggerToggle.IsChecked)
+                    if (StimulusBeans.Instance.DioID == StimulusBeans.Instance.TriggerId) //&& (bool)view._triggerToggle.IsChecked
                     {
                         //InperGlobalClass.ShowReminderInfo("无法重复使用");
                         if (eventChannels.First(x => x.ChannelId != StimulusBeans.Instance.TriggerId) is EventChannel channel)
@@ -167,31 +206,61 @@ namespace InperStudio.ViewModels
                 StimulusBeans.Instance.DioID = (view.dio.SelectedItem as EventChannel).ChannelId;
                 var chn = EventChannels.FirstOrDefault(x => x.ChannelId == StimulusBeans.Instance.TriggerId) ?? EventChannels.FirstOrDefault();
                 view._triggerdio.SelectedItem = StimulusBeans.Instance.TriggerId > 0 ? chn : EventChannels.FirstOrDefault(x => x.ChannelId != StimulusBeans.Instance.DioID);
+                if (view._triggerdio.SelectedItem == null)
+                {
+                    view._triggerdio.SelectedIndex = -1;
+                }
                 view._triggerdio.SelectionChanged += (s, e) =>
                 {
-                    StimulusBeans.Instance.TriggerId = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
-                    if (StimulusBeans.Instance.TriggerId == StimulusBeans.Instance.DioID)
+                    try
                     {
-                        if (eventChannels.First(x => x.ChannelId != StimulusBeans.Instance.DioID) is EventChannel channel)
+                        StimulusBeans.Instance.TriggerId = ((s as ComboBox).SelectedValue as EventChannel).ChannelId;
+                        if (StimulusBeans.Instance.TriggerId == StimulusBeans.Instance.DioID)
                         {
-                            view.dio.SelectedValue = channel;
+                            if (eventChannels.FirstOrDefault(x => x.ChannelId != StimulusBeans.Instance.DioID) is EventChannel channel)
+                            {
+                                view.dio.SelectedValue = channel;
+                            }
+                            else
+                            {
+                                view.dio.SelectedItem = null;
+                            }
                         }
-                        else
-                        {
-                            view.dio.SelectedIndex = -1;
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+
                     }
                 };
                 if (view._triggerdio.SelectedItem != null)
                 {
                     StimulusBeans.Instance.TriggerId = (view._triggerdio.SelectedItem as EventChannel).ChannelId;
                 }
+                view._triggerMode.SelectionChanged += (s, e) =>
+                {
+                    if ((bool)view._triggerToggle.IsChecked)
+                    {
+                        var item = (s as ComboBox).SelectedItem as ComboBoxItem;
+                        if (item.Content.ToString() == "Edge" || item.Content.ToString() == "边沿")
+                        {
+                            view.edge.Visibility = Visibility.Visible;
+                            view.realtime.Visibility = Visibility.Collapsed;
+                        }
+                        else
+                        {
+                            view.edge.Visibility = Visibility.Collapsed;
+                            view.realtime.Visibility = Visibility.Visible;
+                        }
+                    }
+                };
             }
             view._triggerToggle.IsChecked = StimulusBeans.Instance.IsTrigger;
+
             view._triggerMode.SelectedIndex = StimulusBeans.Instance.TriggerMode;
             view.isUse.IsChecked = StimulusBeans.Instance.IsActiveStimulus;
 
             view.sweepsSource.ItemsSource = Sweeps;
+            //view.sweepsSource.UpdateLayout();
         }
         public void AddWaveformEvent()
         {
@@ -279,12 +348,21 @@ namespace InperStudio.ViewModels
             try
             {
                 var model = new SweepSettingViewModel(sweep);
-                double second = sweep.Duration;
+                //double second = sweep.Duration;
+                //TimeSpan timeSpan1 = new TimeSpan(StimulusBeans.Instance.Hour, StimulusBeans.Instance.Minute, StimulusBeans.Instance.Seconds);
                 model.SwepTimeChangeEvent += (s, e) =>
                 {
-                    TimeSpan timeSpan1 = new TimeSpan(StimulusBeans.Instance.Hour, StimulusBeans.Instance.Minute, StimulusBeans.Instance.Seconds);
-                    var seconds = timeSpan1.TotalSeconds - second + e;
-                    TimeSpan timeSpan = new TimeSpan(0, 0, (int)seconds < 0 ? 0 : (int)seconds);
+                    //var seconds = timeSpan1.TotalSeconds - second + e;
+                    //TimeSpan timeSpan = new TimeSpan(0, 0, (int)seconds < 0 ? 0 : (int)seconds);
+                    double _seconds = 0;
+                    Sweeps.ForEachDo(x =>
+                    {
+                        if (x.IsChecked)
+                        {
+                            _seconds += x.Duration;
+                        }
+                    });
+                    TimeSpan timeSpan = new TimeSpan(0, 0, (int)_seconds < 0 ? 0 : (int)_seconds);
                     view.hour.Text = timeSpan.Hours.ToString();
                     view.minute.Text = timeSpan.Minutes.ToString();
                     view.seconds.Text = timeSpan.Seconds.ToString();

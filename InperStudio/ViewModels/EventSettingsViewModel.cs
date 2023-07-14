@@ -523,7 +523,10 @@ namespace InperStudio.ViewModels
                             }
                             if (item.Condition.Type == ChannelTypeEnum.Camera.ToString())
                             {
-                                item.LightIndex = (view.OutLightSources.SelectedItem as WaveGroup).GroupId;
+                                if (view.OutLightSources.SelectedItem != null)
+                                {
+                                    item.LightIndex = (view.OutLightSources.SelectedItem as WaveGroup).GroupId;
+                                }
                             }
                         }
                     }
@@ -580,30 +583,27 @@ namespace InperStudio.ViewModels
                 EventChannel item = (sender as System.Windows.Controls.ComboBox).SelectedItem as EventChannel;
                 EventChannel channel = view.ConditionsCombox.SelectedItem as EventChannel;
 
-                if (item != null)
+                if (item != null && channel != null)
                 {
                     view.MarkerName.Text = channel.SymbolName + "-" + item.Name;
                     if (item.Type == ChannelTypeEnum.Manual.ToString())
                     {
                         view.outputHotkeys.Content = item.Hotkeys = "F" + (channel.ChannelId + 1);
                     }
-                    if (channel != null)
+                    channel.Condition = new EventChannelJson()
                     {
-                        channel.Condition = new EventChannelJson()
-                        {
-                            ChannelId = item.ChannelId,
-                            BgColor = item.BgColor,
-                            Hotkeys = item.Hotkeys,
-                            DeltaF = item.DeltaF,
-                            WindowSize = item.WindowSize,
-                            Tau1 = item.Tau1,
-                            Tau2 = item.Tau2,
-                            Tau3 = item.Tau3,
-                            Name = item.Name,
-                            Type = item.Type,
-                            VideoZone = item.VideoZone,
-                        };
-                    }
+                        ChannelId = item.ChannelId,
+                        BgColor = item.BgColor,
+                        Hotkeys = item.Hotkeys,
+                        DeltaF = item.DeltaF,
+                        WindowSize = item.WindowSize,
+                        Tau1 = item.Tau1,
+                        Tau2 = item.Tau2,
+                        Tau3 = item.Tau3,
+                        Name = item.Name,
+                        Type = item.Type,
+                        VideoZone = item.VideoZone,
+                    };
                 }
             }
             catch (Exception ex)
@@ -889,7 +889,7 @@ namespace InperStudio.ViewModels
                                         Growl.Warning(text, "SuccessMsg");
                                         return;
                                     }
-                                } 
+                                }
                                 channle.IsActive = true;
                                 EventChannel chn = new EventChannel()
                                 {

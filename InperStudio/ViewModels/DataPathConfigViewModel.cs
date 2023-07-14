@@ -185,5 +185,19 @@ namespace InperStudio.ViewModels
                 throw;
             }
         }
+
+        public void OpenFilePath()
+        {
+            try
+            {
+                System.Diagnostics.ProcessStartInfo psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe");
+                psi.Arguments = "/e,/select," + System.IO.Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName);
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
     }
 }

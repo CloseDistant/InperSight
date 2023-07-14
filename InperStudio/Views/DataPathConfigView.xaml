@@ -11,21 +11,24 @@
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         IsShowTopAllButton="False" IsShowOtherButton="False" FontFamily="{DynamicResource InperFontFamily}"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:DataPathConfigViewModel}" 
-        Width="360" Height="280" MinWidth="200" MinHeight="200" Title="{DynamicResource file_config}" IsShowCancleButton="False" ConfirmClickEvent="{s:Action InperDialogWindow_ConfirmClickEvent}">
+        Width="360" Height="280" MinWidth="200" MinHeight="200" Title="{DynamicResource file_config}" ResizeMode="NoResize" IsShowCancleButton="False" ConfirmClickEvent="{s:Action InperDialogWindow_ConfirmClickEvent}">
     <inper:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass"/>
     </inper:InperDialogWindow.Resources>
     <Grid Background="{DynamicResource InperDialogContentColor}">
         <StackPanel x:Name="Path"  Visibility="Visible" Margin="30 20 0 0">
-            <WrapPanel>
+            <WrapPanel IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path=IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}">
                 <TextBlock FontFamily="{StaticResource InperFontFamily}" Width="35" FontSize="11" Text="{DynamicResource file_name}" VerticalAlignment="Center"/>
                 <TextBox  Margin="20 0 0 0" Style="{StaticResource BaseStyle}"  VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="#CCCCCC" hc:BorderElement.CornerRadius="0" FontSize="11" Width="180" Height="20"  Text="{Binding Source={StaticResource InperGlobalClass},Path=DataFolderName,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  hc:InfoElement.Placeholder="File name" x:Name="fileName" />
             </WrapPanel>
             <WrapPanel Margin="0 15">
-                <TextBlock FontFamily="{StaticResource InperFontFamily}" FontSize="11" Width="35" Text="{DynamicResource file_where}" VerticalAlignment="Center"/>
-                <Button x:Name="pathText" Margin="20 0 0 0" BorderThickness="1" FontSize="11" ToolTip="{Binding Source={StaticResource InperGlobalClass},Path=DataPath,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#CCCCCC" Width="180" Foreground="{StaticResource InperTextColor}"  Style="{StaticResource BaseStyle}" hc:BorderElement.CornerRadius="0" Height="20" FontFamily="{DynamicResource InperFontFamily}" Command="{s:Action ChoosePath}" CommandParameter="Path"  Content="{Binding Source={StaticResource InperGlobalClass},Path=DataPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path=IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}" FontFamily="{StaticResource InperFontFamily}" FontSize="11" Width="35" Text="{DynamicResource file_where}" VerticalAlignment="Center"/>
+                <Button  IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path=IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}" x:Name="pathText" Margin="20 0 0 0" BorderThickness="1" FontSize="11" ToolTip="{Binding Source={StaticResource InperGlobalClass},Path=DataPath,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#CCCCCC" Width="180" Foreground="{StaticResource InperTextColor}"  Style="{StaticResource BaseStyle}" hc:BorderElement.CornerRadius="0" Height="20" FontFamily="{DynamicResource InperFontFamily}" Command="{s:Action ChoosePath}" CommandParameter="Path"  Content="{Binding Source={StaticResource InperGlobalClass},Path=DataPath,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                <Button Style="{StaticResource InperFreeButton}" Width="20" Height="20" Margin="10 0 0 0" Command="{s:Action OpenFilePath}" VerticalAlignment="Center">
+                    <Image Source="/Lib/Images/New/fileopen.png" Stretch="UniformToFill" VerticalAlignment="Center" />
+                </Button>
             </WrapPanel>
-            <WrapPanel HorizontalAlignment="Stretch">
+            <WrapPanel HorizontalAlignment="Stretch"  IsEnabled="{Binding Source={StaticResource InperGlobalClass}, Path=IsRecord,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource Boolean2BooleanReConverter}}">
                 <TextBlock FontFamily="{StaticResource InperFontFamily}" FontSize="11" Width="35" Text="{DynamicResource file_tag}" VerticalAlignment="Top"/>
                 <StackPanel Margin="20 0 0 0" HorizontalAlignment="Stretch">
                     <hc:TagContainer DisplayMemberPath="Value"  Margin="0 0 0 3" Width="180" FontSize="{StaticResource InperSmallFontSize}" Padding="5"  Height="58" HorizontalAlignment="Left" ItemsSource="{Binding DataList}"/>

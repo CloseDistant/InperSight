@@ -12,7 +12,7 @@
         xmlns:global="clr-namespace:InperStudio.Lib.Bean"
         xmlns:local="clr-namespace:InperStudio.Views"
         mc:Ignorable="d" FontFamily="{StaticResource InperFontFamily}" IsShowTopAllButton="False" IsShowCancleButton="False"  IsShowOtherButton="False" 
-        Title="{DynamicResource properties_title}" SizeToContent="Height" Width="620"  d:DataContext="{d:DesignInstance Type=vm:SignalPropertiesViewModel}">
+        Title="{DynamicResource properties_title}" SizeToContent="Height" ResizeMode="NoResize" Width="620"  d:DataContext="{d:DesignInstance Type=vm:SignalPropertiesViewModel}">
     <inp:InperDialogWindow.Resources>
         <global:InperGlobalClass x:Key="InperGlobalClass" />
         <convert:DoubleToBoolConverter x:Key="DoubleToBoolConverter"/>
@@ -98,7 +98,8 @@
                             <TextBlock Margin="10 0 0 0" Text="{DynamicResource properties_bandpass}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
                         <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0" Width="45" Margin="0 0 20 0" x:Name="low" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandpass_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandpass}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandpass1}"/>
+                            <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0" Width="45" Margin="0 0 0 0" x:Name="low" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Double" InperTextChanged="{s:Action Bandpass_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandpass}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandpass1}"/>
+                            <TextBlock VerticalAlignment="Center" Text="-" FontWeight="Medium" Margin="10 0"/>
                             <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0" Width="45" Margin="0 0 20 0" x:Name="high" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandpass_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandpass}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandpass2}"/>
                         </WrapPanel>
                     </Grid>
@@ -107,7 +108,8 @@
                             <TextBlock Margin="10 0 0 0" Text="{DynamicResource properties_bandstop}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
                         <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"  Width="45" Margin="0 0 20 0" x:Name="stopLow" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandstop_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandstop}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandstop1}"/>
+                            <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"  Width="45" Margin="0 0 0 0" x:Name="stopLow" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandstop_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandstop}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandstop1}"/>
+                            <TextBlock VerticalAlignment="Center" Text="-" FontWeight="Medium" Margin="10 0"/>
                             <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"  Width="45" Margin="0 0 20 0" x:Name="stopHigh" InperVerify="True" InperMaxValue="999" InperMinValue="0" InperTextType="Int" InperTextChanged="{s:Action Bandstop_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsBandstop}" Text="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.Bandstop2}"/>
                         </WrapPanel>
                     </Grid>
@@ -115,7 +117,7 @@
                         <CheckBox Name="smooth"  HorizontalAlignment="Left" Checked="{s:Action Smooth_Checked}" Unchecked="{s:Action Smooth_UnChecked}" IsChecked="{Binding ElementName=selectChannel,Mode=TwoWay,Path=SelectedItem.Filters.IsSmooth}">
                             <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" Text="{DynamicResource properties_smooth}"  FontSize="{DynamicResource InperLargeFontSize}"/>
                         </CheckBox>
-                        <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"   Width="110" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="1" InperTextType="Int" InperTextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=selectChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
+                        <inper:InperTextBox Style="{StaticResource InperTextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" VerticalContentAlignment="Center" Height="25" Padding="3 0 0 0"   Width="115" Margin="0 0 20 0" InperVerify="True" InperMaxValue="99999" InperMinValue="1" InperTextType="Int" InperTextChanged="{s:Action Smooth_TextChanged}" IsEnabled="{Binding ElementName=selectChannel,Path=SelectedItem.Filters.IsSmooth}" HorizontalAlignment="Right" Text="{Binding ElementName=selectChannel ,Mode=TwoWay,Path=SelectedItem.Filters.Smooth}"/>
                     </Grid>
                     <Grid Margin="0 40 0 0" Name="_offsetTitle">
                         <TextBlock Text="{DynamicResource properties_offset}" Foreground="{DynamicResource InperTheme}" FontSize="{DynamicResource InperLargeFontSize}" />

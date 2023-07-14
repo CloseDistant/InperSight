@@ -76,6 +76,7 @@
     <Compile Include="CmdPhotometry\CmdSetGBLWF.cs" />
     <Compile Include="CmdPhotometry\CmdSetIOStatus.cs" />
     <Compile Include="CmdPhotometry\CmdSetLightPower.cs" />
+    <Compile Include="CmdPhotometry\CmdSetStimulusTrigger.cs" />
     <Compile Include="CmdPhotometry\CmdSetSweepState.cs" />
     <Compile Include="CmdPhotometry\CmdSetTrigger.cs" />
     <Compile Include="CmdPhotometry\CmdStart.cs" />

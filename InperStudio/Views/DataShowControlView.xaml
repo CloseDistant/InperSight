@@ -176,7 +176,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <ListBox x:Name="dataList" Margin="-5 0 0 -4" ItemsSource="{Binding ChartDatas}" hc:ScrollViewerAttach.AutoHide="False"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="False" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
+                    <ListBox x:Name="dataList" Margin="-3 0 0 -4" ItemsSource="{Binding ChartDatas}" hc:ScrollViewerAttach.AutoHide="False"  ItemsControl.AlternationCount="2" Grid.IsSharedSizeScope="False" ItemContainerStyle="{StaticResource InperBaseListboxStyle}"
                      ItemTemplate="{StaticResource ListDataTemplate}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>

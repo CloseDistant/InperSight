@@ -12,7 +12,7 @@
         xmlns:chart="clr-namespace:InperStudio.Lib.Chart"
         xmlns:vm="clr-namespace:InperStudio.ViewModels" 
         mc:Ignorable="d" IsShowTopAllButton="False"  IsShowCancleButton="True" IsShowOtherButton="False" FontFamily="{DynamicResource InperFontFamily}"
-        Title="{DynamicResource addSweep_title}" Height="420" Width="570" d:DataContext="{d:DesignInstance vm:SweepSettingViewModel}">
+        Title="{DynamicResource addSweep_title}" Height="420" Width="570" ResizeMode="NoResize" d:DataContext="{d:DesignInstance vm:SweepSettingViewModel}">
     <inp:InperDialogWindow.Resources>
         <chart:CustomTimeSpanLableProvider x:Key="customTimeSpanLableProvider"/>
     </inp:InperDialogWindow.Resources>

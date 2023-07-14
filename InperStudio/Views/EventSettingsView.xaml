@@ -12,7 +12,7 @@
         xmlns:convert="clr-namespace:InperStudio.Lib.Convert"
         xmlns:local="clr-namespace:InperStudio.Views"
         mc:Ignorable="d" IsShowCancleButton="False" IsShowTopAllButton="False" IsShowOtherButton="False" 
-        Title="Marker" FontFamily="{DynamicResource InperFontFamily}" x:Name="eswidnow" SizeToContent="Height"  Width="540" Height="380" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
+        Title="Marker" FontFamily="{DynamicResource InperFontFamily}" ResizeMode="NoResize" x:Name="eswidnow" SizeToContent="Height"  Width="540" Height="380" d:DataContext="{d:DesignInstance vm:EventSettingsViewModel}">
     <inp:InperDialogWindow.Resources>
         <convert:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter" />
         <convert:ChannelAnalogTypeToVisibilityConverter x:Key="ChannelAnalogTypeToVisibilityConverter" />
@@ -297,7 +297,7 @@
                 <Grid>
                     <Grid Margin="0 20 0 0"  Visibility="{Binding ElementName=MarkerName,Path=Text,Converter={StaticResource RoiAIVisibilityConverter}}">
                         <TextBlock VerticalAlignment="Center" Text="{DynamicResource marker_rp}"  FontSize="{DynamicResource InperNormalFontSize}"/>
-                        <inper:InperTextBox Margin="20 0" Name="refp" hc:BorderElement.CornerRadius="2" Height="25" Padding="3 0 0 0" VerticalContentAlignment="Center" FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.RefractoryPeriod}" Style="{DynamicResource InperTextBoxBaseStyle}" InperTextType="Double" InperVerify="True" InperMinValue="0" InperMaxValue="99999"  HorizontalAlignment="Right"  Width="170" />
+                        <inper:InperTextBox Margin="20 0" Name="refp" hc:BorderElement.CornerRadius="2" Height="25" Padding="3 0 0 0" VerticalContentAlignment="Center" FontSize="{DynamicResource InperNormalFontSize}" HorizontalContentAlignment="Center" Text="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.RefractoryPeriod}" Style="{DynamicResource InperTextBoxBaseStyle}" InperTextType="Double" InperVerify="True" InperMinValue="0" InperMaxValue="99999"  HorizontalAlignment="Right"  Width="120" />
                     </Grid>
                 </Grid>
                 <Grid Margin="0 20 0 10" >

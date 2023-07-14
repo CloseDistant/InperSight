@@ -51,7 +51,7 @@ namespace InperStudio.ViewModels
             {
                 base.OnViewLoaded();
                 windowView = View as MainWindowView;
-                // 手动强制刷新界面
+                // 手动强制刷新界面f
                 LeftToolsControlViewModel = new LeftToolsControlViewModel(windowManager);
                 ManulControlViewModel = new ManulControlViewModel(windowManager);
                 DataShowControlViewModel = new DataShowControlViewModel(windowManager);

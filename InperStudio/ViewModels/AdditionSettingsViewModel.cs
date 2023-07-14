@@ -168,7 +168,7 @@ namespace InperStudio.ViewModels
 
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
-                        if (item.Value != StimulusBeans.Instance.DioID)
+                        if (item.Value != StimulusBeans.Instance.DioID && item.Value != StimulusBeans.Instance.TriggerId)
                         {
                             if (!EventChannelsStart.Any(x => x.ChannelId == item.Value))
                             {
@@ -202,13 +202,25 @@ namespace InperStudio.ViewModels
                         {
                             //view.start_trigger.SelectedIndex = item.ChannelId;
                             EventChannelsStart.FirstOrDefault(x => x.ChannelId == item.ChannelId && item.Type == ChannelTypeEnum.TriggerStart.ToString()).IsActive = true;
-                            EventChannelsStop.Remove(EventChannelsStop.First(x => x.ChannelId == item.ChannelId));
+                            if (EventChannelsStop.FirstOrDefault(x => x.ChannelId == item.ChannelId) is var chnn)
+                            {
+                                if (chnn != null)
+                                {
+                                    EventChannelsStop.Remove(chnn);
+                                }
+                            }
                         }
                         if (item.Type == ChannelTypeEnum.TriggerStop.ToString())
                         {
                             //view.stop_trigger.SelectedIndex = item.ChannelId;
                             EventChannelsStop.FirstOrDefault(x => x.ChannelId == item.ChannelId && item.Type == ChannelTypeEnum.TriggerStop.ToString()).IsActive = true;
-                            EventChannelsStart.Remove(EventChannelsStart.First(x => x.ChannelId == item.ChannelId));
+                            if (EventChannelsStart.FirstOrDefault(x => x.ChannelId == item.ChannelId) is var chnn)
+                            {
+                                if (chnn != null)
+                                {
+                                    EventChannelsStart.Remove(chnn);
+                                }
+                            }
                         }
                     }
                     //不能合并上下两个for循环的原因
@@ -253,7 +265,7 @@ namespace InperStudio.ViewModels
                                     {
                                         if (EventChannelsStop.FirstOrDefault(f => f.ChannelId != jsonb.ChannelId) is var chan)
                                         {
-                                            view.stop_trigger.SelectedValue= chan;
+                                            view.stop_trigger.SelectedValue = chan;
                                         }
                                         else
                                         {
@@ -261,13 +273,13 @@ namespace InperStudio.ViewModels
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    if (EventChannelsStop.FirstOrDefault(f => f.ChannelId != comb.ChannelId) is var chan)
-                                    {
-                                        view.stop_trigger.SelectedValue = chan;
-                                    }
-                                }
+                                //else
+                                //{
+                                //    if (EventChannelsStop.FirstOrDefault(f => f.ChannelId != comb.ChannelId) is var chan)
+                                //    {
+                                //        view.stop_trigger.SelectedValue = chan;
+                                //    }
+                                //}
                                 //if ((bool)view.triggerRad.IsChecked)
                                 //{
                                 //    EventChannelsStop.Remove(json);
@@ -499,6 +511,7 @@ namespace InperStudio.ViewModels
                     {
                         InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.Type == ChannelTypeEnum.TriggerStop.ToString());
                     }
+
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStart);
                     InperJsonHelper.SetAdditionRecodConditions(additionRecordStop, "stop");
                     InperJsonHelper.SetEventSettings(InperGlobalClass.EventSettings);
@@ -593,6 +606,7 @@ namespace InperStudio.ViewModels
                     selectCameraItem.Reset(selectCameraItem.CapabilyItems[index]);
                     view.framrate.SelectedIndex = index;
                 }
+                view.CameraName.Text = "Video-" + (UsedKits.Count + 1);
 
                 //清除并重新渲染zone
                 ClearZone();
@@ -691,7 +705,12 @@ namespace InperStudio.ViewModels
                     {
                         if (Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.Title.Equals(camera_active.CustomName)) != null)
                         {
-                            InperGlobalClass.ShowReminderInfo("The camera is running!");
+                            string text = "相机正在运行中！";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "The camera is running!";
+                            }
+                            InperGlobalClass.ShowReminderInfo(text);
                             return;
                         }
                         //对应zone取消激活
@@ -718,7 +737,12 @@ namespace InperStudio.ViewModels
                         }
                         if (UsedKits.Count(x => x.CustomName == camera.CustomName) > 0)
                         {
-                            Growl.Warning(new GrowlInfo() { Message = "This name already exists!", Token = "SuccessMsg", WaitTime = 1 });
+                            string text = "名称已存在！";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "This name already exists!";
+                            }
+                            Growl.Warning(new GrowlInfo() { Message = text, Token = "SuccessMsg", WaitTime = 1 });
                             return;
                         }
                         //对应zone激活
@@ -742,7 +766,7 @@ namespace InperStudio.ViewModels
                         camera.Stop();
                         //view.PopButton.Background = MarkerChannels.First().BgColor;
                         view.CameraCombox.SelectedIndex = 0;
-                        view.CameraName.Text = "Video-";
+                        //view.CameraName.Text = "Video-";
 
                     }
                 }

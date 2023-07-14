@@ -590,6 +590,7 @@
     <Resource Include="Lib\Images\InperSignal.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Lib\Images\New\fileopen.png" />
     <Resource Include="Lib\Images\New\refresh.png" />
     <Resource Include="Lib\Images\New\tg_close.png" />
     <Resource Include="Lib\Images\New\tg_open.png" />

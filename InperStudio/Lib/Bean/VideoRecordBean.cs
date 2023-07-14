@@ -124,19 +124,27 @@ namespace InperStudio.Lib.Bean
                 {
                     await Task.Run(() =>
                     {
-                        var tracking = InperTrackingDnnHelper.Detect(mat);
+                        //var tracking = InperTrackingDnnHelper.Detect(mat);
+                        var tracking = InperTrackingHelper.DetectNo(mat);
 
-                        if (tracking.Count > 0)
+                        //if (tracking.Count > 0)
+                        //{
+                        //    for (var i = 0; i < tracking.Count; i++)
+                        //    {
+                        //        if (InperGlobalClass.IsRecord)
+                        //        {
+                        //            trackingsQueue.Enqueue(tracking[i]);
+                        //        }
+                        //        _DrawTracking = tracking[i];
+                        //    }
+                        //}
+
+                        if (InperGlobalClass.IsRecord)
                         {
-                            for (var i = 0; i < tracking.Count; i++)
-                            {
-                                if (InperGlobalClass.IsRecord)
-                                {
-                                    trackingsQueue.Enqueue(tracking[i]);
-                                }
-                                _DrawTracking = tracking[i];
-                            }
+                            trackingsQueue.Enqueue(tracking);
                         }
+                        _DrawTracking = tracking;
+
                         Interlocked.Exchange(ref _trackingLock, 0);
                     });
                 }
@@ -182,21 +190,22 @@ namespace InperStudio.Lib.Bean
             {
                 if (trackingsQueue.TryDequeue(out Tracking tracking))
                 {
-
-                    TrackingToMarker(tracking);
-
-                    trackingsToInsert.Add(tracking);
-
-                    if (trackingsToInsert.Count >= batchSize)
+                    if (tracking != null)
                     {
-                        await Task.Run(() =>
+                        TrackingToMarker(tracking);
+                        trackingsToInsert.Add(tracking);
+                        if (trackingsToInsert.Count >= batchSize)
                         {
-                            // 执行批量插入操作
-                            App.SqlDataInit.sqlSugar.Insertable(trackingsToInsert).ExecuteCommand();
-                        });
+                            await Task.Run(() =>
+                            {
+                                // 执行批量插入操作
+                                App.SqlDataInit.sqlSugar.Insertable(trackingsToInsert).ExecuteCommand();
+                            });
 
-                        trackingsToInsert.Clear();
+                            trackingsToInsert.Clear();
+                        }
                     }
+
                 }
                 else
                 {
@@ -366,11 +375,11 @@ namespace InperStudio.Lib.Bean
             }
             return false;
         }
-        public void Reset(AccordResolutionInfo resolutionInfo)
+        public async void Reset(AccordResolutionInfo resolutionInfo)
         {
             try
             {
-                accordCamraSetting.Stop();
+                await accordCamraSetting.Stop();
                 var resol = accordCamraSetting.VideoCapabilities.FirstOrDefault(x => x.FrameSize == resolutionInfo.FrameSize);
                 accordCamraSetting.SetResoulation(resol);
                 accordCamraSetting.Start();
@@ -384,18 +393,18 @@ namespace InperStudio.Lib.Bean
         {
             accordCamraSetting.Start();
         }
-        public void StartRecording(string path = null)
+        public async void StartRecording(string path = null)
         {
-            accordCamraSetting.Stop();
+            await accordCamraSetting.Stop();
             accordCamraSetting.SetWritePath(path);
             accordCamraSetting.Start();
             accordCamraSetting.IsRecord = true;
 
             StartTracking();
         }
-        public void Stop()
+        public async void Stop()
         {
-            accordCamraSetting.Stop();
+            await accordCamraSetting.Stop();
             accordCamraSetting.IsRecord = false;
             StopTracking();
         }

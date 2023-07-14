@@ -9,6 +9,7 @@ using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Control.TextBox;
 using InperStudioControlLib.Lib.Config;
+using MathNet.Numerics.Distributions;
 using SciChart.Core.Extensions;
 using Stylet;
 using System;
@@ -158,7 +159,7 @@ namespace InperStudio.ViewModels
                 //if (@enum == SignalPropertiesTypeEnum.Camera)
                 if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.Type == ChannelTypeEnum.Camera.ToString() && x.ChannelId == currentId) is var chn)
                 {
-                    chn?.LightModes.ForEach(l =>
+                    chn?.LightModes.OrderBy(m => m.LightType).ToList().ForEach(l =>
                     {
                         Light light = new Light()
                         {
@@ -1170,7 +1171,7 @@ namespace InperStudio.ViewModels
                         {
                             channel.LightModes.ForEach(x =>
                             {
-                                InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
+                                InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType] = new System.Collections.Concurrent.ConcurrentQueue<double>();
                             });
                         }
                     }
@@ -1200,7 +1201,7 @@ namespace InperStudio.ViewModels
                             {
                                 channel.LightModes.ForEach(x =>
                                 {
-                                    InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType].Clear();
+                                    InperDeviceHelper.Instance.FilterData[channel.ChannelId][x.LightType] = new System.Collections.Concurrent.ConcurrentQueue<double>();
                                 });
                             }
                         }
@@ -1412,6 +1413,15 @@ namespace InperStudio.ViewModels
             {
                 var cb = sender as CheckBox;
                 if (!cb.IsFocused) return;
+                if (InperGlobalClass.IsStop)
+                {
+                    string text = "检测到软件处于非运行状态,请在preview状态下点击刷新按钮生效该功能。";
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "If the software is detected to be in a non-running state, please click the refresh button in the preview state to take effect.";
+                    }
+                    InperGlobalClass.ShowReminderInfo(text, 5);
+                }
                 //// 清空内部字典中的队列
                 //foreach (var outerKeyValuePair in InperDeviceHelper.Instance.OffsetData)
                 //{
@@ -1452,7 +1462,7 @@ namespace InperStudio.ViewModels
                 //        }
                 //    }));
                 //});
-
+                OffsetValue_Refresh();
             }
             catch (Exception ex)
             {
@@ -1481,6 +1491,18 @@ namespace InperStudio.ViewModels
                         if (chn.ChannelId == item.ChannelId)
                         {
                             chn.Offset = false;
+                            //chn.
+                        }
+                    }));
+                });
+                _ = Parallel.ForEach(Lights, l =>
+                {
+                    view.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        if (l.ChannelId == item.ChannelId)
+                        {
+                            l.OffsetValue = 0.ToString();
+                            //chn.
                         }
                     }));
                 });

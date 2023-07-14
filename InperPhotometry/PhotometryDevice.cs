@@ -177,6 +177,10 @@ namespace InperDeviceManagement
         {
             _CS.SetSweepState(state);
         }
+        public void SetStimulusTrigger(byte state, int ioid, byte mode)
+        {
+            _CS.SetStimulusTrigger(state, ioid, mode);
+        }
         public void SetCHNSweep(List<byte> datas)
         {
             _CS.SetCHNSweep(datas);

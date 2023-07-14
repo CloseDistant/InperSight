@@ -120,8 +120,8 @@
     <sys:String x:Key="marker_color">Color</sys:String>
     <sys:String x:Key="marker_active_channels">Active Channels</sys:String>
     <sys:String x:Key="marker_hotkeys">Hotkeys</sys:String>
-    <sys:String x:Key="marker_windowsize">WindowSize(point)</sys:String>
-    <sys:String x:Key="marker_rp">RP (s)</sys:String>
+    <sys:String x:Key="marker_windowsize">Window size (point)</sys:String>
+    <sys:String x:Key="marker_rp">Refractory period (s)</sys:String>
     
     <!--stimulus-->
     <sys:String x:Key="stimulus_title">Stimulus</sys:String>
@@ -138,6 +138,11 @@
     <sys:String x:Key="stimulus_time">hh:mm:ss</sys:String>
     <sys:String x:Key="stimulus_use">Active</sys:String>
     <sys:String x:Key="stimulus_nouse">Inactive</sys:String>
+    <sys:String x:Key="stimulus_triggerstart">Trigger</sys:String>
+    <sys:String x:Key="stimulus_triggermode">Mode</sys:String>
+    <sys:String x:Key="stimulus_triggeredge">Edge</sys:String>
+    <sys:String x:Key="stimulus_triggerrealtime">Realtime</sys:String>
+    
     <!--add sweep-->
     <sys:String x:Key="addSweep_title">Add Sweep</sys:String>
     <sys:String x:Key="addSweep_sweep_setting">Sweep Setting</sys:String>
@@ -195,4 +200,7 @@
     <sys:String x:Key="properties_duplicate">Duplicate</sys:String>
     <sys:String x:Key="properties_offsetvalue">Value</sys:String>
     <sys:String x:Key="properties_refresh">Refresh</sys:String>
+
+    <!--心跳精灵-->
+    <sys:String x:Key="heartbeat_hidden">Hidden</sys:String>
 </ResourceDictionary>

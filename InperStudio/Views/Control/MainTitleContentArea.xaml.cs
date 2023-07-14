@@ -100,7 +100,7 @@ namespace InperStudio.Views.Control
                     if (InperGlobalClass.StimulusSettings.Sweeps.Count > 0)
                     {
                         StimulusBeans.Instance.Sweeps.Clear();
-                        InperGlobalClass.StimulusSettings.Sweeps.ToList().ForEach(x => StimulusBeans.Instance.Sweeps.Add(x));
+                        InperGlobalClass.StimulusSettings.Sweeps.OrderByDescending(x => x.IsChecked).ToList().ForEach(x => StimulusBeans.Instance.Sweeps.Add(x));
                     }
                     if (InperGlobalClass.StimulusSettings.WaveForms.Count > 0)
                     {

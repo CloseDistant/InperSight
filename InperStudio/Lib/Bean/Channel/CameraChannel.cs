@@ -92,8 +92,8 @@ namespace InperStudio.Lib.Bean.Channel
         public bool IsNotch { get; set; }
         public double Notch { get; set; }
         public bool IsBandpass { get; set; }
-        public double Bandpass1 { get; set; } = 0;
-        public double Bandpass2 { get; set; } = 0;
+        public double Bandpass1 { get; set; } = 0.003;
+        public double Bandpass2 { get; set; } = 2;
         public bool IsBandstop { get; set; }
         public double Bandstop1 { get; set; } = 0;
         public double Bandstop2 { get; set; } = 0;

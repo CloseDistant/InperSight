@@ -249,6 +249,13 @@ namespace InperProtocolStack
             _TC.Transmit(cmd);
             return;
         }
+        public void SetStimulusTrigger(byte state, int ioid, byte mode)
+        {
+            CmdSetStimulusTrigger cmd = new CmdSetStimulusTrigger();
+            cmd.SetCmdParam(state, ioid, mode);
+            _TC.Transmit(cmd);
+            return;
+        }
         public void SetCHNSweep(List<byte> datas)
         {
             CmdSetCHNSweep cmd = new CmdSetCHNSweep();
