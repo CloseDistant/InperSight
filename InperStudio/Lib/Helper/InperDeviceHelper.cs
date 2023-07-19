@@ -166,6 +166,8 @@ namespace InperStudio.Lib.Helper
                             }
                         }
                     });
+                    //这个要注释
+                    //LightWaveLength.Add(new WaveGroup() { GroupId = 2, WaveType = "561 nm" });
                 }
             };
             device.SyncDeviceInfo();
@@ -484,12 +486,12 @@ namespace InperStudio.Lib.Helper
         private int[] _cameraSkipCountArray = new int[4];
         private int _cameraSkipCount = 0;
         public int _FrameProcLock = 0;
-        private ConcurrentDictionary<int, double[]> _defectValues;
+        //private ConcurrentDictionary<int, double[]> _defectValues;
         public async void FrameProc()
         {
             while (!_frameProcTaskTokenSource.Token.IsCancellationRequested)
             {
-                if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
+                //if (Interlocked.Exchange(ref _FrameProcLock, 1) == 0)
                 {
                     _MatQ.TryDequeue(out MarkedMat m);
                     if (m != null)
@@ -581,7 +583,7 @@ namespace InperStudio.Lib.Helper
                     {
                         await Task.Delay(1);
                     }
-                    _ = Interlocked.Exchange(ref _FrameProcLock, 0);
+                    //_ = Interlocked.Exchange(ref _FrameProcLock, 0);
                 }
                 //if (!_MatQ.IsEmpty)
                 //{
@@ -874,27 +876,27 @@ namespace InperStudio.Lib.Helper
                             _ = queue.TryDequeue(out _);
                             val = queue.Average();
 
-                            //double stdDev = Math.Sqrt(queue.Sum(x => Math.Pow(x - val, 2)) / (queue.Count - 1));
-                            //double _values = 0;
-                            //bool isExistOutlier = false;
-                            //foreach (double value in queue)
-                            //{
-                            //    if (Math.Abs(value - val) > 3 * stdDev)
-                            //    {
-                            //        //Console.WriteLine($"Found an outlier: {value}");
-                            //        App.Log.Error($"Found an outlier: {value}");
-                            //        _values += val;
-                            //        isExistOutlier = true;
-                            //    }
-                            //    else
-                            //    {
-                            //        _values += value;
-                            //    }
-                            //}
-                            //if (isExistOutlier)
-                            //{
-                            //    val = _values / queue.Count;
-                            //}
+                            double stdDev = Math.Sqrt(queue.Sum(x => Math.Pow(x - val, 2)) / (queue.Count - 1));
+                            double _values = 0;
+                            bool isExistOutlier = false;
+                            foreach (double value in queue)
+                            {
+                                if (Math.Abs(value - val) > 3 * stdDev)
+                                {
+                                    //Console.WriteLine($"Found an outlier: {value}");
+                                    //App.Log.Error($"Found an outlier: {value}");
+                                    _values += val;
+                                    isExistOutlier = true;
+                                }
+                                else
+                                {
+                                    _values += value;
+                                }
+                            }
+                            if (isExistOutlier)
+                            {
+                                val = _values / queue.Count;
+                            }
                         }
                     }
                 }
@@ -1524,7 +1526,7 @@ namespace InperStudio.Lib.Helper
                     _Metronome.Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                     _Metronome.Start();
                 }
-                _defectValues = new ConcurrentDictionary<int, double[]>();
+                //_defectValues = new ConcurrentDictionary<int, double[]>();
                 _eventIsFirst = true; isFirstRecordTiem = true; isLoop = true;
                 _updateTaskTokenSource = new CancellationTokenSource();
                 _frameProcTaskTokenSource = new CancellationTokenSource();

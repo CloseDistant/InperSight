@@ -168,7 +168,7 @@ namespace InperStudio.ViewModels
 
                     foreach (KeyValuePair<string, uint> item in InperDeviceHelper.Instance.device.DeviceIOIDs)
                     {
-                        if (item.Value != StimulusBeans.Instance.DioID && item.Value != StimulusBeans.Instance.TriggerId)
+                        if ((item.Value != StimulusBeans.Instance.DioID || !StimulusBeans.Instance.IsConfigSweep) && (item.Value != StimulusBeans.Instance.TriggerId || !InperGlobalClass.StimulusSettings.IsTrigger))
                         {
                             if (!EventChannelsStart.Any(x => x.ChannelId == item.Value))
                             {

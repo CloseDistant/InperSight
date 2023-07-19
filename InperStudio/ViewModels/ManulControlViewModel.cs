@@ -7,6 +7,7 @@ using InperStudio.Views;
 using InperStudio.Views.Control;
 using Stylet;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -421,6 +422,7 @@ namespace InperStudio.ViewModels
 
                     isrecord = false;
                 }
+                InperDeviceHelper.Instance.AllLightClose();
 
                 if (Directory.GetDirectories(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0 || Directory.GetFiles(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName)).Length > 0)
                 {
@@ -430,8 +432,6 @@ namespace InperStudio.ViewModels
                         _ = Directory.CreateDirectory(Path.Combine(InperGlobalClass.DataPath, InperGlobalClass.DataFolderName));
                     }
                 }
-
-                InperDeviceHelper.Instance.AllLightClose();
                 //System.Windows.MessageBox.Show("收到点数：" + InperDeviceHelper.Instance.count + "存储收到点数：" + InperDeviceHelper.Instance.count1 + "记录时长：" + seconds);
             }
             catch (Exception ex)

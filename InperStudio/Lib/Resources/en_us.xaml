@@ -200,6 +200,7 @@
     <sys:String x:Key="properties_duplicate">Duplicate</sys:String>
     <sys:String x:Key="properties_offsetvalue">Value</sys:String>
     <sys:String x:Key="properties_refresh">Refresh</sys:String>
+    <sys:String x:Key="properties_refresh_remainder">Please refresh at the Preview mode</sys:String>
 
     <!--心跳精灵-->
     <sys:String x:Key="heartbeat_hidden">Hidden</sys:String>

@@ -535,7 +535,10 @@ namespace InperStudio.ViewModels
                         _ = EllipseBorder.Remove(moveGrid);
 
                         CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
-                        _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
+                        //lock (InperDeviceHelper.Instance._FrameProcLock)
+                        {
+                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
+                        }
                         //InperDeviceHelper.Instance._LoopCannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance._LoopCannels.Where(x => x.ChannelId != item.ChannelId));
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Camera.ToString());
                         if (channel != null)
@@ -681,7 +684,10 @@ namespace InperStudio.ViewModels
                         }
                     });
                 }
-                InperDeviceHelper.Instance.CameraChannels.Add(item);
+                //lock (InperDeviceHelper.Instance._FrameProcLock)
+                {
+                    InperDeviceHelper.Instance.CameraChannels.Add(item);
+                }
                 //InperDeviceHelper.Instance._LoopCannels.Add(item);
                 Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
 
@@ -724,7 +730,7 @@ namespace InperStudio.ViewModels
                 Mat m = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
                 SetMat(m, grid);
             }
-            
+
             SetDefaultCircle(grid);
 
             return grid;
@@ -1467,7 +1473,10 @@ namespace InperStudio.ViewModels
                         CameraChannel cameraChannel = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
                         if (cameraChannel != null)
                         {
-                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(cameraChannel);
+                            //lock (InperDeviceHelper.Instance._FrameProcLock)
+                            {
+                                _ = InperDeviceHelper.Instance.CameraChannels.Remove(cameraChannel);
+                            }
                             InperDeviceHelper.Instance.aiChannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance.aiChannels.Where(x => x.ChannelId != cameraChannel.ChannelId));
                             InperDeviceHelper.Instance.AiSettingFunc(cameraChannel.ChannelId, 0);
                             InperDeviceHelper.Instance._adPreTime.Remove(cameraChannel.ChannelId);
@@ -1515,8 +1524,10 @@ namespace InperStudio.ViewModels
 
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = ch.BgColor.Color, YAxisId = "Ch0" };
                         item.RenderableSeries.Add(line);
-
-                        InperDeviceHelper.Instance.CameraChannels.Add(item);
+                        //lock (InperDeviceHelper.Instance._FrameProcLock)
+                        {
+                            InperDeviceHelper.Instance.CameraChannels.Add(item);
+                        }
                         InperDeviceHelper.Instance.aiChannels.Add(item);
                         if (!InperDeviceHelper.Instance._adPreTime.ContainsKey(item.ChannelId))
                         {

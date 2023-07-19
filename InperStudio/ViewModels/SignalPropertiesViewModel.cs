@@ -14,12 +14,14 @@ using SciChart.Core.Extensions;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace InperStudio.ViewModels
 {
@@ -1413,15 +1415,7 @@ namespace InperStudio.ViewModels
             {
                 var cb = sender as CheckBox;
                 if (!cb.IsFocused) return;
-                if (InperGlobalClass.IsStop)
-                {
-                    string text = "检测到软件处于非运行状态,请在preview状态下点击刷新按钮生效该功能。";
-                    if (InperConfig.Instance.Language == "en_us")
-                    {
-                        text = "If the software is detected to be in a non-running state, please click the refresh button in the preview state to take effect.";
-                    }
-                    InperGlobalClass.ShowReminderInfo(text, 5);
-                }
+
                 //// 清空内部字典中的队列
                 //foreach (var outerKeyValuePair in InperDeviceHelper.Instance.OffsetData)
                 //{
@@ -1527,6 +1521,23 @@ namespace InperStudio.ViewModels
             try
             {
                 var item = this.view.selectChannel.SelectedItem as Channel;
+                if (InperGlobalClass.IsStop)
+                {
+                    view.refresh_remainder.Visibility = Visibility.Visible;
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    Task.Run(async () =>
+                    {
+                        while (stopwatch.Elapsed.TotalSeconds < 2)
+                        {
+                            await Task.Delay(10);
+                        }
+                        stopwatch.Stop();
+                        this.view.Dispatcher.Invoke(() =>
+                        {
+                            view.refresh_remainder.Visibility = Visibility.Collapsed;
+                        });
+                    });
+                }
 
                 if (InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId) is var chn)
                 {

@@ -1,4 +1,5 @@
-﻿using InperProtocolStack.CmdPhotometry;
+﻿using Accord.Diagnostics;
+using InperProtocolStack.CmdPhotometry;
 using InperStudio.Lib.Bean;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Bean.Stimulus;
@@ -71,8 +72,11 @@ namespace InperStudio.ViewModels
             view.isUse.Unchecked += (s, e) =>
             {
                 StimulusBeans.Instance.IsConfigSweep = false;
-                StimulusBeans.Instance.DioID = -1;
-                StimulusBeans.Instance.TriggerId = -1;
+                //if (StimulusBeans.Instance.Sweeps.Count(x => x.IsChecked) == 0)
+                //{
+                //    StimulusBeans.Instance.DioID = -1;
+                //}
+                //StimulusBeans.Instance.TriggerId = -1;
                 InperDeviceHelper.Instance.device.SetSweepState(0);
                 InperDeviceHelper.Instance.device.SetStimulusTrigger(0, 0, 0);
             };
@@ -84,16 +88,26 @@ namespace InperStudio.ViewModels
             };
             view._triggerToggle.Checked += (s, e) =>
             {
-                var item = view._triggerMode.SelectedItem as ComboBoxItem;
-                if (item.Content.ToString() == "Edge" || item.Content.ToString() == "边沿")
+                try
                 {
-                    view.edge.Visibility = Visibility.Visible;
-                    view.realtime.Visibility = Visibility.Collapsed;
+                    var item = view._triggerMode.SelectedItem as ComboBoxItem;
+                    if (item != null)
+                    {
+                        if (item.Content.ToString() == "Edge" || item.Content.ToString() == "边沿")
+                        {
+                            view.edge.Visibility = Visibility.Visible;
+                            view.realtime.Visibility = Visibility.Collapsed;
+                        }
+                        else
+                        {
+                            view.edge.Visibility = Visibility.Collapsed;
+                            view.realtime.Visibility = Visibility.Visible;
+                        }
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    view.edge.Visibility = Visibility.Collapsed;
-                    view.realtime.Visibility = Visibility.Visible;
+                    Console.WriteLine(ex.ToString());
                 }
             };
             view.isUse.Checked += (s, e) =>
@@ -109,61 +123,68 @@ namespace InperStudio.ViewModels
             };
             view.ConfirmClickEvent += (s, e) =>
             {
-                if (InperGlobalClass.IsRecord)
+                try
                 {
-                    this.RequestClose();
-                    e.Handled = true;
-                    return;
-                }
-                StimulusBeans.Instance.TriggerMode = view._triggerMode.SelectedIndex;
-                StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
-                StimulusBeans.Instance.IsActiveStimulus = (bool)view.isUse.IsChecked;
-                //zzz
-                if (view.dio.SelectedValue != null && (bool)view.isUse.IsChecked)
-                {
-                    StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
-                }
-                //if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
-                {
-                    #region stimulus 设置下发
-                    if ((bool)view.isUse.IsChecked)
+                    if (InperGlobalClass.IsRecord)
                     {
-                        if (StimulusBeans.Instance.DioID == -1)
+                        this.RequestClose();
+                        e.Handled = true;
+                        return;
+                    }
+                    StimulusBeans.Instance.TriggerMode = view._triggerMode.SelectedIndex;
+                    StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
+                    StimulusBeans.Instance.IsActiveStimulus = (bool)view.isUse.IsChecked;
+                    //zzz
+                    if (view.dio.SelectedValue != null && (bool)view.isUse.IsChecked)
+                    {
+                        StimulusBeans.Instance.DioID = (view.dio.SelectedValue as EventChannel).ChannelId;
+                    }
+                    //if (InperGlobalClass.IsStop || InperGlobalClass.IsPreview)
+                    {
+                        #region stimulus 设置下发
+                        if ((bool)view.isUse.IsChecked)
                         {
-                            string text = "无效的DIO";
-                            if (InperConfig.Instance.Language == "en_us")
+                            if (StimulusBeans.Instance.DioID == -1)
                             {
-                                text = "No available DIO";
+                                string text = "无效的DIO";
+                                if (InperConfig.Instance.Language == "en_us")
+                                {
+                                    text = "No available DIO";
+                                }
+                                InperGlobalClass.ShowReminderInfo(text);
+                                return;
                             }
-                            InperGlobalClass.ShowReminderInfo(text);
-                            return;
-                        }
-                        StimulusBeans.Instance.StimulusCommandSend();
-                        if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.TriggerId = -1; StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
+                            StimulusBeans.Instance.StimulusCommandSend();
+                            if (selectSweeps.Count == 0) { InperDeviceHelper.Instance.device.SetSweepState(0); StimulusBeans.Instance.TriggerId = -1; StimulusBeans.Instance.DioID = -1; StimulusBeans.Instance.IsConfigSweep = false; }
 
-                        if (StimulusBeans.Instance.IsTrigger)
+                            if (StimulusBeans.Instance.IsTrigger)
+                            {
+                                InperDeviceHelper.Instance.device.SetStimulusTrigger(1, StimulusBeans.Instance.TriggerId, (byte)StimulusBeans.Instance.TriggerMode);
+                            }
+
+                        }
+
+                        InperGlobalClass.StimulusSettings.IsConfigSweep = StimulusBeans.Instance.IsConfigSweep;
+                        InperGlobalClass.StimulusSettings.IsActiveStimulus = StimulusBeans.Instance.IsActiveStimulus;
+                        InperGlobalClass.StimulusSettings.DioID = StimulusBeans.Instance.DioID;
+                        InperGlobalClass.StimulusSettings.Hour = StimulusBeans.Instance.Hour;
+                        InperGlobalClass.StimulusSettings.Minute = StimulusBeans.Instance.Minute;
+                        InperGlobalClass.StimulusSettings.Seconds = StimulusBeans.Instance.Seconds;
+                        InperGlobalClass.StimulusSettings.IsTrigger = StimulusBeans.Instance.IsTrigger;
+                        if (InperGlobalClass.StimulusSettings.IsTrigger)
                         {
-                            InperDeviceHelper.Instance.device.SetStimulusTrigger(1, StimulusBeans.Instance.TriggerId, (byte)StimulusBeans.Instance.TriggerMode);
+                            InperGlobalClass.StimulusSettings.TriggerId = StimulusBeans.Instance.TriggerId;
+                            InperGlobalClass.StimulusSettings.TriggerMode = StimulusBeans.Instance.TriggerMode;
                         }
-
+                        InperJsonHelper.SetStimulusSettings(InperGlobalClass.StimulusSettings);
+                        #endregion
                     }
-
-                    InperGlobalClass.StimulusSettings.IsConfigSweep = StimulusBeans.Instance.IsConfigSweep;
-                    InperGlobalClass.StimulusSettings.IsActiveStimulus = StimulusBeans.Instance.IsActiveStimulus;
-                    InperGlobalClass.StimulusSettings.DioID = StimulusBeans.Instance.DioID;
-                    InperGlobalClass.StimulusSettings.Hour = StimulusBeans.Instance.Hour;
-                    InperGlobalClass.StimulusSettings.Minute = StimulusBeans.Instance.Minute;
-                    InperGlobalClass.StimulusSettings.Seconds = StimulusBeans.Instance.Seconds;
-                    InperGlobalClass.StimulusSettings.IsTrigger = StimulusBeans.Instance.IsTrigger;
-                    if (InperGlobalClass.StimulusSettings.IsTrigger)
-                    {
-                        InperGlobalClass.StimulusSettings.TriggerId = StimulusBeans.Instance.TriggerId;
-                        InperGlobalClass.StimulusSettings.TriggerMode = StimulusBeans.Instance.TriggerMode;
-                    }
-                    InperJsonHelper.SetStimulusSettings(InperGlobalClass.StimulusSettings);
-                    #endregion
+                    this.RequestClose();
                 }
-                this.RequestClose();
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{ex.Message}");
+                }
             };
 
 
@@ -229,7 +250,7 @@ namespace InperStudio.ViewModels
                     }
                     catch (Exception ex)
                     {
-
+                        Console.WriteLine(ex.ToString());
                     }
                 };
                 if (view._triggerdio.SelectedItem != null)
@@ -238,19 +259,26 @@ namespace InperStudio.ViewModels
                 }
                 view._triggerMode.SelectionChanged += (s, e) =>
                 {
-                    if ((bool)view._triggerToggle.IsChecked)
+                    try
                     {
-                        var item = (s as ComboBox).SelectedItem as ComboBoxItem;
-                        if (item.Content.ToString() == "Edge" || item.Content.ToString() == "边沿")
+                        if ((bool)view._triggerToggle.IsChecked)
                         {
-                            view.edge.Visibility = Visibility.Visible;
-                            view.realtime.Visibility = Visibility.Collapsed;
+                            var item = (s as ComboBox).SelectedItem as ComboBoxItem;
+                            if (item.Content.ToString() == "Edge" || item.Content.ToString() == "边沿")
+                            {
+                                view.edge.Visibility = Visibility.Visible;
+                                view.realtime.Visibility = Visibility.Collapsed;
+                            }
+                            else
+                            {
+                                view.edge.Visibility = Visibility.Collapsed;
+                                view.realtime.Visibility = Visibility.Visible;
+                            }
                         }
-                        else
-                        {
-                            view.edge.Visibility = Visibility.Collapsed;
-                            view.realtime.Visibility = Visibility.Visible;
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
                     }
                 };
             }

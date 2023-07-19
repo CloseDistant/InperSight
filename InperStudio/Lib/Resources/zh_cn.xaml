@@ -199,6 +199,7 @@
     <sys:String x:Key="properties_duplicate">重复</sys:String>
     <sys:String x:Key="properties_offsetvalue">偏移量</sys:String>
     <sys:String x:Key="properties_refresh">刷新</sys:String>
+    <sys:String x:Key="properties_refresh_remainder">请在预览模式下进行刷新</sys:String>
     
     <!--心跳精灵-->
     <sys:String x:Key="heartbeat_hidden">隐藏</sys:String>

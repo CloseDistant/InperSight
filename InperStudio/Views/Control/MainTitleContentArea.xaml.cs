@@ -84,6 +84,7 @@ namespace InperStudio.Views.Control
                     InperGlobalClass.IsDisplayNote = note;
                     bool.TryParse(InperJsonHelper.GetDisplaySetting("sprit"), out bool sprit);
                     InperGlobalClass.IsDisplaySprit = sprit;
+                    string oldPath = InperGlobalClass.DataPath;
                     if (!string.IsNullOrEmpty(InperJsonHelper.GetDataPathSetting()))
                     {
                         try
@@ -93,9 +94,24 @@ namespace InperStudio.Views.Control
                         }
                         catch (Exception)
                         {
+                            InperGlobalClass.DataPath = oldPath;
 
+                            string text = "数据将被存储在" + InperGlobalClass.DataPath.Substring(0, 15) + "...";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "The files will be stored at " + InperGlobalClass.DataPath.Substring(0, 15) + "...";
+                            }
+                            InperGlobalClass.ShowReminderInfo(text, 3);
                         }
                     }
+                    InperDeviceHelper.Instance.LightWaveLength.ForEachDo(x => x.IsChecked = false);
+                    InperGlobalClass.CameraSignalSettings.LightMode.ForEach(x =>
+                    {
+                        if (InperDeviceHelper.Instance.LightWaveLength.FirstOrDefault(l => l.GroupId == x.GroupId) is var group)
+                        {
+                            group.IsChecked = true;
+                        }
+                    });
 
                     if (InperGlobalClass.StimulusSettings.Sweeps.Count > 0)
                     {
