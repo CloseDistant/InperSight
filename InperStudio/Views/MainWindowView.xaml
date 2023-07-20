@@ -1,4 +1,4 @@
-﻿<hc:BlurWindow x:Class="InperStudio.Views.MainWindowView"
+﻿<hc:GlowWindow x:Class="InperStudio.Views.MainWindowView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -60,4 +60,4 @@
             <StackPanel  hc:Growl.Token="SuccessMsg" VerticalAlignment="Top" Margin="0,10,10,10"/>
         </ScrollViewer>
     </Grid>
-</hc:BlurWindow>
+</hc:GlowWindow>
