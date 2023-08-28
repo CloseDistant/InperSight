@@ -11,6 +11,7 @@ using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudio.Views.Control;
 using InperStudioControlLib.Lib.Config;
+//using OpenVinoSharp;
 using SciChart.Core.Extensions;
 using Stylet;
 using System;
@@ -19,6 +20,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Caching;
 using System.Windows;
@@ -120,24 +122,27 @@ namespace InperStudio.ViewModels
                     view.video.Visibility = Visibility.Visible;
                     UnusedKits = new ObservableCollection<VideoRecordBean>();
                     #region accord
-                    var devices = new AccordGetCameraDevices().VideoDevices;
-                    if (devices.Count > 0)
+                    if (!InperGlobalClass.IsRecord)
                     {
-                        foreach (var device in devices)
+                        var devices = new AccordGetCameraDevices().VideoDevices;
+                        if (devices.Count > 0)
                         {
-                            if (!device.Name.Contains("Basler"))
+                            foreach (var device in devices)
                             {
-                                VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x.MonikerString == device.MonikerString);
-                                if (it == null)
+                                if (!device.Name.Contains("Basler"))
                                 {
-                                    var item = new VideoRecordBean(device);
-                                    UnusedKits.Add(item);
-                                }
-                                else
-                                {
-                                    if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
+                                    VideoRecordBean it = InperGlobalClass.ActiveVideos.FirstOrDefault(x => x.MonikerString == device.MonikerString);
+                                    if (it == null)
                                     {
-                                        it.IsActive = true;
+                                        var item = new VideoRecordBean(device);
+                                        UnusedKits.Add(item);
+                                    }
+                                    else
+                                    {
+                                        if (!InperGlobalClass.IsPreview || !InperGlobalClass.IsRecord)
+                                        {
+                                            it.IsActive = true;
+                                        }
                                     }
                                 }
                             }
@@ -543,7 +548,8 @@ namespace InperStudio.ViewModels
                                     {
                                         eventChannelJson.VideoZone.AllZoneConditions.Add(new ZoneConditions()
                                         {
-                                            ZoneName = item2.Name + "-" + item2.DisplayName,
+                                            //ZoneName = item2.Name + "-" + item2.DisplayName,
+                                            ZoneName = item2.Name,
                                             ShapeLeft = Canvas.GetLeft(item2.Shape),
                                             ShapeTop = Canvas.GetTop(item2.Shape),
                                             ShapeHeight = item2.Shape.Height,
@@ -568,7 +574,8 @@ namespace InperStudio.ViewModels
                                     };
                                     channel.VideoZone.AllZoneConditions.Add(new ZoneConditions()
                                     {
-                                        ZoneName = item2.Name + "-" + item2.DisplayName,
+                                        ZoneName = item2.Name,
+                                        //ZoneName = item2.Name + "-" + item2.DisplayName,
                                         ShapeLeft = Canvas.GetLeft(item2.Shape),
                                         ShapeTop = Canvas.GetTop(item2.Shape),
                                         ShapeHeight = item2.Shape.Height,
@@ -650,7 +657,7 @@ namespace InperStudio.ViewModels
             {
                 if (view.framrate.SelectedItem != null && selectCameraItem != null)
                 {
-                    selectCameraItem.Reset(view.framrate.SelectedItem as AccordResolutionInfo);
+                    //selectCameraItem.Reset(view.framrate.SelectedItem as AccordResolutionInfo);
                     ClearZone();
                 }
             }
@@ -713,9 +720,19 @@ namespace InperStudio.ViewModels
                             InperGlobalClass.ShowReminderInfo(text);
                             return;
                         }
+                        if (InperGlobalClass.EventSettings.Channels.Count(x => ((x.VideoZone != null && x.VideoZone.Name == camera_active.Name) || (x.Condition != null && x.Condition.VideoZone != null && x.Condition?.VideoZone.Name == camera_active.Name)) && x.IsActive) > 0)
+                        {
+                            string text = "该Video中的Zone已被应用在Marker/Output中，请先在Marker/Output中取消激活对应项再操作。";
+                            if (InperConfig.Instance.Language == "en_us")
+                            {
+                                text = "Zones of this video have been occupied, please deactivate it at the Marker/Output panel.";
+                            }
+                            InperGlobalClass.ShowReminderInfo(text);
+                            return;
+                        }
                         //对应zone取消激活
                         zoneVideos.Clear();
-
+                        InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.VideoZone?.Name == camera_active.Name);
                         camera_active.IsActive = false;
                         //camera_active.StartCapture();
                         _ = UsedKits.Remove(camera_active);
@@ -723,6 +740,10 @@ namespace InperStudio.ViewModels
                         if (UnusedKits.Count <= 1)
                         {
                             view.CameraCombox.SelectedIndex = 0;
+                        }
+                        if (InperGlobalClass.EventSettings.Channels.Count(x => x.VideoZone.Name == camera_active.Name) > 0)
+                        {
+                            InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.VideoZone.Name == camera_active.Name);
                         }
                     }
                 }
@@ -759,6 +780,10 @@ namespace InperStudio.ViewModels
                                 }
                             });
                         }
+                        else
+                        {
+                            camera.IsTracking = false;
+                        }
 
                         camera.AutoRecord = true; camera.IsActive = true;
                         _ = UnusedKits.Remove(camera);
@@ -776,11 +801,11 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
-        public void CameraName_TextChanged(object sender, TextChangedEventArgs e)
+        public void CameraName_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             try
             {
-                HandyControl.Controls.TextBox tb = sender as HandyControl.Controls.TextBox;
+                System.Windows.Controls.TextBox tb = sender as System.Windows.Controls.TextBox;
                 if (tb.Text.Length < 6 || !tb.Text.StartsWith("Video-"))
                 {
                     tb.Text = "Video-";
@@ -800,12 +825,22 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
-
+        public void Animal_tracking_Unchecked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            try
+            {
+                this.view.drawAreaCanvas.Children.Clear();
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
         #region zone
-        private Shape currentDashShape = null;
-        private Shape currentShape = null;
-        private Shape mouseDownShape = null;
-        private List<Shape> drawShapes = new List<Shape>();
+        private FrameworkElement currentDashShape = null;
+        private FrameworkElement currentShape = null;
+        private FrameworkElement mouseDownShape = null;
+        private List<FrameworkElement> drawShapes = new List<FrameworkElement>();
         private bool isAddShape = false;
         private Point startPoint;
         private Point appauatusPoint;
@@ -814,7 +849,7 @@ namespace InperStudio.ViewModels
             currentDashShape = null;
             currentShape = null;
             mouseDownShape = null;
-            drawShapes = new List<Shape>();
+            drawShapes = new List<FrameworkElement>();
             isAddShape = false;
             startPoint = new Point();
             appauatusPoint = new Point();
@@ -832,7 +867,7 @@ namespace InperStudio.ViewModels
             {
                 isAddShape = true;
                 startPoint = e.GetPosition(sender as Canvas);
-                if (_shapeDashEnum != ShapeDashEnum.None && currentDashShape == null)//如果选中了Apparatus 去画Apparatus
+                if (_shapeDashEnum != ShapeDashEnum.None && currentDashShape == null)//如果选中了Apparatus 去画Apparatus   第一版需求设计 选中识别区域  现在已弃用
                 {
                     appauatusPoint = startPoint;
                     if (drawShapes.Count == 0)
@@ -862,7 +897,7 @@ namespace InperStudio.ViewModels
                         switch (_shapeEnum)
                         {
                             case ShapeEnum.Rectangle:
-                                currentShape = DrawRectShape(Brushes.Black, false);
+                                currentShape = DrawRectShape(Brushes.Yellow, false);
                                 break;
                             case ShapeEnum.Ellipse:
                                 break;
@@ -892,10 +927,21 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                if (zoneVideos.Count(x => x.Name == currentShape.Name && x.VideoName == selectCameraItem.Name) < 1)
+                {
+                    zoneVideos.Add(new ZoneVideo()
+                    {
+                        Name = currentShape.Name,
+                        Shape = currentShape,
+                        DisplayName = "Zone",
+                        VideoShowName = selectCameraItem.CustomName,
+                        VideoName = selectCameraItem.Name
+                    });
+                }
                 if (isAddShape && currentShape != null)
                 {
                     var layer = AdornerLayer.GetAdornerLayer(currentShape);
-                    var color = (currentDashShape != null && drawShapes.Count == 0) ? Brushes.Red : Brushes.Black;
+                    var color = (currentDashShape != null && drawShapes.Count == 0) ? Brushes.Red : Brushes.Yellow;
                     layer.Add(new InperAdorner(currentShape, currentShape.Name, color, 0, -15, false));
                     currentShape = null;
                 }
@@ -970,48 +1016,20 @@ namespace InperStudio.ViewModels
             }
         }
         #region draw shape
-        private Shape DrawRectShape(Brush brush, bool isDash = false)
+        private FrameworkElement DrawRectShape(Brush brush, bool isDash = false)
         {
             try
             {
-                var rect = new Rectangle()
+                var _rect = new ResizableRectangle()
                 {
                     Width = 10,
                     Height = 10,
-                    StrokeThickness = 1,
-                    Fill = Brushes.Transparent,
-                    Cursor = Cursors.Hand,
-                    Stroke = brush,
-                    Name = "Z" + (drawShapes.Count + 1),
-                    //Name = "Z" + (zoneVideos.Count == 0 ? (zoneVideos.Count + 1) : int.Parse(drawShapes.Last().Name.Substring(1, drawShapes.Last().Name.Length - 1)) + 1),
+                    Background = Brushes.Transparent,
+                    Name = "Z" + (drawShapes.Count > 0 ? int.Parse(drawShapes.Last().Name.Substring(1, drawShapes.Last().Name.Length - 1)) + 1 : 1),
                 };
-                if (isDash)
-                {
-                    rect.Stroke = brush;
-                    rect.Name = "Apparatus";
-                    rect.StrokeDashArray = new DoubleCollection(new List<double>() { 1, 1 });
-                    rect.Cursor = Cursors.Arrow;
-                }
-                else
-                {
-                    rect.MouseDown += (o, e) =>
-                    {
-                        var _shape = o as Shape;
-                        _shape.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2270D95F"));
-                        mouseDownShape = _shape;
-
-                        drawShapes.ForEach(shape =>
-                        {
-                            if (shape.Name != _shape.Name)
-                            {
-                                shape.Fill = Brushes.Transparent;
-                            }
-                        });
-                        e.Handled = true;
-                    };
-                }
-                AddMenuitem(rect);
-                return rect;
+                _rect.PreviewMouseLeftButtonDown += Rect_MouseDown;
+                AddMenuitem(_rect);
+                return _rect;
             }
             catch (Exception ex)
             {
@@ -1019,7 +1037,8 @@ namespace InperStudio.ViewModels
             }
             return null;
         }
-        private void AddMenuitem(Shape shape)
+
+        private void AddMenuitem(FrameworkElement shape)
         {
             // 创建一个 ContextMenu 对象
             ContextMenu contextMenu = new ContextMenu();
@@ -1080,6 +1099,36 @@ namespace InperStudio.ViewModels
             };
 
         }
+        #region zone 选中改变背景颜色
+        private void Rect_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                var _shape = sender as ResizableRectangle;
+                if (_shape.Background == Brushes.Transparent)
+                {
+                    _shape.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2270D95F"));
+                    mouseDownShape = _shape;
+
+                    drawShapes.ForEach(shape =>
+                    {
+                        if (shape.Name != _shape.Name)
+                        {
+                            (shape as ResizableRectangle).Background = Brushes.Transparent;
+                        }
+                    });
+                }
+                else
+                {
+                    _shape.Background = Brushes.Transparent;
+                }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        #endregion
         #endregion
 
         #region zone dash  RectangleDash  EllipseDash  PathDash
@@ -1136,6 +1185,16 @@ namespace InperStudio.ViewModels
         {
             try
             {
+                if (drawShapes.Count == 16)
+                {
+                    string text = "Zone的数量不超过16个！";
+                    if (InperConfig.Instance.Language == "en_us")
+                    {
+                        text = "The number of zones does not exceed 16!";
+                    }
+                    InperGlobalClass.ShowReminderInfo(text);
+                    return;
+                }
                 switch (type)
                 {
                     case "Rectangle":

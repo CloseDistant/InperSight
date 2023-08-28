@@ -34,6 +34,7 @@ namespace InperStudio.ViewModels
         }
         SweepSettingView view;
         Sweep sweep = new Sweep();
+        private double oldDuration = -1;
 
         public SweepSettingViewModel()
         {
@@ -48,7 +49,7 @@ namespace InperStudio.ViewModels
         {
             sweep = _sweep;
             isExist = true;
-
+            oldDuration = sweep.Duration;
             //var select = sweep.WaveForm.Split(',').ToList();
             //WaveForms.ToList().ForEach(w =>
             //{
@@ -131,8 +132,18 @@ namespace InperStudio.ViewModels
                     xyDataSeries.Clear();
                 }
             };
-
+            this.view.CancelClickEvent += View_CancelClickEvent;
         }
+
+        private void View_CancelClickEvent(object obj)
+        {
+            if (isExist)
+            {
+                sweep.Duration = oldDuration;
+            }
+            this.RequestClose();
+        }
+
         [Obsolete]
         public void CheckBox_Checked(object sender, RoutedEventArgs e)
         {

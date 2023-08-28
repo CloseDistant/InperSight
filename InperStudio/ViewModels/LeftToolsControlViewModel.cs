@@ -298,7 +298,11 @@ namespace InperStudio.ViewModels
                             text = "Can't be less than 1";
                         }
                         Growl.Warning(text, "SuccessMsg");
-                        com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                        //com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            Sampling = 1;
+                        }));
                         return;
                     }
                     if (double.Parse(com.Text) > 300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count))
@@ -309,7 +313,11 @@ namespace InperStudio.ViewModels
                             text = "Can't be greater than " + (300 / (InperGlobalClass.CameraSignalSettings.LightMode.Count < 1 ? 1 : InperGlobalClass.CameraSignalSettings.LightMode.Count));
                         }
                         Growl.Warning(text, "SuccessMsg");
-                        com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                        //com.Text = InperGlobalClass.CameraSignalSettings.Sampling.ToString();
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            Sampling = 100;
+                        }));
                         return;
                     }
                     Regex rx = new Regex(@"^([0-9]{1,})$");
@@ -495,6 +503,19 @@ namespace InperStudio.ViewModels
                     {
                         this.view.ellipseCanvas.Children.Add(grid);
                     }
+                    foreach (var item in view.lightMode.Items)
+                    {
+                        var listBoxItem = view.lightMode.ItemContainerGenerator.ContainerFromItem(item) as Visual;
+                        var checkbox = InperClassHelper.FindVisualChild<CheckBox>(listBoxItem);
+                        if (checkbox != null)
+                        {
+                            if (checkbox.IsChecked == false)
+                            {
+                                checkbox.IsChecked = true;
+                                checkbox.IsChecked = false;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -535,10 +556,11 @@ namespace InperStudio.ViewModels
                         _ = EllipseBorder.Remove(moveGrid);
 
                         CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((moveGrid.Children[0] as TextBlock).Text) - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
-                        //lock (InperDeviceHelper.Instance._FrameProcLock)
-                        {
-                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                        }
+
+                        Monitor.Enter(InperDeviceHelper.Instance._FrameProcLock);
+                        _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
+                        Monitor.Exit(InperDeviceHelper.Instance._FrameProcLock);
+
                         //InperDeviceHelper.Instance._LoopCannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance._LoopCannels.Where(x => x.ChannelId != item.ChannelId));
                         Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == item.ChannelId && x.Type == ChannelTypeEnum.Camera.ToString());
                         if (channel != null)
@@ -684,10 +706,9 @@ namespace InperStudio.ViewModels
                         }
                     });
                 }
-                //lock (InperDeviceHelper.Instance._FrameProcLock)
-                {
-                    InperDeviceHelper.Instance.CameraChannels.Add(item);
-                }
+                Monitor.Enter(InperDeviceHelper.Instance._FrameProcLock);
+                InperDeviceHelper.Instance.CameraChannels.Add(item);
+                Monitor.Exit(InperDeviceHelper.Instance._FrameProcLock);
                 //InperDeviceHelper.Instance._LoopCannels.Add(item);
                 Channel channel = InperGlobalClass.CameraSignalSettings.CameraChannels.FirstOrDefault(x => x.ChannelId == index - 1 && x.Type == ChannelTypeEnum.Camera.ToString());
 
@@ -727,8 +748,8 @@ namespace InperStudio.ViewModels
                     });
                 }
 
-                Mat m = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
-                SetMat(m, grid);
+                
+                SetMat(null, grid);
             }
 
             SetDefaultCircle(grid);
@@ -749,6 +770,11 @@ namespace InperStudio.ViewModels
         public void Grid_MouseUp(object sender, MouseButtonEventArgs e)
         {
             isDown = false;
+
+            InperDeviceHelper.CameraChannels.ForEachDo(x =>
+            {
+                x.Mask.SaveImage(x.ChannelId + ".bmp");
+            });
         }
         public void Grid_MouseMove(object sender, MouseEventArgs e)
         {
@@ -785,8 +811,8 @@ namespace InperStudio.ViewModels
                             channel.Top = moveTop;
                         }
 
-                        Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
-                        SetMat(mat, moveGrid);
+                        //Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
+                        SetMat(null, moveGrid);
                     }));
                 }
             }
@@ -885,8 +911,8 @@ namespace InperStudio.ViewModels
                         item.ROI = double.Parse((sender as System.Windows.Controls.TextBox).Text);
                     }
 
-                    Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
-                    SetMat(mat, moveGrid);
+                    //Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
+                    SetMat(null, moveGrid);
                 }
             }
             catch (Exception ex)
@@ -1297,8 +1323,9 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
-        private void SetMat(Mat mat, Grid grid)
+        private void SetMat(Mat _mat, Grid grid)
         {
+            Mat mat = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
             double scale = InperDeviceHelper.Instance.VisionWidth / (this.view.ellipseCanvas.ActualWidth == 0 ? this.view.ellipseCanvas.Width : this.view.ellipseCanvas.ActualWidth);
             double rect_left = (double)grid.GetValue(Canvas.LeftProperty) * scale;
             double rect_top = (double)grid.GetValue(Canvas.TopProperty) * scale;
@@ -1473,10 +1500,9 @@ namespace InperStudio.ViewModels
                         CameraChannel cameraChannel = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ChannelTypeEnum.Analog.ToString());
                         if (cameraChannel != null)
                         {
-                            //lock (InperDeviceHelper.Instance._FrameProcLock)
-                            {
-                                _ = InperDeviceHelper.Instance.CameraChannels.Remove(cameraChannel);
-                            }
+                            Monitor.Enter(InperDeviceHelper.Instance._FrameProcLock);
+                            _ = InperDeviceHelper.Instance.CameraChannels.Remove(cameraChannel);
+                            Monitor.Exit(InperDeviceHelper.Instance._FrameProcLock);
                             InperDeviceHelper.Instance.aiChannels = new System.Collections.Concurrent.ConcurrentBag<CameraChannel>(InperDeviceHelper.Instance.aiChannels.Where(x => x.ChannelId != cameraChannel.ChannelId));
                             InperDeviceHelper.Instance.AiSettingFunc(cameraChannel.ChannelId, 0);
                             InperDeviceHelper.Instance._adPreTime.Remove(cameraChannel.ChannelId);
@@ -1524,10 +1550,9 @@ namespace InperStudio.ViewModels
 
                         LineRenderableSeriesViewModel line = new LineRenderableSeriesViewModel() { Tag = "-1", DataSeries = new XyDataSeries<TimeSpan, double>(), Stroke = ch.BgColor.Color, YAxisId = "Ch0" };
                         item.RenderableSeries.Add(line);
-                        //lock (InperDeviceHelper.Instance._FrameProcLock)
-                        {
-                            InperDeviceHelper.Instance.CameraChannels.Add(item);
-                        }
+                        Monitor.Enter(InperDeviceHelper.Instance._FrameProcLock);
+                        InperDeviceHelper.Instance.CameraChannels.Add(item);
+                        Monitor.Exit(InperDeviceHelper.Instance._FrameProcLock);
                         InperDeviceHelper.Instance.aiChannels.Add(item);
                         if (!InperDeviceHelper.Instance._adPreTime.ContainsKey(item.ChannelId))
                         {

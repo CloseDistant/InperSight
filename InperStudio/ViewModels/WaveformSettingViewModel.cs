@@ -28,9 +28,12 @@ namespace InperStudio.ViewModels
         {
         }
         bool isExist = false;
+        double oldPulse = -1; int oldFreq = -1, oldDruation = -1;
         public WaveformSettingViewModel(WaveForm _waveForm)
         {
             waveForm = _waveForm;
+
+            oldFreq = waveForm.Frequence; oldDruation = waveForm.Duration; oldPulse = waveForm.Pulse;
             isExist = true;
         }
 
@@ -85,8 +88,16 @@ namespace InperStudio.ViewModels
                         waveForm.Index = 1;
                     }
                 }
-                StimulusBeans.Instance.WaveForms.Insert(waveForm.Index - 1, waveForm);
+                StimulusBeans.Instance.WaveForms.Add(waveForm);
                 this.RequestClose();
+            };
+            this.view.CancelClickEvent += (s) =>
+            {
+                if (isExist)
+                {
+                    waveForm.Frequence = oldFreq; waveForm.Pulse = oldPulse; waveForm.Duration = oldDruation;
+                }
+                this.RequestClose(true);
             };
         }
         private List<int> GetGYS(int num)
@@ -127,7 +138,7 @@ namespace InperStudio.ViewModels
                             this.view.remainder.Text = "The Value must be < " + maxPulse.ToString("0.00");
                             if (InperConfig.Instance.Language == "zh_cn")
                             {
-                                this.view.remainder.Text = "最大值为："+ maxPulse.ToString("0.00");
+                                this.view.remainder.Text = "最大值为：" + maxPulse.ToString("0.00");
                             }
                             this.view.remainder.Visibility = System.Windows.Visibility.Visible;
                             return;

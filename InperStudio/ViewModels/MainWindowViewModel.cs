@@ -121,41 +121,44 @@ namespace InperStudio.ViewModels
         }
         public void MainWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            InperGlobalClass.EventSettings.Channels.ForEach(x =>
+            if (!InperGlobalClass.IsStop)
             {
+                InperGlobalClass.EventSettings.Channels.ForEach(x =>
+                {
 
-                if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
-                {
-                    string[] hotkeys = x.Hotkeys.Split('+');
-                    if (hotkeys.Contains(e.Key.ToString()))
+                    if (x.IsActive && x.Type == ChannelTypeEnum.Manual.ToString())
                     {
-                        AddMarkers(hotkeys, x);
-                        e.Handled = true;
-                    }
-                }
-                else if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
-                {
-                    if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
-                    {
-                        string[] hotkeys = x.Condition.Hotkeys.Split('+');
+                        string[] hotkeys = x.Hotkeys.Split('+');
                         if (hotkeys.Contains(e.Key.ToString()))
                         {
-                            AddMarkers(hotkeys, x, 1);
+                            AddMarkers(hotkeys, x);
                             e.Handled = true;
                         }
                     }
-                }
-            });
-            if (e.Key == Key.Space)
-            {
-                e.Handled = true;
-                if (!windowView._focus1.IsFocused)
+                    else if (x.IsActive && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition != null)
+                    {
+                        if (x.Condition.Type == ChannelTypeEnum.Manual.ToString())
+                        {
+                            string[] hotkeys = x.Condition.Hotkeys.Split('+');
+                            if (hotkeys.Contains(e.Key.ToString()))
+                            {
+                                AddMarkers(hotkeys, x, 1);
+                                e.Handled = true;
+                            }
+                        }
+                    }
+                });
+                if (e.Key == Key.Space)
                 {
-                    windowView._focus1.Focus();
-                }
-                else
-                {
-                    windowView._focus2.Focus();
+                    e.Handled = true;
+                    if (!windowView._focus1.IsFocused)
+                    {
+                        windowView._focus1.Focus();
+                    }
+                    else
+                    {
+                        windowView._focus2.Focus();
+                    }
                 }
             }
 

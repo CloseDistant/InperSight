@@ -18,6 +18,7 @@ namespace InperStudio.Lib.Data.Model
         public int Height { get; set; }
         public int CenterX { get; set; }
         public int CenterY { get; set; }
+        public float Max_score { get; set; }
         public DateTime CreateTime { get; set; }
     }
 }

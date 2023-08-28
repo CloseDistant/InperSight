@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Shapes;
 
 namespace InperStudio.Lib.Bean
@@ -22,7 +23,7 @@ namespace InperStudio.Lib.Bean
         /// 相机原本名称
         /// </summary>
         public string VideoName { get; set; }
-        public Shape Shape { get; set; }
+        public FrameworkElement Shape { get; set; }
         /// <summary>
         /// 是否展示
         /// </summary>

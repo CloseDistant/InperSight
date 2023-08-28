@@ -30,7 +30,7 @@ namespace InperStudio.Lib.Chart
             {
                 return value.TotalMilliseconds.ToString();
             }
-            if (DataShowControlViewModel.TextFormat.Equals("Seconds"))
+            if (DataShowControlViewModel.TextFormat.Equals("Second"))
             {
                 return value.TotalSeconds.ToString();
             }

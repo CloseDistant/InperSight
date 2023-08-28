@@ -51,7 +51,7 @@
     <sys:String x:Key="video_setting_video">Video</sys:String>
     <sys:String x:Key="video_setting_format">Format</sys:String>
     <sys:String x:Key="video_setting_frame_rate">Frame rate</sys:String>
-    <sys:String x:Key="video_setting_remainder">Apparatus and Zones would be cleared after frame rate changing</sys:String>
+    <sys:String x:Key="video_setting_remainder">Zones would be cleared after frame rate changing</sys:String>
     <sys:String x:Key="video_setting_add_zone">Add Zone</sys:String>
     <sys:String x:Key="video_setting_animal_tracking">Animal tracking</sys:String>
     <sys:String x:Key="video_setting_darker_background">The animal is darker than the background</sys:String>
@@ -122,6 +122,8 @@
     <sys:String x:Key="marker_hotkeys">Hotkeys</sys:String>
     <sys:String x:Key="marker_windowsize">Window size (point)</sys:String>
     <sys:String x:Key="marker_rp">Refractory period (s)</sys:String>
+    <sys:String x:Key="marker_mode1">Mode</sys:String>
+    <sys:String x:Key="marker_detail1">Detail</sys:String>
     
     <!--stimulus-->
     <sys:String x:Key="stimulus_title">Stimulus</sys:String>

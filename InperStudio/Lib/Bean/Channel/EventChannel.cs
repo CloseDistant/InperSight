@@ -1,10 +1,14 @@
-﻿using InperStudio.Lib.Helper.JsonBean;
+﻿using InperStudio.Lib.Data.Model;
+using InperStudio.Lib.Helper;
+using InperStudio.Lib.Helper.JsonBean;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Visuals.Axes;
 using SciChart.Data.Model;
 using Stylet;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Windows;
 using System.Windows.Media;
 
 namespace InperStudio.Lib.Bean.Channel
@@ -18,11 +22,7 @@ namespace InperStudio.Lib.Bean.Channel
     {
         public ZoneConditions()
         {
-            Timer.Elapsed += (s, e) =>
-            {
-                IsTimerSignal = true;
-                Timer.Stop();
-            };
+
         }
         public string ZoneName { get; set; }
         public bool IsImmediately { get; set; } = true;
@@ -40,6 +40,105 @@ namespace InperStudio.Lib.Bean.Channel
         public bool IsTimerSignal { get; set; } = false;
         public System.Timers.Timer Timer { get; set; } = new System.Timers.Timer();
 
+        private EventChannelJson channelJson;
+        private bool IsIgnore = true;
+        //private bool isStartTimer = false;
+        //private bool isStay = false;
+        private bool isStayAndDrawMarker = false;
+        private int _delayLock = 0;
+        private int _stayLock = 0;
+        public void StayStopDraw()
+        {
+            try
+            {
+                isStayAndDrawMarker = false;
+                Interlocked.Exchange(ref _stayLock, 0);
+                Timer.Stop();
+                Timer.Elapsed -= Timer_Elapsed1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        public void StartTimerDelay(EventChannelJson x, bool isIgnore)
+        {
+            if (Interlocked.Exchange(ref _delayLock, 1) == 0)
+            {
+                channelJson = x;
+                this.IsIgnore = isIgnore;
+
+                Timer.Interval = IsDelay ? DelaySeconds * 1000 : Duration * 1000;
+                Timer.Elapsed += Timer_Elapsed;
+                Timer.Start();
+            }
+        }
+
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+            {
+                Color = channelJson.BgColor,
+                IsIgnore = IsIgnore,
+                CameraTime = InperDeviceHelper.Instance.time / 100,
+                ChannelId = channelJson.ChannelId,
+                CreateTime = DateTime.Now,
+                Name = channelJson.Name,
+                Type = channelJson.Type
+            });
+
+            Timer.Stop();
+            Timer.Elapsed -= Timer_Elapsed;
+            Interlocked.Exchange(ref _delayLock, 0);
+        }
+
+        public void StartTimerStay(EventChannelJson x, bool isIgnore)
+        {
+            if (Interlocked.Exchange(ref _stayLock, 1) == 0)
+            {
+                channelJson = x;
+                this.IsIgnore = isIgnore;
+
+                Timer.Interval = IsDelay ? DelaySeconds * 1000 : Duration * 1000;
+                Timer.Elapsed += Timer_Elapsed1;
+                Timer.Start();
+            }
+        }
+
+        private void Timer_Elapsed1(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (!isStayAndDrawMarker)
+            {
+                InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+                {
+                    Color = channelJson.BgColor,
+                    IsIgnore = IsIgnore,
+                    CameraTime = InperDeviceHelper.Instance.time / 100,
+                    ChannelId = channelJson.ChannelId,
+                    CreateTime = DateTime.Now,
+                    Name = channelJson.Name,
+                    Type = channelJson.Type
+                });
+                isStayAndDrawMarker = true;
+            }
+            Timer.Stop();
+            Timer.Elapsed -= Timer_Elapsed1;
+            Interlocked.Exchange(ref _stayLock, 0);
+        }
+
+        public void ImmediatelyDrawMarker(EventChannelJson x, bool isIgnore)
+        {
+            InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
+            {
+                Color = x.BgColor,
+                IsIgnore = isIgnore,
+                CameraTime = InperDeviceHelper.Instance.time / 100,
+                ChannelId = x.ChannelId,
+                CreateTime = DateTime.Now,
+                Name = x.Name,
+                Type = x.Type
+            });
+        }
     }
     public class EventChannel : ChannelBase
     {

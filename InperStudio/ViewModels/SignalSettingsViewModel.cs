@@ -636,8 +636,7 @@ namespace InperStudio.ViewModels
                     });
                 }
 
-                Mat m = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
-                SetMat(m, grid);
+                SetMat(null, grid);
             }
 
             SetDefaultCircle(grid);
@@ -694,8 +693,8 @@ namespace InperStudio.ViewModels
                             channel.Top = moveTop;
                         }
 
-                        Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
-                        SetMat(mat, moveGrid);
+                        //Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
+                        //SetMat(null, moveGrid);
                     }));
                 }
             }
@@ -789,8 +788,8 @@ namespace InperStudio.ViewModels
                         item.ROI = double.Parse((sender as TextBox).Text);
                     }
 
-                    Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
-                    SetMat(mat, moveGrid);
+                    //Mat mat = InperDeviceHelper.CameraChannels.First(x => x.ChannelId == int.Parse(tb.Text) - 1).Mask;
+                    SetMat(null, moveGrid);
                 }
             }
             catch (Exception ex)
@@ -1163,8 +1162,10 @@ namespace InperStudio.ViewModels
                 InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
             }
         }
-        private void SetMat(Mat mat, Grid grid)
+        private void SetMat(Mat _mat, Grid grid)
         {
+            Mat mat = Mat.Zeros(new OpenCvSharp.Size(InperDeviceHelper.Instance.VisionWidth, InperDeviceHelper.Instance.VisionHeight), MatType.CV_8U);
+
             double scale = InperDeviceHelper.Instance.VisionWidth / (this.view.ellipseCanvas.ActualWidth == 0 ? this.view.ellipseCanvas.Width : this.view.ellipseCanvas.ActualWidth);
             double rect_left = (double)grid.GetValue(Canvas.LeftProperty) * scale;
             double rect_top = (double)grid.GetValue(Canvas.TopProperty) * scale;
@@ -1175,7 +1176,9 @@ namespace InperStudio.ViewModels
 
             mat.Circle(center: Center, radius: (int)(ellips_diam / 4), color: Scalar.White, -1);
 
-            InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(x => x.ChannelId == int.Parse((grid.Children[0] as TextBlock).Text) - 1).Mask = mat;
+            int channelId = int.Parse((grid.Children[0] as TextBlock).Text) - 1;
+            InperDeviceHelper.Instance.CameraChannels[channelId].Mask = mat.Clone();
+
         }
         public void Interval_Checked(object sender, RoutedEventArgs e)
         {

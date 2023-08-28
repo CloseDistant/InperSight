@@ -75,6 +75,11 @@ namespace InperStudio.Views.Control
                     InperGlobalClass.EventPanelProperties = InperJsonHelper.GetEventPanelProperties();
                     InperGlobalClass.CameraSignalSettings = InperJsonHelper.GetCameraSignalSettings();
                     InperGlobalClass.EventSettings = InperJsonHelper.GetEventSettings();
+                    ///把保存的zone相关的去掉
+                    InperGlobalClass.EventSettings.Channels.RemoveWhere(x => x.Type == ChannelTypeEnum.Zone.ToString() || x.Type == ChannelTypeEnum.Stay.ToString()
+                    || x.Type == ChannelTypeEnum.Enter.ToString() || x.Type == ChannelTypeEnum.Leave.ToString()
+                    || x.Condition?.Type == ChannelTypeEnum.Zone.ToString() || x.Condition?.Type == ChannelTypeEnum.Stay.ToString()
+                    || x.Condition?.Type == ChannelTypeEnum.Enter.ToString() || x.Condition?.Type == ChannelTypeEnum.Leave.ToString());
                     InperGlobalClass.StimulusSettings = InperJsonHelper.GetStimulusSettings() ?? new Lib.Helper.JsonBean.StimulusSettings();
                     bool.TryParse(InperJsonHelper.GetDisplaySetting("analog"), out bool analog);
                     InperGlobalClass.IsDisplayAnalog = analog;
@@ -125,6 +130,7 @@ namespace InperStudio.Views.Control
                     }
                     StimulusBeans.Instance.DioID = InperGlobalClass.StimulusSettings.DioID;
                     StimulusBeans.Instance.IsConfigSweep = InperGlobalClass.StimulusSettings.IsConfigSweep;
+                    StimulusBeans.Instance.IsActiveStimulus = InperGlobalClass.StimulusSettings.IsActiveStimulus;
                     StimulusBeans.Instance.Hour = InperGlobalClass.StimulusSettings.Hour;
                     StimulusBeans.Instance.Minute = InperGlobalClass.StimulusSettings.Minute;
                     StimulusBeans.Instance.Seconds = InperGlobalClass.StimulusSettings.Seconds;
@@ -135,6 +141,10 @@ namespace InperStudio.Views.Control
                     if (StimulusBeans.Instance.IsConfigSweep)
                     {
                         StimulusBeans.Instance.StimulusCommandSend();
+                    }
+                    if (StimulusBeans.Instance.IsTrigger)
+                    {
+                        InperDeviceHelper.Instance.device.SetStimulusTrigger(1, StimulusBeans.Instance.TriggerId, (byte)StimulusBeans.Instance.TriggerMode);
                     }
 
                     InperDeviceHelper.Instance.device.SetExposure(InperGlobalClass.CameraSignalSettings.Exposure);
@@ -183,25 +193,26 @@ namespace InperStudio.Views.Control
                         }
                     });
 
-                    List<int> cs = new List<int>();
-                    List<int> _cs = new List<int>();
-                    InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
-                    {
-                        cs.Add(x.ChannelId);
-                    });
-                    foreach (CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
-                    {
-                        item.RenderableSeries.ForEachDo(x => x.DataSeries.Clear());
-                        if (!cs.Contains(item.ChannelId))
-                        {
-                            _cs.Add(item.ChannelId);
-                        }
-                    }
-                    _cs.ForEach(x =>
-                    {
-                        CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
-                        _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
-                    });
+                    //List<int> cs = new List<int>();
+                    //List<int> _cs = new List<int>();
+                    //InperGlobalClass.CameraSignalSettings.CameraChannels.ForEach(x =>
+                    //{
+                    //    cs.Add(x.ChannelId);
+                    //});
+                    //foreach (CameraChannel item in InperDeviceHelper.Instance.CameraChannels)
+                    //{
+                    //    item.RenderableSeries.ForEachDo(x => x.DataSeries.Clear());
+                    //    if (!cs.Contains(item.ChannelId))
+                    //    {
+                    //        _cs.Add(item.ChannelId);
+                    //    }
+                    //}
+                    InperDeviceHelper.Instance.CameraChannels.Clear();
+                    //_cs.ForEach(x =>
+                    //{
+                    //    CameraChannel item = InperDeviceHelper.Instance.CameraChannels.FirstOrDefault(y => y.ChannelId == x);
+                    //    _ = InperDeviceHelper.Instance.CameraChannels.Remove(item);
+                    //});
                     //if (InperClassHelper.GetWindowByNameChar("inper") is System.Windows.Window window)
                     //{
                     //    (window.DataContext as MainWindowViewModel).LeftToolsControlViewModel.InitConfig(true);

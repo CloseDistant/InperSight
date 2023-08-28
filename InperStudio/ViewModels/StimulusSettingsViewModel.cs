@@ -69,6 +69,7 @@ namespace InperStudio.ViewModels
             //{
             //    Sweeps.Add(m);
             //});
+            view.isUse.IsChecked = StimulusBeans.Instance.IsActiveStimulus;
             view.isUse.Unchecked += (s, e) =>
             {
                 StimulusBeans.Instance.IsConfigSweep = false;
@@ -132,7 +133,7 @@ namespace InperStudio.ViewModels
                         return;
                     }
                     StimulusBeans.Instance.TriggerMode = view._triggerMode.SelectedIndex;
-                    StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
+                        StimulusBeans.Instance.IsTrigger = (bool)view._triggerToggle.IsChecked;
                     StimulusBeans.Instance.IsActiveStimulus = (bool)view.isUse.IsChecked;
                     //zzz
                     if (view.dio.SelectedValue != null && (bool)view.isUse.IsChecked)

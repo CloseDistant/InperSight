@@ -1,4 +1,6 @@
-﻿using Accord.Video.DirectShow;
+﻿using Accord;
+using Accord.Video.DirectShow;
+using Google.Protobuf.Reflection;
 using InperCameraSolution.AccordSolution;
 using InperStudio.Lib.Bean.Channel;
 using InperStudio.Lib.Data.Model;
@@ -7,6 +9,7 @@ using InperStudio.Lib.Helper;
 using InperStudio.Lib.Helper.JsonBean;
 using log4net.Repository.Hierarchy;
 using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using Stylet;
 using System;
 using System.Collections.Concurrent;
@@ -19,6 +22,7 @@ using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -36,8 +40,8 @@ namespace InperStudio.Lib.Bean
         public bool IsActive { get; set; }
         public string Name { get; set; }
         public string CustomName { get; set; }
-        private BitmapSource _writeableBitmap;
-        public BitmapSource WriteableBitmap
+        private ImageSource _writeableBitmap;
+        public ImageSource WriteableBitmap
         {
             get => _writeableBitmap;
             private set => SetAndNotify(ref _writeableBitmap, value);
@@ -60,6 +64,8 @@ namespace InperStudio.Lib.Bean
             get => _writeFps;
             set => SetAndNotify(ref _writeFps, value);
         }
+        public double ActWidth { get; set; }
+        public double ActHeight { get; set; }
         private List<AccordResolutionInfo> capabilyItems = new List<AccordResolutionInfo>();
         public List<AccordResolutionInfo> CapabilyItems
         {
@@ -67,9 +73,27 @@ namespace InperStudio.Lib.Bean
             set => SetAndNotify(ref capabilyItems, value);
         }
         public bool IsCanOpen { get; set; } = true;
-        public bool IsTracking { get; set; } = false;
+        private bool isTracking = false;
+        public bool IsTracking
+        {
+            get => isTracking;
+            set
+            {
+                SetAndNotify(ref isTracking, value);
+                if (value)
+                {
+                    if (inperTrackingOpenvinoHelper == null)
+                    {
+                        inperTrackingOpenvinoHelper = new InperTrackingOpenvinoHelper();
+                        inperTrackingOpenvinoHelper.LoadModel();
+                    }
+                }
+            }
+        }
         #region private
         private AccordCamraSetting accordCamraSetting;
+
+        private InperTrackingOpenvinoHelper inperTrackingOpenvinoHelper;
         #endregion
 
         #region methods
@@ -81,39 +105,104 @@ namespace InperStudio.Lib.Bean
             accordCamraSetting.OnInfoReceived += AccordCamraSetting_OnInfoReceived;
             CapabilyItems = accordCamraSetting.AccordResolutionInfos;
         }
+        private ConcurrentQueue<Mat> receivedMats = new ConcurrentQueue<Mat>();
+        private CancellationTokenSource trackCancellationToken = new CancellationTokenSource();
         private void AccordCamraSetting_OnInfoReceived(AccordImageInfo info)
         {
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                //Create a Mat object with the correct size and data type
-                Mat mat = new Mat(info.Height, info.Width, info.CameraChannel == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1);  // Assuming a 3-channel color image (BGR)
-                // Copy the data into the Mat object
-                Marshal.Copy(info.Datas, 0, mat.Data, info.Datas.Length);
+            //System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //Create a Mat object with the correct size and data type
+            Mat mat = new Mat(info.Height, info.Width, info.CameraChannel == 3 ? MatType.CV_8UC3 : MatType.CV_8UC1);  // Assuming a 3-channel color image (BGR)
+                                                                                                                      // Copy the data into the Mat object
+            Marshal.Copy(info.Datas, 0, mat.Data, info.Datas.Length);
 
-                if (IsTracking)
-                {
-                    DrawTrackingRect(mat);
-                }
-                if (_DrawTracking != null)
-                {
-                    OpenCvSharp.Rect rect = new OpenCvSharp.Rect(_DrawTracking.Left, _DrawTracking.Top, _DrawTracking.Width, _DrawTracking.Height);
-                    // 绘制矩形
-                    Cv2.Rectangle(mat, rect, Scalar.Blue, 2); // 使用红色线条绘制矩形，线宽为2 // 绘制中心点 //画点和区域
-
-                    Cv2.Circle(mat, _DrawTracking.Left + _DrawTracking.Width / 2, _DrawTracking.Top + _DrawTracking.Height / 2, 2, Scalar.Blue, -1); // 使用蓝色填充圆形，半径为5  //存储轨迹数据
-                }
-                WriteableBitmap = BitmapSource.Create(info.Width, info.Height, 96, 96, info.CameraChannel == 3 ? PixelFormats.Bgr24 : PixelFormats.Gray8, null, info.Datas, info.CameraChannel == 3 ? info.Width * 3 : info.Width);
-
-            }));
+            receivedMats.Enqueue(mat.Clone());
+            //WriteableBitmap = BitmapSource.Create(info.Width, info.Height, 96, 96, info.CameraChannel == 3 ? PixelFormats.Bgr24 : PixelFormats.Gray8, null, info.Datas, info.CameraChannel == 3 ? info.Width * 3 : info.Width);
+            //}));
         }
+        private void DrawAndTrack(CancellationToken token)
+        {
+            Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        Mat mat = null;
+                        while (receivedMats.Count > 0)
+                        {
+                            receivedMats.TryDequeue(out mat);
+                        }
+                        //receivedMats.TryDequeue(out mat);
 
+                        if (mat != null)
+                        {
+                            if (IsTracking)
+                            {
+                                DrawTrackingRect(mat);
+                            }
+                            else
+                            {
+                                _DrawTracking = null;
+                            }
+
+                            if (_DrawTracking != null)
+                            {
+                                OpenCvSharp.Rect rect = new OpenCvSharp.Rect(_DrawTracking.Left, _DrawTracking.Top, _DrawTracking.Width, _DrawTracking.Height);
+                                // 绘制矩形
+                                //Cv2.Rectangle(mat, rect, Scalar.Red, 2); // 使用红色线条绘制矩形，线宽为2 // 绘制中心点 //画点和区域
+                                //      Cv2.PutText(mat, _DrawTracking.Max_score.ToString("0.00"), new OpenCvSharp.Point(_DrawTracking.Left, _DrawTracking.Top - 10),
+                                //HersheyFonts.HersheySimplex, 0.5, new Scalar(0, 255, 0), 1);
+                                Cv2.Circle(mat, _DrawTracking.Left + _DrawTracking.Width / 2, _DrawTracking.Top + _DrawTracking.Height / 2, 10, Scalar.Red, -1); // 使用蓝色填充圆形，半径为5  //存储轨迹数据
+                                ContainsMouseZone?.Invoke(null, _DrawTracking);
+                            }
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+
+                                using (MemoryStream memoryStream = mat.ToMemoryStream(".bmp"))
+                                {
+                                    WriteableBitmap = ToImageSource(memoryStream);
+                                }
+                            });
+                        }
+                        await Task.Delay(1);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+                    }
+                }
+            });
+        }
+        // at class level
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+        private ImageSource ToImageSource(MemoryStream stream)
+        {
+            try
+            {
+                ImageSource source;
+                using (var bitmap = new Bitmap(stream))
+                {
+                    var hBitmap = bitmap.GetHbitmap();
+                    source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    DeleteObject(hBitmap);
+                }
+                return source;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return null;
+        }
         ///轨迹追踪数据
         private ConcurrentQueue<Tracking> trackingsQueue;
         private CancellationTokenSource _cts;
         private List<EventChannelJson> _trackingEventChannelJson = new List<EventChannelJson>();
         private List<EventChannelJson> _trackingEventChannelJsonOutput = new List<EventChannelJson>();
         ///string ==zoneName,channeltypeenum==状态
-        private Dictionary<string, ChannelTypeEnum> _trackingMarkerStatu = new Dictionary<string, ChannelTypeEnum>();
+        private Dictionary<int, ChannelTypeEnum> _trackingMarkerStatu = new Dictionary<int, ChannelTypeEnum>();
         private int _trackingLock = 0;
         private Tracking _DrawTracking;
         private async void DrawTrackingRect(Mat mat)
@@ -124,33 +213,27 @@ namespace InperStudio.Lib.Bean
                 {
                     await Task.Run(() =>
                     {
-                        //var tracking = InperTrackingDnnHelper.Detect(mat);
-                        var tracking = InperTrackingHelper.DetectNo(mat);
-
-                        //if (tracking.Count > 0)
-                        //{
-                        //    for (var i = 0; i < tracking.Count; i++)
-                        //    {
-                        //        if (InperGlobalClass.IsRecord)
-                        //        {
-                        //            trackingsQueue.Enqueue(tracking[i]);
-                        //        }
-                        //        _DrawTracking = tracking[i];
-                        //    }
-                        //}
-
-                        if (InperGlobalClass.IsRecord)
+                        var tracking = inperTrackingOpenvinoHelper.Detect(mat);
+                        if (tracking.Count > 0)
                         {
-                            trackingsQueue.Enqueue(tracking);
+                            var track = tracking.OrderByDescending(x => x.Max_score).First();
+                            if (InperGlobalClass.IsRecord)
+                            {
+                                trackingsQueue.Enqueue(track);
+                            }
+                            _DrawTracking = track;
                         }
-                        _DrawTracking = tracking;
-
+                        else
+                        {
+                            _DrawTracking = null;
+                        }
                         Interlocked.Exchange(ref _trackingLock, 0);
                     });
                 }
             }
             catch (Exception e)
             {
+                Interlocked.Exchange(ref _trackingLock, 0);
                 InperLogExtentHelper.LogExtent(e, "VideoRecordBean");
             }
         }
@@ -164,11 +247,11 @@ namespace InperStudio.Lib.Bean
                 _trackingMarkerStatu.Clear();
                 _trackingEventChannelJson.ForEach(x =>
                 {
-                    _trackingMarkerStatu.Add(x.Name, ChannelTypeEnum.None);
+                    _trackingMarkerStatu.Add(x.ChannelId, ChannelTypeEnum.None);
                 });
                 _trackingEventChannelJsonOutput.ForEach(x =>
                 {
-                    _trackingMarkerStatu.Add(x.Condition.Name, ChannelTypeEnum.None);
+                    _trackingMarkerStatu.Add(x.Condition.ChannelId, ChannelTypeEnum.None);
                 });
                 trackingsQueue = new ConcurrentQueue<Tracking>();
                 _ = StoreTrackingDataAsync(_cts.Token);
@@ -209,7 +292,7 @@ namespace InperStudio.Lib.Bean
                 }
                 else
                 {
-                    await Task.Delay(10); // 避免无限循环，减轻CPU负担
+                    await Task.Delay(1); // 避免无限循环，减轻CPU负担
                 }
             }
 
@@ -223,59 +306,54 @@ namespace InperStudio.Lib.Bean
                 });
             }
         }
+        public event EventHandler<Tracking> ContainsMouseZone;
         private void TrackingToMarker(Tracking tracking)
         {
             try
             {
                 var point = new System.Windows.Point(tracking.CenterX * (480 / WriteableBitmap.Width), tracking.CenterY * (320 / WriteableBitmap.Height));
+                //var point = new System.Windows.Point(tracking.Left + tracking.Width / 2, tracking.Top + tracking.Height / 2);
                 if (_trackingEventChannelJsonOutput.Any())
                 {
                     _trackingEventChannelJsonOutput.ForEach(x =>
                     {
-                        bool isDrawMarker = false;
                         if (x.Condition.VideoZone.AllZoneConditions.First(z => z.ZoneName == x.Condition.SymbolName) is ZoneConditions zone)
                         {
                             var rect = new System.Windows.Rect(zone.ShapeLeft, zone.ShapeTop, zone.ShapeWidth, zone.ShapeHeight);
-                            bool re = TrackingStateSet(rect.Contains(point), x.Condition.Name, zone.Timer, _trackingMarkerStatu[x.Name] == ChannelTypeEnum.Leave);
+                            bool re = TrackingStateSet(rect.Contains(point), x.Condition.ChannelId, zone.Timer, _trackingMarkerStatu[x.Condition.ChannelId] == ChannelTypeEnum.Leave);
 
-                            if (zone.Type == _trackingMarkerStatu[x.Name].ToString())
+                            if (zone.Type == _trackingMarkerStatu[x.Condition.ChannelId].ToString())
                             {
-                                if (!zone.Timer.Enabled)
+                                if (zone.IsDelay || x.Condition.Type == ChannelTypeEnum.Stay.ToString())
                                 {
-                                    if (zone.IsDelay || x.Type == ChannelTypeEnum.Stay.ToString())
+                                    if (zone.IsDelay && x.Condition.Type != ChannelTypeEnum.Stay.ToString())
                                     {
-                                        zone.Timer.Start();
-                                        zone.Timer.Interval = zone.IsDelay ? zone.DelaySeconds * 1000 : zone.Duration * 1000;
+                                        zone.StartTimerDelay(x, false);
                                     }
                                     else
                                     {
-                                        zone.IsTimerSignal = true;
+                                        zone.StartTimerStay(x, false);
                                     }
                                 }
-                                if (zone.IsTimerSignal)
+                                else
                                 {
-                                    zone.IsTimerSignal = false;
-                                    isDrawMarker = true;
+                                    if (x.Condition.Type != ChannelTypeEnum.Leave.ToString())
+                                    {
+                                        zone.ImmediatelyDrawMarker(x, false);
+                                    }
                                 }
-
                             }
                             else
                             {
-                                if ((re && x.Type == ChannelTypeEnum.Leave.ToString()) || zone.IsTimerSignal) { isDrawMarker = true; zone.IsTimerSignal = false; }
+                                if ((re && x.Condition.Type == ChannelTypeEnum.Leave.ToString()) && !zone.IsDelay)// || zone.IsTimerSignal
+                                {
+                                    zone.ImmediatelyDrawMarker(x, false);
+                                }
+                                if (x.Condition.Type == ChannelTypeEnum.Stay.ToString())
+                                {
+                                    zone.StayStopDraw();
+                                }
                             }
-                        }
-                        if (isDrawMarker)
-                        {
-                            InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
-                            {
-                                Color = x.BgColor,
-                                IsIgnore = false,
-                                CameraTime = InperDeviceHelper.Instance.time / 100,
-                                ChannelId = x.ChannelId,
-                                CreateTime = DateTime.Now,
-                                Name = x.Name,
-                                Type = x.Type
-                            });
                         }
                     });
                 }
@@ -283,55 +361,49 @@ namespace InperStudio.Lib.Bean
                 {
                     _trackingEventChannelJson.ForEach(x =>
                     {
-                        bool isDrawMarker = false;
                         //每个Video下的zone
                         x.VideoZone.AllZoneConditions.ForEach(condition =>
                         {
                             if (condition.ZoneName == x.SymbolName)
                             {
                                 var rect = new System.Windows.Rect(condition.ShapeLeft, condition.ShapeTop, condition.ShapeWidth, condition.ShapeHeight);
-                                bool re = TrackingStateSet(rect.Contains(point), x.Name, condition.Timer, _trackingMarkerStatu[x.Name] == ChannelTypeEnum.Leave);
 
-                                if (x.Type == _trackingMarkerStatu[x.Name].ToString())
+                                bool re = TrackingStateSet(rect.Contains(point), x.ChannelId, condition.Timer, _trackingMarkerStatu[x.ChannelId] == ChannelTypeEnum.Leave);
+
+                                if (x.Type == _trackingMarkerStatu[x.ChannelId].ToString())
                                 {
-                                    if (!condition.Timer.Enabled)
+                                    if (condition.IsDelay || x.Type == ChannelTypeEnum.Stay.ToString())
                                     {
-                                        if (condition.IsDelay || x.Type == ChannelTypeEnum.Stay.ToString())
+                                        if (condition.IsDelay && x.Type != ChannelTypeEnum.Stay.ToString())
                                         {
-                                            condition.Timer.Start();
-                                            condition.Timer.Interval = condition.IsDelay ? condition.DelaySeconds * 1000 : condition.Duration * 1000;
+                                            condition.StartTimerDelay(x, true);
                                         }
                                         else
                                         {
-                                            condition.IsTimerSignal = true;
+                                            condition.StartTimerStay(x, true);
                                         }
                                     }
-                                    if (condition.IsTimerSignal)
+                                    else
                                     {
-                                        condition.IsTimerSignal = false;
-                                        isDrawMarker = true;
+                                        if (x.Type != ChannelTypeEnum.Leave.ToString())
+                                        {
+                                            condition.ImmediatelyDrawMarker(x, true);
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    if ((re && x.Type == ChannelTypeEnum.Leave.ToString()) || condition.IsTimerSignal) { isDrawMarker = true; condition.IsTimerSignal = false; }
+                                    if ((re && x.Type == ChannelTypeEnum.Leave.ToString()) && !condition.IsDelay)
+                                    {
+                                        condition.ImmediatelyDrawMarker(x, true);
+                                    }
+                                    if (x.Type == ChannelTypeEnum.Stay.ToString())
+                                    {
+                                        condition.StayStopDraw();
+                                    }
                                 }
                             }
                         });
-
-                        if (isDrawMarker)
-                        {
-                            InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
-                            {
-                                Color = x.BgColor,
-                                IsIgnore = true,
-                                CameraTime = InperDeviceHelper.Instance.time / 100,
-                                ChannelId = x.ChannelId,
-                                CreateTime = DateTime.Now,
-                                Name = x.Name,
-                                Type = x.Type
-                            });
-                        }
                     });
                 }
             }
@@ -340,7 +412,7 @@ namespace InperStudio.Lib.Bean
                 Console.WriteLine(ex.ToString());
             }
         }
-        private bool TrackingStateSet(bool isTrue, string name, System.Timers.Timer timer, bool isLeave = false)
+        private bool TrackingStateSet(bool isTrue, int name, System.Timers.Timer timer, bool isLeave = false)
         {
             if (isTrue)
             {
@@ -364,12 +436,11 @@ namespace InperStudio.Lib.Bean
                     //如果定时器没有在执行，就设置状态为none
                     if (!timer.Enabled)
                     {
+                        _trackingMarkerStatu[name] = ChannelTypeEnum.None;
                         if (isLeave)
                         {
-                            _trackingMarkerStatu[name] = ChannelTypeEnum.None;
                             return true;
                         }
-                        _trackingMarkerStatu[name] = ChannelTypeEnum.None;
                     }
                 }
             }
@@ -382,7 +453,7 @@ namespace InperStudio.Lib.Bean
                 await accordCamraSetting.Stop();
                 var resol = accordCamraSetting.VideoCapabilities.FirstOrDefault(x => x.FrameSize == resolutionInfo.FrameSize);
                 accordCamraSetting.SetResoulation(resol);
-                accordCamraSetting.Start();
+                StartCapture();
             }
             catch (Exception ex)
             {
@@ -391,13 +462,19 @@ namespace InperStudio.Lib.Bean
         }
         public void StartCapture()
         {
+            _trackingEventChannelJson = new List<EventChannelJson>();
+            _trackingEventChannelJsonOutput = new List<EventChannelJson>();
+            receivedMats = new ConcurrentQueue<Mat>();
+            trackCancellationToken.Cancel();
+            trackCancellationToken = new CancellationTokenSource();
             accordCamraSetting.Start();
+            DrawAndTrack(trackCancellationToken.Token);
         }
         public async void StartRecording(string path = null)
         {
             await accordCamraSetting.Stop();
             accordCamraSetting.SetWritePath(path);
-            accordCamraSetting.Start();
+            StartCapture();
             accordCamraSetting.IsRecord = true;
 
             StartTracking();
@@ -405,6 +482,7 @@ namespace InperStudio.Lib.Bean
         public async void Stop()
         {
             await accordCamraSetting.Stop();
+            trackCancellationToken.Cancel();
             accordCamraSetting.IsRecord = false;
             StopTracking();
         }

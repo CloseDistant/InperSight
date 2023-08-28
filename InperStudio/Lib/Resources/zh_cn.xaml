@@ -121,7 +121,9 @@
     <sys:String x:Key="marker_hotkeys">热键</sys:String>
     <sys:String x:Key="marker_windowsize">窗口</sys:String>
     <sys:String x:Key="marker_rp">不应期 (s)</sys:String>
-
+    <sys:String x:Key="marker_mode1">模式</sys:String>
+    <sys:String x:Key="marker_detail1">细节</sys:String>
+    
     <!--stimulus-->
     <sys:String x:Key="stimulus_title">同步</sys:String>
     <sys:String x:Key="stimulus_waveform">基础波形</sys:String>

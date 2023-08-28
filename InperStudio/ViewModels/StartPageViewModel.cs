@@ -34,7 +34,7 @@ namespace InperStudio.ViewModels
             bool.TryParse(InperJsonHelper.GetDisplaySetting("note"), out bool note);
             InperGlobalClass.IsDisplayNote = note;
             bool.TryParse(InperJsonHelper.GetDisplaySetting("sprit"), out bool sprit);
-            InperGlobalClass.IsDisplaySprit= sprit;
+            InperGlobalClass.IsDisplaySprit = sprit;
         }
         async Task TaskExecute(CancellationToken token)
         {
@@ -120,6 +120,7 @@ namespace InperStudio.ViewModels
                         InperLogExtentHelper.InitLogDatabase();
                         //加载模型
                         //InperTrackingDnnHelper.LoadNet();
+                        //InperTrackingOpenvinoHelper.LoadModel();
                         windowManager.ShowWindow(new MainWindowViewModel(windowManager));
                         RequestClose();
                     }

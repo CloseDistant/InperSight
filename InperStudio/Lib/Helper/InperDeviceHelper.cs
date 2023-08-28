@@ -15,6 +15,7 @@ using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
 using SciChart.Charting.Visuals.Annotations;
 using SciChart.Charting.Visuals.Axes;
+using SciChart.Core.Extensions;
 using Stylet;
 using System;
 using System.CodeDom;
@@ -485,7 +486,7 @@ namespace InperStudio.Lib.Helper
         }
         private int[] _cameraSkipCountArray = new int[4];
         private int _cameraSkipCount = 0;
-        public int _FrameProcLock = 0;
+        public object _FrameProcLock = new object();
         //private ConcurrentDictionary<int, double[]> _defectValues;
         public async void FrameProc()
         {
@@ -500,66 +501,70 @@ namespace InperStudio.Lib.Helper
                         time = ts;
                         ConcurrentBag<string> values = new ConcurrentBag<string>();
                         ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
-                        foreach (var mask in CameraChannels)
+                        if (Monitor.TryEnter(_FrameProcLock))
                         {
-                            if (mask.Type == ChannelTypeEnum.Camera.ToString())
+                            foreach (var mask in CameraChannels)
                             {
-                                double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
-
-                                if (mask.Offset)
+                                if (mask.Type == ChannelTypeEnum.Camera.ToString())
                                 {
-                                    if (InperGlobalClass.IsPreview)
+                                    double r = (double)m.ImageMat.Mean(mask.Mask) / 655.35;
+
+                                    if (mask.Offset)
                                     {
-                                        if (OffsetData.GetOrAdd(mask.ChannelId, new Dictionary<int, Queue<double>>()) is Dictionary<int, Queue<double>> res)
+                                        if (InperGlobalClass.IsPreview)
                                         {
-                                            if (res.ContainsKey(m.Group))
+                                            if (OffsetData.GetOrAdd(mask.ChannelId, new Dictionary<int, Queue<double>>()) is Dictionary<int, Queue<double>> res)
                                             {
-                                                if (res[m.Group].Count > 999)
+                                                if (res.ContainsKey(m.Group))
                                                 {
-                                                    res[m.Group].Dequeue();
+                                                    if (res[m.Group].Count > 999)
+                                                    {
+                                                        res[m.Group].Dequeue();
+                                                    }
+                                                    res[m.Group].Enqueue(r);
                                                 }
-                                                res[m.Group].Enqueue(r);
-                                            }
-                                            else
-                                            {
-                                                res.Add(m.Group, new Queue<double>());
+                                                else
+                                                {
+                                                    res.Add(m.Group, new Queue<double>());
+                                                }
                                             }
                                         }
-                                    }
 
-                                    if (mask.LightModes.FirstOrDefault(x => x.LightType == m.Group) is var mode)
-                                    {
-                                        if (mode != null)
+                                        if (mask.LightModes.FirstOrDefault(x => x.LightType == m.Group) is var mode)
                                         {
-                                            r -= mode.OffsetValue;
+                                            if (mode != null)
+                                            {
+                                                r -= mode.OffsetValue;
+                                            }
                                         }
                                     }
-                                }
 
-                                if (mask.Filters.IsSmooth)
-                                {
-                                    r = Smooth(mask, m.Group, r);
-                                }
-                                if (mask.IsDeltaFCalculate)
-                                {
-                                    _ = Task.Run(() =>
+                                    if (mask.Filters.IsSmooth)
                                     {
-                                        DeltaFCalculate(mask.ChannelId, m.Group, r, ts / 100);
-                                    });
-                                }
-                                if (mask.Filters.IsBandpass)
-                                {
-                                    r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
-                                }
-                                if (mask.Filters.IsBandstop)
-                                {
-                                    r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
-                                }
+                                        r = Smooth(mask, m.Group, r);
+                                    }
+                                    if (mask.IsDeltaFCalculate)
+                                    {
+                                        _ = Task.Run(() =>
+                                        {
+                                            DeltaFCalculate(mask.ChannelId, m.Group, r, ts / 100);
+                                        });
+                                    }
+                                    if (mask.Filters.IsBandpass)
+                                    {
+                                        r = mask.Filters.OnlineFilter.GetBandpassValue(r, m.Group);
+                                    }
+                                    if (mask.Filters.IsBandstop)
+                                    {
+                                        r = mask.Filters.OnlineFilter.GetBandstopValue(r, m.Group);
+                                    }
 
-                                values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
-                                _poltValues.TryAdd(mask.ChannelId, r);
+                                    values.Add(mask.ChannelId + "," + System.Convert.ToBase64String(BitConverter.GetBytes(r)));
+                                    _poltValues.TryAdd(mask.ChannelId, r);
 
+                                }
                             }
+                            Monitor.Exit(_FrameProcLock);
                         }
                         if (_cameraSkipCountArray[m.Group] >= _cameraSkipCount)
                         {
@@ -876,27 +881,26 @@ namespace InperStudio.Lib.Helper
                             _ = queue.TryDequeue(out _);
                             val = queue.Average();
 
-                            double stdDev = Math.Sqrt(queue.Sum(x => Math.Pow(x - val, 2)) / (queue.Count - 1));
-                            double _values = 0;
-                            bool isExistOutlier = false;
-                            foreach (double value in queue)
-                            {
-                                if (Math.Abs(value - val) > 3 * stdDev)
-                                {
-                                    //Console.WriteLine($"Found an outlier: {value}");
-                                    //App.Log.Error($"Found an outlier: {value}");
-                                    _values += val;
-                                    isExistOutlier = true;
-                                }
-                                else
-                                {
-                                    _values += value;
-                                }
-                            }
-                            if (isExistOutlier)
-                            {
-                                val = _values / queue.Count;
-                            }
+                            //double stdDev = Math.Sqrt(queue.Sum(x => Math.Pow(x - val, 2)) / (queue.Count - 1));
+                            //double _values = 0;
+                            //bool isExistOutlier = false;
+                            //foreach (double value in queue)
+                            //{
+                            //    Console.WriteLine($"value:{value}--stdDev:{stdDev}");
+                            //    if (Math.Abs(value - val) > 3 * stdDev)
+                            //    {
+                            //        _values += val;
+                            //        isExistOutlier = true;
+                            //    }
+                            //    else
+                            //    {
+                            //        _values += value;
+                            //    }
+                            //}
+                            //if (isExistOutlier)
+                            //{
+                            //    val = _values / queue.Count;
+                            //}
                         }
                     }
                 }
@@ -1011,7 +1015,6 @@ namespace InperStudio.Lib.Helper
         private async Task ImageDataCloneToSave(AllChannelRecord[] datas)
         {
             IEnumerable<IGrouping<int, AllChannelRecord>> res = datas.GroupBy(x => x.Type);
-
             await Task.WhenAll(res.Select(async data =>
             {
                 await Task.Run(() =>
@@ -1275,17 +1278,19 @@ namespace InperStudio.Lib.Helper
                             {
                                 if (marker.IsIgnore)//marker
                                 {
-                                    await App.SqlDataInit?.sqlSugar.UseTranAsync(async () =>
-                                    {
-                                        await App.SqlDataInit.sqlSugar.Insertable(marker).AS(nameof(Marker)).ExecuteCommandAsync();
-                                    });
+                                    if (App.SqlDataInit?.sqlSugar != null)
+                                        await App.SqlDataInit?.sqlSugar.UseTranAsync(async () =>
+                                        {
+                                            await App.SqlDataInit.sqlSugar.Insertable(marker).AS(nameof(Marker)).ExecuteCommandAsync();
+                                        });
                                 }
                                 else//output
                                 {
-                                    await App.SqlDataInit?.sqlSugar.UseTranAsync(async () =>
-                                    {
-                                        await App.SqlDataInit.sqlSugar.Insertable(marker).AS(nameof(OutputMarker)).ExecuteCommandAsync();
-                                    });
+                                    if (App.SqlDataInit?.sqlSugar != null)
+                                        await App.SqlDataInit?.sqlSugar.UseTranAsync(async () =>
+                                        {
+                                            await App.SqlDataInit.sqlSugar.Insertable(marker).AS(nameof(OutputMarker)).ExecuteCommandAsync();
+                                        });
                                 }
                             }
                         }

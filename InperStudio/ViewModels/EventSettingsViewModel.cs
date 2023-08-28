@@ -9,12 +9,15 @@ using InperStudio.Lib.Helper.JsonBean;
 using InperStudio.Views;
 using InperStudioControlLib.Lib.Config;
 using MathNet.Numerics.Distributions;
+using Newtonsoft.Json;
 using SciChart.Charting.Model.ChartSeries;
 using SciChart.Charting.Model.DataSeries;
+using SciChart.Core.Extensions;
 using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Windows;
@@ -130,7 +133,7 @@ namespace InperStudio.ViewModels
                         markerChannels.Add(new EventChannel()
                         {
                             IsActive = false,
-                            ChannelId = 0,
+                            ChannelId = 17,
                             SymbolName = "Start",
                             Name = "Start",
                             BgColor = InperColorHelper.ColorPresetList[0],
@@ -139,7 +142,7 @@ namespace InperStudio.ViewModels
                         markerChannels.Add(new EventChannel()
                         {
                             IsActive = false,
-                            ChannelId = 1,
+                            ChannelId = 18,
                             SymbolName = "Stop",
                             Name = "Stop",
                             BgColor = InperColorHelper.ColorPresetList[1],
@@ -159,7 +162,7 @@ namespace InperStudio.ViewModels
                     ConditionsChannels.Add(new EventChannel()
                     {
                         IsActive = false,
-                        ChannelId = 0,
+                        ChannelId = 17,
                         SymbolName = "Start",
                         Name = "Start",
                         BgColor = InperColorHelper.ColorPresetList[0],
@@ -168,7 +171,7 @@ namespace InperStudio.ViewModels
                     ConditionsChannels.Add(new EventChannel()
                     {
                         IsActive = false,
-                        ChannelId = 1,
+                        ChannelId = 18,
                         SymbolName = "Stop",
                         Name = "Stop",
                         BgColor = InperColorHelper.ColorPresetList[1],
@@ -268,6 +271,7 @@ namespace InperStudio.ViewModels
                                         if (chn != null)
                                         {
                                             chn.IsActive = item.IsActive; chn.BgColor = item.BgColor; chn.RefractoryPeriod = item.RefractoryPeriod;
+                                            chn.DeltaF = item.DeltaF; chn.WindowSize = item.WindowSize;
                                         }
                                     }
                                 }
@@ -336,6 +340,14 @@ namespace InperStudio.ViewModels
                     EventChannel ch = @enum == EventSettingsTypeEnum.Marker
                         ? this.view.MarkerChannelCombox.SelectedItem as EventChannel
                         : this.view.ConditionsCombox.SelectedItem as EventChannel;
+                    if (ch.Type == ChannelTypeEnum.Zone.ToString())
+                    {
+                        if (!tb.Text.StartsWith(ch.Name))
+                        {
+                            tb.Text = ch.Name + "-";
+                            tb.SelectionStart = tb.Text.Length;
+                        }
+                    }
                     if (ch.Name.StartsWith("DIO") || ch.Type == ChannelTypeEnum.DIO.ToString())
                     {
                         if (tb.Text.Length < 6 || !tb.Text.StartsWith("DIO-" + (ch.ChannelId + 1) + "-"))
@@ -511,12 +523,12 @@ namespace InperStudio.ViewModels
                                 Hotkeys = con.Hotkeys,
                                 DeltaF = con.DeltaF,
                                 WindowSize = con.WindowSize,
-                                Tau1 = con.Tau1,
-                                Tau2 = con.Tau2,
-                                Tau3 = con.Tau3,
                                 Name = con.Name,
-                                Type = con.Type
+                                Type = con.Type,
+                                SymbolName = con.SymbolName,
+                                VideoZone = con.VideoZone
                             };
+
                             if (item.Condition.Type == ChannelTypeEnum.Analog.ToString())
                             {
                                 item.LightIndex = -1;
@@ -541,6 +553,12 @@ namespace InperStudio.ViewModels
                             view.lightSource.Visibility = Visibility.Collapsed;
                             item.LightIndex = -1;
                         }
+                        if (item.Type == ChannelTypeEnum.Zone.ToString())
+                        {
+                            view.markerMode.SelectedIndex = 0;
+                            view.zoneConditions.SelectedIndex = 0;
+                            view.MarkerName.Text = item.SymbolName + "-" + view.markerMode.Text + "-" + view.zoneConditions.Text;
+                        }
                     }
                 }
             }
@@ -563,13 +581,16 @@ namespace InperStudio.ViewModels
                 if (item.Type == ChannelTypeEnum.Zone.ToString() && @enum == EventSettingsTypeEnum.Marker)
                 {
                     view.MarkerName.Text = item.SymbolName + "-" + name;
-                    view.MarkerName.IsEnabled = false;
+                    //view.MarkerName.IsEnabled = false;
                 }
                 else
                 {
                     view.MarkerName.IsEnabled = true;
                 }
-
+                if (view.zoneConditions.SelectedItem == null)
+                {
+                    view.zoneConditions.SelectedIndex = 0;
+                }
             }
             catch (Exception ex)
             {
@@ -604,6 +625,11 @@ namespace InperStudio.ViewModels
                         Type = item.Type,
                         VideoZone = item.VideoZone,
                     };
+                    if (item.Type == ChannelTypeEnum.Zone.ToString())
+                    {
+                        view.outputMode.SelectedIndex = 0;
+                        view.zoneConditions1.SelectedIndex = 0;
+                    }
                 }
             }
             catch (Exception ex)
@@ -638,15 +664,15 @@ namespace InperStudio.ViewModels
         {
             try
             {
-                EventChannel ch = @enum == EventSettingsTypeEnum.Marker
-                    ? view.MarkerChannelCombox.SelectedItem as EventChannel
-                    : view.ConditionsCombox.SelectedItem as EventChannel;
+                EventChannel ch = @enum == EventSettingsTypeEnum.Marker ? view.MarkerChannelCombox.SelectedItem as EventChannel : view.ConditionsCombox.SelectedItem as EventChannel;
+
                 if (moveType == "leftMove")//右移是激活 左移是取消激活
                 {
                     EventChannel ch_active = this.view.markerActiveChannel.SelectedItem as EventChannel;
                     if (ch_active != null)
                     {
-                        if (ch_active.Type != ChannelTypeEnum.Zone.ToString() && ch_active.Type != ChannelTypeEnum.Manual.ToString() && @enum == EventSettingsTypeEnum.Marker)
+                        ch_active.IsActive = false;
+                        if (ch_active.Type != ChannelTypeEnum.Stay.ToString() && ch_active.Type != ChannelTypeEnum.Leave.ToString() && ch_active.Type != ChannelTypeEnum.EnterOrLeave.ToString() && ch_active.Type != ChannelTypeEnum.Enter.ToString() && ch_active.Type != ChannelTypeEnum.Zone.ToString() && ch_active.Type != ChannelTypeEnum.Manual.ToString() && @enum == EventSettingsTypeEnum.Marker)
                         {
                             EventChannel act = @enum == EventSettingsTypeEnum.Output
                                 ? MarkerChannels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.Type == ch_active.Type && x.Condition.Type == ch_active.Condition.Type)
@@ -666,9 +692,9 @@ namespace InperStudio.ViewModels
                             }
                         }
                         EventChannelJson item = @enum == EventSettingsTypeEnum.Marker
-                            ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Input.ToString()) && x.Type != ChannelTypeEnum.Output.ToString())
+                            ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type) && x.Type != ChannelTypeEnum.Output.ToString())
                             : InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && (x.Type == ch_active.Type || x.Type == ChannelTypeEnum.Output.ToString()) && x.Condition?.ChannelId == ch_active.Condition?.ChannelId && x.Condition?.Type == ch_active.Condition?.Type);
-                        if (item != null)
+                        if (item != null && item.Type != ChannelTypeEnum.Zone.ToString() && item.Type != ChannelTypeEnum.Leave.ToString() && item.Type != ChannelTypeEnum.Enter.ToString() && item.Type != ChannelTypeEnum.EnterOrLeave.ToString() && item.Type != ChannelTypeEnum.Stay.ToString())
                         {
                             _ = InperGlobalClass.EventSettings.Channels.Remove(item);
                             var r = InperDeviceHelper.Instance.DeltaFCalculateList.Remove(item);
@@ -684,17 +710,18 @@ namespace InperStudio.ViewModels
                             if (item.Type == ChannelTypeEnum.Manual.ToString())
                             {
                                 _ = MarkerChannels.Remove(ch_active);
-                                manualChannels.Remove(ch_active);
+                                manualChannels.RemoveWhere(x => x.Hotkeys == ch_active.Hotkeys && x.Type == ch_active.Type);
                                 markerChannels.FirstOrDefault(x => x.ChannelId == -1 && x.Type == ChannelTypeEnum.Manual.ToString()).Name = ChannelTypeEnum.Manual.ToString();
                             }
-                            if (item.Type == ChannelTypeEnum.Output.ToString())
+                            else
+                            //if (item.Type == ChannelTypeEnum.Output.ToString() || item.Type==ChannelTypeEnum.Input.ToString())
                             {
                                 _ = MarkerChannels.Remove(ch_active);
                             }
                         }
                         else
                         {
-                            if (ch_active.Type == ChannelTypeEnum.Zone.ToString())
+                            if (ch_active.Type == ChannelTypeEnum.Zone.ToString() || ch_active.Type == ChannelTypeEnum.Leave.ToString() || ch_active.Type == ChannelTypeEnum.Enter.ToString() || ch_active.Type == ChannelTypeEnum.Stay.ToString() || ch_active.Type == ChannelTypeEnum.EnterOrLeave.ToString())
                             {
                                 markerChannels.Remove(ch_active);
                                 if (InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch_active.ChannelId && x.SymbolName == ch_active.SymbolName) is EventChannelJson channelJson)
@@ -706,17 +733,21 @@ namespace InperStudio.ViewModels
                     }
                     if (@enum == EventSettingsTypeEnum.Output)
                     {
-                        view.ConditionsCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false && x.ChannelId == ch_active.ChannelId);
+                        if (ch_active.Condition.Type != ChannelTypeEnum.Leave.ToString() && ch_active.Condition.Type != ChannelTypeEnum.Stay.ToString() && ch_active.Condition.Type != ChannelTypeEnum.Enter.ToString())
+                        {
+                            view.ConditionsCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false && x.ChannelId == ch_active.ChannelId);
+                        }
                     }
                 }
                 else
                 {
                     if (ch != null)
                     {
-                        EventChannel mc = MarkerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type && x.IsActive == false);
+                        EventChannel mc = MarkerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type); //&& x.IsActive == false
+
                         if (ch.Type != ChannelTypeEnum.Manual.ToString())
                         {
-                            ch.IsActive = mc.IsActive = true;
+                            //ch.IsActive = mc.IsActive = true;
                             mc.Name = view.MarkerName.Text;
                             if (mc.Name.EndsWith("-"))
                             {
@@ -725,28 +756,13 @@ namespace InperStudio.ViewModels
                         }
 
                         var outputChannels = InperGlobalClass.EventSettings.Channels.FindAll(x => x.Type == ChannelTypeEnum.Output.ToString());
-                        var lightChannels = outputChannels.FindAll(f => f.ChannelId == ch.ChannelId && (f.Condition.Type == ChannelTypeEnum.Light.ToString() || f.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString()));
+                        //var lightChannels = outputChannels.FindAll(f => f.C hannelId == ch.ChannelId && (f.Condition.Type == ChannelTypeEnum.Light.ToString() || f.Condition.Type == ChannelTypeEnum.AfterExcitation.ToString()));
 
                         if (@enum == EventSettingsTypeEnum.Output)
                         {
-                            if (outputChannels.Count > 0)
-                            {
-                                if (lightChannels.Count > 0)
-                                {
-                                    string text = "条件已存在!";
-                                    if (InperConfig.Instance.Language == "en_us")
-                                    {
-                                        text = "This condition already exists!";
-                                    }
-                                    Growl.Warning(text, "SuccessMsg");
-                                    ch.IsActive = false;
-                                    return;
-                                }
-                            }
+                            EventChannelJson output = outputChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Condition?.Type == ch.Condition?.Type && (x.Type == ch.Type || x.Type == ChannelTypeEnum.Output.ToString()));// && x.Condition?.ChannelId == ch.Condition?.ChannelId
 
-                            EventChannelJson output = outputChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Condition?.Type == ch.Condition?.Type && x.Condition?.ChannelId == ch.Condition?.ChannelId && (x.Type == ch.Type || x.Type == ChannelTypeEnum.Output.ToString()));
-
-                            if (output != null)
+                            if (output != null && output.Condition.Type != ChannelTypeEnum.Manual.ToString())
                             {
                                 string text = "条件已存在!";
                                 if (InperConfig.Instance.Language == "en_us")
@@ -754,14 +770,33 @@ namespace InperStudio.ViewModels
                                     text = "This condition already exists!";
                                 }
                                 Growl.Warning(text, "SuccessMsg");
-                                ch.IsActive = false;
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            var markerChannels = InperGlobalClass.EventSettings.Channels.FindAll(x => x.Type != ChannelTypeEnum.Output.ToString());
+                            var marekr = markerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ChannelTypeEnum.Input.ToString() && ch.Type != ChannelTypeEnum.Camera.ToString());
+                            if (marekr == null)
+                            {
+                                markerChannels = markerChannels.FindAll(x => x.Type != ChannelTypeEnum.Input.ToString());
+                                marekr = markerChannels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type && ch.Type != ChannelTypeEnum.Zone.ToString());
+                            }
+                            if (marekr != null)
+                            {
+                                string text = "条件已存在!";
+                                if (InperConfig.Instance.Language == "en_us")
+                                {
+                                    text = "This condition already exists!";
+                                }
+                                Growl.Warning(text, "SuccessMsg");
                                 return;
                             }
                         }
 
                         EventChannelJson item = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.ChannelId == ch.ChannelId && x.Type == ch.Type);
 
-                        if (item == null)
+                        if (item == null && ch.Type != ChannelTypeEnum.Zone.ToString())
                         {
                             string type = string.Empty;
                             type = @enum == EventSettingsTypeEnum.Marker
@@ -776,18 +811,15 @@ namespace InperStudio.ViewModels
                             EventChannelJson channle = new EventChannelJson()
                             {
                                 ChannelId = id,
-                                IsActive = ch.IsActive,
+                                IsActive = true,
                                 SymbolName = ch.SymbolName,
                                 Name = view.MarkerName.Text,
                                 RefractoryPeriod = double.Parse(view.refp.Text),
                                 BgColor = ch.BgColor,
                                 DeltaF = ch.DeltaF,
                                 WindowSize = ch.WindowSize,
-                                //Tau1 = ch.Tau1,
-                                //Tau2 = ch.Tau2,
-                                //Tau3 = ch.Tau3,
                                 Hotkeys = ch.Hotkeys,
-                                Condition = ch.Condition,
+                                Condition = JsonConvert.DeserializeObject<EventChannelJson>(JsonConvert.SerializeObject(ch.Condition)),
                                 Type = type
                             };
 
@@ -824,11 +856,12 @@ namespace InperStudio.ViewModels
                                         mc.IsActive = false;
                                         return;
                                     }
+                                    bool isExit = false;
                                     InperGlobalClass.EventSettings.Channels.ForEach(x =>
                                     {
                                         if (x.Type == ChannelTypeEnum.Manual.ToString())
                                         {
-                                            if (x.Hotkeys == channle.Condition.Hotkeys || x.Name == channle.Condition.Name)
+                                            if (x.Hotkeys == channle.Condition.Hotkeys) //|| x.Name == channle.Condition.Name
                                             {
                                                 string text = "条件已存在!";
                                                 if (InperConfig.Instance.Language == "en_us")
@@ -836,7 +869,7 @@ namespace InperStudio.ViewModels
                                                     text = "This condition already exists!";
                                                 }
                                                 Growl.Warning(text, "SuccessMsg");
-                                                mc.IsActive = false;
+                                                isExit = true;
                                                 return;
                                             }
                                         }
@@ -852,13 +885,14 @@ namespace InperStudio.ViewModels
                                                         text = "This condition already exists!";
                                                     }
                                                     Growl.Warning(text, "SuccessMsg");
-                                                    mc.IsActive = false;
+                                                    isExit = true;
+                                                    return;
                                                 }
 
                                             }
                                         }
                                     });
-                                    if (mc.IsActive == false)
+                                    if (isExit)
                                     {
                                         return;
                                     }
@@ -906,53 +940,100 @@ namespace InperStudio.ViewModels
                                 }
 
                                 manualChannels.Add(chn);
-                                MarkerChannels.Add(chn);
+                                //MarkerChannels.Add(chn);
                             }
                             //output zone条件配置
                             if (channle.Type == ChannelTypeEnum.Output.ToString())
                             {
+                                channle.Condition.ChannelId = new Random().Next(999, 999999);
+
                                 if (channle.Condition != null && view.outputzoneVisibility.IsVisible)
                                 {
+                                    if (InperGlobalClass.EventSettings.Channels.Count(x => x.Condition?.Name == ch.Condition.Name && x.ChannelId == channle.ChannelId && x.Type == ChannelTypeEnum.Output.ToString() && x.Condition.SymbolName == view.outputMode.Text && x.Condition.Type == view.zoneConditions1.Text) > 0)
+                                    {
+                                        string text = "条件已存在!";
+                                        if (InperConfig.Instance.Language == "en_us")
+                                        {
+                                            text = "This condition already exists!";
+                                        }
+                                        ch.IsActive = mc.IsActive = false;
+                                        Growl.Warning(text, "SuccessMsg");
+                                        return;
+                                    }
                                     channle.Condition.SymbolName = view.outputMode.Text;
                                     channle.Condition.Type = view.zoneConditions1.Text;
+                                    channle.Condition.VideoZone = new VideoZone()
+                                    {
+                                        Name = ch.Condition.VideoZone.Name,
+                                        AllZoneConditions = new List<ZoneConditions>()
+                                    };
+                                    var conditions = view.outputMode.SelectedValue as ZoneConditions;
+                                    //conditions.Type = view.zoneConditions1.Text;
+                                    int.TryParse(view.zoneDuration1.Text, out int duration);
+                                    //conditions.Duration = duration;
+                                    //conditions.IsImmediately = (bool)view.zoneImmediately1.IsChecked;
+                                    //conditions.IsDelay = (bool)view.outputZone.IsChecked;
+                                    int.TryParse(view.zoneDelaySeconds1.Text, out int delayDuration);
+                                    channle.Condition.VideoZone.AllZoneConditions.Add(new ZoneConditions()
+                                    {
+                                        Color = conditions.Color,
+                                        DelaySeconds = delayDuration,
+                                        Duration = duration,
+                                        IsImmediately = (bool)view.zoneImmediately1.IsChecked,
+                                        IsDelay = (bool)view.outputZone.IsChecked,
+                                        IsTimerSignal = conditions.IsTimerSignal,
+                                        ShapeHeight = conditions.ShapeHeight,
+                                        ShapeWidth = conditions.ShapeWidth,
+                                        ShapeLeft = conditions.ShapeLeft,
+                                        ShapeName = conditions.ShapeName,
+                                        ShapeTop = conditions.ShapeTop,
+                                        ShapeType = conditions.ShapeType,
+                                        Timer = conditions.Timer,
+                                        Type = view.zoneConditions1.Text,
+                                        ZoneName = conditions.ZoneName,
+                                    });
+                                    //ch.IsActive = mc.IsActive = false;
+                                    //channle.IsActive = true;
                                 }
                             }
+                            MarkerChannels.Add(JsonConvert.DeserializeObject<EventChannel>(JsonConvert.SerializeObject(channle)));
 
                             InperGlobalClass.EventSettings.Channels.Add(channle);
                             InperDeviceHelper.Instance.DeltaFCalculateList.Add(channle);
-
-
                         }
-                        else
+                        else  //如果已存在
                         {
                             if (item.Type == ChannelTypeEnum.Zone.ToString())
                             {
                                 ch.IsActive = false;
 
                                 var symboname = @enum == EventSettingsTypeEnum.Marker ? view.markerMode.Text : view.outputMode.Text;
-                                if (markerChannels.Count(x => x.SymbolName == symboname) > 0)
+                                //if (markerChannels.Count(x => x.SymbolName == symboname) > 0)
                                 {
-                                    var zone = @enum == EventSettingsTypeEnum.Marker ? item.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == symboname) : item.Condition.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == symboname);
+                                    //var zone = @enum == EventSettingsTypeEnum.Marker ? item.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == symboname && x.Type == view.zoneConditions.Text) : item.Condition.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == symboname && x.Type == view.zoneConditions.Text);
+                                    var zone = @enum == EventSettingsTypeEnum.Marker ? InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.Name.StartsWith(ch.Name) && x.Type == view.zoneConditions.Text && x.SymbolName == symboname) :
+                                        InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.Condition != null && x.Condition.Type == view.zoneConditions1.Text && x.Condition.SymbolName == symboname);
                                     if (zone != null)
                                     {
-                                        zone = new ZoneConditions()
+                                        //zone = new ZoneConditions()
+                                        //{
+                                        //    ZoneName = zone.ZoneName,
+                                        //    Color = zone.Color,
+                                        //    ShapeTop = zone.ShapeTop,
+                                        //    ShapeLeft = zone.ShapeLeft,
+                                        //    ShapeHeight = zone.ShapeHeight,
+                                        //    ShapeWidth = zone.ShapeWidth,
+                                        //    ShapeName = zone.ShapeName,
+                                        //};
+                                        string text = "条件已存在!";
+                                        if (InperConfig.Instance.Language == "en_us")
                                         {
-                                            ZoneName = zone.ZoneName,
-                                            Color = zone.Color,
-                                            ShapeTop = zone.ShapeTop,
-                                            ShapeLeft = zone.ShapeLeft,
-                                            ShapeHeight = zone.ShapeHeight,
-                                            ShapeWidth = zone.ShapeWidth,
-                                            ShapeName = zone.ShapeName,
-                                        };
+                                            text = "This condition already exists!";
+                                        }
+                                        Growl.Warning(text, "SuccessMsg");
+                                        ch.IsActive = mc.IsActive = false;
+                                        return;
                                     }
-                                    string text = "条件已存在!";
-                                    if (InperConfig.Instance.Language == "en_us")
-                                    {
-                                        text = "This condition already exists!";
-                                    }
-                                    Growl.Warning(text, "SuccessMsg");
-                                    return;
                                 }
                                 var chnjson = new EventChannel()
                                 {
@@ -971,7 +1052,10 @@ namespace InperStudio.ViewModels
                                     chnjson.Condition = item.Condition;
                                     chnjson.Type = ChannelTypeEnum.Output.ToString();
                                 }
-                                MarkerChannels.Add(chnjson);
+                                if (!view.outputzoneVisibility.IsVisible && !view.markerzoneVisibility.IsVisible)
+                                {
+                                    MarkerChannels.Add(chnjson);
+                                }
                                 EventChannelJson channle2 = new EventChannelJson
                                 {
                                     ChannelId = chnjson.ChannelId,
@@ -988,13 +1072,67 @@ namespace InperStudio.ViewModels
                                 };
                                 if (@enum == EventSettingsTypeEnum.Marker)
                                 {
-                                    channle2.VideoZone.AllZoneConditions.Add(view.markerMode.SelectedValue as ZoneConditions);
+                                    var conditions = view.markerMode.SelectedValue as ZoneConditions;
+                                    //conditions.Type = view.zoneConditions.Text;
+                                    int.TryParse(view.zoneDuration.Text, out int duration);
+                                    //conditions.Duration = duration;
+                                    //conditions.IsImmediately = (bool)view.zoneImmediately.IsChecked;
+                                    //conditions.IsDelay = (bool)view.markerZone.IsChecked;
+                                    int.TryParse(view.zoneDelaySeconds.Text, out int delayDuration);
+                                    //conditions.DelaySeconds = delayDuration;
+
+                                    channle2.VideoZone.AllZoneConditions.Add(new ZoneConditions()
+                                    {
+                                        Color = conditions.Color,
+                                        DelaySeconds = delayDuration,
+                                        Duration = duration,
+                                        IsImmediately = (bool)view.zoneImmediately.IsChecked,
+                                        IsDelay = (bool)view.markerZone.IsChecked,
+                                        IsTimerSignal = conditions.IsTimerSignal,
+                                        ShapeHeight = conditions.ShapeHeight,
+                                        ShapeWidth = conditions.ShapeWidth,
+                                        ShapeLeft = conditions.ShapeLeft,
+                                        ShapeName = conditions.ShapeName,
+                                        ShapeTop = conditions.ShapeTop,
+                                        ShapeType = conditions.ShapeType,
+                                        Timer = conditions.Timer,
+                                        Type = view.zoneConditions.Text,
+                                        ZoneName = conditions.ZoneName,
+                                    });
+                                    channle2.ChannelId = new Random().Next(999, 999999);
                                 }
                                 else
                                 {
-                                    channle2.VideoZone.AllZoneConditions.Add(view.outputMode.SelectedValue as ZoneConditions);
+                                    var conditions = view.outputMode.SelectedValue as ZoneConditions;
+                                    //conditions.Type = view.zoneConditions1.Text;
+                                    int.TryParse(view.zoneConditions1.Text, out int duration);
+                                    //conditions.Duration = duration;
+                                    //conditions.IsImmediately = (bool)view.zoneImmediately1.IsChecked;
+                                    //conditions.IsDelay = (bool)view.outputZone.IsChecked;
+                                    int.TryParse(view.zoneDelaySeconds1.Text, out int delayDuration);
+                                    channle2.VideoZone.AllZoneConditions.Add(new ZoneConditions()
+                                    {
+                                        Color = conditions.Color,
+                                        DelaySeconds = delayDuration,
+                                        Duration = duration,
+                                        IsImmediately = (bool)view.zoneImmediately1.IsChecked,
+                                        IsDelay = (bool)view.outputZone.IsChecked,
+                                        IsTimerSignal = conditions.IsTimerSignal,
+                                        ShapeHeight = conditions.ShapeHeight,
+                                        ShapeWidth = conditions.ShapeWidth,
+                                        ShapeLeft = conditions.ShapeLeft,
+                                        ShapeName = conditions.ShapeName,
+                                        ShapeTop = conditions.ShapeTop,
+                                        ShapeType = conditions.ShapeType,
+                                        Timer = conditions.Timer,
+                                        Type = view.zoneConditions1.Text,
+                                        ZoneName = conditions.ZoneName,
+                                    });
+                                    channle2.Condition.ChannelId = new Random().Next(999, 999999);
                                 }
+                                ch.IsActive = mc.IsActive = false;
                                 InperGlobalClass.EventSettings.Channels.Add(channle2);
+                                MarkerChannels.Add(JsonConvert.DeserializeObject<EventChannel>(JsonConvert.SerializeObject(channle2)));
                             }
                             else
                             {
@@ -1016,18 +1154,22 @@ namespace InperStudio.ViewModels
                         }
                         else
                         {
-                            view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
-                            EventChannel _item = new EventChannel()
-                            {
-                                BgColor = view.MarkerColorList.SelectedItem.ToString(),
-                                ChannelId = ch.ChannelId,
-                                Name = ch.SymbolName,
-                                SymbolName = ch.SymbolName,
-                                IsActive = false,
-                                Type = ch.Type
-                            };
-                            MarkerChannels.Add(_item);
-                            view.ConditionsCombox.SelectedItem = _item;
+                            //if (!view.outputzoneVisibility.IsVisible && !view.markerzoneVisibility.IsVisible)
+                            //{
+                            //    view.MarkerChannelCombox.SelectedItem = MarkerChannels.FirstOrDefault(x => x.IsActive == false);
+                            //    EventChannel _item = new EventChannel()
+                            //    {
+                            //        BgColor = view.MarkerColorList.SelectedItem.ToString(),
+                            //        ChannelId = ch.ChannelId,
+                            //        Name = ch.SymbolName,
+                            //        SymbolName = ch.SymbolName,
+                            //        IsActive = false,
+                            //        Condition = JsonConvert.DeserializeObject<EventChannelJson>(JsonConvert.SerializeObject(ch.Condition)),
+                            //        Type = ch.Type
+                            //    };
+                            //    MarkerChannels.Add(_item);
+                            //    view.ConditionsCombox.SelectedItem = _item;
+                            //}
                         }
                     }
                 }
@@ -1059,8 +1201,8 @@ namespace InperStudio.ViewModels
                     }
                     if (channel.Type == ChannelTypeEnum.Zone.ToString() || channel.Type == ChannelTypeEnum.Enter.ToString() || channel.Type == ChannelTypeEnum.Stay.ToString() || channel.Type == ChannelTypeEnum.Leave.ToString())
                     {
-                        var chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.IsActive && x.SymbolName == channel.SymbolName);
-                        var zone = chn.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == channel.SymbolName);
+                        //var chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.IsActive && x.SymbolName == channel.SymbolName);
+                        var zone = channel.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == channel.SymbolName);
                         if (zone != null)
                         {
                             if (zone.IsImmediately)
@@ -1094,24 +1236,40 @@ namespace InperStudio.ViewModels
                     }
                     if (channel.Condition.Type == ChannelTypeEnum.Leave.ToString() || channel.Condition.Type == ChannelTypeEnum.Enter.ToString() || channel.Condition.Type == ChannelTypeEnum.Stay.ToString())
                     {
-                        var chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.IsActive && x.Condition != null && x.Condition.SymbolName == channel.Condition.SymbolName);
-                        var zone = chn.Condition.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == channel.Condition.SymbolName);
+                        //var chn = InperGlobalClass.EventSettings.Channels.FirstOrDefault(x => x.IsActive && x.Condition != null && x.Condition.SymbolName == channel.Condition.SymbolName);
+                        var zone = channel.Condition.VideoZone.AllZoneConditions.FirstOrDefault(x => x.ZoneName == channel.Condition.SymbolName);
                         if (zone != null)
                         {
                             if (zone.IsImmediately)
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + zone.Type };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + channel.Condition.Type };
                             }
                             if (zone.IsDelay)
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + zone.Type + " Delay:" + zone.DelaySeconds };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + channel.Condition.Type + " Delay:" + zone.DelaySeconds };
                             }
                             if (zone.Type == ChannelTypeEnum.Stay.ToString())
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + zone.Type + " Duration:" + zone.Duration };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + channel.Condition.Type + " Duration:" + zone.Duration };
                             }
                         }
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+
+        public void ZoneConditions_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var item = ((sender as System.Windows.Controls.ComboBox).SelectedItem as ComboBoxItem).Content;
+                if (item != null)
+                {
+                    view.MarkerName.Text = view.MarkerName.Text.Substring(0, view.MarkerName.Text.LastIndexOf("-") + 1) + item.ToString();
                 }
             }
             catch (Exception ex)

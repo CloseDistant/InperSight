@@ -70,7 +70,7 @@
         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0 5 0 0">
             <TextBlock Text="{DynamicResource stimulus_use}" Width="50" FontSize="14" FontFamily="{DynamicResource InperFontFamily}"/> <!--Visibility="{Binding ElementName=isUse,Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter}}"-->
             <!--<TextBlock Text="{DynamicResource stimulus_nouse}" Width="50" FontSize="14" FontFamily="{DynamicResource InperFontFamily}" Visibility="{Binding ElementName=isUse,Path=IsChecked,Converter={StaticResource Boolean2VisibilityReConverter}}"/>-->
-            <ToggleButton Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Margin="0 0 0 0" Height="18" Cursor="Hand" Name="isUse" IsChecked="True"/>
+            <ToggleButton Style="{DynamicResource ToggleButtonSwitchBaseStyle }" Margin="0 0 0 0" Height="18" Cursor="Hand" Name="isUse" />
         </WrapPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -231,7 +231,7 @@
                 <TextBlock Text="{StaticResource stimulus_triggermode}" Width="50" Margin="44 0 0 0" VerticalAlignment="Center"/>
                 <ComboBox Padding="3 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Name="_triggerMode" DisplayMemberPath="" Width="100" Height="25" IsEnabled="{Binding ElementName=_triggerToggle,Path=IsChecked}" HorizontalAlignment="Left" Margin="5 0 0 0">
                     <ComboBoxItem Content="{StaticResource stimulus_triggeredge}"></ComboBoxItem>
-                    <ComboBoxItem Content="{StaticResource stimulus_triggerrealtime}"></ComboBoxItem>
+                    <!--<ComboBoxItem Content="{StaticResource stimulus_triggerrealtime}"></ComboBoxItem>-->
                 </ComboBox>
             </WrapPanel>
         </Grid>

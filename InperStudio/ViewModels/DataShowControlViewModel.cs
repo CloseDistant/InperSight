@@ -69,7 +69,7 @@ namespace InperStudio.ViewModels
             ChartDatas = InperDeviceHelper.Instance.CameraChannels;
             EventChannelChart = InperDeviceHelper.Instance.EventChannelChart;
             TextLableFormatting.Add("hh:mm:ss");
-            TextLableFormatting.Add("Seconds");
+            TextLableFormatting.Add("Second");
             TextLableFormatting.Add("ms");
             TextLableFormatting.Add("Time of day");
             InperGlobalClass.IsExistEvent = true;

@@ -157,33 +157,33 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2.2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Mode" FontSize="{DynamicResource InperNormalFontSize}" Grid.Column="0" VerticalAlignment="Center"/>
-                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Name="outputMode" ItemsSource="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.VideoZone.AllZoneConditions}" DisplayMemberPath="ZoneName"/>
+                            <TextBlock Text="{DynamicResource marker_mode1}" FontSize="{DynamicResource InperNormalFontSize}" Grid.Column="0" VerticalAlignment="Center"/>
+                            <ComboBox Height="25" FontSize="{StaticResource InperNormalFontSize}" hc:BorderElement.CornerRadius="2" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Padding="3 0 0 0" Margin="0 0 20 0" Name="outputMode" ItemsSource="{Binding ElementName=ConditionChannelCombox,Path=SelectedItem.VideoZone.AllZoneConditions}" DisplayMemberPath="ZoneName"/>
                         </Grid>
                         <Grid Grid.Row="1" Margin="0 20 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2.2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock FontSize="{DynamicResource InperNormalFontSize}" Text="Detail" VerticalAlignment="Center"/>
-                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Name="zoneConditions1" Text="{Binding ElementName=outputMode,Path=SelectedValue.Type,Mode=TwoWay}">
-                                <ComboBoxItem IsSelected="True">Enter</ComboBoxItem>
+                            <TextBlock FontSize="{DynamicResource InperNormalFontSize}" Text="{DynamicResource marker_detail1}" VerticalAlignment="Center"/>
+                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" FontSize="{StaticResource InperNormalFontSize}"  SelectionChanged="{s:Action ZoneConditions_SelectionChanged}" Padding="5 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Name="zoneConditions1">
+                                <ComboBoxItem>Enter</ComboBoxItem>
                                 <ComboBoxItem>Leave</ComboBoxItem>
                                 <ComboBoxItem>Stay</ComboBoxItem>
                             </ComboBox>
                         </Grid>
                         <WrapPanel HorizontalAlignment="Center" Name="stayCondition" Grid.Row="2" Margin="32 10 0 0" Visibility="{Binding ElementName=zoneConditions1,Path=SelectedItem.Content,Converter={StaticResource ZoneConditionVisibilityConverter}}">
                             <TextBlock Text="Duration (s)" FontSize="{DynamicResource InperNormalFontSize}" VerticalAlignment="Center"/>
-                            <TextBox Style="{StaticResource TextBoxBaseStyle}" Padding="3 0 0 0" Height="25" VerticalContentAlignment="Center" Width="120" Margin="20 0 0 0" hc:BorderElement.CornerRadius="2" Text="{Binding ElementName=outputMode,Path=SelectedValue.Duration,Mode=TwoWay}"/>
+                            <inper:InperTextBox InperVerify="True" InperTextType="Int" InperMinValue="1" InperMaxValue="9999" Style="{StaticResource TextBoxBaseStyle}" Name="zoneDuration1" Padding="3 0 0 0" Height="25" VerticalContentAlignment="Center" Width="120" Margin="20 0 0 0" hc:BorderElement.CornerRadius="2" Text="{Binding ElementName=outputMode,Path=SelectedValue.Duration,Mode=OneWay}"/>
                         </WrapPanel>
                         <StackPanel Grid.Row="2" Margin="0 10 0 0" Visibility="{Binding ElementName=stayCondition,Path=Visibility,Converter={StaticResource VisibilityToVisibilityReConverter}}">
-                            <RadioButton GroupName="zone" IsChecked="{Binding ElementName=outputMode,Path=SelectedValue.IsImmediately,Mode=TwoWay}" HorizontalAlignment="Left" Margin="80 5 0 0">
+                            <RadioButton GroupName="zone" Name="zoneImmediately1" IsChecked="{Binding ElementName=outputMode,Path=SelectedValue.IsImmediately,Mode=OneWay}" HorizontalAlignment="Left" Margin="80 5 0 0">
                                 <TextBlock Text="Immediately" FontSize="{DynamicResource InperNormalFontSize}"/>
                             </RadioButton>
-                            <RadioButton GroupName="zone" Margin="80 10 0 0" Name="outputZone" HorizontalAlignment="Left" IsChecked="{Binding ElementName=outputMode,Path=SelectedValue.IsDelay,Mode=TwoWay}">
+                            <RadioButton GroupName="zone" Margin="80 10 0 0" Name="outputZone" HorizontalAlignment="Left" IsChecked="{Binding ElementName=outputMode,Path=SelectedValue.IsDelay,Mode=OneWay}">
                                 <WrapPanel>
                                     <TextBlock VerticalAlignment="Center" Text="Delay (s)" FontSize="{DynamicResource InperNormalFontSize}"/>
-                                    <TextBox Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" Height="25" VerticalContentAlignment="Center" Width="60" Margin="12 0 0 0" IsEnabled="{Binding ElementName=outputZone,Path=IsChecked}" Text="{Binding ElementName=outputMode,Path=SelectedValue.DelaySeconds,Mode=TwoWay}"/>
+                                    <inper:InperTextBox InperVerify="True" Name="zoneDelaySeconds1" InperMaxValue="9999" InperMinValue="1" InperTextType="Int" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" TextAlignment="Center" Padding="0 0 0 0" MinHeight="25" VerticalContentAlignment="Center" Width="60" Margin="12 0 0 0" IsEnabled="{Binding ElementName=outputZone,Path=IsChecked}" Text="{Binding ElementName=outputMode,Path=SelectedValue.DelaySeconds,Mode=OneWay}"/>
                                 </WrapPanel>
                             </RadioButton>
                         </StackPanel>
@@ -191,7 +191,7 @@
                 </Grid>
                 <!--markerZone-->
                 <Grid Visibility="{Binding EventType,Converter={StaticResource EventTypeConverter}}">
-                    <Grid Margin="0 20 0 0" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource ZoneVisibilityConverter}}">
+                    <Grid Margin="0 20 0 0" x:Name="markerzoneVisibility" Visibility="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.Name,Converter={StaticResource ZoneVisibilityConverter}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
@@ -202,33 +202,33 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2.2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Mode" FontSize="{DynamicResource InperNormalFontSize}" Grid.Column="0" VerticalAlignment="Center"/>
-                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Name="markerMode" SelectionChanged="{s:Action MarkerMode_SelectionChanged}" ItemsSource="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.VideoZone.AllZoneConditions}" DisplayMemberPath="ZoneName"/>
+                            <TextBlock Text="{DynamicResource marker_mode1}" FontSize="{DynamicResource InperNormalFontSize}" Grid.Column="0" VerticalAlignment="Center"/>
+                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" FontSize="{StaticResource InperNormalFontSize}" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Padding="3 0" Name="markerMode" SelectionChanged="{s:Action MarkerMode_SelectionChanged}" ItemsSource="{Binding ElementName=MarkerChannelCombox,Path=SelectedItem.VideoZone.AllZoneConditions}" DisplayMemberPath="ZoneName" SelectedIndex="0"/>
                         </Grid>
                         <Grid Grid.Row="1" Margin="0 20 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2.2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock FontSize="{DynamicResource InperNormalFontSize}" Text="Detail" VerticalAlignment="Center"/>
-                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Name="zoneConditions" Text="{Binding ElementName=markerMode,Path=SelectedValue.Type,Mode=TwoWay}">
-                                <ComboBoxItem IsSelected="True">Enter</ComboBoxItem>
+                            <TextBlock FontSize="{DynamicResource InperNormalFontSize}" Text="{DynamicResource marker_detail1}" VerticalAlignment="Center"/>
+                            <ComboBox Height="25" hc:BorderElement.CornerRadius="2" SelectionChanged="{s:Action ZoneConditions_SelectionChanged}" FontSize="{StaticResource InperNormalFontSize}" Padding="5 0" Style="{StaticResource InperComboBoxBaseStyle}" Grid.Column="1" Margin="0 0 20 0" Name="zoneConditions">
+                                <ComboBoxItem>Enter</ComboBoxItem>
                                 <ComboBoxItem>Leave</ComboBoxItem>
                                 <ComboBoxItem>Stay</ComboBoxItem>
                             </ComboBox>
                         </Grid>
                         <WrapPanel HorizontalAlignment="Center" Name="stayCondition1" Grid.Row="2" Margin="16 15 0 0" Visibility="{Binding ElementName=zoneConditions,Path=SelectedItem.Content,Converter={StaticResource ZoneConditionVisibilityConverter}}">
                             <TextBlock Text="Duration (s)" FontSize="{DynamicResource InperNormalFontSize}" VerticalAlignment="Center"/>
-                            <TextBox VerticalContentAlignment="Center" Width="120" Margin="20 0 0 0" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" Height="25" Text="{Binding ElementName=markerMode,Path=SelectedValue.Duration,Mode=TwoWay}"/>
+                            <inper:InperTextBox VerticalContentAlignment="Center" TextAlignment="Center" Width="120" Margin="20 0 0 0" InperVerify="True" InperMinValue="1" InperTextType="Int" InperMaxValue="9999" Name="zoneDuration" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" Height="25" Text="{Binding ElementName=markerMode,Path=SelectedValue.Duration,Mode=OneWay}"/>
                         </WrapPanel>
                         <StackPanel Grid.Row="2" Margin="0 10 0 0" Visibility="{Binding ElementName=stayCondition1,Path=Visibility,Converter={StaticResource VisibilityToVisibilityReConverter}}">
-                            <RadioButton GroupName="zone"  IsChecked="{Binding ElementName=markerMode,Path=SelectedValue.IsImmediately,Mode=TwoWay}" HorizontalAlignment="Left" Margin="80 5 0 0">
+                            <RadioButton GroupName="zone" Name="zoneImmediately" IsChecked="{Binding ElementName=markerMode,Path=SelectedValue.IsImmediately,Mode=OneWay}" HorizontalAlignment="Left" Margin="80 5 0 0">
                                 <TextBlock Text="Immediately" FontSize="{DynamicResource InperNormalFontSize}"/>
                             </RadioButton>
-                            <RadioButton GroupName="zone" Margin="80 10 0 0" Name="markerZone" HorizontalAlignment="Left" IsChecked="{Binding ElementName=markerMode,Path=SelectedValue.IsDelay,Mode=TwoWay}">
+                            <RadioButton GroupName="zone" Margin="80 10 0 0" Name="markerZone" HorizontalAlignment="Left" IsChecked="{Binding ElementName=markerMode,Path=SelectedValue.IsDelay,Mode=OneWay}">
                                 <WrapPanel>
                                     <TextBlock VerticalAlignment="Center" Text="Delay (s)" FontSize="{DynamicResource InperNormalFontSize}"/>
-                                    <TextBox VerticalContentAlignment="Center" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="3 0 0 0" Height="25" Width="60" Margin="12 0 0 0" IsEnabled="{Binding ElementName=markerZone,Path=IsChecked}" Text="{Binding ElementName=markerMode,Path=SelectedValue.DelaySeconds,Mode=TwoWay}" />
+                                    <inper:InperTextBox Name="zoneDelaySeconds" VerticalContentAlignment="Center" InperVerify="True" InperMaxValue="9999" InperMinValue="1" InperTextType="Int" TextAlignment="Center" Style="{StaticResource TextBoxBaseStyle}" hc:BorderElement.CornerRadius="2" Padding="0 0 0 0" MinHeight="25" Width="60" Margin="12 0 0 0" IsEnabled="{Binding ElementName=markerZone,Path=IsChecked}" Text="{Binding ElementName=markerMode,Path=SelectedValue.DelaySeconds,Mode=OneWay}" />
                                 </WrapPanel>
                             </RadioButton>
                         </StackPanel>

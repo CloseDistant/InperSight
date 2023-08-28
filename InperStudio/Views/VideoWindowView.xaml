@@ -28,8 +28,8 @@
         </Button>-->
         <!--<Viewbox Stretch="Uniform">-->
         <Grid Background="{DynamicResource InperTitlePageColor}">
-            <Canvas x:Name="drawCanvas" Panel.ZIndex="9"/>
-            <Image Grid.Row="0" Name="image" Stretch="Uniform" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}"  />
+            <Canvas x:Name="drawCanvas" Panel.ZIndex="9"  Width="{Binding ElementName=image,Path=ActualWidth}" Height="{Binding ElementName=image,Path=ActualHeight}"/>
+            <Image Grid.Row="0" Name="image" Stretch="Uniform" Source="{Binding BehaviorRecorderKit.WriteableBitmap,UpdateSourceTrigger=PropertyChanged}" SizeChanged="{s:Action Image_SizeChanged}" />
             <TextBlock Visibility="Collapsed" Style="{StaticResource TextBlockBaseStyle}" Foreground="OrangeRed" FontFamily="雅黑" FontWeight="DemiBold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10 10 0 0" Text="{Binding BehaviorRecorderKit.Time,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource VideoIntToTIme}}"/>
         </Grid>
         <!--</Viewbox>-->

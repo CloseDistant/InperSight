@@ -142,7 +142,7 @@
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <sc:SciChartSurface Background="Transparent" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis}" RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
+                    <sc:SciChartSurface Background="Transparent" LeftAxesPanelTemplate="{StaticResource YAxesPanel}" sc:SciChartGroup.VerticalChartGroup="SyncedChartsSameAxisSizes" XAxis="{Binding TimeSpanAxis,UpdateSourceTrigger=PropertyChanged}" RenderableSeries="{sc:SeriesBinding RenderableSeries,UpdateSourceTrigger=PropertyChanged}" ViewportManager="{Binding ViewportManager,UpdateSourceTrigger=PropertyChanged}"  x:Name="sciChartSurface" >
                         <sc:SciChartSurface.YAxes>
                             <sc:NumericAxis Id="Ch0" Margin="0 5 0 0" Visibility="{Binding S0Visible,Converter={StaticResource Boolean2VisibilityConverter}}" TickLabelStyle="{StaticResource LeftAxisLabelStyle}" DrawMajorBands="False" GrowBy="0.1,0.1" Grid.Row="6" Grid.Column="0" Width="60" 
                                 DrawMajorGridLines="False"
