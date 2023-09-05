@@ -342,9 +342,9 @@ namespace InperStudio.ViewModels
                         : this.view.ConditionsCombox.SelectedItem as EventChannel;
                     if (ch.Type == ChannelTypeEnum.Zone.ToString())
                     {
-                        if (!tb.Text.StartsWith(ch.Name))
+                        if (!tb.Text.StartsWith(ch.SymbolName + "-"))
                         {
-                            tb.Text = ch.Name + "-";
+                            tb.Text = ch.SymbolName + "-";
                             tb.SelectionStart = tb.Text.Length;
                         }
                     }
@@ -580,7 +580,7 @@ namespace InperStudio.ViewModels
                 var name = ((sender as System.Windows.Controls.ComboBox).SelectedItem as ZoneConditions).ZoneName;
                 if (item.Type == ChannelTypeEnum.Zone.ToString() && @enum == EventSettingsTypeEnum.Marker)
                 {
-                    view.MarkerName.Text = item.SymbolName + "-" + name;
+                    view.MarkerName.Text = item.SymbolName + "-" + name + "-" + view.zoneConditions.Text;
                     //view.MarkerName.IsEnabled = false;
                 }
                 else
@@ -1099,7 +1099,13 @@ namespace InperStudio.ViewModels
                                         Type = view.zoneConditions.Text,
                                         ZoneName = conditions.ZoneName,
                                     });
-                                    channle2.ChannelId = new Random().Next(999, 999999);
+                                    int id = new Random().Next(999, 999999);
+
+                                    if (InperGlobalClass.EventSettings.Channels.Count(x => x.ChannelId == id) > 0)
+                                    {
+                                        id = new Random().Next(999, 999999);
+                                    }
+                                    channle2.ChannelId = id;
                                 }
                                 else
                                 {
@@ -1128,7 +1134,13 @@ namespace InperStudio.ViewModels
                                         Type = view.zoneConditions1.Text,
                                         ZoneName = conditions.ZoneName,
                                     });
-                                    channle2.Condition.ChannelId = new Random().Next(999, 999999);
+                                    int id = new Random().Next(999, 999999);
+
+                                    if (InperGlobalClass.EventSettings.Channels.Count(x => x.Condition.ChannelId == id || x.ChannelId == id) > 0)
+                                    {
+                                        id = new Random().Next(999, 999999);
+                                    }
+                                    channle2.Condition.ChannelId = id;
                                 }
                                 ch.IsActive = mc.IsActive = false;
                                 InperGlobalClass.EventSettings.Channels.Add(channle2);
@@ -1207,15 +1219,15 @@ namespace InperStudio.ViewModels
                         {
                             if (zone.IsImmediately)
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Type:" + zone.Type };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Detail:" + zone.Type };
                             }
                             if (zone.IsDelay)
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Type:" + zone.Type + " Delay:" + zone.DelaySeconds };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Detail:" + zone.Type + " Delay:" + zone.DelaySeconds };
                             }
                             if (zone.Type == ChannelTypeEnum.Stay.ToString())
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Type:" + zone.Type + " Duration:" + zone.Duration };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + channel.SymbolName + " Detail:" + zone.Type + " Duration:" + zone.Duration };
                             }
                         }
                     }
@@ -1242,15 +1254,15 @@ namespace InperStudio.ViewModels
                         {
                             if (zone.IsImmediately)
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + channel.Condition.Type };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Detail:" + channel.Condition.Type };
                             }
                             if (zone.IsDelay)
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + channel.Condition.Type + " Delay:" + zone.DelaySeconds };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Detail:" + channel.Condition.Type + " Delay:" + zone.DelaySeconds };
                             }
                             if (zone.Type == ChannelTypeEnum.Stay.ToString())
                             {
-                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Type:" + channel.Condition.Type + " Duration:" + zone.Duration };
+                                (sender as Grid).ToolTip = new TextBlock() { Text = "Zone:" + zone.ZoneName + " Detail:" + channel.Condition.Type + " Duration:" + zone.Duration };
                             }
                         }
                     }

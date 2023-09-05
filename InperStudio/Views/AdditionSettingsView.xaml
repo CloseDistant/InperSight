@@ -158,7 +158,7 @@
         <Grid x:Name="video" Visibility="Collapsed" Margin="0 0 0 5">
             <WrapPanel Margin="300 114 0 0" Height="13" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="{Binding ElementName=animal_tracking,Path=IsChecked,Converter={StaticResource Boolean2VisibilityConverter}}">
                 <Image Source="/Lib/Images/New/plaint.png" Name="_remainder" Cursor="Hand" Width="13" Height="13" Margin="10 0 0 0"/>
-                <TextBlock Margin="5 0 0 0" Name="_remainderText" Text="{DynamicResource video_setting_remainder}" FontSize="12" FontFamily="{StaticResource InperFontFamily}" Foreground="#909090">
+                <TextBlock Margin="5 0 0 0" Name="_remainderText" Text="{DynamicResource video_setting_remainder}" FontSize="11" FontFamily="{StaticResource InperFontFamily}" Foreground="#909090">
                     <TextBlock.Visibility>
                         <MultiBinding Converter="{StaticResource CombinedVisibilityConverter}">
                             <Binding ElementName="framrate" Path="IsDropDownOpen" UpdateSourceTrigger="PropertyChanged" />
@@ -216,7 +216,7 @@
                             <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{DynamicResource video_setting_frame_rate}"  FontSize="14"/>
                             <WrapPanel Grid.Column="1" HorizontalAlignment="Left" Margin="0 0 0 0">
                                 <ComboBox Margin="20 0 0 0" Style="{StaticResource InperComboBoxBaseStyle}" Height="25" hc:BorderElement.CornerRadius="2 0 0 2" FontSize="{StaticResource InperNormalFontSize}" HorizontalAlignment="Left" Width="130" SelectedIndex="0" ItemsSource="{Binding ElementName=CameraCombox,Path=SelectedItem.CapabilyItems,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="FrameSizeStr" x:Name="framrate" SelectionChanged="{s:Action FramerateChanged}" />
-                                <hc:TextBox Margin="0 0 0 0" hc:BorderElement.CornerRadius="0 2 2 0" IsEnabled="False" Text="{Binding ElementName=framrate,Path=SelectedItem.AverageFrameRate,Mode=OneWay}" Style="{DynamicResource InperTextBoxBaseStyle}" TextAlignment="Center" Height="25" Padding="0" VerticalContentAlignment="Center" FontSize="{StaticResource InperNormalFontSize}" Width="50" HorizontalAlignment="Right"/>
+                                <hc:TextBox Margin="0 0 0 0" hc:BorderElement.CornerRadius="0 2 2 0" IsEnabled="False" Text="{Binding ElementName=framrate,Path=SelectedItem.AverageFrameRate}" Style="{DynamicResource InperTextBoxBaseStyle}" TextAlignment="Center" Height="25" Padding="0" VerticalContentAlignment="Center" FontSize="{StaticResource InperNormalFontSize}" Width="50" HorizontalAlignment="Right"/>
                             </WrapPanel>
                         </Grid>
                     </Grid>
@@ -340,7 +340,7 @@
                     </Grid.RowDefinitions>
                     <StackPanel Margin="0 100 0 0" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
                         <TextBlock HorizontalAlignment="Center" Text="{DynamicResource video_setting_name}"  FontSize="14" />
-                        <TextBox Margin="0 10" Style="{StaticResource TextBoxBaseStyle}" FontSize="{StaticResource InperNormalFontSize}" x:Name="CameraName" PreviewTextInput="{s:Action CameraName_PreviewTextInput}" Text="Video-" HorizontalAlignment="Right"  Width="120" />
+                        <TextBox Margin="0 10" Style="{StaticResource TextBoxBaseStyle}" FontSize="{StaticResource InperNormalFontSize}" x:Name="CameraName" PreviewTextInput="{s:Action CameraName_PreviewTextInput}" TextChanged="{s:Action CameraName_TextChanged}" Text="Video-" HorizontalAlignment="Right"  Width="120" />
                     </StackPanel>
                     <Grid Grid.Row="1">
                         <Button Cursor="Hand" BorderThickness="0" VerticalAlignment="Top" x:Name="rightMove" Command="{s:Action CameraMove}" CommandParameter="rightMove" hc:IconElement.Geometry="{DynamicResource RightGeometry}" Width="40" Height="30" Style="{DynamicResource ButtonPrimary}" Background="{DynamicResource InperTheme}" ></Button>

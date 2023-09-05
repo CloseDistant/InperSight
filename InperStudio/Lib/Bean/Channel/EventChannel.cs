@@ -76,11 +76,16 @@ namespace InperStudio.Lib.Bean.Channel
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            long time = 0;
+            lock (InperDeviceHelper.Instance._timeLock)
+            {
+                time = InperDeviceHelper.Instance.time / 100;
+            }
             InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
             {
                 Color = channelJson.BgColor,
                 IsIgnore = IsIgnore,
-                CameraTime = InperDeviceHelper.Instance.time / 100,
+                CameraTime = time,
                 ChannelId = channelJson.ChannelId,
                 CreateTime = DateTime.Now,
                 Name = channelJson.Name,
@@ -109,11 +114,16 @@ namespace InperStudio.Lib.Bean.Channel
         {
             if (!isStayAndDrawMarker)
             {
+                long time = 0;
+                lock (InperDeviceHelper.Instance._timeLock)
+                {
+                    time = InperDeviceHelper.Instance.time / 100;
+                }
                 InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
                 {
                     Color = channelJson.BgColor,
                     IsIgnore = IsIgnore,
-                    CameraTime = InperDeviceHelper.Instance.time / 100,
+                    CameraTime = time,
                     ChannelId = channelJson.ChannelId,
                     CreateTime = DateTime.Now,
                     Name = channelJson.Name,
@@ -128,11 +138,16 @@ namespace InperStudio.Lib.Bean.Channel
 
         public void ImmediatelyDrawMarker(EventChannelJson x, bool isIgnore)
         {
+            long time = 0;
+            lock (InperDeviceHelper.Instance._timeLock)
+            {
+                time = InperDeviceHelper.Instance.time / 100;
+            }
             InperDeviceHelper.Instance.SetMarkers(new BaseMarker()
             {
                 Color = x.BgColor,
                 IsIgnore = isIgnore,
-                CameraTime = InperDeviceHelper.Instance.time / 100,
+                CameraTime = time,
                 ChannelId = x.ChannelId,
                 CreateTime = DateTime.Now,
                 Name = x.Name,

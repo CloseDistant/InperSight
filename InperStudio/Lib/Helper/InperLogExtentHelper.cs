@@ -176,7 +176,7 @@ namespace InperStudio.Lib.Helper
                     {
                         { "createtime", DateTime.Now },
                         { "error_level",0},
-                        { "error_message",ex.Message + "@页面" + errorPage + "@行号" + lineNumber},
+                        { "error_message",ex.Message + "@页面" + errorPage + "@行号" + lineNumber+"@版本号："+InperConfig.Instance.Version},
                         { "snumber",InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString()},
                         { "is_dispose",1 },
                         { "type",0}
@@ -442,7 +442,7 @@ namespace InperStudio.Lib.Helper
                         if (apires != null && apires.Code == 401)
                         {
                             var res = HttpClientHelper.Get("Token/login?number=" + InperDeviceHelper.Instance.device.PhotometryInfo.SN.ToString());
-                            if (res != null && res.Success && res.Data!=null)
+                            if (res != null && res.Success && res.Data != null)
                             {
                                 token = res.Data.ToString();
                                 DeviceModuleUseCountSet();

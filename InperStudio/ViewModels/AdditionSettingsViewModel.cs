@@ -610,7 +610,7 @@ namespace InperStudio.ViewModels
                     {
                         index = selectCameraItem.CapabilyItems.IndexOf(accordResolutionInfo);
                     }
-                    selectCameraItem.Reset(selectCameraItem.CapabilyItems[index]);
+                    //selectCameraItem.Reset(selectCameraItem.CapabilyItems[index]);
                     view.framrate.SelectedIndex = index;
                 }
                 view.CameraName.Text = "Video-" + (UsedKits.Count + 1);
@@ -657,7 +657,7 @@ namespace InperStudio.ViewModels
             {
                 if (view.framrate.SelectedItem != null && selectCameraItem != null)
                 {
-                    //selectCameraItem.Reset(view.framrate.SelectedItem as AccordResolutionInfo);
+                    selectCameraItem.Reset(view.framrate.SelectedItem as AccordResolutionInfo);
                     ClearZone();
                 }
             }
@@ -817,6 +817,24 @@ namespace InperStudio.ViewModels
                 {
                     tb.Text = tb.Text.Substring(0, 15);
                     tb.SelectionStart = tb.Text.Length;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                InperLogExtentHelper.LogExtent(ex, this.GetType().Name);
+            }
+        }
+        public void CameraName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            try
+            {
+                System.Windows.Controls.TextBox tb = sender as System.Windows.Controls.TextBox;
+                if (tb.Text.Length < 6 || !tb.Text.StartsWith("Video-"))
+                {
+                    tb.Text = "Video-";
+                    tb.SelectionStart = tb.Text.Length;
+                    //Growl.Warning(new GrowlInfo() { Message = "固定字符串，请勿修改", Token = "SuccessMsg", WaitTime = 1 });
                     return;
                 }
             }
@@ -1190,7 +1208,7 @@ namespace InperStudio.ViewModels
                     string text = "Zone的数量不超过16个！";
                     if (InperConfig.Instance.Language == "en_us")
                     {
-                        text = "The number of zones does not exceed 16!";
+                        text = "The number of Zones should be less than 16.";
                     }
                     InperGlobalClass.ShowReminderInfo(text);
                     return;

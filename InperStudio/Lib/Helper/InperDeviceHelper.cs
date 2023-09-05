@@ -193,7 +193,12 @@ namespace InperStudio.Lib.Helper
                 {
                     if (InperGlobalClass.IsRecord)
                     {
-                        Task.Factory.StartNew(() => { SetIntervalData(time / 100, 0); });
+                        long _time = 0;
+                        lock (_timeLock)
+                        {
+                            _time = time / 100;
+                        }
+                        Task.Factory.StartNew(() => { SetIntervalData(_time / 100, 0); });
                     }
                     LightWaveLength.ToList().ForEach(x =>
                     {
@@ -216,7 +221,12 @@ namespace InperStudio.Lib.Helper
                     next_Interval = InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000 == 0 ? 5 * 1000 : InperGlobalClass.CameraSignalSettings.RecordMode.Duration * 1000;
                     if (InperGlobalClass.IsRecord)
                     {
-                        Task.Factory.StartNew(() => { SetIntervalData(time / 100, 1); });
+                        long _time = time / 100;
+                        lock (_timeLock)
+                        {
+                            _time = time / 100;
+                        }
+                        Task.Factory.StartNew(() => { SetIntervalData(_time / 100, 1); });
                     }
                 }
                 _Metronome.Interval = next_Interval;
@@ -291,7 +301,10 @@ namespace InperStudio.Lib.Helper
                             if (_eventIsFirst)
                             {
                                 _EventStartTime = (long)dev.Timestamp;
-                                synTime = time / 100;
+                                lock (_timeLock)
+                                {
+                                    synTime = time / 100;
+                                }
                                 _eventIsFirst = false;
                             }
                             Input input = new Input() { ChannelId = (int)dev.IOID, Index = (int)dev.Index, CameraTime = synTime + (long)dev.Timestamp - _EventStartTime, Value = dev.Status, CreateTime = DateTime.Now };
@@ -488,6 +501,7 @@ namespace InperStudio.Lib.Helper
         private int _cameraSkipCount = 0;
         public object _FrameProcLock = new object();
         //private ConcurrentDictionary<int, double[]> _defectValues;
+        public object _timeLock = new object(); // 定义一个用于锁的对象
         public async void FrameProc()
         {
             while (!_frameProcTaskTokenSource.Token.IsCancellationRequested)
@@ -498,7 +512,11 @@ namespace InperStudio.Lib.Helper
                     if (m != null)
                     {
                         long ts = m.Timestamp - _PlottingStartTime;
-                        time = ts;
+                        lock (_timeLock)
+                        {
+                            time = ts;
+                        }
+
                         ConcurrentBag<string> values = new ConcurrentBag<string>();
                         ConcurrentDictionary<int, double> _poltValues = new ConcurrentDictionary<int, double>();
                         if (Monitor.TryEnter(_FrameProcLock))
@@ -576,12 +594,15 @@ namespace InperStudio.Lib.Helper
                         {
                             _cameraSkipCountArray[m.Group]++;
                         }
-                        AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
-                        if (InperGlobalClass.IsRecord)
+                        if (values.Count > 0)
                         {
-                            InperGlobalClass.RunTime = new DateTime(ts / 100, DateTimeKind.Unspecified);
-                            SaveDatas.Enqueue(allChannelRecord); //mask.ChannelId, m.Group, r, ts, mask.Type
-                            _ = Task.Run(() => { SaveImageData(); });
+                            AllChannelRecord allChannelRecord = new AllChannelRecord() { CameraTime = ts, CreateTime = DateTime.Now, Type = m.Group, Value = string.Join(" ", values.ToArray()) };
+                            if (InperGlobalClass.IsRecord)
+                            {
+                                InperGlobalClass.RunTime = new DateTime(ts / 100, DateTimeKind.Unspecified);
+                                SaveDatas.Enqueue(allChannelRecord); //mask.ChannelId, m.Group, r, ts, mask.Type
+                                _ = Task.Run(() => { SaveImageData(); });
+                            }
                         }
                     }
                     else
